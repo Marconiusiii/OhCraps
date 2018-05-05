@@ -96,8 +96,8 @@ def line():
 			dcome = raw_input("$>")
 			continue
 		elif lb == 6:
-			print "How  much would you like to put down for your Pass Line Odds?"
-			passOdds = raw_input("$> ")
+			print "How much for your Pass Line Odds?"
+			passOdds = input("$>")
 			continue
 		elif lb == 7:
 			print "Finished betting."
@@ -158,7 +158,7 @@ def hard():
 		hChoice = input("Pick a number!")
 		if hChoice == 1:
 			h4 = input("$>")
-			print "YOu bet $%d on Hard 4." %h4
+			print "You bet $%d on Hard 4." %h4
 			continue
 		elif hChoice == 2:
 			print "How much on hard 6?"
@@ -199,7 +199,7 @@ def single():
 		if sChoice == 1:
 			print "How much on C&E?"
 			ce = input("$>")
-			print "GOt it, $%d on Craps and Eleven." %ce
+			print "Got it, $%d on Craps and Eleven." %ce
 			continue
 		elif sChoice == 2:
 			print "How much on Any 7?"
@@ -238,12 +238,6 @@ def single():
 			print "Did you forget to make a choice?"
 			continue
 	return ce, any7, snake, three, boxcars, horn, anyCraps
-# Bet init
-
-lineBets = [0, 0, 0, 0, 0, 0]
-placeBets = [0, 0, 0, 0, 0, 0]
-hardBets = [0, 0, 0, 0]
-singleBets = [0, 0, 0, 0, 0, 0, 0]
 
 # Full Betting Engine
 
@@ -274,19 +268,19 @@ def bet(lineBets, placeBets, hardBets, singleBets):
 # Checking line bets
 def lineCheck(roll, bank, comingOut):
 	if lineBets[0] > 0 and pointOn == False:
-		if roll == 7 or roll == 11:
+		if roll in {7, 11}:
 			print "Pass Line winner! $%d coming your way." %lineBets[0]
 			bank += lineBets[0]
-		elif roll == 2 or roll == 3 or roll == 12:
+		elif roll in {2, 3, 12}:
 			print "Pass Line loses! You lost $%d." %lineBets[0]
 			bank -= lineBets[0]
 		else:
 			pass
 	if lineBets[1] > 0 and pointOn == False:
-		if roll == 7 or roll == 11:
+		if roll in {7, 11}:
 			print "YOu lost $%d from the Don't Pass Line." %lineBets[1]
 			bank -= lineBets[1]
-		elif roll == 2 or roll == 3 or roll == 12:
+		elif roll in {2, 3, 12}:
 			print "You win $%d on the Don't Pass Line! $%d coming your way." %lineBets[1]
 		else:
 			pass
@@ -299,14 +293,15 @@ def lineCheck(roll, bank, comingOut):
 # 4, 10 = x2
 # 5, 9 = x1.5
 # 6, 8 = x1.2
-			if roll == 4 or roll == 10:
+			if roll in {4, 10}:
 				plOdds = lineBets[5] * 2
-			elif roll == 5 or roll == 9:
+			elif roll in {5, 9}:
 				plOdds = lineBets[5] * 1.5
-			elif roll == 6 or roll == 8:
+			elif roll in {6, 8}:
 				plOdds = lineBets[5] * 1.2
 			plWin = lineBets[0] + plOdds
 			print "We have a Pass Line winner! $%d coming your way!" %plWin
+			bank += plWin
 		else:
 			pass
 		if lineBets[1] > 0 and pointOn == True:
@@ -328,7 +323,7 @@ def fieldCheck(roll, bank):
 		elif roll == 12:
 			print "Tripled your money on the Field! Here comes $%d your way." %(lineBets[2] * 3)
 			bank += lineBets[2] * 3
-		elif roll == 5 or roll == 6 or roll == 7 or roll == 8:
+		elif roll in {5, 6, 7, 8}:
 			print "You lose your Field bet."
 			bank -= lineBets[2]
 		else:
@@ -352,7 +347,14 @@ print "Great, starting off with $%d." %bank
 while True:
 	print "you have $%d left in your bank." %bank
 	pointOn = False
-	betReset()
+
+# Bet init
+
+	lineBets = [0, 0, 0, 0, 0, 0]
+	placeBets = [0, 0, 0, 0, 0, 0]
+	hardBets = [0, 0, 0, 0]
+	singleBets = [0, 0, 0, 0, 0, 0, 0]
+
 	print "Place your bets!"
 
 	lineBets, placeBets, hardBets, singleBets = bet(lineBets, placeBets, hardBets, singleBets)
@@ -370,7 +372,7 @@ while True:
 	elif comingOut == 11:
 		print "Yo 11 Winner!"
 		continue
-	elif comingOut == 2 or comingOut == 3 or comingOut == 12:
+	elif comingOut in {2, 3, 12}:
 		print "Craps!"
 		continue
 	else:
@@ -394,10 +396,10 @@ while True:
 						bank += hardBets[0] * 8
 						print "You won $%d from your Hard 4 bet." %(hardBets[0] * 8)
 					if p2 == 6 and hardBets[1] > 0:
-						bank += hardBets[1] * 8
-						print "You won $%d from your Hard 6 bet." %(hardBets[1] * 8)
+						bank += hardBets[1] * 10
+						print "You won $%d from your Hard 6 bet." %(hardBets[1] * 10)
 					if p2 == 8 and hardBets[2] > 0:
-						bank += hardBets[2] * 8
+						bank += hardBets[2] * 10
 						print "You won $%d from your Hard 8 bet." %(hardBets[2] * 8)
 					if p2 == 10 and hardBets[3] > 0:
 						bank += hardBets[3] * 8

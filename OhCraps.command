@@ -265,29 +265,41 @@ def bet(lineBets, placeBets, hardBets, singleBets):
 			continue
 	return lineBets, placeBets, hardBets, singleBets
 
+# Bet Array Summation
+
+def betSum(array):
+	count = 0
+	for i in array:
+		count += i
+	return count
+
+
 # Checking line bets
-def lineCheck(roll, bank, comingOut):
+def lineCheck(lineBets, pointOn, roll, comingOut):
+	payout = 0
 	if lineBets[0] > 0 and pointOn == False:
 		if roll in {7, 11}:
 			print "Pass Line winner! $%d coming your way." %lineBets[0]
-			bank += lineBets[0]
+			payout += lineBets[0]
 		elif roll in {2, 3, 12}:
 			print "Pass Line loses! You lost $%d." %lineBets[0]
-			bank -= lineBets[0]
+			payout -= lineBets[0]
 		else:
 			pass
 	if lineBets[1] > 0 and pointOn == False:
 		if roll in {7, 11}:
-			print "YOu lost $%d from the Don't Pass Line." %lineBets[1]
-			bank -= lineBets[1]
+			print "You lost $%d from the Don't Pass Line." %lineBets[1]
+			payout -= lineBets[1]
 		elif roll in {2, 3, 12}:
 			print "You win $%d on the Don't Pass Line! $%d coming your way." %lineBets[1]
+			payout += lineBets[1]
 		else:
 			pass
 
 	if lineBets[0] > 0 and pointOn == True:
 		if roll == 7:
 			print "You lost $%d from the Pass Line." %lineBets[0]
+			payout -= lineBets[0] + lineBets[5]
 		elif roll == comingOut:
 # Pass Line Odds
 # 4, 10 = x2
@@ -301,34 +313,35 @@ def lineCheck(roll, bank, comingOut):
 				plOdds = lineBets[5] * 1.2
 			plWin = lineBets[0] + plOdds
 			print "We have a Pass Line winner! $%d coming your way!" %plWin
-			bank += plWin
+			payout += plWin
 		else:
 			pass
 		if lineBets[1] > 0 and pointOn == True:
 			if roll == 7:
 				print "Don't Pass wins! $%d coming to you." %lineBets[1]
-				bank += lineBets[1]
+				payout += lineBets[1]
 			elif roll == comingOut:
 				print "You lost $%d from the Don't Pass Line." %lineBets[1]
-				bank -= lineBets[1]
+				payout -= lineBets[1]
 			else:
 				pass
+# Field Bet
 
-
-def fieldCheck(roll, bank):
 	if lineBets[2] > 0:
 		if roll == 2:
 			print "You win Double on the Field! $%d coming your way." %(lineBets[2] * 2)
-			bank += lineBets[2] * 2
+			payout += lineBets[2] * 2
 		elif roll == 12:
 			print "Tripled your money on the Field! Here comes $%d your way." %(lineBets[2] * 3)
-			bank += lineBets[2] * 3
+			payout += lineBets[2] * 3
 		elif roll in {5, 6, 7, 8}:
 			print "You lose your Field bet."
-			bank -= lineBets[2]
+			payout -= lineBets[2]
 		else:
 			print "You win on the Field! $%d to you!" %lineBets[2]
-			bank += lineBets[2]
+			payout += lineBets[2]
+
+	return payout
 
 # Begin game
 
@@ -364,17 +377,13 @@ while True:
 
 	comingOut, p1hardWay = roll(pointOn)
 
-	lineCheck(comingOut, bank, comingOut)
-	fieldCheck(comingOut, bank)
+	bank += lineCheck(lineBets, pointOn, comingOut, comingOut)
 	if comingOut == 7:
 		print "Winner!"
-		continue
 	elif comingOut == 11:
 		print "Yo 11 Winner!"
-		continue
 	elif comingOut in {2, 3, 12}:
 		print "Craps!"
-		continue
 	else:
 		pointOn = True
 		print "The point is %d!" %comingOut
@@ -384,8 +393,7 @@ while True:
 			raw_input("Hit Enter to roll again!")
 			p2, p2HardWays = roll(pointOn)
 
-			lineCheck(p2, bank, comingOut)
-			fieldCheck(p2, bank)
+			bank += lineCheck(lineBets, pointOn, p2, comingOut)
 			if p2 == 7:
 				print "That's a loss. Resetting the table."
 				break

@@ -66,7 +66,7 @@ while True:
 	pointIsOn = False
 	passLine = 0
 	dPass = 0
-	bet1 = raw_input("(p)ass or (d)on't pass?")
+	bet1 = raw_input("Pass or Don't pass?")
 	if bet1 == 'p':
 		passLine = input("How much on the Pass Line? $ >")
 		print "Great, $%d on the Pass Line." %passLine
@@ -119,8 +119,8 @@ while True:
 			fBet = raw_input("Bet the Field? y/n")
 			if fBet == 'y':
 				fieldBet = input("How much on the Field?")
-			else:
-				fieldBet = 0
+			#else:
+				#fieldBet = 0
 			#hWays = raw_input("Bet the hard ways? y/n")
 			#if hWays == 'y':
 				#hard4 = input("How much on Hard 4?")
@@ -152,32 +152,38 @@ while True:
 				win4 = (four/5) * 9
 				print "You win $%d on the place 4." %win4
 				bank += win4
-				#four = press(four)
+				if comingOut != 4:
+					four = press(four)
 			if p2 == 5 and five > 0:
 				win5 = (five/5) * 7
 				print "You win $%d on the place 5." %win5
 				bank += win5
-				#five = press(5)
+				if comingOut != 5:
+					five = press(5)
 			if p2 == 6 and six > 0:
 				print "You win $%d on the place 6." %(six/6 * 7)
 				bank += six/6 * 7
-				six = press(six)
+				if comingOut != 6:
+					six = press(six)
 
 			if p2 == 8 and eight > 0:
 				print "You win $%d on the place Eight." %(eight/6 * 7)
 				bank += eight/6 * 7
-				eight = press(eight)
+				if comingOut != 8:
+					eight = press(eight)
 			if p2 == 9 and nine > 0:
 				win9 = (nine/5) * 7
 				print "You win $%d on the place 9!" %win9
 				bank += win9
-				#nine = press(nine)
+				if comingOut != 9:
+					nine = press(nine)
 
 			if p2 == 10 and ten > 0:
 				win10 = (ten/5) * 9
 				print "You win $%d on the place 10." %win10
 				bank += win10
-				#ten = press(ten)
+				if comingOut != 10:
+					ten = press(ten)
 			if p2 == comingOut:
 				if bet1 == 'p':
 					print "You win $%d!" %passLine

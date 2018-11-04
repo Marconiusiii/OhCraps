@@ -281,7 +281,7 @@ while True:
 				if hard4 + hard6 + hard8 + hard10 > 0:
 					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
 					bank -= (hard4 + hard6 + hard8 + hard10)
-					hard4 = hard 6 = hard8 = hard10 = 0
+					hard4 = hard6 = hard8 = hard10 = 0
 				print "You lose $%d from the place bets." %(four + five + six + eight + nine + ten)
 				bank -= (four + five + six + eight + nine + ten)
 				four = five = six = eight = nine = ten = 0

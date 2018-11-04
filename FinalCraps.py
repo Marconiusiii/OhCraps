@@ -1,4 +1,5 @@
 from random import *
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = 0
 
 def roll(point):
 	hard = False
@@ -66,6 +67,7 @@ while True:
 	pointIsOn = False
 	passLine = 0
 	dPass = 0
+	fieldBet = 0
 	bet1 = raw_input("Pass or Don't pass?")
 	if bet1 == 'p':
 		passLine = input("How much on the Pass Line? $ >")
@@ -76,6 +78,10 @@ while True:
 	else:
 		print "That won't work!"
 		continue
+	fBet = raw_input("Bet the Field? y/n")
+	if fBet == 'y':
+		fieldBet = input("How much on the Field?")
+		print "Ok, $%d on the Field." %fieldBet
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
 	if comingOut in [7, 11]:
@@ -85,6 +91,12 @@ while True:
 		elif bet1 == 'd':
 			print "You lost $%d." %dPass
 			bank -= dPass
+		if comingOut == 7 and fieldBet > 0:
+			print "You lose $%d on the Field." %fieldBet
+			bank -= fieldBet
+		elif comingOut == 11 and fieldBet > 0:
+			print "You win $%d on the Field!" %fieldBet
+			bank += fieldBet
 		print "You now have $%d in your bank." %bank
 		continue
 	elif comingOut in [2, 3, 12]:
@@ -94,11 +106,27 @@ while True:
 		elif bet1 == 'd':
 			print "You win $%d!" %dPass
 			bank += dPass
+		if fieldBet > 0 and comingOut == 2:
+			print "You win double on the Field! $%d coming to you." %(fieldBet * 2)
+			bank += fieldBet * 2
+		elif fieldBet > 0 and comingOut == 12:
+			print "You win triple on the Field! $%d coming to you." %(fieldBet * 3)
+			bank += fieldBet * 3
+		elif fieldBet > 0 and comingOut == 3:
+			print "You win $%d on the Field!" %fieldBet
+			bank += fieldBet
 		print "You now have $%d in your bank." %bank
 		continue
 	else:
 		pointIsOn = True
 		print "The point is %d." %comingOut
+		if comingOut in [4, 9, 10] and fieldBet > 0:
+			print "You win $%d on the Field!" %fieldBet
+			bank += fieldBet
+		elif comingOut in [5, 6, 8] and fieldBet > 0:
+			print "You lose $%d on the Field." %fieldBet
+			bank -= fieldBet
+		
 		pOddsBet = raw_input("Odds on your Line bet? y/n")
 		if pOddsBet == 'y':
 			passOdds = input("How much for your line odds?")
@@ -114,23 +142,36 @@ while True:
 				eight = input("How much on Eight?")
 				nine = input("How much on 9?")
 				ten = input("How much on 10?")
-	
-			#comeBet = "How much on the Come bet?")
-			fBet = raw_input("Bet the Field? y/n")
+
+#Come Bet
+	#		cmBet = raw_input("Come bet? y/n")
+#			if cmBet == 'y':
+			#	comeBet = "How much on the Come bet?")
+		#		print "Ok, $%d in the Come." %comeBet
+#Field Bet
+
+			fBet = raw_input("Bet the Field? You have $%d wagered. y/n" %fieldBet)
 			if fBet == 'y':
 				fieldBet = input("How much on the Field?")
 			#else:
 				#fieldBet = 0
-			#hWays = raw_input("Bet the hard ways? y/n")
-			#if hWays == 'y':
-				#hard4 = input("How much on Hard 4?")
-				#hard6 = input("How much on Hard 6?")
-				#hard8 = input("How much on Hard 8?")
-				#hard10 = input("How much on Hard 10?")
-			#	print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
+
+#Hard Ways
+			hWays = raw_input("Bet the hard ways? y/n")
+			if hWays == 'y':
+				hard4 = input("How much on Hard 4?")
+				hard6 = input("How much on Hard 6?")
+				hard8 = input("How much on Hard 8?")
+				hard10 = input("How much on Hard 10?")
+				print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
+
 			raw_input("Hit Enter to roll again.")
 
 			p2, p2Hard = roll(pointIsOn)
+
+		#	if comeBet > 0:
+	#			come.append(p2)
+
 			if fieldBet != 0:
 				if p2 == 2:
 					print "You win double on the Field! $%d coming to you." %(fieldBet * 2)
@@ -144,9 +185,45 @@ while True:
 				else:
 					print "You lose $%d on the Field." %fieldBet
 					bank -= fieldBet
+					fieldBet = 0
 	
-#Hard Ways
-#			if p2 == 
+#Hard Ways payout
+			if p2 == 4 and p2Hard == True and hard4 > 0:
+				print "You win $%d on the Hard 4!" %(hard4 * 10)
+				bank += hard4 * 10
+			elif p2 == 4 and p2Hard == False and hard4 > 0:
+				print "You lose $%d on the Hard 4." %hard4
+				bank -= hard4
+				hard4 = 0
+			else:
+				pass
+			if p2 == 6 and p2Hard == True and hard6 > 0:
+				print "You win $%d on the Hard 6!" %(hard6 * 9)
+				bank += hard6 * 9
+			elif p2 == 6 and p2Hard == False and hard6 >0:
+				print "You lose $%d on the Hard 6." %hard6
+				bank -= hard6
+				hard6 = 0
+			else:
+				pass
+			if p2 == 8 and p2Hard == True and hard8 > 0:
+				print "You win $%d on the Hard 8!" %(hard8 * 9)
+				bank += hard8 * 9
+			elif p2 == 8 and p2Hard == False and hard8 > 0:
+				print "You lose $%d on the Hard 8." %hard8
+				bank -= hard8
+				hard8 = 0
+			else:
+				pass
+			if p2 == 10 and p2Hard == True and hard10 > 0:
+				print "You win $%d on the Hard 10!" %(hard10 * 10)
+				bank += hard10 * 10
+			elif p2 == 10 and p2Hard == False and hard10 > 0:
+				print "You lose $%d on the Hard 10." %hard10
+				bank -= hard10
+				hard10 = 0
+			else:
+				pass
 
 			if p2 == 4 and four > 0:
 				win4 = (four/5) * 9
@@ -199,9 +276,15 @@ while True:
 						bank -= passOdds
 					bank -= dPass
 				break
+#Seven Out
 			elif p2 == 7:
+				if hard4 + hard6 + hard8 + hard10 > 0:
+					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
+					bank -= (hard4 + hard6 + hard8 + hard10)
+					hard4 = hard 6 = hard8 = hard10 = 0
 				print "You lose $%d from the place bets." %(four + five + six + eight + nine + ten)
 				bank -= (four + five + six + eight + nine + ten)
+				four = five = six = eight = nine = ten = 0
 				if bet1 == 'p':
 					print "You lose $%d." %passLine
 					if passOdds > 0:

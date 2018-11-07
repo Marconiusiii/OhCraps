@@ -1,5 +1,85 @@
 from random import *
-four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = 0
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
+
+def prop():
+	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
+
+	pr1 = raw_input("Bet on Any 7?")
+	if pr1 == 'y':
+		any7 = input("How Much on Any 7? $>")
+		print "Ok, $%d on Any 7." %any7
+	pr2 = raw_input("Bet on Any Craps?")
+	if pr2 == 'y':
+		anyCraps = input("How much on Any Craps? $<")
+		print "Ok, $%d on Any Craps." %anyCraps
+	pr3 = raw_input("Bet on C&E?")
+	if pr3 == 'y':
+		cAndE = input("How much on C&E? $>")
+		print "Ok, $%d on C&E." %cAndE
+	pr4 = raw_input("Bet on Snake Eyes?")
+	if pr4 == 'y':
+		snakeEyes = input("How much on Snake Eyes? $>")
+		print "Ok, $%d on Snake Eyes." %snakeEyes
+	pr5 = raw_input("Bet on Acey-Deucey?")
+	if pr5 == 'y':
+		aceDeuce = input("How much on Acey-Deucey? $>")
+		print "Ok, $%d on Acey-Deucey." %aceDeuce
+	pr6 = raw_input("Bet on Boxcars?")
+	if pr6 == 'y':
+		boxcars = input("How much on Boxcars? $>")
+		print "Ok, $%d on Boxcars." %boxcars
+	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars
+
+def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars):
+	payout = 0
+	if any7 > 0:
+		if roll == 7:
+			print "You win $%d on Any Seven!" %(any7 * 4)
+			payout += any7 * 4
+		else:
+			print "You lose $%d on Any 7." %any7
+			payout -= any7
+	if anyCraps > 0:
+		if roll in [2, 3, 12]:
+			print "You win $%d on Any Craps!" %(anyCraps * 7)
+			payout += anyCraps * 7
+		else:
+			print "You lose $%d on Any Craps." %anyCraps
+			payout -= anyCraps
+	if cAndE > 0:
+		if roll in [2, 3, 12]:
+			print "You win $%d for your C&E bet!" %(cAndE * 3)
+			payout+= cAndE * 3
+		elif roll == 11:
+			print "You win $%d on your C&E bet!" %(cAndE * 7)
+			payout += cAndE * 7
+		else:
+			print "You lose $%d on your C&E." %cAndE
+			payout -= cAndE
+	if snakeEyes > 0:
+		if roll == 2:
+			print "You win $%d on your Aces bet!" %(snakeEyes * 31)
+			payout += snakeEyes * 31
+		else:
+			print "You lose $%d on your Aces bet." %snakeEyes
+			payout -= snakeEyes
+	if aceDeuce > 0:
+		if roll == 3:
+			print "You win $%d on your Acey-Deucey!" %(aceDeuce * 15)
+			payout += aceDeuce * 15
+		else:
+			print "You lose $%d on your Acey-Deucey." %aceDeuce
+			payout -= aceDeuce
+	if boxcars > 0:
+		if roll == 12:
+			print "You win $%d on the Boxcars!" %(boxcars * 30)
+			lpayout += boxcars * 30
+		else:
+			print "You lose $%d on the Boxcars bet." %boxcars
+			payout -= boxcars
+	return payout
+
+
 
 def roll(point):
 	hard = False
@@ -82,8 +162,13 @@ while True:
 	if fBet == 'y':
 		fieldBet = input("How much on the Field?")
 		print "Ok, $%d on the Field." %fieldBet
+	propStart = raw_input("Proposition Bets?")
+	if propStart == 'y':
+		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
+
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
+	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
@@ -94,6 +179,7 @@ while True:
 		if comingOut == 7 and fieldBet > 0:
 			print "You lose $%d on the Field." %fieldBet
 			bank -= fieldBet
+			fieldBet = 0
 		elif comingOut == 11 and fieldBet > 0:
 			print "You win $%d on the Field!" %fieldBet
 			bank += fieldBet
@@ -126,7 +212,8 @@ while True:
 		elif comingOut in [5, 6, 8] and fieldBet > 0:
 			print "You lose $%d on the Field." %fieldBet
 			bank -= fieldBet
-		
+			fieldBet = 0
+
 		pOddsBet = raw_input("Odds on your Line bet? y/n")
 		if pOddsBet == 'y':
 			passOdds = input("How much for your line odds?")
@@ -134,6 +221,7 @@ while True:
 			passOdds = 0
 		#Betting
 		while True:
+			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
 				four = input("How much on Place 4?")
@@ -164,13 +252,22 @@ while True:
 				hard8 = input("How much on Hard 8?")
 				hard10 = input("How much on Hard 10?")
 				print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
+#Prop Bets
+			#props = raw_input("Proposition Bets? y/n")
+		#	if props == 'y':
+	#			any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
 
-			raw_input("Hit Enter to roll again.")
-
+			print "Dice are rolling!"
+			#raw_input("Hit Enter to roll again.")
+#Phase 2 Roll
 			p2, p2Hard = roll(pointIsOn)
 
 		#	if comeBet > 0:
 	#			come.append(p2)
+
+#Prop Bet Payout
+			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
+
 
 			if fieldBet != 0:
 				if p2 == 2:
@@ -298,6 +395,12 @@ while True:
 						print "You won $%d on your Don't Pass Odds." %dOdds
 						bank += dOdds
 					bank += dPass
+				if any7 > 0:
+					print "You win $%d on Any 7!" %(any7 * 4)
+					bank += any7 * 4
+					any7 = 0
+					
+
 				break
 			else:
 				print "Bank = $%d. The point is %d." %(bank, comingOut)

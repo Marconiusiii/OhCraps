@@ -145,19 +145,22 @@ come = []
 
 while True:
 	pointIsOn = False
+	bet1 = 'a'
 	passLine = 0
 	dPass = 0
 	fieldBet = 0
-	bet1 = raw_input("Pass or Don't pass?")
-	if bet1 == 'p':
-		passLine = input("How much on the Pass Line? $ >")
-		print "Great, $%d on the Pass Line." %passLine
-	elif bet1 == 'd':
-		dPass = input("How much on the Don't Pass line? $ >")
-		print "Great, $%d on the Don't Pass Line." %dPass
-	else:
-		print "That won't work!"
-		continue
+	lineBets = raw_input("Line Bets? y/n")
+	if lineBets == 'y':
+		bet1 = raw_input("Pass or Don't pass?")
+		if bet1 == 'p':
+			passLine = input("How much on the Pass Line? $ >")
+			print "Great, $%d on the Pass Line." %passLine
+		elif bet1 == 'd':
+			dPass = input("How much on the Don't Pass line? $ >")
+			print "Great, $%d on the Don't Pass Line." %dPass
+		else:
+			print "That won't work!"
+			continue
 	fBet = raw_input("Bet the Field? y/n")
 	if fBet == 'y':
 		fieldBet = input("How much on the Field?")
@@ -253,9 +256,9 @@ while True:
 				hard10 = input("How much on Hard 10?")
 				print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
 #Prop Bets
-			#props = raw_input("Proposition Bets? y/n")
-		#	if props == 'y':
-	#			any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
+			props = raw_input("Proposition Bets? y/n")
+			if props == 'y':
+				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
 
 			print "Dice are rolling!"
 			#raw_input("Hit Enter to roll again.")

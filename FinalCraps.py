@@ -239,7 +239,25 @@ while True:
 
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
-	bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+
+	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
+		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+	if comingOut == 7:
+		come4 = come5 = come6 = come8 = come9 = come10 = 0
+	if comingOut == 4 and come4 > 0:
+		come4 = c4Odds = 0
+	if comingOut == 5 and come5 > 0:
+		come5 = c5Odds = 0
+	if comingOut == 6 and come6 > 0:
+		come6 = c6Odds = 0
+	if comingOut == 8 and come8 > 0:
+		come8 = c8Odds = 0
+	if comingOut == 9 and come9 > 0:
+		come9 = c9Odds = 0
+	if comingOut == 10 and come10 > 0:
+		come10 = come10Odds = 0
+			
+		
 	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
@@ -323,7 +341,7 @@ while True:
 			if come9 > 0 and c9Odds == 0:
 				print "You have $%d on the 9." %come9
 			elif c9Odds > 0:
-				print "You have $%d on the 9 with $%d in Odds." %(come9. c9Odds)
+				print "You have $%d on the 9 with $%d in Odds." %(come9, c9Odds)
 			if come10 > 0 and c10Odds == 0:
 				print "You have $%d on the 10." %come10
 			elif c10Odds > 0:
@@ -361,6 +379,18 @@ while True:
 
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+			if p2 == 4 and come4 > 0:
+				come4 = c4Odds = 0
+			elif p2 == 5 and come5 > 0:
+				come5 = c5Odds = 0
+			elif p2 == 6 and come6 > 0:
+				come6 = c6Odds = 0
+			elif p2 == 8 and come8 > 0:
+				come8 = c8Odds = 0
+			elif p2 == 9 and come9 > 0:
+				come9 = c9Odds = 0
+			elif p2 == 10 and come10 > 0:
+				come10 = c10Odds = 0
 			if comeBet > 0:
 				if p2 in [7, 11]:
 					print "You win $%d on the Come!" %comeBet

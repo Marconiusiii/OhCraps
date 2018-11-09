@@ -1,5 +1,5 @@
 from random import *
-four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars =  0
 
 def prop():
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
@@ -29,6 +29,74 @@ def prop():
 		boxcars = input("How much on Boxcars? $>")
 		print "Ok, $%d on Boxcars." %boxcars
 	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars
+
+def come(roll, comeBet, come4, come5, come6, come8, come9, come10):
+
+	print "Moving Come Bet to the %d." %roll
+	if roll == 4:
+		come4 = comeBet
+	elif roll == 5:
+		come5 = comeBet
+	elif roll == 6:
+		come6 = comeBet
+	elif roll == 8:
+		come8 = comeBet
+	elif roll == 9:
+		come9 = comeBet
+	elif roll == 10:
+		come10 = comeBet
+	return come4, come5, come6, come8, come9, come10
+
+def comePayout(roll, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds):
+	payout = 0
+	if roll == 4 and come4 > 0:
+		print "You win $%d from the 4 come Bet." %come4
+		if c4Odds > 0:
+			print "You win $%d on the 4 from your Odds." %(c4Odds * 2)
+		else:
+			c4Odds = 0
+		payout += come4 +  c4Odds * 2
+	elif roll == 5 and come5 > 0:
+		print "You win $%d from the Come 5." %come5
+		if c5Odds > 0:
+			print "You win $%d from your Odds on the 5." %(c5Odds/2 * 3)
+		else:
+			c5Odds = 0
+		payout += come5 + c5Odds/2 * 3
+	elif roll == 6 and come6 > 0:
+		print "You win $%d on the Come 6." %come6
+		if c6Odds > 0:
+			print "You win $%d from your Odds on the 6." %(c6Odds/5 * 6)
+		else:
+			c6Odds = 0
+		payout += come6 + c6Odds/5 * 6
+	elif roll == 8 and come8 > 0:
+		print "You win $%d on the Come 8." %come8
+		if c8Odds > 0:
+			print "You win $%d from your Odds on the 8." %(c8Odds/5 * 6)
+		else:
+			c8Odds = 0
+		payout += come8 + c8Odds/5 * 6
+	elif roll == 9 and come9 > 0:
+		print "You win $%d on the Come 9." %come9
+		if c9Odds > 0:
+			print "You win $%d from your Odds on the 9." %(c9Odds/2 * 3)
+		else:
+			c9Odds = 0
+		payout += come9 + c9Odds/2 * 3
+	elif roll == 10 and come10 > 0:
+		print "You win $%d on the Come 10." %come10
+		if c10Odds > 0:
+			print "You win $%d from your Odds on the 10." %(c10Odds * 2)
+		else:
+			c10Odds = 0
+		payout += come10 + c10Odds * 2
+	elif roll == 7:
+		allCome = come4 + come5 + come6 + come8 + come9 + come10 + c4Odds + c5Odds + c6Odds + c8Odds + c9Odds + c10Odds
+		print "You lost $%d from your Come bets. All bets cleared." %allCome
+		payout -= allCome
+	return payout
+
 
 def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars):
 	payout = 0
@@ -141,7 +209,7 @@ bank = input("How much do you want to start with? $ >")
 print "Ok, starting off with $%d." %bank
 
 comeBet = 0
-come = []
+
 
 while True:
 	pointIsOn = False
@@ -171,6 +239,7 @@ while True:
 
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
+	bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
 	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
@@ -235,10 +304,35 @@ while True:
 				ten = input("How much on 10?")
 
 #Come Bet
-	#		cmBet = raw_input("Come bet? y/n")
-#			if cmBet == 'y':
-			#	comeBet = "How much on the Come bet?")
-		#		print "Ok, $%d in the Come." %comeBet
+			if come4 > 0 and c4Odds == 0:
+				print "You have $%d on the 4." %come4
+			elif c4Odds > 0:
+				print "You have $%d on the 4 with $%d in Odds." %(come4, c4Odds)
+			if come5 > 0 and c5Odds == 0:
+				print "You have $%d on the 5." %come5
+			elif c5Odds > 0:
+				print "You have $%d on the 5 with $%d in Odds." %(come5, c5Odds)
+			if come6 > 0 and c6Odds == 0:
+				print "You have $%d on the 6." %come6
+			elif c6Odds > 0:
+				print "You have $%d on the 6 with $%d in Odds." %(come6, c6Odds)
+			if come8 > 0 and c8Odds == 0:
+				print "You have $%d on the 8." %come8
+			elif c8Odds > 0:
+				print "You have $%d on the 8 with $%d in Odds." %(come8, c8Odds)
+			if come9 > 0 and c9Odds == 0:
+				print "You have $%d on the 9." %come9
+			elif c9Odds > 0:
+				print "You have $%d on the 9 with $%d in Odds." %(come9. c9Odds)
+			if come10 > 0 and c10Odds == 0:
+				print "You have $%d on the 10." %come10
+			elif c10Odds > 0:
+				print "You have $%d on the 10 with $%d in Odds." %(come10, c10Odds)
+			cmBet = raw_input("Come bet? y/n")
+			if cmBet == 'y':
+				comeBet = input("How much on the Come bet?")
+				print "Ok, $%d in the Come." %comeBet
+
 #Field Bet
 
 			fBet = raw_input("Bet the Field? You have $%d wagered. y/n" %fieldBet)
@@ -265,8 +359,38 @@ while True:
 #Phase 2 Roll
 			p2, p2Hard = roll(pointIsOn)
 
-		#	if comeBet > 0:
-	#			come.append(p2)
+
+			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+			if comeBet > 0:
+				if p2 in [7, 11]:
+					print "You win $%d on the Come!" %comeBet
+					bank += comeBet
+				elif p2 in [2, 3, 12]:
+					print "You lose $%d from the Come." %comeBet
+					bank -= comeBet
+				else:
+					come4, come5, come6, come8, come9, come10 = come(p2, comeBet, come4, come5, come6, come8, come9, come10)
+					cOdds = raw_input("Odds on your Come bet? y/n")
+					if cOdds == 'y':
+						if p2 == 4:
+							c4Odds = input("Odds on the 4? $>")
+							print "Ok, $%d on the 4." %c4Odds
+						elif p2 == 5:
+							c5Odds = input("Odds on the 5? $>")
+							print "Ok, $%d on the 5." %c5Odds
+						elif p2 == 6:
+							c6Odds = input("Odds on the 6?")
+							print "Ok,$%d on the 6." %c6Odds
+						elif p2 == 8:
+							c8Odds = input("Odds on the 8? $>")
+							print "Ok, $%d on the 8." %c8Odds
+						elif p2 == 9:
+							c9Odds = input("Odds on the 9? $>")
+							print "Ok, $%d on the 9." %c9Odds
+						elif p2 == 10:
+							c10Odds = input("Odds on the 10? $>")
+							print "Ok, $%d on the 10." %c10Odds
+				comeBet = 0
 
 #Prop Bet Payout
 			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
@@ -289,8 +413,8 @@ while True:
 	
 #Hard Ways payout
 			if p2 == 4 and p2Hard == True and hard4 > 0:
-				print "You win $%d on the Hard 4!" %(hard4 * 10)
-				bank += hard4 * 10
+				print "You win $%d on the Hard 4!" %(hard4 * 7)
+				bank += hard4 * 7
 			elif p2 == 4 and p2Hard == False and hard4 > 0:
 				print "You lose $%d on the Hard 4." %hard4
 				bank -= hard4
@@ -316,8 +440,8 @@ while True:
 			else:
 				pass
 			if p2 == 10 and p2Hard == True and hard10 > 0:
-				print "You win $%d on the Hard 10!" %(hard10 * 10)
-				bank += hard10 * 10
+				print "You win $%d on the Hard 10!" %(hard10 * 7)
+				bank += hard10 * 7
 			elif p2 == 10 and p2Hard == False and hard10 > 0:
 				print "You lose $%d on the Hard 10." %hard10
 				bank -= hard10
@@ -378,6 +502,7 @@ while True:
 				break
 #Seven Out
 			elif p2 == 7:
+				come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds  = c6Odds = c8Odds = c9Odds = c10Odds = 0
 				if hard4 + hard6 + hard8 + hard10 > 0:
 					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
 					bank -= (hard4 + hard6 + hard8 + hard10)

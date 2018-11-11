@@ -231,7 +231,7 @@ print "Great, starting off with $%d." %bank
 
 
 comeBet = 0
-
+gameLoops = 0
 
 while True:
 	pointIsOn = False
@@ -335,6 +335,10 @@ while True:
 			passOdds = 0
 		#Betting
 		while True:
+			gameLoops += 1
+			if gameLoops == 14:
+				clearScreen()
+				gameLoops = 0
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':

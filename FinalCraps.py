@@ -1,5 +1,11 @@
+import os
+
 from random import *
+
 four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars =  0
+
+def clearScreen():
+	os.system('cls' if os.name == 'nt' else 'clear')
 
 def prop():
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
@@ -212,10 +218,17 @@ def press(x):
 	return x
 
 #Game Start
-print "Craps Craps Craps!"
+print "Oh Craps v.3.0"
+print "How much would you like to cash in for your bank?"
+while True:
+	try:
+		bank = int(raw_input("$"))
+		break
+	except ValueError:
+		print "That wasn't a number, doofus."
+		continue
+print "Great, starting off with $%d." %bank
 
-bank = input("How much do you want to start with? $ >")
-print "Ok, starting off with $%d." %bank
 
 comeBet = 0
 
@@ -577,4 +590,5 @@ while True:
 				#raw_input("Roll Again!")
 				continue
 		print "You have $%d in your bank!" %bank
+	clearScreen()
 	continue

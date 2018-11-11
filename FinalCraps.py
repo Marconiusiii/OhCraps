@@ -91,7 +91,7 @@ def comePayout(roll, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, 
 		else:
 			c10Odds = 0
 		payout += come10 + c10Odds * 2
-	elif roll == 7:
+	elif roll == 7 and (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 		allCome = come4 + come5 + come6 + come8 + come9 + come10 + c4Odds + c5Odds + c6Odds + c8Odds + c9Odds + c10Odds
 		print "You lost $%d from your Come bets. All bets cleared." %allCome
 		payout -= allCome
@@ -182,14 +182,23 @@ def roll(point):
 
 	return roll, hard
 
-def odds(comingOut, bet):
+def odds(comingOut, bet, line):
 	oddsOut = 0
 	if comingOut in [4, 10]:
-		oddsOut = bet * 2
+		if line == 'p':
+			oddsOut = bet * 2
+		elif line == 'd':
+			oddsOut = bet/2
 	elif comingOut in [5, 9]:
-		oddsOut = bet/2 * 3
+		if line == 'p':
+			oddsOut = bet/2 * 3
+		elif line == 'd':
+			oddsOut = bet/3 * 2
 	elif comingOut in [6, 8]:
-		oddsOut = bet/5 * 6
+		if line == 'p':
+			oddsOut = bet/5 * 6
+		elif line == 'd':
+			oddsOut = bet/6 * 5
 
 	return oddsOut
 
@@ -303,10 +312,12 @@ while True:
 			print "You lose $%d on the Field." %fieldBet
 			bank -= fieldBet
 			fieldBet = 0
-
 		pOddsBet = raw_input("Odds on your Line bet? y/n")
 		if pOddsBet == 'y':
-			passOdds = input("How much for your line odds?")
+			if bet1 == 'p':
+				passOdds = input("How much for your line odds?")
+			elif bet1 == 'd':
+				passOdds = input("How much to lay against the %d? $>" %comingOut)
 		else:
 			passOdds = 0
 		#Betting
@@ -519,7 +530,7 @@ while True:
 				if bet1 == 'p':
 					print "You win $%d!" %passLine
 					if passOdds > 0:
-						oddsWin = odds(comingOut, passOdds)
+						oddsWin = odds(comingOut, passOdds, bet1)
 						print "You win $%d on your odds." %oddsWin
 						bank += oddsWin
 					bank += passLine
@@ -537,9 +548,10 @@ while True:
 					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
 					bank -= (hard4 + hard6 + hard8 + hard10)
 					hard4 = hard6 = hard8 = hard10 = 0
-				print "You lose $%d from the place bets." %(four + five + six + eight + nine + ten)
-				bank -= (four + five + six + eight + nine + ten)
-				four = five = six = eight = nine = ten = 0
+				if (four + five + six + eight + nine + ten) > 0:
+					print "You lose $%d from the place bets." %(four + five + six + eight + nine + ten)
+					bank -= (four + five + six + eight + nine + ten)
+					four = five = six = eight = nine = ten = 0
 				if bet1 == 'p':
 					print "You lose $%d." %passLine
 					if passOdds > 0:
@@ -549,7 +561,7 @@ while True:
 				elif bet1 == 'd':
 					print "You win $%d!" %dPass
 					if passOdds > 0:
-						dOdds = odds(comingOut, dPass)
+						dOdds = odds(comingOut, passOdds, bet1)
 						print "You won $%d on your Don't Pass Odds." %dOdds
 						bank += dOdds
 					bank += dPass

@@ -2,7 +2,7 @@ import os
 
 from random import *
 
-four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars =  0
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
 dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
@@ -10,7 +10,7 @@ def clearScreen():
 	os.system('cls' if os.name == 'nt' else 'clear')
 
 def prop():
-	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
+	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
 	pr1 = raw_input("Bet on Any 7?")
 	if pr1 == 'y':
@@ -36,7 +36,11 @@ def prop():
 	if pr6 == 'y':
 		boxcars = input("How much on Boxcars? $>")
 		print "Ok, $%d on Boxcars." %boxcars
-	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars
+	pr7 = raw_input("Bet the Horn?")
+	if pr7 == 'y':
+		horn = input("How much on the Horn Bet? $>")
+		print "Ok, $%d on the Horn Bet!" %horn
+	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn
 
 def come(roll, comeBet, come4, come5, come6, come8, come9, come10):
 	print "Moving Come Bet to the %d." %roll
@@ -208,7 +212,7 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 			payout -= dCome10
 	return payout
 
-def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars):
+def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn):
 	payout = 0
 	if any7 > 0:
 		if roll == 7:
@@ -251,10 +255,21 @@ def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars):
 	if boxcars > 0:
 		if roll == 12:
 			print "You win $%d on the Boxcars!" %(boxcars * 30)
-			lpayout += boxcars * 30
+			payout += boxcars * 30
 		else:
 			print "You lose $%d on the Boxcars bet." %boxcars
 			payout -= boxcars
+	if horn > 0:
+		if roll in [2, 12]:
+			print "You win $%d  on the Horn Bet!" %(horn * 30)
+			payout += horn * 30
+		elif roll in [3, 11]:
+			print "You win $%d on the Horn bet!" %(horn * 15)
+			payout += horn * 15
+		else:
+			print "You lose $%d from the Horn Bet." %horn
+			payout -= horn
+
 	return payout
 
 
@@ -359,9 +374,10 @@ while True:
 	if fBet == 'y':
 		fieldBet = input("How much on the Field?")
 		print "Ok, $%d on the Field." %fieldBet
+
 	propStart = raw_input("Proposition Bets?")
 	if propStart == 'y':
-		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
+		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn = prop()
 
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
@@ -399,7 +415,7 @@ while True:
 		come10 = come10Odds = 0
 			
 		
-	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
+	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
@@ -458,7 +474,7 @@ while True:
 			if gameLoops == 14:
 				clearScreen()
 				gameLoops = 0
-			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = 0
+			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
 				four = input("How much on Place 4?")
@@ -548,7 +564,7 @@ while True:
 #Prop Bets
 			props = raw_input("Proposition Bets? y/n")
 			if props == 'y':
-				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars = prop()
+				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn = prop()
 
 			print "Dice are rolling!"
 			#raw_input("Hit Enter to roll again.")
@@ -655,7 +671,7 @@ while True:
 				dComeBet = 0
 
 #Prop Bet Payout
-			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars)
+			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
 
 
 			if fieldBet != 0:

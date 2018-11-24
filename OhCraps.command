@@ -40,7 +40,7 @@ def betInput(bank):
 		if bet > bank:
 			print "You simply can't bet that much! You only have $%d in the bank." %bank
 			continue
-		elif bet <= 0:
+		elif bet < 0:
 			print "Nice try, but that's not gonna work!"
 			continue
 		else:
@@ -373,7 +373,7 @@ def odds(comingOut, bet, line):
 
 	return oddsOut
 
-def press(x):
+def press(p):
 	press = raw_input("Press this bet? y/n")
 	if press == 'y':
 		print "What's your new bet?"

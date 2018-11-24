@@ -9,36 +9,81 @@ dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Od
 def clearScreen():
 	os.system('cls' if os.name == 'nt' else 'clear')
 
+def betInput(bank):
+	if bank <= 0:
+		print "You are totally out of money!"
+		print "Add more to your bank or hit Ctrl-C to exit the game, walking away with a sad, empty wallet."
+		while True:
+			try:
+				bank += +int(raw_input("$"))
+			except ValueError:
+				print "That wasn't a number, try again."
+				continue
+			if bank < 0:
+				print "You fail at math. Try again!"
+				bank = 0
+				continue
+			else:
+				print "Great, starting you off again with $%d." %bank
+				break
+	else:
+		pass
+
+	while True:
+		while True:
+			try:
+				bet = int(raw_input("$>"))
+				break
+			except ValueError:
+				print "That wasn't a number! The stickman whaps you upside the head with his stick."
+				continue
+		if bet > bank:
+			print "You simply can't bet that much! You only have $%d in the bank." %bank
+			continue
+		elif bet <= 0:
+			print "Nice try, but that's not gonna work!"
+			continue
+		else:
+			break
+	return bet
+
 def prop():
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
 	pr1 = raw_input("Bet on Any 7?")
 	if pr1 == 'y':
-		any7 = input("How Much on Any 7? $>")
+		print "How much on Any 7?"
+		any7 = betInput(bank)
 		print "Ok, $%d on Any 7." %any7
 	pr2 = raw_input("Bet on Any Craps?")
 	if pr2 == 'y':
-		anyCraps = input("How much on Any Craps? $<")
+		print "How much on Any Craps?"
+		anyCraps = betInput(bank)
 		print "Ok, $%d on Any Craps." %anyCraps
 	pr3 = raw_input("Bet on C&E?")
 	if pr3 == 'y':
-		cAndE = input("How much on C&E? $>")
+		print "How much on C & E?"
+		cAndE = betInput(bank)
 		print "Ok, $%d on C&E." %cAndE
 	pr4 = raw_input("Bet on Snake Eyes?")
 	if pr4 == 'y':
-		snakeEyes = input("How much on Snake Eyes? $>")
+		print "How much on Snake Eyes?"
+		snakeEyes = betInput(bank)
 		print "Ok, $%d on Snake Eyes." %snakeEyes
 	pr5 = raw_input("Bet on Acey-Deucey?")
 	if pr5 == 'y':
-		aceDeuce = input("How much on Acey-Deucey? $>")
+		print "How much on Acey-Deucey?"
+		aceDeuce = betInput(bank)
 		print "Ok, $%d on Acey-Deucey." %aceDeuce
 	pr6 = raw_input("Bet on Boxcars?")
 	if pr6 == 'y':
-		boxcars = input("How much on Boxcars? $>")
+		print "How much on Boxcars?"
+		boxcars = betInput(bank)
 		print "Ok, $%d on Boxcars." %boxcars
 	pr7 = raw_input("Bet the Horn?")
 	if pr7 == 'y':
-		horn = input("How much on the Horn Bet? $>")
+		print "How much on the Horn?"
+		horn = betInput(bank)
 		print "Ok, $%d on the Horn Bet!" %horn
 	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn
 
@@ -330,11 +375,12 @@ def odds(comingOut, bet, line):
 def press(x):
 	press = raw_input("Press this bet? y/n")
 	if press == 'y':
-		x = input("New bet >")
-		print "You now bet  $%d." %x
+		print "What's your new bet?"
+		p = betInput(bank)
+		print "You now bet  $%d." %p
 	else:
 		pass
-	return x
+	return p
 
 #Game Start
 print "Oh Craps v.3.0"
@@ -358,21 +404,47 @@ while True:
 	passLine = 0
 	dPass = 0
 	fieldBet = 0
+
+#Empty Bank check
+	if bank <= 0:
+		print "You are totally out of money!"
+		print "Add more to your bank or hit Ctrl-C to exit the game, walking away with a sad, empty wallet."
+		while True:
+			try:
+				bank += +int(raw_input("$"))
+			except ValueError:
+				print "That wasn't a number, try again."
+				continue
+			if bank < 0:
+				print "You fail at math. Try again!"
+				bank = 0
+				continue
+			else:
+				print "Great, starting you off again with $%d." %bank
+				break
+	else:
+		pass
+
+
+
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':
 		bet1 = raw_input("Pass or Don't pass?")
 		if bet1 == 'p':
-			passLine = input("How much on the Pass Line? $ >")
+			print "How much on the Pass Line?"
+			passLine = betInput(bank)
 			print "Great, $%d on the Pass Line." %passLine
 		elif bet1 == 'd':
-			dPass = input("How much on the Don't Pass line? $ >")
+			print "How much on the Don't Pass Line?"
+			dPass = betInput(bank)
 			print "Great, $%d on the Don't Pass Line." %dPass
 		else:
-			print "That won't work!"
+			print "Pass or Don't Pass, there is nothing else!"
 			continue
 	fBet = raw_input("Bet the Field? y/n")
 	if fBet == 'y':
-		fieldBet = input("How much on the Field?")
+		print "How much on the Field?"
+		fieldBet = betInput(bank)
 		print "Ok, $%d on the Field." %fieldBet
 
 	propStart = raw_input("Proposition Bets?")
@@ -463,9 +535,11 @@ while True:
 		pOddsBet = raw_input("Odds on your Line bet? y/n")
 		if pOddsBet == 'y':
 			if bet1 == 'p':
-				passOdds = input("How much for your line odds?")
+				print "How much for your Pass Line Odds?"
+				passOdds = betInput(bank)
 			elif bet1 == 'd':
-				passOdds = input("How much to lay against the %d? $>" %comingOut)
+				print "How much to Lay against the %d?" %comingOut
+				passOdds = betInput(bank)
 		else:
 			passOdds = 0
 		#Betting
@@ -477,12 +551,18 @@ while True:
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
-				four = input("How much on Place 4?")
-				five = input("How much on 5?")
-				six = input("How much on Six?")
-				eight = input("How much on Eight?")
-				nine = input("How much on 9?")
-				ten = input("How much on 10?")
+				print "How much on the Place 4?"
+				four = betInput(bank)
+				print "How much on the Place 5?"
+				five = betInput(bank)
+				print "How much on the Place 6?"
+				six = betInput(bank)
+				print "How much on the place 8?"
+				eight = betInput(bank)
+				print "How much on the Place 9?"
+				nine = betInput(bank)
+				print "How much on the Place 10?"
+				ten = betInput(bank)
 
 #Come Bet
 			if come4 > 0 and c4Odds == 0:
@@ -539,27 +619,34 @@ while True:
 			if cmBet == 'y':
 				comeChoice = raw_input("Come or Don't Come?")
 				if comeChoice == 'c':
-					comeBet = input("How much on the Come bet?")
+					print "How much on the Come?"
+					comeBet = betInput(bank)
 					print "Ok, $%d in the Come." %comeBet
 				elif comeChoice == 'd':
-					dComeBet = input("How much on the Don't Come?")
+					print "How much on the Don't Come?"
+					dComeBet = betInput(bank)
 					print "Ok, $%d on the Don't Come." %dComeBet
 
 #Field Bet
 
 			fBet = raw_input("Bet the Field? You have $%d wagered. y/n" %fieldBet)
 			if fBet == 'y':
-				fieldBet = input("How much on the Field?")
+				print "How much on the Field?"
+				fieldBet = betInput(bank)
 			#else:
 				#fieldBet = 0
 
 #Hard Ways
 			hWays = raw_input("Bet the hard ways? y/n")
 			if hWays == 'y':
-				hard4 = input("How much on Hard 4?")
-				hard6 = input("How much on Hard 6?")
-				hard8 = input("How much on Hard 8?")
-				hard10 = input("How much on Hard 10?")
+				print "How much on Hard 4?"
+				hard4 = betInput(bank)
+				print "How much on Hard 6?"
+				hard6 = betInput(bank)
+				print "How much on Hard 8?"
+				hard8 = betInput(bank)
+				print "How much on Hard 10?"
+				hard10 = betInput(bank)
 				print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
 #Prop Bets
 			props = raw_input("Proposition Bets? y/n")
@@ -619,22 +706,28 @@ while True:
 					cOdds = raw_input("Odds on your Come bet? y/n")
 					if cOdds == 'y':
 						if p2 == 4:
-							c4Odds = input("Odds on the 4? $>")
+							print "Odds on the 4?"
+							c4Odds = betInput(bank)
 							print "Ok, $%d on the 4." %c4Odds
 						elif p2 == 5:
-							c5Odds = input("Odds on the 5? $>")
+							print "Odds on the 5?"
+							c5Odds = betInput(bank)
 							print "Ok, $%d on the 5." %c5Odds
 						elif p2 == 6:
-							c6Odds = input("Odds on the 6?")
+							print "Odds on the 6?"
+							c6Odds = betInput(bank)
 							print "Ok,$%d on the 6." %c6Odds
 						elif p2 == 8:
-							c8Odds = input("Odds on the 8? $>")
+							print "Odds on the 8?"
+							c8Odds = betInput(bank)
 							print "Ok, $%d on the 8." %c8Odds
 						elif p2 == 9:
-							c9Odds = input("Odds on the 9? $>")
+							print "Odds on the 9?"
+							c9Odds = betInput(bank)
 							print "Ok, $%d on the 9." %c9Odds
 						elif p2 == 10:
-							c10Odds = input("Odds on the 10? $>")
+							print "Odds on the 10?"
+							c10Odds = betInput(bank)
 							print "Ok, $%d on the 10." %c10Odds
 				comeBet = 0
 
@@ -651,22 +744,28 @@ while True:
 					dcOdds = raw_input("Odds on your Don't Come bet? y/n")
 					if dcOdds == 'y':
 						if p2 == 4:
-							dC4Odds = input("Odds on the 4? $>")
+							print "Odds on the Don't Come 4?"
+							dC4Odds = betInput(bank)
 							print "Ok, $%d on the 4." %dC4Odds
 						elif p2 == 5:
-							dC5Odds = input("Odds on the 5? $>")
+							print "Odds on the Don't Come 5?"
+							dC5Odds = betInput(bank)
 							print "Ok, $%d on the 5." %dC5Odds
 						elif p2 == 6:
-							dC6Odds = input("Odds on the 6?")
+							print "Odds on the Don't Come 6?"
+							dC6Odds = betInput(bank)
 							print "Ok,$%d on the 6." %dC6Odds
 						elif p2 == 8:
-							dC8Odds = input("Odds on the 8? $>")
+							print "Odds on the Don't Come 8?"
+							dC8Odds = betInput(bank)
 							print "Ok, $%d on the 8." %dC8Odds
 						elif p2 == 9:
-							dC9Odds = input("Odds on the 9? $>")
+							print "Odds on the Don't Come 9?"
+							dC9Odds = betInput(bank)
 							print "Ok, $%d on the 9." %dC9Odds
 						elif p2 == 10:
-							dC10Odds = input("Odds on the 10? $>")
+							print "Odds on the Don't Come 10?"
+							dC10Odds = betInput(bank)
 							print "Ok, $%d on the 10." %dC10Odds
 				dComeBet = 0
 

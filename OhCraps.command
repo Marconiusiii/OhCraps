@@ -45,6 +45,7 @@ def betInput(bank):
 			continue
 		else:
 			break
+
 	return bet
 
 def prop():

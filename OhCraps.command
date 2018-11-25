@@ -553,7 +553,7 @@ while True:
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
 				if four > 0:
-					print You have $%d wagered on the Place 4. What's your new bet?" %four
+					print "You have $%d wagered on the Place 4. What's your new bet?" %four
 				else:
 					print "How much on the Place 4?"
 				four = betInput(bank)

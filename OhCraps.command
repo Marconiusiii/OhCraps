@@ -286,8 +286,8 @@ def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn):
 			payout -= cAndE
 	if snakeEyes > 0:
 		if roll == 2:
-			print "You win $%d on your Aces bet!" %(snakeEyes * 31)
-			payout += snakeEyes * 31
+			print "You win $%d on your Aces bet!" %(snakeEyes * 30)
+			payout += snakeEyes * 30
 		else:
 			print "You lose $%d on your Aces bet." %snakeEyes
 			payout -= snakeEyes

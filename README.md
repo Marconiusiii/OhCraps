@@ -81,25 +81,64 @@ These bets are available at all times. If there is a bet on the Field, the Field
 
 ## Pay Table
 
-| Bet | Payout |
-| Pass/Don't Pass Line | 1:1 |
-| Pass Line Odds 4 and 10 | 2:1 |
-|Pass Line Odds 5 and 9 | 3:2 |
-| Pass Line Odds 6 and 8 | 6:5 |
-| Field Bet | 1:1 |
-| Field Bet 2 | 2:1 |
-| Field Bet 12 | 3:1 |
-| Place 4 and 10 | 9:5 |
-| Place 5 and 9 | 7:5 |
-| Place 6 and 8 | 7:6 |
-| Come/Don't Come Bet | 1:1 |
-| Come/DC Odds 4 and 10 | 2:1 |
-| Come/DC Odds 5 and 9 | 3:2 |
-| Come/DC Odds 6 and 8 | 6:5 |
-| Lay 4, 10 | 1:2 |
-| Lay 5, 9 | 2:3 |
-| Lay 6, 8 | 5:6 |
-
+<table>
+<caption>Line, Field, and Come Payouts</caption>
+<tr>
+<th>Bet</th>
+<th>Payout</th>
+</tr>
+<tr>
+<td>Pass/Don't Pass Line</td><td>1:1</td>
+</tr>
+<tr>
+<td>Pass Line Odds 4 and 10</td><td>2:1</td>
+</tr>
+<tr>
+<td>Pass Line Odds 5 and 9</td><td>3:2</td>
+</tr>
+<tr>
+<td>Pass Line Odds 6 and 8</td><td>6:5</td>
+</tr>
+<tr>
+<td>Field Bet</td><td>1:1</td>
+</tr>
+<tr>
+<td>Field Bet 2</td><td>2:1</td>
+</tr>
+<tr>
+<td>Field Bet 12</td><td>3:1</td>
+</tr>
+<tr>
+<td>Place 4 and 10</td><td>9:5</td>
+</tr>
+<tr>
+<td>Place 5 and 9</td><td>7:5</td>
+</tr>
+<tr>
+<td>Place 6 and 8</td><td>7:6</td>
+</tr>
+<tr>
+<td>Come/Don't Come Bet</td><td>1:1</td>
+</tr>
+<tr>
+<td>Come/DC Odds 4 and 10</td><td>2:1</td>
+</tr>
+<tr>
+<td>Come/DC Odds 5 and 9</td><td>3:2</td>
+</tr>
+<tr>
+<td>Come/DC Odds 6 and 8</td><td>6:5</td>
+</tr>
+<tr>
+<td>Lay 4, 10</td><td>1:2</td>
+</tr>
+<tr>
+<td>Lay 5, 9</td><td>2:3</td>
+</tr>
+<tr>
+<td>Lay 6, 8</td><td>5:6</td>
+</tr>
+</table>
 ### Prop Bet Pay Table
 
 | Bet | Payout |

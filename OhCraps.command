@@ -552,17 +552,35 @@ while True:
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
-				print "How much on the Place 4?"
+				if four > 0:
+					print You have $%d wagered on the Place 4. What's your new bet?" %four
+				else:
+					print "How much on the Place 4?"
 				four = betInput(bank)
-				print "How much on the Place 5?"
+				if five > 0:
+					print "You have $%d wagered on the Place 5. What's your new bet?" %five
+				else:
+					print "How much on the Place 5?"
 				five = betInput(bank)
-				print "How much on the Place 6?"
+				if six > 0:
+					print "You have $%d wagered on the Place 6. What's your new bet?" %six
+				else:
+					print "How much on the Place 6?"
 				six = betInput(bank)
-				print "How much on the place 8?"
+				if eight > 0:
+					print "You have $%d wagered on the Place 8. What's your new bet?" %eight
+				else:
+					print "How much on the place 8?"
 				eight = betInput(bank)
-				print "How much on the Place 9?"
+				if nine > 0:
+					print "Yu have $%d wagered on the Place 9. What's your new bet?" %nine
+				else:
+					print "How much on the Place 9?"
 				nine = betInput(bank)
-				print "How much on the Place 10?"
+				if ten > 0:
+					print "You have $%d wagered on the Place 10. What's your new bet?" %ten
+				else:
+					print "How much on the Place 10?"
 				ten = betInput(bank)
 
 #Come Bet

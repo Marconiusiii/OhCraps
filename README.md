@@ -139,15 +139,36 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <td>Lay 6, 8</td><td>5:6</td>
 </tr>
 </table>
-### Prop Bet Pay Table
-
-| Bet | Payout |
-| Any 7 | 4:1 |
-| Any Craps | 7:1 |
-| C & E with Craps | 3:1 |
-| C&E with 11 | 7:1 |
-| Snake Eyes | 30:1 |
-| Acey-Deucey | 15:1 |
-| Boxcars | 30:1 |
-| Horn Bet on 2, 12 | 30:1 |
-| Horn Bet on 3, 11 | 15:1 |
+<table>
+<caption>Proposition Bet Payouts</caption>
+<tr>
+<th>Bet</th><th>Payout</th>
+</tr>
+<tr>
+<td>Any 7</td><td>4:1</td>
+</tr>
+<tr>
+<td>Any Craps</td><td>7:1</td>
+</tr>
+<tr>
+<td>C & E with Craps</td><td>3:1</td>
+</tr>
+<tr>
+<td>C&E with 11</td><td>7:1</td>
+</tr>
+<tr>
+<td>Snake Eyes</td><td>30:1</td>
+<tr>
+<tr>
+<td>Acey-Deucey</td><td>15:1</td>
+</tr>
+<tr>
+<td>Boxcars</td><td>30:1</td>
+</tr>
+<tr>
+<td>Horn Bet on 2, 12</td><td>30:1</td>
+</tr>
+<tr>
+<td>Horn Bet on 3, 11</td><td>15:1</td>
+</tr>
+</table>

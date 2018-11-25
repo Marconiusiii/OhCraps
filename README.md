@@ -171,4 +171,10 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <tr>
 <td>Horn Bet on 3, 11</td><td>15:1</td>
 </tr>
+<tr>
+<td>Hard 4 and 10</td><td>7:1</td>
+</tr>
+<tr>
+<td>Hard 6 and 8</td><td>9:1</td>
+</tr>
 </table>

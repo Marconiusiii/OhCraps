@@ -121,7 +121,7 @@ def dCome(roll, comeBet, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10):
 		dCome10 = comeBet
 	return dCome4, dCome5, dCome6, dCome8, dCome9, dCome10
 
-def comePayout(roll, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds):
+def comePayout(roll, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn):
 	payout = 0
 	if roll == 4 and come4 > 0:
 		print "You win $%d from the 4 come Bet." %come4
@@ -165,10 +165,15 @@ def comePayout(roll, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, 
 		else:
 			c10Odds = 0
 		payout += come10 + c10Odds * 2
-	elif roll == 7 and (come4 + come5 + come6 + come8 + come9 + come10) > 0:
+	elif roll == 7 and (come4 + come5 + come6 + come8 + come9 + come10) > 0 and pointIsOn == True:
 		allCome = come4 + come5 + come6 + come8 + come9 + come10 + c4Odds + c5Odds + c6Odds + c8Odds + c9Odds + c10Odds
-		print "You lost $%d from your Come bets. All bets cleared." %allCome
+		print "You lost $%d from your Come bets and Odds. All bets cleared." %allCome
 		payout -= allCome
+	elif roll == 7 and (come4 + come5 + come6 + come8 + come9 + come10) > 0 and pointIsOn == False:
+		onlyCome = (come4 + come5 + come6 + come8 + come9 + come10)
+		print "You lost $%d from your Come bets. All Odds were off and returned to you." %onlyCome
+		payout -= onlyCome
+
 	return payout
 
 def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, dC5Odds, dC6Odds, dC8Odds, dC9Odds, dC10Odds, pointIsOn):
@@ -426,8 +431,6 @@ while True:
 	else:
 		pass
 
-
-
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':
 		bet1 = raw_input("Pass or Don't pass?")
@@ -456,7 +459,7 @@ while True:
 	comingOut, coHard = roll(pointIsOn)
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
-		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 	if (dCome4 + dCome5 + dCome6 + dCome8 + dCome9 + dCome10) > 0:
 		bank += dComePayout(comingOut, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, dC5Odds, dC6Odds, dC8Odds, dC9Odds, dC10Odds, pointIsOn)
 		if comingOut == 4 and dCome4 > 0:
@@ -678,7 +681,7 @@ while True:
 			p2, p2Hard = roll(pointIsOn)
 
 
-			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds)
+			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 
 			bank += dComePayout(p2, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, dC5Odds, dC6Odds, dC8Odds, dC9Odds, dC10Odds, pointIsOn)
 

@@ -536,16 +536,20 @@ while True:
 			print "You lose $%d on the Field." %fieldBet
 			bank -= fieldBet
 			fieldBet = 0
-		pOddsBet = raw_input("Odds on your Line bet? y/n")
-		if pOddsBet == 'y':
-			if bet1 == 'p':
-				print "How much for your Pass Line Odds?"
-				passOdds = betInput(bank)
-			elif bet1 == 'd':
-				print "How much to Lay against the %d?" %comingOut
-				passOdds = betInput(bank)
-		else:
-			passOdds = 0
+
+#Pass/Don't Pass Odds
+		if passLine > 0 or dPass > 0:
+			pOddsBet = raw_input("Odds on your Line bet? y/n")
+			if pOddsBet == 'y':
+				if bet1 == 'p':
+					print "How much for your Pass Line Odds?"
+					passOdds = betInput(bank)
+				elif bet1 == 'd':
+					print "How much to Lay against the %d?" %comingOut
+					passOdds = betInput(bank)
+			else:
+				passOdds = 0
+
 		#Betting
 		while True:
 			gameLoops += 1

@@ -182,8 +182,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 4!" %dCome4
 			if dC4Odds > 0:
-				print "You win $%d from your Don't Come 4 Odds." %(dC4Odds * 2)
-				payout += dC4Odds * 2
+				print "You win $%d from your Don't Come 4 Odds." %(dC4Odds / 2)
+				payout += dC4Odds / 2
 			payout += dCome4
 		elif roll == 4:
 			print "You lose $%d on your Don't Come 4." %dCome4
@@ -196,8 +196,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 5!" %dCome5
 			if dC5Odds > 0:
-				print "You win $%d from your Don't Come 5 Odds." %(dC5Odds/2 * 3)
-				payout += dC5Odds/2 * 3
+				print "You win $%d from your Don't Come 5 Odds." %(dC5Odds/3 * 2)
+				payout += dC5Odds/3 * 2
 			payout += dCome5
 		elif roll == 5:
 			print "You lose $%d on your Don't Come 5." %dCome5
@@ -210,8 +210,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 6!" %dCome6
 			if dC6Odds > 0:
-				print "You win $%d from your Don't Come 6 Odds." %(dC6Odds/5 * 6)
-				payout += dC6Odds/5 * 6
+				print "You win $%d from your Don't Come 6 Odds." %(dC6Odds/6 * 5)
+				payout += dC6Odds/6 * 5
 			payout += dCome6
 		elif roll == 6:
 			print "You lose $%d on your Don't Come 6." %dCome6
@@ -224,8 +224,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 8!" %dCome8
 			if dC8Odds > 0:
-				print "You win $%d from your Don't Come 8 Odds." %(dC8Odds/5 * 6)
-				payout += dC8Odds/5 * 6
+				print "You win $%d from your Don't Come 8 Odds." %(dC8Odds/6 * 5)
+				payout += dC8Odds/6 * 5
 			payout += dCome8
 		elif roll == 8:
 			print "You lose $%d on your Don't Come 8." %dCome8
@@ -238,8 +238,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 9!" %dCome9
 			if dC9Odds > 0:
-				print "You win $%d from your Don't Come 9 Odds." %(dC9Odds/2 * 3)
-				payout += dC9Odds/2 * 3
+				print "You win $%d from your Don't Come 9 Odds." %(dC9Odds/3 * 2)
+				payout += dC9Odds/3 * 2
 			payout += dCome9
 		elif roll == 9:
 			print "You lose $%d on your Don't Come 9." %dCome9
@@ -252,8 +252,8 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 		if roll == 7:
 			print "You win $%d on your Don't Come for the 10!" %dCome10
 			if dC10Odds > 0:
-				print "You win $%d from your Don't Come 10 Odds." %(dC10Odds * 2)
-				payout += dC10Odds * 2
+				print "You win $%d from your Don't Come 10 Odds." %(dC10Odds / 2)
+				payout += dC10Odds / 2
 			payout += dCome10
 		elif roll == 10:
 			print "You lose $%d on your Don't Come 10." %dCome10
@@ -901,7 +901,7 @@ while True:
 				break
 #Seven Out
 			elif p2 == 7:
-				come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds  = c6Odds = c8Odds = c9Odds = c10Odds = 0
+				come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds  = c6Odds = c8Odds = c9Odds = c10Odds = dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC10Odds = 0
 				if hard4 + hard6 + hard8 + hard10 > 0:
 					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
 					bank -= (hard4 + hard6 + hard8 + hard10)

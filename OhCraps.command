@@ -475,7 +475,7 @@ while True:
 		elif comingOut == 10 and dCome10 > 0:
 			dCome10 = dC10Odds = 0
 	if comingOut == 7:
-		come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = 0
+		come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
 	if comingOut == 4 and come4 > 0:
 		come4 = c4Odds = 0

@@ -389,7 +389,7 @@ def press(p):
 	return p
 
 #Game Start
-print "Oh Craps v.3.0"
+print "Oh Craps v.3.3"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -489,8 +489,9 @@ while True:
 		come9 = c9Odds = 0
 	if comingOut == 10 and come10 > 0:
 		come10 = come10Odds = 0
-			
-		
+
+
+
 	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
@@ -537,19 +538,6 @@ while True:
 			bank -= fieldBet
 			fieldBet = 0
 
-#Pass/Don't Pass Odds
-		if passLine > 0 or dPass > 0:
-			pOddsBet = raw_input("Odds on your Line bet? y/n")
-			if pOddsBet == 'y':
-				if bet1 == 'p':
-					print "How much for your Pass Line Odds?"
-					passOdds = betInput(bank)
-				elif bet1 == 'd':
-					print "How much to Lay against the %d?" %comingOut
-					passOdds = betInput(bank)
-			else:
-				passOdds = 0
-
 		#Betting
 		while True:
 			gameLoops += 1
@@ -557,6 +545,20 @@ while True:
 				clearScreen()
 				gameLoops = 0
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+#Pass/Don't Pass Odds
+			if passLine > 0 or dPass > 0:
+				pOddsBet = raw_input("Pass/Don't Pass Line Odds? y/n")
+				if pOddsBet == 'y':
+					if bet1 == 'p':
+						print "How much for your Pass Line Odds?"
+						passOdds = betInput(bank)
+					elif bet1 == 'd':
+						print "How much to Lay against the %d?" %comingOut
+						passOdds = betInput(bank)
+				else:
+					pass
+
+#Place Bets
 			placeBet = raw_input("Place bets? y/n")
 			if placeBet == 'y':
 				if four > 0:
@@ -902,6 +904,7 @@ while True:
 						print "You lose $%d from your odds." %passOdds
 						bank -= passOdds
 					bank -= dPass
+					passOdds = 0
 				break
 #Seven Out
 			elif p2 == 7:
@@ -919,6 +922,7 @@ while True:
 					if passOdds > 0:
 						print "You lose $%d from your odds." %passOdds
 						bank -= passOdds
+						passOdds = 0
 					bank -= passLine
 				elif bet1 == 'd':
 					print "You win $%d!" %dPass
@@ -926,6 +930,7 @@ while True:
 						dOdds = odds(comingOut, passOdds, bet1)
 						print "You won $%d on your Don't Pass Odds." %dOdds
 						bank += dOdds
+						passOdds = 0
 					bank += dPass
 				if any7 > 0:
 					print "You win $%d on Any 7!" %(any7 * 4)

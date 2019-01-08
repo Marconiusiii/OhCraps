@@ -2,7 +2,7 @@ import os
 
 from random import *
 
-four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = passOdds = 0
 
 dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
@@ -324,7 +324,6 @@ def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn):
 	return payout
 
 
-
 def roll(point):
 	hard = False
 	d1 = randint(1,6)
@@ -490,9 +489,12 @@ while True:
 	if comingOut == 10 and come10 > 0:
 		come10 = come10Odds = 0
 
-
-
 	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
+
+#Zero Out all Prop bets
+
+	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+
 	if comingOut in [7, 11]:
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
@@ -541,7 +543,7 @@ while True:
 		#Betting
 		while True:
 			gameLoops += 1
-			if gameLoops == 14:
+			if gameLoops == 7:
 				clearScreen()
 				gameLoops = 0
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
@@ -686,7 +688,6 @@ while True:
 #Phase 2 Roll
 			p2, p2Hard = roll(pointIsOn)
 
-
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 
 			bank += dComePayout(p2, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, dC5Odds, dC6Odds, dC8Odds, dC9Odds, dC10Odds, pointIsOn)
@@ -799,7 +800,7 @@ while True:
 
 #Prop Bet Payout
 			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
-
+			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
 			if fieldBet != 0:
 				if p2 == 2:

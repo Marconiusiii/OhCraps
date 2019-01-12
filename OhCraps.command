@@ -657,6 +657,53 @@ while True:
 					dComeBet = betInput(bank)
 					print "Ok, $%d on the Don't Come." %dComeBet
 
+#Come Odds
+			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
+				alterOdds = raw_input("Change Come Odds? y/n")
+				if alterOdds == 'y':
+					if come4 > 0:
+						print "You have $% in Odds for the 4. Enter a new amount." %c4Odds
+						c4Odds = betInput(bank)
+					if come5 > 0:
+						print "You have $% in Odds for the 5. Enter a new amount." %c5Odds
+						c5Odds =	 betInput(bank)
+					if come6 > 0:
+						print "You have $% in Odds for the 6. Enter a new amount." %c6Odds
+						c6Odds = betInput(bank)
+					if come8 > 0:
+						print "You have $% in Odds for the 8. Enter a new amount." %c8Odds
+						c8Odds = betInput(bank)
+					if come9 > 0:
+						print "You have $% in Odds for the 9. Enter a new amount." %c9Odds
+						c9Odds = betInput(bank)
+					if come10 > 0:
+						print "You have $% in Odds for the 10. Enter a new amount." %c10Odds
+						c10Odds = betInput(bank)
+
+# Don't Come Odds
+
+			if (dCome4 + dCome5 + dCome6 + dCome8 + dCome9 + dCome10) > 0:
+				alterDont = raw_input("Change Don't Come Odds? y/n")
+				if alterDont == 'y':
+					if dCome4 > 0:
+						print "Your Lay 4 has $% in Odds. Enter the new amount." %dC4Odds
+						dC4Odds = betInput(bank)
+					if dCome5 > 0:
+						print "Your Lay 5 has $% in Odds. Enter the new amount." %dC5Odds
+						dC5Odds = betInput(bank)
+					if dCome6 > 0:
+						print "Your Lay 6 has $% in Odds. Enter the new amount." %dC6Odds
+						dC6Odds = betInput(bank)
+					if dCome8 > 0:
+						print "Your Lay 8 has $% in Odds. Enter the new amount." %dC8Odds
+						dC8Odds = betInput(bank)
+					if dCome9 > 0:
+						print "Your Lay 9 has $% in Odds. Enter the new amount." %dC9Odds
+						dC9Odds = betInput(bank)
+					if dCome10 > 0:
+						print "Your Lay 10 has $% in Odds. Enter the new amount." %dC10Odds
+						dC10Odds = betInput(bank)
+
 #Field Bet
 
 			fBet = raw_input("Bet the Field? You have $%d wagered. y/n" %fieldBet)

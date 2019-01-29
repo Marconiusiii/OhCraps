@@ -1,13 +1,9 @@
-import os
-
 from random import *
 
 four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = passOdds = 0
 
 dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
-def clearScreen():
-	os.system('cls' if os.name == 'nt' else 'clear')
 
 def betInput(bank):
 	if bank <= 0:
@@ -401,7 +397,6 @@ print "Great, starting off with $%d." %bank
 
 
 comeBet = dComeBet = 0
-gameLoops = 0
 
 while True:
 	pointIsOn = False
@@ -542,10 +537,6 @@ while True:
 
 		#Betting
 		while True:
-			gameLoops += 1
-			if gameLoops == 7:
-				clearScreen()
-				gameLoops = 0
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 #Pass/Don't Pass Odds
 			if passLine > 0 or dPass > 0:
@@ -992,5 +983,4 @@ while True:
 				#raw_input("Roll Again!")
 				continue
 		print "You have $%d in your bank!" %bank
-	clearScreen()
 	continue

@@ -384,7 +384,7 @@ def press(p):
 	return p
 
 #Game Start
-print "Oh Craps v.3.3"
+print "Oh Craps v.3.5"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -551,40 +551,6 @@ while True:
 				else:
 					pass
 
-#Place Bets
-			placeBet = raw_input("Place bets? y/n")
-			if placeBet == 'y':
-				if four > 0:
-					print "You have $%d wagered on the Place 4. What's your new bet?" %four
-				else:
-					print "How much on the Place 4?"
-				four = betInput(bank)
-				if five > 0:
-					print "You have $%d wagered on the Place 5. What's your new bet?" %five
-				else:
-					print "How much on the Place 5?"
-				five = betInput(bank)
-				if six > 0:
-					print "You have $%d wagered on the Place 6. What's your new bet?" %six
-				else:
-					print "How much on the Place 6?"
-				six = betInput(bank)
-				if eight > 0:
-					print "You have $%d wagered on the Place 8. What's your new bet?" %eight
-				else:
-					print "How much on the place 8?"
-				eight = betInput(bank)
-				if nine > 0:
-					print "Yu have $%d wagered on the Place 9. What's your new bet?" %nine
-				else:
-					print "How much on the Place 9?"
-				nine = betInput(bank)
-				if ten > 0:
-					print "You have $%d wagered on the Place 10. What's your new bet?" %ten
-				else:
-					print "How much on the Place 10?"
-				ten = betInput(bank)
-
 #Come Bet
 			if come4 > 0 and c4Odds == 0:
 				print "You have $%d on the 4." %come4
@@ -647,6 +613,55 @@ while True:
 					print "How much on the Don't Come?"
 					dComeBet = betInput(bank)
 					print "Ok, $%d on the Don't Come." %dComeBet
+
+#Place Bets
+
+			if four > 0:
+				print "You have $%d placed on the 4." %four
+			if five > 0:
+				print "You have $%d placed on the 5." %five
+			if six > 0:
+				print "You have $%d placed on the 6." %six
+			if eight > 0:
+				print "You have $%d placed on the 8." %eight
+			if nine > 0:
+				print "You have $%d placed on the 9." %nine
+			if ten > 0:
+				print "You have $%d placed on the 10." %ten
+
+
+			placeBet = raw_input("Place bets? y/n")
+			if placeBet == 'y':
+				if four > 0:
+					print "You have $%d wagered on the Place 4. What's your new bet?" %four
+				else:
+					print "How much on the Place 4?"
+				four = betInput(bank)
+				if five > 0:
+					print "You have $%d wagered on the Place 5. What's your new bet?" %five
+				else:
+					print "How much on the Place 5?"
+				five = betInput(bank)
+				if six > 0:
+					print "You have $%d wagered on the Place 6. What's your new bet?" %six
+				else:
+					print "How much on the Place 6?"
+				six = betInput(bank)
+				if eight > 0:
+					print "You have $%d wagered on the Place 8. What's your new bet?" %eight
+				else:
+					print "How much on the place 8?"
+				eight = betInput(bank)
+				if nine > 0:
+					print "Yu have $%d wagered on the Place 9. What's your new bet?" %nine
+				else:
+					print "How much on the Place 9?"
+				nine = betInput(bank)
+				if ten > 0:
+					print "You have $%d wagered on the Place 10. What's your new bet?" %ten
+				else:
+					print "How much on the Place 10?"
+				ten = betInput(bank)
 
 #Come Odds
 			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -955,7 +970,7 @@ while True:
 				if (four + five + six + eight + nine + ten) > 0:
 					print "You lose $%d from the place bets." %(four + five + six + eight + nine + ten)
 					bank -= (four + five + six + eight + nine + ten)
-					four = five = six = eight = nine = ten = 0
+				four = five = six = eight = nine = ten = 0
 				if bet1 == 'p':
 					print "You lose $%d." %passLine
 					if passOdds > 0:
@@ -975,7 +990,6 @@ while True:
 					print "You win $%d on Any 7!" %(any7 * 4)
 					bank += any7 * 4
 					any7 = 0
-					
 
 				break
 			else:

@@ -919,7 +919,7 @@ while True:
 				print "You win $%d on the place 5." %win5
 				bank += win5
 				if comingOut != 5:
-					five = press(5)
+					five = press(five)
 			if p2 == 6 and six > 0:
 				print "You win $%d on the place 6." %(six/6 * 7)
 				bank += six/6 * 7

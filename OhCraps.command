@@ -540,6 +540,8 @@ while True:
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 #Pass/Don't Pass Odds
 			if passLine > 0 or dPass > 0:
+				if passOdds > 0:
+					print "You have $%d bet for your Odds." %passOdds
 				pOddsBet = raw_input("Pass/Don't Pass Line Odds? y/n")
 				if pOddsBet == 'y':
 					if bet1 == 'p':
@@ -720,6 +722,15 @@ while True:
 				#fieldBet = 0
 
 #Hard Ways
+
+			if hard4 > 0:
+				print "You have $%d on the Hard 4." %hard4
+			if hard6 > 0:
+				print "You have $%d on the Hard 6." %hard6
+			if hard8 > 0:
+				print "You have $%d on the Hard 8." %hard8
+			if hard10 > 0:
+				print "You have $%d on the Hard 10." %hard10
 			hWays = raw_input("Bet the hard ways? y/n")
 			if hWays == 'y':
 				print "How much on Hard 4?"

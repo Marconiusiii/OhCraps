@@ -403,7 +403,7 @@ def press(p):
 	return p
 
 #Game Start
-print "Oh Craps v.3.5"
+print "Oh Craps v.3.75"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -760,7 +760,15 @@ while True:
 				hard8 = betInput(bank)
 				print "How much on Hard 10?"
 				hard10 = betInput(bank)
-				print "Ok, $%d, $%d, $%d, $%d on the 4, 6, 8, and 10!" %(hard4, hard6, hard8, hard10)
+				if hard4 > 0:
+					print "$%d on Hard 4." %hard4
+				if hard6 > 0:
+					print "$%d on Hard 6." %hard6
+				if hard8 > 0:
+					print "$%d on Hard 8." %hard8
+				if hard10 > 0:
+					print "$%d on Hard 10." %hard10
+
 #Prop Bets
 			props = raw_input("Proposition Bets? y/n")
 			if props == 'y':

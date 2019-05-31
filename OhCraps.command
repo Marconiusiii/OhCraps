@@ -47,41 +47,60 @@ def betInput(bank):
 def prop():
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
-	pr1 = raw_input("Bet on Any 7?")
-	if pr1 == 'y':
-		print "How much on Any 7?"
-		any7 = betInput(bank)
-		print "Ok, $%d on Any 7." %any7
-	pr2 = raw_input("Bet on Any Craps?")
-	if pr2 == 'y':
-		print "How much on Any Craps?"
-		anyCraps = betInput(bank)
-		print "Ok, $%d on Any Craps." %anyCraps
-	pr3 = raw_input("Bet on C&E?")
-	if pr3 == 'y':
-		print "How much on C & E?"
-		cAndE = betInput(bank)
-		print "Ok, $%d on C&E." %cAndE
-	pr4 = raw_input("Bet on Snake Eyes?")
-	if pr4 == 'y':
-		print "How much on Snake Eyes?"
-		snakeEyes = betInput(bank)
-		print "Ok, $%d on Snake Eyes." %snakeEyes
-	pr5 = raw_input("Bet on Acey-Deucey?")
-	if pr5 == 'y':
-		print "How much on Acey-Deucey?"
-		aceDeuce = betInput(bank)
-		print "Ok, $%d on Acey-Deucey." %aceDeuce
-	pr6 = raw_input("Bet on Boxcars?")
-	if pr6 == 'y':
-		print "How much on Boxcars?"
-		boxcars = betInput(bank)
-		print "Ok, $%d on Boxcars." %boxcars
-	pr7 = raw_input("Bet the Horn?")
-	if pr7 == 'y':
-		print "How much on the Horn?"
-		horn = betInput(bank)
-		print "Ok, $%d on the Horn Bet!" %horn
+	while True:
+		propPick = raw_input("Type in your Prop Bet: ")
+		if propPick == '7':
+			print "How much on Any 7?"
+			any7 = betInput(bank)
+			print "Ok, $%d on Any 7." %any7
+			continue
+		elif propPick == "cr":
+			print "How much on Any Craps?"
+			anyCraps = betInput(bank)
+			print "Ok, $%d on Any Craps." %anyCraps
+			continue
+		elif propPick == "ce":
+			print "How much on C & E?"
+			cAndE = betInput(bank)
+			print "Ok, $%d on C&E." %cAndE
+			continue
+		elif propPick == "sn" or propPick == "s":
+			print "How much on Snake Eyes?"
+			snakeEyes = betInput(bank)
+			print "Ok, $%d on Snake Eyes." %snakeEyes
+			continue
+		elif propPick == "ad" or propPick == "3":
+			print "How much on Acey-Deucey?"
+			aceDeuce = betInput(bank)
+			print "Ok, $%d on Acey-Deucey." %aceDeuce
+			continue
+		elif propPick == "b" or propPick == "12":
+			print "How much on Boxcars?"
+			boxcars = betInput(bank)
+			print "Ok, $%d on Boxcars." %boxcars
+			continue
+		elif propPick == "h":
+			print "How much on the Horn?"
+			horn = betInput(bank)
+			print "Ok, $%d on the Horn Bet!" %horn
+			continue
+		elif propPick == "all":
+			print "Current prop bets:"
+			if any7 > 0:
+				print "$%d on Any 7." %any7
+			if anyCraps > 0:
+				print "$%d on Any Craps." %anyCraps
+			if cAndE > 0:
+				print "$%d on C&E." %cAndE
+			if snakeEyes > 0:
+				print "$%d on Snake Eyes." %snakeEyes
+			if aceDeuce > 0:
+				print "$%d on Acey-Deucey." %aceDeuce
+			if horn > 0:
+				print "$%d on the Horn." %horn
+			continue
+		else:
+			break
 	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn
 
 def come(roll, comeBet, come4, come5, come6, come8, come9, come10):

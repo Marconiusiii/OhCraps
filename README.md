@@ -29,15 +29,22 @@ Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Fo
 
 #### Proposition Bets
 
-These bets are all single-roll bets. If they do not come up on the very next roll, they will lose.
+These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, or just hit Enter to finish up and move onwards with the game.
 
 1. Any 7 - Bet on any 7 to come up.
+	• Bet Code: "7"
 2. Any Craps - Bet on a 2, 3, or 12 to come up.
+	• Bet Code: "cr"
 3. C & E - Bet on a 2, 3, 11, or 12 to come up.
+	• Bet Code: "ce"
 4. Snake Eyes - Bet that a 2 comes up.
+	• Bet Code: "s" or "2"
 5. Acey-Deucey - Bet on a 3 to come up.
+	• Bet Code: "ad" or "3"
 6. Boxcars - Bet that a 12 comes up.
+	• Bet Code: "b" or "12"
 7. Horn - Bet that a 2, 3, 11, or 12 comes up.
+	• Bet Code: "h"
 
 Check the Pay Table section to understand the various payouts for all these bets.
 

@@ -423,6 +423,7 @@ while True:
 	passLine = 0
 	dPass = 0
 	fieldBet = 0
+	working = False
 
 #Empty Bank check
 	if bank <= 0:
@@ -463,6 +464,13 @@ while True:
 		print "How much on the Field?"
 		fieldBet = betInput(bank)
 		print "Ok, $%d on the Field." %fieldBet
+
+	if (four + five + six + eight + nine + ten) > 0:
+		workPlace = raw_input("Place Bets working? y/n >")
+		if workPlace == 'y':
+			working = True
+		else:
+			working = False
 
 	propStart = raw_input("Proposition Bets?")
 	if propStart == 'y':
@@ -510,6 +518,10 @@ while True:
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
 
 	if comingOut in [7, 11]:
+		if working == True and comingOut == 7:
+			bank -= (four + five  + six + eight + nine + ten)
+			print "You lost $%d on the Place Bets." %(four + five + six + eight + nine + ten)
+			four = five = six = eight = nine = ten = 0
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
 			bank += passLine
@@ -546,6 +558,37 @@ while True:
 	else:
 		pointIsOn = True
 		print "The point is %d." %comingOut
+
+# Working Bets
+		if working == True and (four + five + six + eight + nine + ten) > 0:
+			if four > 0 and comingOut == 4:
+				bank += four/5 * 9
+				print "You won $%d on the 4." %(four/5 * 9)
+				four = press(four)
+			elif five > 0 and comingOut == 5:
+				bank += five/5 * 7
+				print "You won $%d on the 5." %(five/5 * 7)
+				five = press(five)
+			elif six > 0 and comingOut == 6:
+				bank += six/6 * 7
+				print "Yu won $%d on the 6." %(six/6 * 7)
+				six = press(six)
+			elif eight > 0 and comingOut == 8:
+				bank += eight/6 * 7
+				print "You won $%d on the 8." %(eight/6 * 7)
+				eight = press(eight)
+			elif nine > 0 and comingOut == 9:
+				bank += nine/5 * 7
+				print "You won $%d on the 9." %(nine/5 * 7)
+				nine = press(nine)
+			elif ten > 0 and comingOut == 10:
+				bank += ten/5 * 9
+				print "You won $%d on the 10." %(ten/5 * 9)
+				ten = press(ten)
+			else:
+				Pass
+
+
 		if comingOut in [4, 9, 10] and fieldBet > 0:
 			print "You win $%d on the Field!" %fieldBet
 			bank += fieldBet
@@ -947,7 +990,10 @@ while True:
 				pass
 
 			if p2 == 4 and four > 0:
-				win4 = (four/5) * 9
+				if 0 < four < 25:
+					win4 = (four/5) * 9
+				elif four >= 25:
+					win4 = (four * 2) - (four * 0.02)
 				print "You win $%d on the place 4." %win4
 				bank += win4
 				if comingOut != 4:
@@ -977,7 +1023,10 @@ while True:
 					nine = press(nine)
 
 			if p2 == 10 and ten > 0:
-				win10 = (ten/5) * 9
+				if 0 < ten < 25:
+					win10 = (ten/5) * 9
+				elif ten >= 25:
+					win10 = (ten * 2) - (ten * 0.02)
 				print "You win $%d on the place 10." %win10
 				bank += win10
 				if comingOut != 10:

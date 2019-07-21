@@ -27,6 +27,10 @@ The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is roll
 
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
+#### Working Place Bets
+
+If you had Place Bets and hit the previous point number, entering "y" here will turn all your bets On/Working for the Come Out roll. If you roll any Place number on the Coming Out roll, it will pay out, but if you roll a 7, you will lose all your Place bets. This option only appears if you have Place Bets already set up.
+
 #### Proposition Bets
 
 These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, or just hit Enter to finish up and move onwards with the game.
@@ -64,7 +68,9 @@ Typing 'y' and hitting Enter when prompted with the Place Bets will take you thr
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Place Bets are always off on the Coming Out roll, so they will not be paid until after the Point Phase has started.
+Place Bets are always off on the Coming Out roll, so they will not be paid until after the Point Phase has started unless you enter "y" in the Place Bets Working prompt between the Field and Proposition bet prompts in the Coming Out phase.
+
+Placing the 4 or 10 for $25 or more will automatically Buy those bets, and the 2% commission is factored into what you win if they hit. For example, Buying the 4 for $25 will win 2 for 1, so you pay $1 to win $50, and will end up collecting $49.
 
 #### Come and Don't Come
 

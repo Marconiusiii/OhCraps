@@ -48,7 +48,9 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 6. Boxcars - Bet that a 12 comes up.
 	• Bet Code: "b" or "12"
 7. Horn - Bet that a 2, 3, 11, or 12 comes up.
-	• Bet Code: "h"
+	• Bet Code: "h", "horn"
+8. Yo - Betting that an Eleven will be the next roll outcome.
+	• BetCodes: "11", "eleven", "56" 
 
 Check the Pay Table section to understand the various payouts for all these bets.
 
@@ -181,10 +183,14 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <td>Boxcars</td><td>30:1</td>
 </tr>
 <tr>
-<td>Horn Bet on 2, 12</td><td>30:1</td>
+<td>Horn Bet on 2, 12</td><td>30:1 - 3/4 of initial bet</td>
 </tr>
 <tr>
-<td>Horn Bet on 3, 11</td><td>15:1</td>
+<td>Horn Bet on 3, 11</td><td>15:1 - 3/4 of initial bet</td>
+</tr>
+<tr>
+<td>Yo Eleven</td>
+<td>15:1</td>
 </tr>
 <tr>
 <td>Hard 4 and 10</td><td>7:1</td>

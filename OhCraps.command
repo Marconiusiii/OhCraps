@@ -1,6 +1,6 @@
 from random import *
 
-four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = passOdds = 0
+four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = passOdds = 0
 
 dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
@@ -45,7 +45,7 @@ def betInput(bank):
 	return bet
 
 def prop():
-	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = 0
 
 	while True:
 		propPick = raw_input("Type in your Prop Bet: ")
@@ -79,10 +79,15 @@ def prop():
 			boxcars = betInput(bank)
 			print "Ok, $%d on Boxcars." %boxcars
 			continue
-		elif propPick == "h":
+		elif propPick in ["h", 'horn']:
 			print "How much on the Horn?"
 			horn = betInput(bank)
 			print "Ok, $%d on the Horn Bet!" %horn
+			continue
+		elif propPick in ['11', 'eleven', '56']:
+			print "How much on the Eleven?"
+			eleven = betInput(bank)
+			print "Ok, $%d on the Eleven." %eleven
 			continue
 		elif propPick == "all":
 			print "Current prop bets:"
@@ -98,10 +103,12 @@ def prop():
 				print "$%d on Acey-Deucey." %aceDeuce
 			if horn > 0:
 				print "$%d on the Horn." %horn
+			if eleven > 0:
+				print "$%d on the Eleven." %eleven
 			continue
 		else:
 			break
-	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn
+	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven
 
 def come(roll, comeBet, come4, come5, come6, come8, come9, come10):
 	print "Moving Come Bet to the %d." %roll
@@ -278,7 +285,7 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 			payout -= dCome10
 	return payout
 
-def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn):
+def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven):
 	payout = 0
 	if any7 > 0:
 		if roll == 7:
@@ -327,14 +334,21 @@ def propPayout(roll, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn):
 			payout -= boxcars
 	if horn > 0:
 		if roll in [2, 12]:
-			print "You win $%d  on the Horn Bet!" %(horn * 30)
-			payout += horn * 30
+			print "You win $%d  on the Horn Bet!" %(((horn/4) * 30) - ((horn/4) * 3))
+			payout += ((horn/4) * 30) - ((horn/4) * 3)
 		elif roll in [3, 11]:
-			print "You win $%d on the Horn bet!" %(horn * 15)
-			payout += horn * 15
+			print "You win $%d on the Horn bet!" %(((horn/4) * 15) - ((horn/4) * 3))
+			payout += ((horn/4) * 15) - ((horn/4) * 3)
 		else:
 			print "You lose $%d from the Horn Bet." %horn
 			payout -= horn
+	if eleven > 0:
+		if roll == 11:
+			print "You won $%d on the 11!" %(eleven * 15)
+			payout += eleven * 15
+		else:
+			print "You lost $%d from the Yo Eleven bet." %eleven
+			payout -= eleven
 
 	return payout
 
@@ -474,7 +488,7 @@ while True:
 
 	propStart = raw_input("Proposition Bets?")
 	if propStart == 'y':
-		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn = prop()
+		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
@@ -511,11 +525,11 @@ while True:
 	if comingOut == 10 and come10 > 0:
 		come10 = come10Odds = 0
 
-	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
+	bank += propPayout(comingOut, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven)
 
 #Zero Out all Prop bets
 
-	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven =  0
 
 	if comingOut in [7, 11]:
 		if working == True and comingOut == 7:
@@ -599,7 +613,7 @@ while True:
 
 		#Betting
 		while True:
-			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = 0
 #Pass/Don't Pass Odds
 			if passLine > 0 or dPass > 0:
 				if passOdds > 0:
@@ -815,7 +829,7 @@ while True:
 #Prop Bets
 			props = raw_input("Proposition Bets? y/n")
 			if props == 'y':
-				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn = prop()
+				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
 			print "Dice are rolling!"
 			#raw_input("Hit Enter to roll again.")
@@ -933,8 +947,8 @@ while True:
 				dComeBet = 0
 
 #Prop Bet Payout
-			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn)
-			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = 0
+			bank += propPayout(p2, any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven)
+			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = 0
 
 			if fieldBet != 0:
 				if p2 == 2:

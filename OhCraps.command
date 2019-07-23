@@ -600,7 +600,7 @@ while True:
 				print "You won $%d on the 10." %(ten/5 * 9)
 				ten = press(ten)
 			else:
-				Pass
+				pass
 
 
 		if comingOut in [4, 9, 10] and fieldBet > 0:

@@ -490,8 +490,12 @@ while True:
 	if propStart == 'y':
 		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
+# Coming Out Roll
 	print "Dice are coming out!"
 	comingOut, coHard = roll(pointIsOn)
+#	comingOut = 10
+# Use this for specific number testing
+
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
@@ -596,8 +600,8 @@ while True:
 				print "You won $%d on the 9." %(nine/5 * 7)
 				nine = press(nine)
 			elif ten > 0 and comingOut == 10:
-				bank += ten/5 * 9
-				print "You won $%d on the 10." %(ten/5 * 9)
+				bank += (ten/5) * 9
+				print "You won $%d on the 10." %((ten/5) * 9)
 				ten = press(ten)
 			else:
 				pass
@@ -835,6 +839,9 @@ while True:
 			#raw_input("Hit Enter to roll again.")
 #Phase 2 Roll
 			p2, p2Hard = roll(pointIsOn)
+# Use this for specific number testing
+#			p2 = 10
+#			p2Hard = False
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 

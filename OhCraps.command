@@ -686,15 +686,24 @@ while True:
 
 			cmBet = raw_input("Come bet? y/n")
 			if cmBet == 'y':
-				comeChoice = raw_input("Come or Don't Come?")
-				if comeChoice == 'c':
-					print "How much on the Come?"
-					comeBet = betInput(bank)
-					print "Ok, $%d in the Come." %comeBet
-				elif comeChoice == 'd':
-					print "How much on the Don't Come?"
-					dComeBet = betInput(bank)
-					print "Ok, $%d on the Don't Come." %dComeBet
+
+				while True:
+					comeChoice = raw_input("Come or Don't Come?")
+					if comeChoice == 'c':
+						print "How much on the Come?"
+						comeBet = betInput(bank)
+						print "Ok, $%d in the Come." %comeBet
+						break
+					elif comeChoice == 'd':
+						print "How much on the Don't Come?"
+						dComeBet = betInput(bank)
+						print "Ok, $%d on the Don't Come." %dComeBet
+						break
+					elif comeChoice in ['x', 'exit', 'esc', 'n']:
+						break
+					else:
+						print "Come or Don't Come, there is no try!"
+						continue
 
 #Place Bets
 

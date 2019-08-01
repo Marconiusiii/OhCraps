@@ -683,8 +683,8 @@ while True:
 				print "You have $%d on the Don't Come 10." %dCome10
 			elif dC10Odds > 0:
 				print "You have $%d on the Don't Come 10 with $%d in Odds." %(dCome10, dC10Odds)
-
-			cmBet = raw_input("Come bet? y/n")
+			print "Come Bet?"
+			cmBet = raw_input(">")
 			if cmBet == 'y':
 
 				while True:
@@ -720,39 +720,57 @@ while True:
 			if ten > 0:
 				print "You have $%d placed on the 10." %ten
 
-
-			placeBet = raw_input("Place bets? y/n")
+			print "Place Bets?"
+			placeBet = raw_input(">")
 			if placeBet == 'y':
 				if four > 0:
-					print "You have $%d wagered on the Place 4. What's your new bet?" %four
+					print "You have $%d wagered on the Place 4. Press the 4?" %four
+					editFour = raw_input(">")
+					if editFour == 'y':
+						four = betInput(bank)
 				else:
 					print "How much on the Place 4?"
-				four = betInput(bank)
+					four = betInput(bank)
 				if five > 0:
-					print "You have $%d wagered on the Place 5. What's your new bet?" %five
+					print "You have $%d wagered on the Place 5. Press the 5?" %five
+					editFive = raw_input(">")
+					if editFive == 'y':
+						five = betInput(bank)
 				else:
 					print "How much on the Place 5?"
-				five = betInput(bank)
+					five = betInput(bank)
 				if six > 0:
-					print "You have $%d wagered on the Place 6. What's your new bet?" %six
+					print "You have $%d wagered on the Place 6. Press the 6" %six
+					editSix = raw_input(">")
+					if editSix == 'y':
+						six = betInput(bank)
 				else:
 					print "How much on the Place 6?"
-				six = betInput(bank)
+					six = betInput(bank)
 				if eight > 0:
-					print "You have $%d wagered on the Place 8. What's your new bet?" %eight
+					print "You have $%d wagered on the Place 8. Press the 8?" %eight
+					editEight = raw_input(">")
+					if editEight == 'y':
+						eight = betInput(bank)
 				else:
 					print "How much on the place 8?"
-				eight = betInput(bank)
+					eight = betInput(bank)
 				if nine > 0:
-					print "Yu have $%d wagered on the Place 9. What's your new bet?" %nine
+					print "Yu have $%d wagered on the Place 9. Press the 9?" %nine
+					editNine = raw_input("")
+					if editNine == 'y':
+						nine = betInput(bank)
 				else:
 					print "How much on the Place 9?"
-				nine = betInput(bank)
+					nine = betInput(bank)
 				if ten > 0:
-					print "You have $%d wagered on the Place 10. What's your new bet?" %ten
+					print "You have $%d wagered on the Place 10. Press the 10?" %ten
+					editTen = raw_input(">")
+					if editTen == 'y':
+						ten = betInput(bank)
 				else:
 					print "How much on the Place 10?"
-				ten = betInput(bank)
+					ten = betInput(bank)
 
 #Come Odds
 			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:

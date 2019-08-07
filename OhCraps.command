@@ -740,7 +740,7 @@ while True:
 					print "How much on the Place 5?"
 					five = betInput(bank)
 				if six > 0:
-					print "You have $%d wagered on the Place 6. Press the 6" %six
+					print "You have $%d wagered on the Place 6. Press the 6?" %six
 					editSix = raw_input(">")
 					if editSix == 'y':
 						six = betInput(bank)

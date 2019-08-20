@@ -492,9 +492,9 @@ while True:
 
 # Coming Out Roll
 	print "Dice are coming out!"
-#	comingOut, coHard = roll(pointIsOn)
+	comingOut, coHard = roll(pointIsOn)
 # Use this for specific number testing
-	comingOut = 4
+#	comingOut = 4
 
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -873,10 +873,10 @@ while True:
 			print "Dice are rolling!"
 			#raw_input("Hit Enter to roll again.")
 #Phase 2 Roll
-#			p2, p2Hard = roll(pointIsOn)
+			p2, p2Hard = roll(pointIsOn)
 # Use this for specific number testing
-			p2 = 4
-			p2Hard = False
+#			p2 = 4
+#			p2Hard = False
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 

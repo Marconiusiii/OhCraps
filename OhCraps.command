@@ -492,9 +492,9 @@ while True:
 
 # Coming Out Roll
 	print "Dice are coming out!"
-	comingOut, coHard = roll(pointIsOn)
-#	comingOut = 10
+#	comingOut, coHard = roll(pointIsOn)
 # Use this for specific number testing
+	comingOut = 4
 
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -580,8 +580,12 @@ while True:
 # Working Bets
 		if working == True and (four + five + six + eight + nine + ten) > 0:
 			if four > 0 and comingOut == 4:
-				bank += four/5 * 9
-				print "You won $%d on the 4." %(four/5 * 9)
+				if four < 25:
+					bank += four/5 * 9
+					print "You won $%d on the 4." %(four/5 * 9)
+				elif four >= 25:
+					bank += (four * 2) - (four * 0.02)
+					print "You won $%d on the Place 4." %((four * 2) - (four * 0.02))
 				four = press(four)
 			elif five > 0 and comingOut == 5:
 				bank += five/5 * 7
@@ -600,8 +604,12 @@ while True:
 				print "You won $%d on the 9." %(nine/5 * 7)
 				nine = press(nine)
 			elif ten > 0 and comingOut == 10:
-				bank += (ten/5) * 9
-				print "You won $%d on the 10." %((ten/5) * 9)
+				if ten < 25:
+					bank += (ten/5) * 9
+					print "You won $%d on the 10." %((ten/5) * 9)
+				elif ten >= 25:
+					bank += (ten * 2) - (ten * 0.02)
+					print "You won $%d on the Place 10." %((ten * 2) - (ten * 0.02))
 				ten = press(ten)
 			else:
 				pass
@@ -865,10 +873,10 @@ while True:
 			print "Dice are rolling!"
 			#raw_input("Hit Enter to roll again.")
 #Phase 2 Roll
-			p2, p2Hard = roll(pointIsOn)
+#			p2, p2Hard = roll(pointIsOn)
 # Use this for specific number testing
-#			p2 = 10
-#			p2Hard = False
+			p2 = 4
+			p2Hard = False
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 

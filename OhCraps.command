@@ -419,7 +419,7 @@ def press(p):
 	return p
 
 #Game Start
-print "~~~ Oh Craps v.4.0 ~~~"
+print "Oh Craps v.4.0"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:

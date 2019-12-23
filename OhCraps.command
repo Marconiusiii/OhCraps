@@ -432,7 +432,7 @@ print "Great, starting off with $%d." %bank
 
 
 comeBet = dComeBet = 0
-
+throws = 0
 while True:
 	pointIsOn = False
 	bet1 = 'a'
@@ -440,6 +440,7 @@ while True:
 	dPass = 0
 	fieldBet = 0
 	working = False
+	
 
 #Empty Bank check
 	if bank <= 0:
@@ -493,11 +494,15 @@ while True:
 		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
 # Coming Out Roll
-	print "Dice are coming out!"
+	if throws == 1:
+		print "Dice are coming out! %d roll." %throws
+	else:
+		print "Dice are coming out! %d rolls." %throws
 	comingOut, coHard = roll(pointIsOn)
 # Use this for specific number testing
 #	comingOut = 4
 
+	throws += 1
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
@@ -871,14 +876,18 @@ while True:
 			props = raw_input("Proposition Bets? y/n")
 			if props == 'y':
 				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
-
-			print "Dice are rolling!"
+			if throws == 1:
+				print "Dice are rolling! %d roll." %throws
+			else:
+				print "Dice are rolling! %d rolls." %throws
 			#raw_input("Hit Enter to roll again.")
 #Phase 2 Roll
 			p2, p2Hard = roll(pointIsOn)
 # Use this for specific number testing
 #			p2 = 4
 #			p2Hard = False
+
+			throws += 1
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 
@@ -1135,7 +1144,7 @@ while True:
 					print "You win $%d on Any 7!" %(any7 * 4)
 					bank += any7 * 4
 					any7 = 0
-
+				throws = 0
 				break
 			else:
 				print "Bank = $%d. The point is %d." %(bank, comingOut)

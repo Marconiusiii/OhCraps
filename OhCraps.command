@@ -563,6 +563,7 @@ while True:
 		print "You now have $%d in your bank." %bank
 		continue
 	elif comingOut in [2, 3, 12]:
+		print "Craps!"
 		if bet1 == 'p':
 			print "You lost $%d." %passLine
 			bank -= passLine
@@ -1099,6 +1100,7 @@ while True:
 				if comingOut != 10:
 					ten = press(ten)
 			if p2 == comingOut:
+				print "Point hit!"
 				if bet1 == 'p':
 					print "You win $%d!" %passLine
 					if passOdds > 0:

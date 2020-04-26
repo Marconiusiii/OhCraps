@@ -46,6 +46,38 @@ def betInput(bank):
 
 	return bet
 
+def hardPay(roll, hard, hard4, hard6, hard8, hard10):
+	payout = 0
+	if roll == 4 and hard == True and hard4 > 0:
+		print "You win $%d on the Hard 4!" %(hard4 * 7)
+		payout += hard4 * 7
+	elif roll == 4 and hard == False and hard4 > 0:
+		print "You lose $%d on the Hard 4." %hard4
+		payout -= hard4
+
+	if roll == 6 and hard == True and hard6 > 0:
+		print "You win $%d on the Hard 6!" %(hard6 * 9)
+		payout += hard6 * 9
+	elif roll == 6 and hard == False and hard6 >0:
+		print "You lose $%d on the Hard 6." %hard6
+		payout -= hard6
+
+	if roll == 8 and hard == True and hard8 > 0:
+		print "You win $%d on the Hard 8!" %(hard8 * 9)
+		payout += hard8 * 9
+	elif roll == 8 and hard == False and hard8 > 0:
+		print "You lose $%d on the Hard 8." %hard8
+		payout -= hard8
+
+	if roll == 10 and hard == True and hard10 > 0:
+		print "You win $%d on the Hard 10!" %(hard10 * 7)
+		payout += hard10 * 7
+	elif roll == 10 and hard == False and hard10 > 0:
+		print "You lose $%d on the Hard 10." %hard10
+		payout -= hard10
+
+	return payout
+
 def prop():
 	any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = 0
 
@@ -419,7 +451,7 @@ def press(p):
 	return p
 
 #Game Start
-print "Oh Craps v.4.0"
+print "Oh Craps v.4.5"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -482,8 +514,8 @@ while True:
 		fieldBet = betInput(bank)
 		print "Ok, $%d on the Field." %fieldBet
 
-	if (four + five + six + eight + nine + ten) > 0:
-		workPlace = raw_input("Place Bets working? y/n >")
+	if (four + five + six + eight + nine + ten + hard4 + hard6 + hard8 + hard10) > 0:
+		workPlace = raw_input("All bets working? y/n")
 		if workPlace == 'y':
 			working = True
 		else:
@@ -501,7 +533,7 @@ while True:
 	comingOut, coHard = roll(pointIsOn)
 # Use this for specific number testing
 #	comingOut = 4
-
+#	coHard = False
 	throws += 1
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -547,6 +579,10 @@ while True:
 			bank -= (four + five  + six + eight + nine + ten)
 			print "You lost $%d on the Place Bets." %(four + five + six + eight + nine + ten)
 			four = five = six = eight = nine = ten = 0
+			if (hard4 + hard6 + hard8 + hard10) > 0:
+				print "You lost $%d on the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
+				bank -= (hard4 + hard6 + hard8 + hard10)
+				hard4 = hard6 = hard8 = hard10 = 0
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
 			bank += passLine
@@ -586,7 +622,8 @@ while True:
 		print "The point is %d." %comingOut
 
 # Working Bets
-		if working == True and (four + five + six + eight + nine + ten) > 0:
+		if working == True:
+
 			if four > 0 and comingOut == 4:
 				if four < 25:
 					bank += four/5 * 9
@@ -619,9 +656,18 @@ while True:
 					bank += (ten * 2) - (ten * 0.02)
 					print "You won $%d on the Place 10." %((ten * 2) - (ten * 0.02))
 				ten = press(ten)
-			else:
-				pass
 
+		if working == True and (hard4 + hard6 + hard8 + hard10) > 0:
+			bank += hardPay(comingOut, coHard, hard4, hard6, hard8, hard10)
+			if coHard == False:
+				if comingOut == 4:
+					hard4 = 0
+				if comingOut ==6 :
+					hard6 = 0
+				if comingOut == 8:
+					hard8 = 0
+				if comingOut == 10:
+					hard10 = 0
 
 		if comingOut in [4, 9, 10] and fieldBet > 0:
 			print "You win $%d on the Field!" %fieldBet
@@ -886,7 +932,7 @@ while True:
 			p2, p2Hard = roll(pointIsOn)
 # Use this for specific number testing
 #			p2 = 4
-#			p2Hard = False
+#			p2Hard = True
 
 			throws += 1
 
@@ -1020,43 +1066,8 @@ while True:
 					fieldBet = 0
 	
 #Hard Ways payout
-			if p2 == 4 and p2Hard == True and hard4 > 0:
-				print "You win $%d on the Hard 4!" %(hard4 * 7)
-				bank += hard4 * 7
-			elif p2 == 4 and p2Hard == False and hard4 > 0:
-				print "You lose $%d on the Hard 4." %hard4
-				bank -= hard4
-				hard4 = 0
-			else:
-				pass
-			if p2 == 6 and p2Hard == True and hard6 > 0:
-				print "You win $%d on the Hard 6!" %(hard6 * 9)
-				bank += hard6 * 9
-			elif p2 == 6 and p2Hard == False and hard6 >0:
-				print "You lose $%d on the Hard 6." %hard6
-				bank -= hard6
-				hard6 = 0
-			else:
-				pass
-			if p2 == 8 and p2Hard == True and hard8 > 0:
-				print "You win $%d on the Hard 8!" %(hard8 * 9)
-				bank += hard8 * 9
-			elif p2 == 8 and p2Hard == False and hard8 > 0:
-				print "You lose $%d on the Hard 8." %hard8
-				bank -= hard8
-				hard8 = 0
-			else:
-				pass
-			if p2 == 10 and p2Hard == True and hard10 > 0:
-				print "You win $%d on the Hard 10!" %(hard10 * 7)
-				bank += hard10 * 7
-			elif p2 == 10 and p2Hard == False and hard10 > 0:
-				print "You lose $%d on the Hard 10." %hard10
-				bank -= hard10
-				hard10 = 0
-			else:
-				pass
 
+			bank += hardPay(p2, p2Hard, hard4, hard6, hard8, hard10)
 			if p2 == 4 and four > 0:
 				if 0 < four < 25:
 					win4 = (four/5) * 9

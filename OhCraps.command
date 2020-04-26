@@ -491,8 +491,7 @@ while True:
 			else:
 				print "Great, starting you off again with $%d." %bank
 				break
-	else:
-		pass
+
 
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':
@@ -745,8 +744,8 @@ while True:
 				print "You have $%d on the Don't Come 10." %dCome10
 			elif dC10Odds > 0:
 				print "You have $%d on the Don't Come 10 with $%d in Odds." %(dCome10, dC10Odds)
-			print "Come Bet?"
-			cmBet = raw_input(">")
+#			print "Come Bet?"
+			cmBet = raw_input("Come Bet? y/n")
 			if cmBet == 'y':
 
 				while True:
@@ -782,8 +781,8 @@ while True:
 			if ten > 0:
 				print "You have $%d placed on the 10." %ten
 
-			print "Place Bets?"
-			placeBet = raw_input(">")
+#			print "Place Bets?"
+			placeBet = raw_input("Place Bets? y/")
 			if placeBet == 'y':
 				if four > 0:
 					print "You have $%d wagered on the Place 4. Press the 4?" %four

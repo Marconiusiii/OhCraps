@@ -598,7 +598,7 @@ while True:
 		print "You now have $%d in your bank." %bank
 		continue
 	elif comingOut in [2, 3, 12]:
-		print "Craps!"
+		print "Oh Craps!"
 		if bet1 == 'p':
 			print "You lost $%d." %passLine
 			bank -= passLine

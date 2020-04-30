@@ -2,8 +2,10 @@
 
 from random import *
 
+# General Bet variable designation
 four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = passOdds = 0
 
+# Don't Come variable designation
 dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
 
 
@@ -24,8 +26,6 @@ def betInput(bank):
 			else:
 				print "Great, starting you off again with $%d." %bank
 				break
-	else:
-		pass
 
 	while True:
 		while True:
@@ -139,9 +139,17 @@ def prop():
 				print "$%d on the Horn." %horn
 			if eleven > 0:
 				print "$%d on the Eleven." %eleven
+			raw_input("Hit Enter to continue >")
 			continue
-		else:
+		elif propPick == "help":
+			print "Use the following codes in the bet prompt to place that specific bet:\n\t7 - Any Seven\n\tcr - Any Craps\n\tce - Craps and Eleven\n\ts, 2 - Snake Eyes\n\tad, 3 - Acey Deucey\n\tb, 12 - Boxcars\n\th, horn - Horn Bet\n\t11, eleven, 56 - Yo Eleven\n\tall - Show all bets\n\tx - Exit prop betting and return to game"
+			raw_input("Hit Enter to continue >")
+			continue
+		elif propPick == "x":
 			break
+		else:
+			print "That's not a valid bet, and the boxman glares at you in disgust. Try again, or type 'x' and hit Enter to exit."
+
 	return any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven
 
 def come(roll, comeBet, come4, come5, come6, come8, come9, come10):

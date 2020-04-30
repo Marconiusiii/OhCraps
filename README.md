@@ -33,7 +33,7 @@ If you had Place Bets and hit the previous point number, entering "y" here will 
 
 #### Proposition Bets
 
-These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, or just hit Enter to finish up and move onwards with the game.
+These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
 
 1. Any 7 - Bet on any 7 to come up.
 	• Bet Code: "7"
@@ -50,7 +50,14 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 7. Horn - Bet that a 2, 3, 11, or 12 comes up.
 	• Bet Code: "h", "horn"
 8. Yo - Betting that an Eleven will be the next roll outcome.
-	• BetCodes: "11", "eleven", "56" 
+	• BetCodes: "11", "eleven", "56"
+9. All - See all prop bets you've placed.
+	• Code: all
+10. Help - See a list of all Prop Bet commands.
+	• Code: help
+11. Exit Prop betting and return to the game.
+	• Code: x
+
 
 Check the Pay Table section to understand the various payouts for all these bets.
 

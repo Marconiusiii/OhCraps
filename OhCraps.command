@@ -168,7 +168,6 @@ def come(roll, comeBet, come4, come5, come6, come8, come9, come10):
 		come10 = comeBet
 	return come4, come5, come6, come8, come9, come10
 
-
 def dCome(roll, comeBet, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10):
 	print "Moving Don't Come Bet to the %d." %roll
 	if roll == 4:
@@ -454,8 +453,6 @@ def press(p):
 		print "What's your new bet?"
 		p = betInput(bank)
 		print "You now bet  $%d." %p
-	else:
-		pass
 	return p
 
 #Game Start
@@ -480,7 +477,6 @@ while True:
 	dPass = 0
 	fieldBet = 0
 	working = False
-	
 
 #Empty Bank check
 	if bank <= 0:
@@ -500,7 +496,7 @@ while True:
 				print "Great, starting you off again with $%d." %bank
 				break
 
-
+# Phase 1
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':
 		bet1 = raw_input("Pass or Don't pass?")
@@ -515,6 +511,7 @@ while True:
 		else:
 			print "Pass or Don't Pass, there is nothing else!"
 			continue
+
 	fBet = raw_input("Bet the Field? y/n")
 	if fBet == 'y':
 		print "How much on the Field?"

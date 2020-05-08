@@ -562,8 +562,17 @@ def hardWays(hard4, hard6, hard8, hard10):
 
 	return hard4, hard6, hard8, hard10
 
+stickman = [
+"Hot Shooter! Keep 'er goin!",
+"Let's go Shooter!",
+"Keep on rolling! Place your bets!",
+"Dice are hot tonight and the Shooter is on fire!",
+"Well done! Pay the Line, take the Don't!",
+"Alright, alright, alright, that's how we do it!"
+]
+
 #Game Start
-print "Oh Craps v.4.5"
+print "Oh Craps v.4.75"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -607,7 +616,7 @@ while True:
 	if throws == 0:
 		print "Here comes a new shooter!"
 	else:
-		print "Hot Shooter! Keep it going!"
+		print stickman[randint(0, len(stickman)-1)]
 
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':

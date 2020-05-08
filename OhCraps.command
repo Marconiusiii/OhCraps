@@ -455,6 +455,113 @@ def press(p):
 		print "You now bet  $%d." %p
 	return p
 
+def placeCall():
+	if four > 0:
+		print "You have $%d placed on the 4." %four
+	if five > 0:
+		print "You have $%d placed on the 5." %five
+	if six > 0:
+		print "You have $%d placed on the 6." %six
+	if eight > 0:
+		print "You have $%d placed on the 8." %eight
+	if nine > 0:
+		print "You have $%d placed on the 9." %nine
+	if ten > 0:
+		print "You have $%d placed on the 10." %ten
+
+def place(four, five, six, eight, nine, ten):
+	if four > 0:
+		print "You have $%d wagered on the Place 4. Press the 4?" %four
+		editFour = raw_input(">")
+		if editFour == 'y':
+			four = betInput(bank)
+	else:
+		print "How much on the Place 4?"
+		four = betInput(bank)
+	if five > 0:
+		print "You have $%d wagered on the Place 5. Press the 5?" %five
+		editFive = raw_input(">")
+		if editFive == 'y':
+			five = betInput(bank)
+	else:
+		print "How much on the Place 5?"
+		five = betInput(bank)
+	if six > 0:
+		print "You have $%d wagered on the Place 6. Press the 6?" %six
+		editSix = raw_input(">")
+		if editSix == 'y':
+			six = betInput(bank)
+	else:
+		print "How much on the Place 6?"
+		six = betInput(bank)
+	if eight > 0:
+		print "You have $%d wagered on the Place 8. Press the 8?" %eight
+		editEight = raw_input(">")
+		if editEight == 'y':
+			eight = betInput(bank)
+	else:
+		print "How much on the place 8?"
+		eight = betInput(bank)
+	if nine > 0:
+		print "Yu have $%d wagered on the Place 9. Press the 9?" %nine
+		editNine = raw_input("")
+		if editNine == 'y':
+			nine = betInput(bank)
+	else:
+		print "How much on the Place 9?"
+		nine = betInput(bank)
+	if ten > 0:
+		print "You have $%d wagered on the Place 10. Press the 10?" %ten
+		editTen = raw_input(">")
+		if editTen == 'y':
+			ten = betInput(bank)
+	else:
+		print "How much on the Place 10?"
+		ten = betInput(bank)
+	return four, five, six, eight, nine, ten
+
+def hardCall():
+	if hard4 > 0:
+		print "You have $%d on the Hard 4." %hard4
+	if hard6 > 0:
+		print "You have $%d on the Hard 6." %hard6
+	if hard8 > 0:
+		print "You have $%d on the Hard 8." %hard8
+	if hard10 > 0:
+		print "You have $%d on the Hard 10." %hard10
+
+def hardCheck(roll, isHard, hard4, hard6, hard8, hard10):
+	if hard4 > 0 and roll == 4 and isHard == False:
+		hard4 = 0
+	if hard6 > 0 and roll == 6 and isHard == False:
+		hard6 = 0
+	if hard8 > 0 and roll == 8 and isHard == False:
+		hard8 = 0
+	if hard10 > 0 and roll == 10 and isHard == False:
+		hard10 = 0
+
+	return hard4, hard6, hard8, hard10
+
+def hardWays(hard4, hard6, hard8, hard10):
+	print "How much on Hard 4?"
+	hard4 = betInput(bank)
+	print "How much on Hard 6?"
+	hard6 = betInput(bank)
+	print "How much on Hard 8?"
+	hard8 = betInput(bank)
+	print "How much on Hard 10?"
+	hard10 = betInput(bank)
+	if hard4 > 0:
+		print "$%d on Hard 4." %hard4
+	if hard6 > 0:
+		print "$%d on Hard 6." %hard6
+	if hard8 > 0:
+		print "$%d on Hard 8." %hard8
+	if hard10 > 0:
+		print "$%d on Hard 10." %hard10
+
+	return hard4, hard6, hard8, hard10
+
 #Game Start
 print "Oh Craps v.4.5"
 print "How much would you like to cash in for your bank?"
@@ -497,6 +604,11 @@ while True:
 				break
 
 # Phase 1
+	if throws == 0:
+		print "Here comes a new shooter!"
+	else:
+		print "Hot Shooter! Keep it going!"
+
 	lineBets = raw_input("Line Bets? y/n")
 	if lineBets == 'y':
 		bet1 = raw_input("Pass or Don't pass?")
@@ -511,6 +623,16 @@ while True:
 		else:
 			print "Pass or Don't Pass, there is nothing else!"
 			continue
+
+	placeCall()
+	plBet = raw_input("Place Bets?")
+	if plBet == 'y':
+		four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
+
+	hardCall()
+	hardBet = raw_input("Hard Ways?")
+	if hardBet == 'y':
+		hard4, hard6, hard8, hard10 = hardWays(hard4, hard6, hard8, hard10)
 
 	fBet = raw_input("Bet the Field? y/n")
 	if fBet == 'y':
@@ -663,15 +785,7 @@ while True:
 
 		if working == True and (hard4 + hard6 + hard8 + hard10) > 0:
 			bank += hardPay(comingOut, coHard, hard4, hard6, hard8, hard10)
-			if coHard == False:
-				if comingOut == 4:
-					hard4 = 0
-				if comingOut ==6 :
-					hard6 = 0
-				if comingOut == 8:
-					hard8 = 0
-				if comingOut == 10:
-					hard10 = 0
+			hard4, hard6, hard8, hard10 = hardCheck(comingOut, coHard, hard4, hard6, hard8, hard10)
 
 		if comingOut in [4, 9, 10] and fieldBet > 0:
 			print "You win $%d on the Field!" %fieldBet
@@ -773,70 +887,11 @@ while True:
 
 #Place Bets
 
-			if four > 0:
-				print "You have $%d placed on the 4." %four
-			if five > 0:
-				print "You have $%d placed on the 5." %five
-			if six > 0:
-				print "You have $%d placed on the 6." %six
-			if eight > 0:
-				print "You have $%d placed on the 8." %eight
-			if nine > 0:
-				print "You have $%d placed on the 9." %nine
-			if ten > 0:
-				print "You have $%d placed on the 10." %ten
-
 #			print "Place Bets?"
+			placeCall()
 			placeBet = raw_input("Place Bets? y/")
 			if placeBet == 'y':
-				if four > 0:
-					print "You have $%d wagered on the Place 4. Press the 4?" %four
-					editFour = raw_input(">")
-					if editFour == 'y':
-						four = betInput(bank)
-				else:
-					print "How much on the Place 4?"
-					four = betInput(bank)
-				if five > 0:
-					print "You have $%d wagered on the Place 5. Press the 5?" %five
-					editFive = raw_input(">")
-					if editFive == 'y':
-						five = betInput(bank)
-				else:
-					print "How much on the Place 5?"
-					five = betInput(bank)
-				if six > 0:
-					print "You have $%d wagered on the Place 6. Press the 6?" %six
-					editSix = raw_input(">")
-					if editSix == 'y':
-						six = betInput(bank)
-				else:
-					print "How much on the Place 6?"
-					six = betInput(bank)
-				if eight > 0:
-					print "You have $%d wagered on the Place 8. Press the 8?" %eight
-					editEight = raw_input(">")
-					if editEight == 'y':
-						eight = betInput(bank)
-				else:
-					print "How much on the place 8?"
-					eight = betInput(bank)
-				if nine > 0:
-					print "Yu have $%d wagered on the Place 9. Press the 9?" %nine
-					editNine = raw_input("")
-					if editNine == 'y':
-						nine = betInput(bank)
-				else:
-					print "How much on the Place 9?"
-					nine = betInput(bank)
-				if ten > 0:
-					print "You have $%d wagered on the Place 10. Press the 10?" %ten
-					editTen = raw_input(">")
-					if editTen == 'y':
-						ten = betInput(bank)
-				else:
-					print "How much on the Place 10?"
-					ten = betInput(bank)
+				four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
 
 #Come Odds
 			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -895,34 +950,10 @@ while True:
 				#fieldBet = 0
 
 #Hard Ways
-
-			if hard4 > 0:
-				print "You have $%d on the Hard 4." %hard4
-			if hard6 > 0:
-				print "You have $%d on the Hard 6." %hard6
-			if hard8 > 0:
-				print "You have $%d on the Hard 8." %hard8
-			if hard10 > 0:
-				print "You have $%d on the Hard 10." %hard10
+			hardCall()
 			hWays = raw_input("Bet the hard ways? y/n")
 			if hWays == 'y':
-				print "How much on Hard 4?"
-				hard4 = betInput(bank)
-				print "How much on Hard 6?"
-				hard6 = betInput(bank)
-				print "How much on Hard 8?"
-				hard8 = betInput(bank)
-				print "How much on Hard 10?"
-				hard10 = betInput(bank)
-				if hard4 > 0:
-					print "$%d on Hard 4." %hard4
-				if hard6 > 0:
-					print "$%d on Hard 6." %hard6
-				if hard8 > 0:
-					print "$%d on Hard 8." %hard8
-				if hard10 > 0:
-					print "$%d on Hard 10." %hard10
-
+				hard4, hard6, hard8, hard10 = hardWays(hard4, hard6, hard8, hard10)
 #Prop Bets
 			props = raw_input("Proposition Bets? y/n")
 			if props == 'y':
@@ -1072,6 +1103,8 @@ while True:
 #Hard Ways payout
 
 			bank += hardPay(p2, p2Hard, hard4, hard6, hard8, hard10)
+			hard4, hard6, hard8, hard10 = hardCheck(p2, p2Hard, hard4, hard6, hard8, hard10)
+
 			if p2 == 4 and four > 0:
 				if 0 < four < 25:
 					win4 = (four/5) * 9

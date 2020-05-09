@@ -83,47 +83,47 @@ def prop():
 
 	while True:
 		propPick = raw_input("Type in your Prop Bet: ")
-		if propPick == '7':
+		if propPick in ['7', 'seven', 'big red', 'Seven', 'any 7', 'Any 7', 'Any Seven', 'Any seven', 'any seven']:
 			print "How much on Any 7?"
 			any7 = betInput(bank)
 			print "Ok, $%d on Any 7." %any7
 			continue
-		elif propPick == "cr":
+		elif propPick in ['cr', 'CR', 'Cr', 'any craps', 'Any Craps', 'Any craps', 'craps', 'Craps']:
 			print "How much on Any Craps?"
 			anyCraps = betInput(bank)
 			print "Ok, $%d on Any Craps." %anyCraps
 			continue
-		elif propPick == "ce":
+		elif propPick in ['ce', 'CE', 'craps and eleven', 'Craps and Eleven', 'craps and 11', 'c and e', 'C and E', "C&E"]:
 			print "How much on C & E?"
 			cAndE = betInput(bank)
 			print "Ok, $%d on C&E." %cAndE
 			continue
-		elif propPick == "sn" or propPick == "s":
+		elif propPick == "sn" or propPick in ['s', 'S', 'snake', 'snakeyes', 'snake eyes', 'Snake Eyes', 'snakeeyes', 'aces', 'Aces', 'ace ace', '2']:
 			print "How much on Snake Eyes?"
 			snakeEyes = betInput(bank)
 			print "Ok, $%d on Snake Eyes." %snakeEyes
 			continue
-		elif propPick == "ad" or propPick == "3":
+		elif propPick in ['ad', 'three', '3', 'AD', 'ace deuce', 'acey deucey', 'Three', '3']:
 			print "How much on Acey-Deucey?"
 			aceDeuce = betInput(bank)
 			print "Ok, $%d on Acey-Deucey." %aceDeuce
 			continue
-		elif propPick == "b" or propPick == "12":
+		elif propPick in ['b', 'B', 'boxcars', 'Boxcars', 'Box Cars', 'box cars', '12', 'twelve', 'Twelve', 'six six', '66']:
 			print "How much on Boxcars?"
 			boxcars = betInput(bank)
 			print "Ok, $%d on Boxcars." %boxcars
 			continue
-		elif propPick in ["h", 'horn']:
+		elif propPick in ["h", 'horn', 'H', 'Horn']:
 			print "How much on the Horn?"
 			horn = betInput(bank)
 			print "Ok, $%d on the Horn Bet!" %horn
 			continue
-		elif propPick in ['11', 'eleven', '56']:
+		elif propPick in ['11', 'eleven', '56', 'Eleven', 'yo', 'Yo', 'Yo Eleven']:
 			print "How much on the Eleven?"
 			eleven = betInput(bank)
 			print "Ok, $%d on the Eleven." %eleven
 			continue
-		elif propPick == "all":
+		elif propPick in ['all', 'All', 'all bets', 'All Bets', 'Show All Bets', 'show all bets']:
 			print "Current prop bets:"
 			if any7 > 0:
 				print "$%d on Any 7." %any7
@@ -145,7 +145,7 @@ def prop():
 			print "Use the following codes in the bet prompt to place that specific bet:\n\t7 - Any Seven\n\tcr - Any Craps\n\tce - Craps and Eleven\n\ts, 2 - Snake Eyes\n\tad, 3 - Acey Deucey\n\tb, 12 - Boxcars\n\th, horn - Horn Bet\n\t11, eleven, 56 - Yo Eleven\n\tall - Show all bets\n\tx - Exit prop betting and return to game"
 			raw_input("Hit Enter to continue >")
 			continue
-		elif propPick == "x":
+		elif propPick in ["x", 'X', 'exit', 'Exit']:
 			break
 		else:
 			print "That's not a valid bet, and the boxman glares at you in disgust. Try again, or type 'x' and hit Enter to exit."
@@ -449,7 +449,7 @@ def odds(comingOut, bet, line):
 
 def press(p):
 	press = raw_input("Press this bet? >")
-	if press == 'y':
+	if press in ['y', 'Y', 'yes', 'Yes']:
 		print "What's your new bet?"
 		p = betInput(bank)
 		print "You now bet  $%d." %p
@@ -473,7 +473,7 @@ def place(four, five, six, eight, nine, ten):
 	if four > 0:
 		print "You have $%d wagered on the Place 4. Press the 4?" %four
 		editFour = raw_input(">")
-		if editFour == 'y':
+		if editFour in ['y', 'Y', 'yes', 'Yes']:
 			four = betInput(bank)
 	else:
 		print "How much on the Place 4?"
@@ -481,7 +481,7 @@ def place(four, five, six, eight, nine, ten):
 	if five > 0:
 		print "You have $%d wagered on the Place 5. Press the 5?" %five
 		editFive = raw_input(">")
-		if editFive == 'y':
+		if editFive in ['y', 'Y', 'yes', 'Yes']:
 			five = betInput(bank)
 	else:
 		print "How much on the Place 5?"
@@ -489,7 +489,7 @@ def place(four, five, six, eight, nine, ten):
 	if six > 0:
 		print "You have $%d wagered on the Place 6. Press the 6?" %six
 		editSix = raw_input(">")
-		if editSix == 'y':
+		if editSix in ['y', 'Y', 'yes', 'Yes']:
 			six = betInput(bank)
 	else:
 		print "How much on the Place 6?"
@@ -497,7 +497,7 @@ def place(four, five, six, eight, nine, ten):
 	if eight > 0:
 		print "You have $%d wagered on the Place 8. Press the 8?" %eight
 		editEight = raw_input(">")
-		if editEight == 'y':
+		if editEight in ['y', 'Y', 'yes', 'Yes']:
 			eight = betInput(bank)
 	else:
 		print "How much on the place 8?"
@@ -505,7 +505,7 @@ def place(four, five, six, eight, nine, ten):
 	if nine > 0:
 		print "Yu have $%d wagered on the Place 9. Press the 9?" %nine
 		editNine = raw_input("")
-		if editNine == 'y':
+		if editNine in ['y', 'Y', 'yes', 'Yes']:
 			nine = betInput(bank)
 	else:
 		print "How much on the Place 9?"
@@ -513,7 +513,7 @@ def place(four, five, six, eight, nine, ten):
 	if ten > 0:
 		print "You have $%d wagered on the Place 10. Press the 10?" %ten
 		editTen = raw_input(">")
-		if editTen == 'y':
+		if editTen in ['y', 'Y', 'yes', 'Yes']:
 			ten = betInput(bank)
 	else:
 		print "How much on the Place 10?"
@@ -609,13 +609,13 @@ while True:
 		print stickman[randint(0, len(stickman)-1)]
 
 	lineBets = raw_input("Line Bets? >")
-	if lineBets == 'y':
+	if lineBets in ['y', 'Y', 'yes', 'Yes']:
 		bet1 = raw_input("Pass or Don't pass?")
-		if bet1 == 'p':
+		if bet1 in ['p', 'P', 'pass', 'Pass Line', 'Pass']:
 			print "How much on the Pass Line?"
 			passLine = betInput(bank)
 			print "Great, $%d on the Pass Line." %passLine
-		elif bet1 == 'd':
+		elif bet1 in ['d', 'D', 'dp', 'DP', 'dont', "Don't Pass", "don't pass"]:
 			print "How much on the Don't Pass Line?"
 			dPass = betInput(bank)
 			print "Great, $%d on the Don't Pass Line." %dPass
@@ -625,29 +625,29 @@ while True:
 
 	placeCall()
 	plBet = raw_input("Place Bets? >")
-	if plBet == 'y':
+	if plBet in ['y', 'Y', 'yes', 'Yes']:
 		four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
 
 	hardCall()
 	hardBet = raw_input("Hard Ways? >")
-	if hardBet == 'y':
+	if hardBet in ['y', 'Y', 'yes', 'Yes']:
 		hard4, hard6, hard8, hard10 = hardWays(hard4, hard6, hard8, hard10)
 
 	fBet = raw_input("Bet the Field? >")
-	if fBet == 'y':
+	if fBet in ['y', 'Y', 'yes', 'Yes']:
 		print "How much on the Field?"
 		fieldBet = betInput(bank)
 		print "Ok, $%d on the Field." %fieldBet
 
 	if (four + five + six + eight + nine + ten + hard4 + hard6 + hard8 + hard10) > 0:
 		workPlace = raw_input("All bets working? >")
-		if workPlace == 'y':
+		if workPlace in ['y', 'Y', 'yes', 'Yes']:
 			working = True
 		else:
 			working = False
 
 	propStart = raw_input("Proposition Bets? >")
-	if propStart == 'y':
+	if propStart in ['y', 'Y', 'yes', 'Yes']:
 		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
 # Coming Out Roll
@@ -801,11 +801,11 @@ while True:
 				if passOdds > 0:
 					print "You have $%d bet for your Odds." %passOdds
 				pOddsBet = raw_input("Pass/Don't Pass Line Odds? >")
-				if pOddsBet == 'y':
-					if bet1 == 'p':
+				if pOddsBet in ['y', 'Y', 'yes', 'Yes']:
+					if bet1 in ['p', 'P', 'pass', 'Pass Line', 'Pass']:
 						print "How much for your Pass Line Odds?"
 						passOdds = betInput(bank)
-					elif bet1 == 'd':
+					elif bet1 in ['d', 'D', 'dp', 'DP', 'dont', "Don't Pass", "don't pass"]:
 						print "How much to Lay against the %d?" %comingOut
 						passOdds = betInput(bank)
 
@@ -861,16 +861,16 @@ while True:
 				print "You have $%d on the Don't Come 10 with $%d in Odds." %(dCome10, dC10Odds)
 #			print "Come Bet?"
 			cmBet = raw_input("Come Bet? >")
-			if cmBet == 'y':
+			if cmBet in ['y', 'Y', 'yes', 'Yes']:
 
 				while True:
 					comeChoice = raw_input("Come or Don't Come?")
-					if comeChoice == 'c':
+					if comeChoice in ['c', 'C', 'come', 'Come']:
 						print "How much on the Come?"
 						comeBet = betInput(bank)
 						print "Ok, $%d in the Come." %comeBet
 						break
-					elif comeChoice == 'd':
+					elif comeChoice in ['d', 'dc', 'dont', "Don't Come", "don't come"]:
 						print "How much on the Don't Come?"
 						dComeBet = betInput(bank)
 						print "Ok, $%d on the Don't Come." %dComeBet
@@ -886,13 +886,13 @@ while True:
 #			print "Place Bets?"
 			placeCall()
 			placeBet = raw_input("Place Bets? >")
-			if placeBet == 'y':
+			if placeBet in ['y', 'Y', 'yes', 'Yes']:
 				four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
 
 #Come Odds
 			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 				alterOdds = raw_input("Change Come Odds? >")
-				if alterOdds == 'y':
+				if alterOdds in ['y', 'Y', 'yes', 'Yes']:
 					if come4 > 0:
 						print "You have $% in Odds for the 4. Enter a new amount." %c4Odds
 						c4Odds = betInput(bank)
@@ -916,7 +916,7 @@ while True:
 
 			if (dCome4 + dCome5 + dCome6 + dCome8 + dCome9 + dCome10) > 0:
 				alterDont = raw_input("Change Don't Come Odds? >")
-				if alterDont == 'y':
+				if alterDont in ['y', 'Y', 'yes', 'Yes']:
 					if dCome4 > 0:
 						print "Your Lay 4 has $% in Odds. Enter the new amount." %dC4Odds
 						dC4Odds = betInput(bank)
@@ -939,7 +939,7 @@ while True:
 #Field Bet
 
 			fBet = raw_input("Bet the Field? You have $%d wagered. >" %fieldBet)
-			if fBet == 'y':
+			if fBet in ['y', 'Y', 'yes', 'Yes']:
 				print "How much on the Field?"
 				fieldBet = betInput(bank)
 			#else:
@@ -948,11 +948,11 @@ while True:
 #Hard Ways
 			hardCall()
 			hWays = raw_input("Bet the hard ways? >")
-			if hWays == 'y':
+			if hWays in ['y', 'Y', 'yes', 'Yes']:
 				hard4, hard6, hard8, hard10 = hardWays(hard4, hard6, hard8, hard10)
 #Prop Bets
 			props = raw_input("Proposition Bets? >")
-			if props == 'y':
+			if props in ['y', 'Y', 'yes', 'Yes']:
 				any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 			if throws == 1:
 				print "Dice are rolling! %d roll." %throws
@@ -1012,7 +1012,7 @@ while True:
 				else:
 					come4, come5, come6, come8, come9, come10 = come(p2, comeBet, come4, come5, come6, come8, come9, come10)
 					cOdds = raw_input("Odds on your Come bet? >")
-					if cOdds == 'y':
+					if cOdds in ['y', 'Y', 'yes', 'Yes']:
 						if p2 == 4:
 							print "Odds on the 4?"
 							c4Odds = betInput(bank)
@@ -1050,7 +1050,7 @@ while True:
 				else:
 					dCome4, dCome5, dCome6, dCome8, dCome9, dCome10 = dCome(p2, dComeBet, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10)
 					dcOdds = raw_input("Odds on your Don't Come bet? >")
-					if dcOdds == 'y':
+					if dcOdds in ['y', 'Y', 'yes', 'Yes']:
 						if p2 == 4:
 							print "Odds on the Don't Come 4?"
 							dC4Odds = betInput(bank)

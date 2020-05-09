@@ -13,7 +13,7 @@ The game starts off asking you to set up a bankroll. Enter a numeric amount to s
 
 ### Coming Out Roll
 
-You've established your bankroll and are now ready to start betting. You have a few options for the very first roll:
+You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the letter 'y' and then hitting Enter to proceed. You can bypass any of the bets by simply hitting Enter to move on through the game.
 
 #### Line Bets
 
@@ -21,15 +21,30 @@ Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to 
 
 Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet.
 
+#### Place Bets
+
+Typing 'y' and hitting Enter when prompted with the Place Bets will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number.
+
+If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
+
+Placing the 4 or 10 for $25 or more will automatically Buy those bets, and the 2% commission is factored into what you win if they hit. For example, Buying the ender
+4 for $25 will win 2 for 1, so you pay $1 to win $50, and will end up collecting $49.
+
+#### Hard Ways
+
+The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled.
+
+Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
+
 #### Field Bet
 
 The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is rolled, you win double your bet, and if a 12 is rolled, you will win triple your bet. All other numbers win even money. A 5, 6, 7, or 8 will lose.
 
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
-#### Working Place Bets
+#### Working  Bets
 
-If you had Place Bets and hit the previous point number, entering "y" here will turn all your bets On/Working for the Come Out roll. If you roll any Place number on the Coming Out roll, it will pay out, but if you roll a 7, you will lose all your Place bets. This option only appears if you have Place Bets already set up.
+If you've made Place Bets or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
 #### Proposition Bets
 
@@ -58,7 +73,6 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 11. Exit Prop betting and return to the game.
 	• Code: x
 
-
 Check the Pay Table section to understand the various payouts for all these bets.
 
 ### Point Phase
@@ -71,16 +85,6 @@ New betting modes appear in the Point phase:
 
 When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, you'll be asked if you want Pass Line Odds. If you bet on the Don't Pass Line, you'll be prompted for a Lay Bet. Both are optional and can be bypassed by hitting Enter.
 
-#### Place Bets
-
-Typing 'y' and hitting Enter when prompted with the Place Bets will take you through the Place Bet flow, asking you for a bet on each of the place numbers. Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number.
-
-If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
-
-Place Bets are always off on the Coming Out roll, so they will not be paid until after the Point Phase has started unless you enter "y" in the Place Bets Working prompt between the Field and Proposition bet prompts in the Coming Out phase.
-
-Placing the 4 or 10 for $25 or more will automatically Buy those bets, and the 2% commission is factored into what you win if they hit. For example, Buying the 4 for $25 will win 2 for 1, so you pay $1 to win $50, and will end up collecting $49.
-
 #### Come and Don't Come
 
 The Come and Don't Come Fields act like additional Pass Line Bets after a Point has been established. Placing these bets is only possible after the Point Phase has started. Enter 'y' if you want to bet on these fields when prompted, then Enter a 'c' for Come or a 'd' for Don't Come.
@@ -92,12 +96,6 @@ A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any 
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.
 
 If Come or Don't Come bets are working during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll. If a 7 is rolled for the Coming Out roll, Come bets will lose but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established.
-
-#### Hard Ways
-
-The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled.
-
-Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
 
 #### Field and Proposition Bets
 

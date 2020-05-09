@@ -574,7 +574,6 @@ while True:
 		continue
 print "Great, starting off with $%d." %bank
 
-
 comeBet = dComeBet = 0
 throws = 0
 while True:

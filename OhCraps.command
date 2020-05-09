@@ -551,15 +551,6 @@ def hardWays(hard4, hard6, hard8, hard10):
 	hard8 = betInput(bank)
 	print "How much on Hard 10?"
 	hard10 = betInput(bank)
-	if hard4 > 0:
-		print "$%d on Hard 4." %hard4
-	if hard6 > 0:
-		print "$%d on Hard 6." %hard6
-	if hard8 > 0:
-		print "$%d on Hard 8." %hard8
-	if hard10 > 0:
-		print "$%d on Hard 10." %hard10
-
 	return hard4, hard6, hard8, hard10
 
 stickman = [
@@ -754,11 +745,10 @@ while True:
 		continue
 	else:
 		pointIsOn = True
-		print "The point is %d." %comingOut
+		print "The point is %d.\n" %comingOut
 
 # Working Bets
 		if working == True:
-
 			if four > 0 and comingOut == 4:
 				if four < 25:
 					bank += four/5 * 9
@@ -819,8 +809,6 @@ while True:
 					elif bet1 == 'd':
 						print "How much to Lay against the %d?" %comingOut
 						passOdds = betInput(bank)
-				else:
-					pass
 
 #Come Bet
 			if come4 > 0 and c4Odds == 0:

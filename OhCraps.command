@@ -629,7 +629,7 @@ stickman = [
 ]
 
 #Game Start
-print "Oh Craps v.4.75"
+print "Oh Craps v.4.85"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:

@@ -30,6 +30,12 @@ If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Ent
 Placing the 4 or 10 for $25 or more will automatically Buy those bets, and the 2% commission is factored into what you win if they hit. For example, Buying the ender
 4 for $25 will win 2 for 1, so you pay $1 to win $50, and will end up collecting $49.
 
+#### Lay Bets
+
+Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 to leave the bet alone.
+
+Check the Pay Table to see how each of the Lay Bets pays out.
+
 #### Hard Ways
 
 The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled.
@@ -44,7 +50,7 @@ Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Fo
 
 #### Working  Bets
 
-If you've made Place Bets or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
+If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
 #### Proposition Bets
 

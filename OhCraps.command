@@ -6,7 +6,7 @@ from random import *
 four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = passOdds = 0
 
 # Don't Come variable designation
-dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = 0
+dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = lay4 = lay5 = lay6 = lay8 = lay9 = lay10 = 0
 
 
 def betInput(bank):
@@ -448,7 +448,7 @@ def odds(comingOut, bet, line):
 	return oddsOut
 
 def press(p):
-	press = raw_input("Press this bet? >")
+	press = raw_input("Change this bet? >")
 	if press in ['y', 'Y', 'yes', 'Yes']:
 		print "What's your new bet?"
 		p = betInput(bank)
@@ -468,6 +468,18 @@ def placeCall():
 		print "You have $%d placed on the 9." %nine
 	if ten > 0:
 		print "You have $%d placed on the 10." %ten
+	if lay4 > 0:
+		print "You have $%d laid against the 4." %lay4
+	if lay5 > 0:
+		print "You have $%d laid against the 5." %lay5
+	if lay6 > 0:
+		print "You have $%d laid against the 6." %lay6
+	if lay8 > 0:
+		print "You have $%d laid against the 8." %lay8
+	if lay9 > 0:
+		print "You have $%d laid against the 9." %lay9
+	if lay10 > 0:
+		print "You have $%d laid against the 10." %lay10
 
 def place(four, five, six, eight, nine, ten):
 	if four > 0:
@@ -519,6 +531,60 @@ def place(four, five, six, eight, nine, ten):
 		print "How much on the Place 10?"
 		ten = betInput(bank)
 	return four, five, six, eight, nine, ten
+
+#Lay Bet Function
+def lay(lay4, lay5, lay6, lay8, lay9, lay10):
+	if lay4 > 0:
+		print "You have $%d laid against the 4. Change your bet?" %lay4
+		editFour = raw_input(">")
+		if editFour in ['y', 'Y', 'yes', 'Yes']:
+			lay4 = betInput(bank)
+	else:
+		print "How much to lay against the 4?"
+		lay4 = betInput(bank)
+	if lay5 > 0:
+		print "You have $%d laid against the 5. Change your bet?" %lay5
+		editFive = raw_input(">")
+		if editFive in ['y', 'Y', 'yes', 'Yes']:
+			lay5 = betInput(bank)
+	else:
+		print "How much to lay against the 5?"
+		lay5 = betInput(bank)
+	if lay6 > 0:
+		print "You have $%d laud against the 6. Change your bet?" %lay6
+		editSix = raw_input(">")
+		if editSix in ['y', 'Y', 'yes', 'Yes']:
+			lay6 = betInput(bank)
+	else:
+		print "How much to lay against the 6?"
+		lay6 = betInput(bank)
+	if lay8 > 0:
+		print "You have $%d laud against the 8. Change your bet?" %lay8
+		editEight = raw_input(">")
+		if editEight in ['y', 'Y', 'yes', 'Yes']:
+			lay8 = betInput(bank)
+	else:
+		print "How much to lay against the 8?"
+		lay8 = betInput(bank)
+	if lay9 > 0:
+		print "Yu have $%d laud against the 9. Change your bet?" %lay9
+		editNine = raw_input("")
+		if editNine in ['y', 'Y', 'yes', 'Yes']:
+			lay9 = betInput(bank)
+	else:
+		print "How much to lay against the 9?"
+		lay9 = betInput(bank)
+	if lay10 > 0:
+		print "You have $%d laud against the 10. Change your bet?" %lay10
+		editTen = raw_input(">")
+		if editTen in ['y', 'Y', 'yes', 'Yes']:
+			lay10 = betInput(bank)
+	else:
+		print "How much to lay against the 10?"
+		lay10 = betInput(bank)
+	return lay4, lay5, lay6, lay8, lay9, lay10
+
+
 
 def hardCall():
 	if hard4 > 0:
@@ -628,6 +694,11 @@ while True:
 	if plBet in ['y', 'Y', 'yes', 'Yes']:
 		four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
 
+	lBet = raw_input("Lay Bets? >")
+	if lBet in ['y', 'Y', 'yes', 'Yes']:
+		lay4, lay5, lay6, lay8, lay9, lay10 = lay(lay4, lay5, lay6, lay8, lay9, lay10)
+
+
 	hardCall()
 	hardBet = raw_input("Hard Ways? >")
 	if hardBet in ['y', 'Y', 'yes', 'Yes']:
@@ -708,6 +779,33 @@ while True:
 				print "You lost $%d on the Hard Ways." %(hard4 + hard6 + hard8 + hard10)
 				bank -= (hard4 + hard6 + hard8 + hard10)
 				hard4 = hard6 = hard8 = hard10 = 0
+#Working Lay Bets
+			if lay4 > 0:
+				print "You won $%d on the Lay 4." %(lay4 / 2)
+				bank += (lay4 / 2)
+				lay4 = 0
+			if lay5 > 0:
+				print "You won $%d on the lay 5!" %((lay5 / 3) * 2)
+				bank += (lay5 / 3) * 2
+				lay5 = 0
+			if lay6 > 0:
+				print "You won $%d on the Lay 6!" %((lay6/6) * 5)
+				bank += (lay6 / 6) * 5
+				lay6 = 0
+			if lay8 > 0:
+				print "You won $%d on the Lay 8!" %((lay8/6) * 5)
+				bank += (lay8 / 6) * 5
+				lay8 = 0
+			if lay9 > 0:
+				print "You won $%d on the lay 9!" %((lay9 / 3) * 2)
+				bank += (lay9 / 3) * 2
+				lay9 = 0
+			if lay10 > 0:
+				print "You won $%d on the Lay 10!" %(lay10 / 2)
+				bank += lay10 / 2
+				lay10 = 0
+
+
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
 			bank += passLine
@@ -748,6 +846,30 @@ while True:
 
 # Working Bets
 		if working == True:
+			if lay4 > 0 and comingOut == 4:
+				print "You lose $%d from the Lay 4." %lay4
+				bank -= lay4
+				lay4 = 0
+			if lay5 > 0 and comingOut == 5:
+				print "You lost $%d from the lay 5." %lay5
+				bank -= lay5
+				lay5 = 0
+			if lay6 > 0 and comingOut == 6:
+				print "You lost $%d from the Lay 6." %lay6
+				bank -= lay6
+				lay6 = 0
+			if lay8 > 0 and comingOut == 8:
+				print "You lost $%d from the Lay 8." %lay8
+				bank -= lay8
+				lay8 = 0
+			if lay9 > 0 and comingOut == 9:
+				print "You lost $%d from the Lay 9." %lay9
+				bank -= lay9
+				lay9 = 0
+			if lay10 > 0 and comingOut == 10:
+				print "You lost $%d from the Lay 10." %lay10
+				bank -= lay10
+				lay10 = 0
 			if four > 0 and comingOut == 4:
 				if four < 25:
 					bank += four/5 * 9
@@ -881,13 +1003,17 @@ while True:
 						print "Come or Don't Come, there is no try!"
 						continue
 
-#Place Bets
+#Place and Lay Bets
 
 #			print "Place Bets?"
 			placeCall()
 			placeBet = raw_input("Place Bets? >")
 			if placeBet in ['y', 'Y', 'yes', 'Yes']:
 				four, five, six, eight, nine, ten = place(four, five, six, eight, nine, ten)
+			lyBets = raw_input("Lay Bets? >")
+			if lyBets in ['y', 'Y', 'yes', 'Yes']:
+				lay4, lay5, lay6, lay8, lay9, lay10 = lay(lay4, lay5, lay6, lay8, lay9, lay10)
+
 
 #Come Odds
 			if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
@@ -1143,6 +1269,33 @@ while True:
 				bank += win10
 				if comingOut != 10:
 					ten = press(ten)
+# Lay Bets Loss
+			if lay4 > 0 and p2 == 4:
+				print "You lose $%d from the Lay 4." %lay4
+				bank -= lay4
+				lay4 = 0
+			if lay5 > 0 and p2 == 5:
+				print "You lost $%d from the lay 5." %lay5
+				bank -= lay5
+				lay5 = 0
+			if lay6 > 0 and p2 == 6:
+				print "You lost $%d from the Lay 6." %lay6
+				bank -= lay6
+				lay6 = 0
+			if lay8 > 0 and p2 == 8:
+				print "You lost $%d from the Lay 8." %lay8
+				bank -= lay8
+				lay8 = 0
+			if lay9 > 0 and p2 == 9:
+				print "You lost $%d from the Lay 9." %lay9
+				bank -= lay9
+				lay9 = 0
+			if lay10 > 0 and p2 == 10:
+				print "You lost $%d from the Lay 10." %lay10
+				bank -= lay10
+				lay10 = 0
+
+
 			if p2 == comingOut:
 				print "Point hit!"
 				if bet1 == 'p':
@@ -1162,6 +1315,31 @@ while True:
 				break
 #Seven Out
 			elif p2 == 7:
+				if lay4 > 0:
+					print "You won $%d on the Lay 4." %(lay4 / 2)
+					bank += (lay4 / 2)
+					lay4 = 0
+				if lay5 > 0:
+					print "You won $%d on the lay 5!" %((lay5 / 3) * 2)
+					bank += (lay5 / 3) * 2
+					lay5 = 0
+				if lay6 > 0:
+					print "You won $%d on the Lay 6!" %((lay6/6) * 5)
+					bank += (lay6 / 6) * 5
+					lay6 = 0
+				if lay8 > 0:
+					print "You won $%d on the Lay 8!" %((lay8/6) * 5)
+					bank += (lay8 / 6) * 5
+					lay8 = 0
+				if lay9 > 0:
+					print "You won $%d on the lay 9!" %((lay9 / 3) * 2)
+					bank += (lay9 / 3) * 2
+					lay9 = 0
+				if lay10 > 0:
+					print "You won $%d on the Lay 10!" %(lay10 / 2)
+					bank += lay10 / 2
+					lay10 = 0
+
 				come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds  = c6Odds = c8Odds = c9Odds = c10Odds = dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC10Odds = 0
 				if hard4 + hard6 + hard8 + hard10 > 0:
 					print "You lose $%d from the Hard Ways." %(hard4 + hard6 + hard8 + hard10)

@@ -6,8 +6,52 @@ from random import *
 four = five = six = eight = nine = ten = hard4 = hard6 = hard8 = hard10 = come4 = come5 = come6 = come8 = come9 = come10 = c4Odds = c5Odds = c6Odds = c8Odds = c9Odds = c10Odds = any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = passOdds = 0
 
 # Don't Come variable designation
-dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = lay4 = lay5 = lay6 = lay8 = lay9 = lay10 = 0
+dCome4 = dCome5 = dCome6 = dCome8 = dCome9 = dCome10 = dC4Odds = dC5Odds = dC6Odds = dC8Odds = dC9Odds = dC10Odds = lay4 = lay5 = lay6 = lay8 = lay9 = lay10 = atsAll = atsSmall = atsTall = 0
+smallNumbers = []
+tallNumbers = []
+ats = []
+atsOn = False
 
+def setClear(x, y, z):
+	smallSet = [2, 3, 4, 5, 6]
+	tallSet = [8, 9, 10, 11, 12]
+	allSet = smallSet + tallSet
+	if set(x) == set(smallSet):
+		x = []
+	if set(y) == set(tallSet):
+		y = []
+	if set(z) == set(allSet):
+		z = []
+	return x, y, z
+
+
+def allTallSmall():
+	print "How much on the All?"
+	a = input("$>")
+	print "Ok, $%d on the All." %a
+	print "How much on the Tall?"
+	t = input("$>")
+	print "Ok, $%d on the Tall." %t
+	print "How much on the Small?"
+	s = input("$>")
+	print "Ok $%d on the Small." %s
+	return a, t, s
+
+def atsCheck(i, inSmall, inTall, all, tall, small):
+	payout = 0
+	allSet = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+	tallSet = [8, 9, 10, 11, 12]
+	smallSet = [2, 3, 4, 5, 6]
+	if set(i) == set(allSet):
+		print "You hit the All and won $%d!" %(all * 176)
+		payout += all * 176
+	if set(inSmall) == set(smallSet):
+		print "You hit the Small and won $%d!" %(small * 35)
+		payout += small * 35
+	if set(inTall) == set(tallSet):
+		print "You hit the Tall and won $%d!" %(tall * 35)
+		payout += tall * 35
+	return payout
 
 def betInput(bank):
 	if bank <= 0:
@@ -629,7 +673,7 @@ stickman = [
 ]
 
 #Game Start
-print "Oh Craps v.4.85"
+print "Oh Craps v.4.95"
 print "How much would you like to cash in for your bank?"
 while True:
 	try:
@@ -721,6 +765,16 @@ while True:
 	if propStart in ['y', 'Y', 'yes', 'Yes']:
 		any7, anyCraps, cAndE, snakeEyes, aceDeuce, boxcars, horn, eleven = prop()
 
+# ATS
+	if atsOn == False and throws == 0:
+		atsChoice = raw_input("All Tall Small? >")
+		if atsChoice in ['y', 'Y', 'yes', 'Yes']:
+			atsOn = True
+			atsAll, atsTall, atsSmall = allTallSmall()
+	if atsOn == True:
+		ats.sort()
+		print "All Tall Small\n"
+		print ats
 # Coming Out Roll
 	if throws == 1:
 		print "Dice are coming out! %d roll." %throws
@@ -731,6 +785,14 @@ while True:
 #	comingOut = 4
 #	coHard = False
 	throws += 1
+	if comingOut in [2, 3, 4, 5, 6]:
+		if comingOut not in smallNumbers:
+			smallNumbers.append(comingOut)
+	elif comingOut in [8, 9, 10, 11, 12]:
+		if comingOut not in tallNumbers:
+			tallNumbers.append(comingOut)
+	if comingOut not in ats:
+		ats.append(comingOut)
 
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
@@ -805,7 +867,20 @@ while True:
 				bank += lay10 / 2
 				lay10 = 0
 
-
+# ATS clean up on 7 out
+		if atsOn == True and (atsAll + atsSmall + atsTall) > 0:
+			if comingOut == 7:
+				print "You lost $%d from the All Tall Small!" %(atsAll + atsTall + atsSmall)
+				bank -= (atsAll + atsTall + atsSmall)
+				atsOn = False
+				atsAll = atsTall = atsSmall = 0
+				if len(ats) > 0:
+					ats = smallNumbers = tallNumbers =  []
+			elif comingOut == 11:
+				if comingOut not in tallNumbers:
+					tallNumbers.append(comingOut)
+				if comingOut not in ats:
+					ats.append(comingOut)
 		if bet1 == 'p':
 			print "You won $%d!" %passLine
 			bank += passLine
@@ -822,6 +897,15 @@ while True:
 		print "You now have $%d in your bank." %bank
 		continue
 	elif comingOut in [2, 3, 12]:
+		if comingOut in [2, 3, 4, 5, 6]:
+			if comingOut not in smallNumbers:
+				smallNumbers.append(comingOut)
+		elif comingOut in [8, 9, 10, 11, 12]:
+			if comingOut not in tallNumbers:
+				tallNumbers.append(comingOut)
+		if comingOut not in ats:
+			ats.append(comingOut)
+
 		print "Oh Craps!"
 		if bet1 == 'p':
 			print "You lost $%d." %passLine
@@ -839,9 +923,22 @@ while True:
 			print "You win $%d on the Field!" %fieldBet
 			bank += fieldBet
 		print "You now have $%d in your bank." %bank
+
+		bank += atsCheck(ats, smallNumbers, tallNumbers, atsAll, atsTall, atsSmall)
+		smallNumbers, tallNumbers, ats = setClear(smallNumbers, tallNumbers, ats)
+
 		continue
 	else:
+		if comingOut in [2, 3, 4, 5, 6]:
+			if comingOut not in smallNumbers:
+				smallNumbers.append(comingOut)
+		elif comingOut in [8, 9, 10, 11, 12]:
+			if comingOut not in tallNumbers:
+				tallNumbers.append(comingOut)
+		if comingOut not in ats:
+			ats.append(comingOut)
 		pointIsOn = True
+
 		print "The point is %d.\n" %comingOut
 
 # Working Bets
@@ -914,9 +1011,14 @@ while True:
 			print "You lose $%d on the Field." %fieldBet
 			bank -= fieldBet
 			fieldBet = 0
-
+		bank += atsCheck(ats, smallNumbers, tallNumbers, atsAll, atsTall, atsSmall)
+		smallNumbers, tallNumbers, ats = setClear(smallNumbers, tallNumbers, ats)
 		#Betting
 		while True:
+			if atsOn == True:
+				ats.sort()
+				print "All Tall Small\n"
+				print ats
 			any7 = anyCraps = cAndE = snakeEyes = aceDeuce = boxcars = horn = eleven = 0
 #Pass/Don't Pass Odds
 			if passLine > 0 or dPass > 0:
@@ -1295,6 +1397,15 @@ while True:
 				bank -= lay10
 				lay10 = 0
 
+			if p2 in [2, 3, 4, 5, 6]:
+				if p2 not in smallNumbers:
+					smallNumbers.append(p2)
+			elif p2 in [8, 9, 10, 11, 12]:
+				if p2 not in tallNumbers:
+					tallNumbers.append(p2)
+			if p2 not in ats:
+				ats.append(p2)
+
 
 			if p2 == comingOut:
 				print "Point hit!"
@@ -1315,6 +1426,15 @@ while True:
 				break
 #Seven Out
 			elif p2 == 7:
+				if atsOn == True and (atsAll + atsTall + atsSmall) > 0:
+					print "You lost $%d from the All Tall Small!" %(atsAll + atsTall + atsSmall)
+					bank -= (atsAll + atsTall + atsSmall)
+					atsAll = atsTall = atsSmall = 0
+					if len(ats) > 0:
+						ats = smallNumbers = tallNumbers =  []
+					atsOn = False
+
+
 				if lay4 > 0:
 					print "You won $%d on the Lay 4." %(lay4 / 2)
 					bank += (lay4 / 2)
@@ -1372,7 +1492,11 @@ while True:
 				break
 			else:
 				print "Bank = $%d. The point is %d." %(bank, comingOut)
+				bank += atsCheck(ats, smallNumbers, tallNumbers, atsAll, atsTall, atsSmall)
+				smallNumbers, tallNumbers, ats = setClear(smallNumbers, tallNumbers, ats)
 				#raw_input("Roll Again!")
 				continue
 		print "You have $%d in your bank!" %bank
+	bank += atsCheck(ats, smallNumbers, tallNumbers, atsAll, atsTall, atsSmall)
+	smallNumbers, tallNumbers, ats = setClear(smallNumbers, tallNumbers, ats)
 	continue

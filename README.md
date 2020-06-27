@@ -52,6 +52,12 @@ Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Fo
 
 If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
+#### All Tall Small
+
+The All Tall Small bet is an interesting persistent bet where you are betting that a set of numbers will all appear before the 7. Small means you are betting that the 2, 3, 4, 5, and 6 will appear before the 7; Tall means you are betting that the 8. 9. 10, 11, and 12 will appear; All is a bet that both the small and tall numbers will all appear before the 7.
+
+This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll.
+
 #### Proposition Bets
 
 These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
@@ -208,5 +214,11 @@ These bets are available at all times. If there is a bet on the Field, the Field
 </tr>
 <tr>
 <td>Hard 6 and 8</td><td>9:1</td>
+</tr>
+<tr>
+<td>Small and Tall</td><td>35:1</td>
+</tr>
+<tr>
+<td>The All</td><td>176:1</td>
 </tr>
 </table>

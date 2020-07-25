@@ -295,7 +295,7 @@ def dComePayout(roll, dCome4, dCome5, dCome6, dCome8, dCome9, dCome10, dC4Odds, 
 	payout = 0
 	if dCome4 > 0:
 		if roll == 7:
-			print "You win ${} on your Don't Come for the 4!".format(Come4)
+			print "You win ${} on your Don't Come for the 4!".format(dCome4)
 			if dC4Odds > 0:
 				print "You win ${} from your Don't Come 4 Odds.".format(dC4Odds / 2)
 				payout += dC4Odds / 2

@@ -50,10 +50,12 @@ def atsCheck():
 		print "You hit the Small and won ${}!".format(atsSmall * 35)
 		bank += atsSmall * 35
 		atsSmall = 0
+		smallNumbers = []
 	if set(tallNumbers) == set(tallSet):
 		print "You hit the Tall and won ${}!".format(atsTall * 35)
 		bank += atsTall * 35
 		atsTall = 0
+		tallNumbers = []
 	if set(ats) == set(allSet):
 		print "You hit the All and won ${}".format(atsAll * 176)
 		bank += atsAll * 176
@@ -951,6 +953,7 @@ while True:
 		if comingOut not in ats:
 			ats.append(comingOut)
 		pointIsOn = True
+		atsCheck()
 
 		print "The point is {}.\n".format(comingOut)
 

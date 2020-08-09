@@ -52,6 +52,8 @@ Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Fo
 
 If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
+If you've Placed, Laid, or made Hard Ways Bets, the "Place and Hard Ways Bets Working?" option will appear in the list, and entering 'y' and hitting Enter will set them all to be Working on the Come Out Roll.
+
 #### All Tall Small
 
 The All Tall Small bet is an interesting persistent bet where you are betting that a set of numbers will all appear before the 7. Small means you are betting that the 2, 3, 4, 5, and 6 will appear before the 7; Tall means you are betting that the 8. 9. 10, 11, and 12 will appear; All is a bet that both the small and tall numbers will all appear before the 7.

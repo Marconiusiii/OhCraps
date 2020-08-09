@@ -24,8 +24,6 @@ def setClear():
 	if set(ats) == set(allSet):
 		ats = []
 
-
-
 def allTallSmall():
 	global atsAll, atsTall, atsSmall
 	print "How much on the All?"
@@ -38,14 +36,12 @@ def allTallSmall():
 	atsSmall = input("$>")
 	print "Ok ${} on the Small.".format(atsSmall)
 
-
-def atsCheck():
+def atsCheck(roll):
 	global atsAll, atsTall, atsSmall, bank, ats, smallNumbers, tallNumbers
 
 	allSet = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
 	tallSet = [8, 9, 10, 11, 12]
 	smallSet = [2, 3, 4, 5, 6]
-
 	if set(smallNumbers) == set(smallSet):
 		print "You hit the Small and won ${}!".format(atsSmall * 35)
 		bank += atsSmall * 35
@@ -61,6 +57,22 @@ def atsCheck():
 		bank += atsAll * 176
 		atsAll = 0
 		ats= smallNumbers = tallNumbers = []
+	if roll == 7 and (atsAll + atsTall + atsSmall) > 0:
+		ats = smallNumbers = tallNumbers = []
+		bank -= atsAll + atsSmall + atsTall
+		print("You lost ${} from the All Tall Small.".format(atsAll+atsSmall+atsTall))
+		atsAll = atSmall = atsTall = 0
+
+def atsAdd(roll):
+	global ats, smallNumbers, tallNumbers
+	if roll in [2, 3, 4, 5, 6]:
+		if roll not in smallNumbers:
+			smallNumbers.append(roll)
+	elif roll in [8, 9, 10, 11, 12]:
+		if roll not in tallNumbers:
+			tallNumbers.append(roll)
+	if roll not in ats:
+		ats.append(roll)
 
 def betInput():
 	global bank
@@ -683,7 +695,7 @@ stickman = [
 ]
 
 #Game Start
-print '{:^30}'.format('Oh Craps! v.4.96')
+print '{:^30}'.format('Oh Craps! v.4.98')
 print "{:^27}".format('By: Marco Salsiccia')
 print "How much would you like to cash in for your bank?"
 while True:
@@ -755,7 +767,6 @@ while True:
 	if lBet in ['y', 'Y', 'yes', 'Yes']:
 		lay4, lay5, lay6, lay8, lay9, lay10 = lay(lay4, lay5, lay6, lay8, lay9, lay10)
 
-
 	hardCall()
 	hardBet = raw_input("Hard Ways? >")
 	if hardBet in ['y', 'Y', 'yes', 'Yes']:
@@ -768,7 +779,7 @@ while True:
 		print "Ok, ${} on the Field.".format(fieldBet)
 
 	if (four + five + six + eight + nine + ten + hard4 + hard6 + hard8 + hard10) > 0:
-		workPlace = raw_input("All bets working? >")
+		workPlace = raw_input("Place and Hard Ways Bets working? >")
 		if workPlace in ['y', 'Y', 'yes', 'Yes']:
 			working = True
 		else:
@@ -799,15 +810,7 @@ while True:
 #	comingOut = 1
 #	coHard = False
 	throws += 1
-	if comingOut in [2, 3, 4, 5, 6]:
-		if comingOut not in smallNumbers:
-			smallNumbers.append(comingOut)
-	elif comingOut in [8, 9, 10, 11, 12]:
-		if comingOut not in tallNumbers:
-			tallNumbers.append(comingOut)
-	if comingOut not in ats:
-		ats.append(comingOut)
-
+	atsAdd(comingOut)
 	if (come4 + come5 + come6 + come8 + come9 + come10) > 0:
 		bank += comePayout(comingOut, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 	if (dCome4 + dCome5 + dCome6 + dCome8 + dCome9 + dCome10) > 0:
@@ -884,23 +887,16 @@ while True:
 
 # ATS clean up on 7 out
 		if atsOn == True and (atsAll + atsSmall + atsTall) > 0:
+			atsCheck(comingOut)
 			if comingOut == 7:
-				print "You lost ${} from the All Tall Small!".format(atsAll + atsTall + atsSmall)
-				bank -= (atsAll + atsTall + atsSmall)
 				atsOn = False
-				atsAll = atsTall = atsSmall = 0
-				if len(ats) > 0:
-					ats = smallNumbers = tallNumbers =  []
 			elif comingOut == 11:
-				if comingOut not in tallNumbers:
-					tallNumbers.append(comingOut)
-				if comingOut not in ats:
-					ats.append(comingOut)
+				atsAdd(comingOut)
 		if bet1 == 'p':
-			print "You won ${}!".format(passLine)
+			print "You won ${} on the Pass Line!".format(passLine)
 			bank += passLine
 		elif bet1 == 'd':
-			print "You lost ${}.".format(dPass)
+			print "You lost ${} from the Don't Pass Line.".format(dPass)
 			bank -= dPass
 		if comingOut == 7 and fieldBet > 0:
 			print "You lose ${} on the Field.".format(fieldBet)
@@ -912,21 +908,13 @@ while True:
 		print "You now have ${} in your bank.".format(bank)
 		continue
 	elif comingOut in [2, 3, 12]:
-		if comingOut in [2, 3, 4, 5, 6]:
-			if comingOut not in smallNumbers:
-				smallNumbers.append(comingOut)
-		elif comingOut in [8, 9, 10, 11, 12]:
-			if comingOut not in tallNumbers:
-				tallNumbers.append(comingOut)
-		if comingOut not in ats:
-			ats.append(comingOut)
-
+		atsAdd(comingOut)
 		print "Oh Craps!"
 		if bet1 == 'p':
 			print "You lost ${}.".format(passLine)
 			bank -= passLine
 		elif bet1 == 'd':
-			print "You win ${}!".format(dPass)
+			print "You win ${} from the Don't Pass Line!".format(dPass)
 			bank += dPass
 		if fieldBet > 0 and comingOut == 2:
 			print "You win double on the Field! ${} coming to you.".format(fieldBet * 2)
@@ -939,21 +927,14 @@ while True:
 			bank += fieldBet
 		print "You now have ${} in your bank.".format(bank)
 
-		atsCheck()
+		atsCheck(comingOut)
 		setClear()
 
 		continue
 	else:
-		if comingOut in [2, 3, 4, 5, 6]:
-			if comingOut not in smallNumbers:
-				smallNumbers.append(comingOut)
-		elif comingOut in [8, 9, 10, 11, 12]:
-			if comingOut not in tallNumbers:
-				tallNumbers.append(comingOut)
-		if comingOut not in ats:
-			ats.append(comingOut)
+		atsAdd(comingOut)
 		pointIsOn = True
-		atsCheck()
+
 
 		print "The point is {}.\n".format(comingOut)
 
@@ -1027,7 +1008,7 @@ while True:
 			print "You lose ${} on the Field.".format(fieldBet)
 			bank -= fieldBet
 			fieldBet = 0
-		atsCheck()
+		atsCheck(comingOut)
 		setClear()
 		#Betting
 		while True:
@@ -1210,6 +1191,7 @@ while True:
 #			p2Hard = True
 
 			throws += 1
+			atsAdd(p2)
 
 			bank += comePayout(p2, come4, come5, come6, come8, come9, come10, c4Odds, c5Odds, c6Odds, c8Odds, c9Odds, c10Odds, pointIsOn)
 
@@ -1413,16 +1395,8 @@ while True:
 				bank -= lay10
 				lay10 = 0
 
-			if p2 in [2, 3, 4, 5, 6]:
-				if p2 not in smallNumbers:
-					smallNumbers.append(p2)
-			elif p2 in [8, 9, 10, 11, 12]:
-				if p2 not in tallNumbers:
-					tallNumbers.append(p2)
-			if p2 not in ats:
-				ats.append(p2)
-
-
+			atsCheck(p2)
+			setClear()
 			if p2 == comingOut:
 				print "Point hit!"
 				if bet1 == 'p':
@@ -1442,15 +1416,6 @@ while True:
 				break
 #Seven Out
 			elif p2 == 7:
-				if atsOn == True and (atsAll + atsTall + atsSmall) > 0:
-					print "You lost ${} from the All Tall Small!".format(atsAll + atsTall + atsSmall)
-					bank -= (atsAll + atsTall + atsSmall)
-					atsAll = atsTall = atsSmall = 0
-					if len(ats) > 0:
-						ats = smallNumbers = tallNumbers =  []
-					atsOn = False
-
-
 				if lay4 > 0:
 					print "You won ${} on the Lay 4.".format(lay4 / 2)
 					bank += (lay4 / 2)
@@ -1486,14 +1451,14 @@ while True:
 					bank -= (four + five + six + eight + nine + ten)
 				four = five = six = eight = nine = ten = 0
 				if bet1 == 'p':
-					print "You lose ${}.".format(passLine)
+					print "You lost ${} from the Pass Line.".format(passLine)
 					if passOdds > 0:
-						print "You lose ${} from your odds.".format(passOdds)
+						print "You lose ${} from your Pass Line odds.".format(passOdds)
 						bank -= passOdds
 						passOdds = 0
 					bank -= passLine
 				elif bet1 == 'd':
-					print "You win ${}!".format(dPass)
+					print "You win ${} from the Don't Pass Line!".format(dPass)
 					if passOdds > 0:
 						dOdds = odds(comingOut, passOdds, bet1)
 						print "You won ${} on your Don't Pass Odds.".format(dOdds)
@@ -1508,11 +1473,7 @@ while True:
 				break
 			else:
 				print "Bank = ${}. The point is {}.".format(bank, comingOut)
-				atsCheck()
-				setClear()
-				#raw_input("Roll Again!")
+
 				continue
 		print "You have ${} in your bank!".format(bank)
-	atsCheck()
-	setClear()
 	continue

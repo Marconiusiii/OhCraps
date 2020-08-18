@@ -11,7 +11,7 @@ dealerCalls = {
 9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her"],
 10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "64 out the door"],
 11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven"],
-12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps"]
+12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps", "Hobo's delight"]
 }
 
 def stickman(roll):
@@ -551,6 +551,7 @@ def ats(roll):
 		atsAll = atsSmall = atsTall = 0
 		allNums = smallNums = tallNums = []
 	else:
+		allNums.sort()
 		print("All Tall Small: {}".format(allNums))
 
 	if set(smallNums) == set(smallSet):

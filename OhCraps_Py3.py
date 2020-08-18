@@ -65,8 +65,9 @@ def hardCheck(roll):
 			if hardWays[key] > 0:
 				loss += hardWays[key]
 				hardWays[key] = 0
-		print("You lost ${} from the Hard Ways.".format(loss))
-		bank -= loss
+		if loss > 0:
+			print("You lost ${} from the Hard Ways.".format(loss))
+			bank -= loss
 	elif roll in [4, 6, 8, 10]:
 		if hardWays[roll] > 0 and rollHard == True:
 			if roll in [4, 10]:
@@ -654,7 +655,10 @@ def placeBets():
 				break
 		if bet > 0:
 			place[key] = bet
-			print("Ok, ${bet} on the Place {num}.".format(bet=bet, num=key))
+			if key in [4, 10] and bet >= 25:
+				print("Buying the {num} for ${bet}.".format(bet=bet, num=key))
+			else:
+				print("Ok, ${bet} on the Place {num}.".format(bet=bet, num=key))
 
 
 def placeShow():
@@ -663,19 +667,25 @@ def placeShow():
 		if place[key] > 0:
 			print("You have ${value} on the Place {key}.".format(value=place[key], key=key))
 
+def vig(bet):
+	print("${vig} paid to the House for the Buy Bet vig.".format(vig=int(bet*0.05)))
+	return int(bet*0.05)
+
 def placeCheck(roll):
 	global place, bank
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if place[roll] > 0:
-			if roll in [4, 10]:
-				bank += (place[roll]//5) * 9
-				print("You won ${win} on the Place {num}!".format(win=(place[roll]//5)*9, num=roll))
+			win = 0
+			if roll in [4, 10] and place[roll] >= 25:
+				win = place[roll] * 2 - vig(place[roll])
+			elif roll in [4, 10]:
+				win = (place[roll]//5) * 9
 			elif roll in [5, 9]:
-				bank += (place[roll]//5) * 7
-				print("You won ${win} on the Place {num}!".format(win=(place[roll]//5)*7, num=roll))
+				win = (place[roll]//5) * 7
 			elif roll in [6, 8]:
-				bank += (place[roll]//6) * 7
-				print("You won ${win} on the Place {num}!".format(win=(place[roll]//6)*7, num=roll))
+				win = (place[roll]//6) * 7
+			bank += win
+			print("You won ${win} on the Place {num}!".format(win=win, num=roll))
 			print("Change your bet?")
 			change = input(">")
 			if change.lower() in ['y', 'yes']:

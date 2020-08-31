@@ -106,8 +106,12 @@ def betPrompt():
 
 def lineBetting():
 	global lineBets
-	print("Pass or Don't Pass?")
+	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
 	while True:
+		if lineBets["Pass"] > 0:
+			print("You have ${} on the Pass Line.".format(lineBets["Pass"]))
+		if lineBets["Don't Pass"] > 0:
+			print("You have ${} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
 		try:
 			lBet = input(">")
 		except ValueError:
@@ -117,53 +121,78 @@ def lineBetting():
 			print("How much on the Pass Line?")
 			lineBets["Pass"] = betPrompt()
 			print("Ok, ${} on the Pass Line.".format(lineBets["Pass"]))
-			break
+			continue
 		elif lBet.lower() in ["d", "dp", "don't pass", "don't"]:
 			print("How much on the Don't Pass line?")
 			lineBets["Don't Pass"] = betPrompt()
 			print("Ok, ${} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
+			continue
+		elif lBet.lower() in ['x', 'close', 'esc', 'exit', 'done']:
+			print("Ok, moving on!")
 			break
 		else:
 			print("Invalid entry, try again!")
 			continue
+
 def lineCheck(roll, p2roll):
 	global lineBets, bank, pointIsOn
 	if pointIsOn == False:
-		if roll in [7, 11] and lineBets["Pass"] > 0:
-			print("You won ${} on the Pass Line!.".format(lineBets["Pass"]))
-			bank += lineBets["Pass"]
-			lineBets["Pass"] = 0
-		elif roll in [7, 11] and lineBets["Don't Pass"] > 0:
-			print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
-			bank -= lineBets["Don't Pass"]
-			lineBets["Don't Pass"] = 0
-		elif roll in [2, 3, 12] and lineBets["Pass"] > 0:
-			print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
-			bank -= lineBets["Pass"]
-			lineBets["Pass"] = 0
-		elif roll in [2, 3, 12] and lineBets["Don't Pass"] > 0:
-			print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
-			bank += lineBets["Don't Pass"]
-			lineBets["Don't Pass"] = 0
+		if roll in [7, 11]:
+			if lineBets["Pass"] > 0:
+				print("You won ${} on the Pass Line!.".format(lineBets["Pass"]))
+				bank += lineBets["Pass"]
+				lineBets["Pass"] = 0
+			if lineBets["Don't Pass"] > 0:
+				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				bank -= lineBets["Don't Pass"]
+				lineBets["Don't Pass"] = 0
+		elif roll in [2, 3, 12]:
+			if lineBets["Pass"] > 0:
+				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
+				bank -= lineBets["Pass"]
+				lineBets["Pass"] = 0
+			if lineBets["Don't Pass"] > 0:
+				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+				bank += lineBets["Don't Pass"]
+				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:
-		if p2roll == roll and lineBets["Pass"] > 0:
-			print("You won ${} on the Pass Line!".format(lineBets["Pass"]))
-			bank += lineBets["Pass"]
+		if p2roll == roll:
+			if lineBets["Pass"] > 0:
+				print("You won ${} on the Pass Line!".format(lineBets["Pass"]))
+				bank += lineBets["Pass"]
+			if lineBets["Don't Pass"] > 0:
+				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				bank -= lineBets["Don't Pass"]
 			oddsCheck(p2roll)
-		elif p2roll == roll and lineBets["Don't Pass"] > 0:
-			print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
-			bank -= lineBets["Don't Pass"]
+		elif p2roll == 7:
+			if lineBets["Pass"] > 0:
+				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
+				bank -= lineBets["Pass"]
+				lineBets["Pass"] = 0
+			if lineBets["Don't Pass"] > 0:
+				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+				bank += lineBets["Don't Pass"]
+				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
-		elif p2roll == 7 and lineBets["Pass"] > 0:
-			print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
-			bank -= lineBets["Pass"]
-			oddsCheck(p2roll)
-			lineBets["Pass"] = 0
-		elif p2roll == 7 and lineBets["Don't Pass"] > 0:
-			print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
-			bank += lineBets["Don't Pass"]
-			oddsCheck(p2roll)
-			lineBets["Don't Pass"] = 0
+
+def dpPhase2():
+	global lineBets
+	print("Take down Don't Pass Bet?")
+	while True:
+		try:
+			takeDown = input(">")
+			break
+		except ValueError:
+			print("Invalid entry, try again!")
+			continue
+	if takeDown.lower() in ['y', 'yes']:
+		print("Ok, taking down your Don't Pass.")
+		lineBets["Don't Pass"] = lineBets["Don't Pass Odds"] =  0
+	elif takeDown.lower() in ['n', 'no']:
+		print("Ok leaving your Don't Pass bets up.")
+	else:
+		pass
+
 # Odds Betting
 
 def odds():
@@ -172,11 +201,10 @@ def odds():
 		print("How Much for your Pass Line Odds?")
 		lineBets["Pass Odds"] = betPrompt()
 		print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-	elif lineBets["Don't Pass"] > 0:
+	if lineBets["Don't Pass"] > 0:
 		print("How much to Lay for your Odds?")
 		lineBets["Don't Pass Odds"] = betPrompt()
 		print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
-
 
 def oddsCheck(roll):
 	global bank, lineBets, comeOut
@@ -208,8 +236,6 @@ def oddsCheck(roll):
 		print("You lost ${} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
 		bank -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
-
-
 
 #Place Betting
 
@@ -807,6 +833,9 @@ while True:
 				oddsPrompt = input(">")
 				if oddsPrompt.lower() in ['y', 'yes']:
 					odds()
+
+			if lineBets["Don't Pass"] > 0:
+				dpPhase2()
 
 			comeShow()
 			print("Come Bet?")

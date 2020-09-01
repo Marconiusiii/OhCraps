@@ -677,14 +677,17 @@ def placeBets():
 				bet = int(input(">"))
 				break
 			except ValueError:
-				bet = 0
+				bet = place[key]
 				break
 		if bet > 0:
 			place[key] = bet
 			if key in [4, 10] and bet >= 25:
 				print("Buying the {num} for ${bet}.".format(bet=bet, num=key))
 			else:
-				print("Ok, ${bet} on the Place {num}.".format(bet=bet, num=key))
+				print("${bet} on the Place {num}.".format(bet=bet, num=key))
+		elif place[key] > 0 and bet == 0:
+			print("Ok, taking down your Place {num} bet.".format(num=key))
+			place[key] = 0
 
 
 def placeShow():
@@ -717,7 +720,10 @@ def placeCheck(roll):
 			if change.lower() in ['y', 'yes']:
 				print("How much on the Place {}?".format(roll))
 				place[roll] = betPrompt()
-				print("Ok, ${} on the Place {}.".format(place[roll], roll))
+				if place[roll] == 0:
+					print("Ok, taking down your Place {} bet.".format(roll))
+				else:
+					print("Ok, ${bet} on the Place {num}.".format(bet=place[roll], num=roll))
 	elif roll == 7:
 		loss = 0
 		for key in place:

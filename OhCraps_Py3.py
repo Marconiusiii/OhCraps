@@ -383,7 +383,7 @@ def comePay(roll):
 		if win > 0:
 			print("You won ${} from your Don't Come Bets!".format(win))
 			if winOdds > 0:
-				print("You won ${} from your Don't Come Bet Odds!".format(winodds))
+				print("You won ${} from your Don't Come Bet Odds!".format(winOdds))
 			bank += win + winOdds
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if comeBets[roll] > 0:
@@ -610,18 +610,20 @@ layBets = {
 def layBetting():
 	global layBets
 	for key in layBets:
-		print("You have ${bet} on the Lay {key}.".format(bet=layVets[key], key=key))
+		print("You have ${bet} on the Lay {key}.".format(bet=layBets[key], key=key))
 		print("How much on the Lay {}?".format(key))
 		while True:
 			try:
 				bet = int(input(">"))
 				break
 			except ValueError:
-				bet = 0
+				bet = layBets[key]
 				break
 		if bet > 0:
 			layBets[key] = bet
 			print("Ok, ${bet} on the Lay {num}.".format(bet=bet, num=key))
+		elif layBets[key] > 0 and bet == 0:
+			print("Ok, taking down your Lay {num} bet.".format(num=key))
 
 def layShow():
 	global layBets
@@ -827,7 +829,7 @@ while True:
 		pointIsOn = True
 		working = False
 		while True:
-			print("{} is the Point.".format(comeOut))
+			print("You have ${bank} in the bank; {point} is the Point.".format(bank=bank, point=comeOut))
 			print("Rolls: {}".format(throws))
 #Phase 2 Betting
 			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:

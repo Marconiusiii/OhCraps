@@ -458,8 +458,7 @@ propBets = {
 "Buffalo": 0
 }
 
-hopBets = {
-"
+
 def propBetting():
 	global propBets
 	while True:

@@ -801,7 +801,7 @@ while True:
 
 	if atsOn == True:
 		print("All Tall Small: {}".format(allNums))
-	else:
+	elif throws == 0:
 		print("All Tall Small?")
 		atsChoice = input(">")
 		if atsChoice.lower() in ['y', 'yes']:

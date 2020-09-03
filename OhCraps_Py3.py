@@ -17,8 +17,10 @@ dealerCalls = {
 def stickman(roll):
 	return dealerCalls[roll][randint(0, len(dealerCalls[roll])-1)]
 
+
+die1 = die2 = 0
 def roll():
-	global rollHard, pointIsOn
+	global rollHard, pointIsOn, die1, die2
 	rollHard = False
 	d1 = randint(1, 6)
 	d2 = randint(1, 6)
@@ -30,6 +32,8 @@ def roll():
 		print("{total} winner! Pay the line, take the don't!".format(total=total))
 	else:
 		print("{tot}, {call}!".format(tot=total, call=stickman(total)))
+	die1 = d1
+	die2 = d2
 	return total
 
 # Hard Ways Setup
@@ -449,9 +453,13 @@ propBets = {
 "C and E": 0,
 "Horn": 0,
 "Boxcars": 0,
-"Eleven": 0
+"Eleven": 0,
+"World": 0,
+"Buffalo": 0
 }
 
+hopBets = {
+"
 def propBetting():
 	global propBets
 	while True:
@@ -573,7 +581,7 @@ def ats(roll):
 
 	if roll == 7:
 		atsOn = False
-		print("You lost ${} from the ALl Tall Small.".format(atsAll+atsTall+atsSmall))
+		print("You lost ${} from the All Tall Small.".format(atsAll+atsTall+atsSmall))
 		bank -= atsAll + atsTall + atsSmall
 		atsAll = atsSmall = atsTall = 0
 		allNums = smallNums = tallNums = []

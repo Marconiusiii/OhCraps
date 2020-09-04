@@ -80,10 +80,29 @@ def hardCheck(roll):
 				win = hardWays[roll] * 9
 			print("You won ${win} on the Hard {num}!".format(win=win, num=roll))
 			bank += win
+			print("Press your bet?")
+			hardPress = input(">")
+			if hardPress.lower() in ['y', 'yes']:
+				print("How much on the Hard {}?".format(roll))
+				hardWays[roll] = betPrompt()
+				if hardWays[roll] == 0:
+					print("Ok, taking down your Hard {} bet.".format(roll))
+				else:
+					print("Ok, bumping up your Hard {num} bet to ${bet}.".format(num=roll, bet=hardWays[roll]))
+			else:
+				pass
 		elif hardWays[roll] > 0 and rollHard == False:
 			print("You lost ${loss} from the Hard {num}.".format(loss=hardWays[roll], num=roll))
 			bank -= hardWays[roll]
-			hardWays[roll] = 0
+			print("Go back up on your Hard {} bet?".format(roll))
+			hardBack = input(">")
+			if hardBack.lower() in ['y', 'yes']:
+				print("How much on the Hard {}?".format(roll))
+				hardWays[roll] = betPrompt()
+				print("Ok, going back up on the Hard {num} for ${bet}.".format(num=roll, bet=hardWays[roll]))
+			else:
+				hardWays[roll] = 0
+
 
 def hardShow():
 	global hardWays
@@ -608,6 +627,7 @@ def ats(roll):
 		bank += atsAll * 176
 		atsAll = 0
 		allNums = []
+		atsOn = False
 
 # Lay Bet Setup
 layBets = {
@@ -791,7 +811,13 @@ while True:
 	hWays = input(">")
 	if hWays.lower() in ['y', 'yes']:
 		hardWaysBetting()
-	if plBet in ['y', 'yes'] or lyBet in ['y', 'yes'] or hWays in ['y', 'yes']:
+	plCheck = hCheck = 0
+	for value in place.values():
+		plCheck += value
+	for value in hardWays.values():
+		hCheck += value
+
+	if plCheck > 0 or hCheck > 0:
 		print("All Bets Working?")
 		work = input(">")
 		if work.lower() in ['y', 'yes']:

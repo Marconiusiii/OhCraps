@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from random import *
 
 dealerCalls = {
@@ -776,7 +777,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.0\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.1\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	print("You have ${} in the bank.".format(bank))

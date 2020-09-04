@@ -549,7 +549,9 @@ def propPay(roll):
 
 #All Tall Small setup
 atsAll = atsSmall = atsTall = 0
-allNums = smallNums = tallNums = []
+allNums = []
+smallNums = []
+tallNums = []
 atsOn = False
 
 def atsBetting():
@@ -569,11 +571,11 @@ def ats(roll):
 	global allNums, smallNums, tallNums, bank, atsAll, atsSmall, atsTall, atsOn
 	smallSet = [2, 3, 4, 5, 6]
 	tallSet = [8, 9, 10, 11, 12]
-	allSet = smallSet + tallSet
+	allSet = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
 
 	if roll in smallSet and roll not in smallNums:
 		smallNums.append(roll)
-	elif roll in tallSet and roll not in tallNums:
+	if roll in tallSet and roll not in tallNums:
 		tallNums.append(roll)
 	if roll in allSet and roll not in allNums:
 		allNums.append(roll)
@@ -583,10 +585,13 @@ def ats(roll):
 		print("You lost ${} from the All Tall Small.".format(atsAll+atsTall+atsSmall))
 		bank -= atsAll + atsTall + atsSmall
 		atsAll = atsSmall = atsTall = 0
-		allNums = smallNums = tallNums = []
+		allNums = []
+		smallNums = []
+		tallNums = []
 	else:
 		allNums.sort()
 		print("All Tall Small: {}".format(allNums))
+
 
 	if set(smallNums) == set(smallSet):
 		print("You won ${} on the Small!".format(atsSmall * 35))

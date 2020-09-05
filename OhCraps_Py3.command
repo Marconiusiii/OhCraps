@@ -863,6 +863,7 @@ def placeCheck(roll):
 					place[roll] = bet
 					print("Ok, taking down your Place {} bet.".format(roll))
 				else:
+					chipsOnTable -= place[roll]
 					place[roll] = bet
 					print("Ok, ${bet} on the Place {num}.".format(bet=place[roll], num=roll))
 	elif roll == 7:
@@ -877,14 +878,14 @@ def placeCheck(roll):
 	else:
 		pass
 
-
+#Additional Global Variables
 p2 = 0
 pointIsOn = False
 working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.1\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.2\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:

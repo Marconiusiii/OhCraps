@@ -55,11 +55,13 @@ def hardWaysBetting():
 		print("How much on the Hard {}?".format(key))
 		bet = betPrompt()
 		if bet > 0:
+			chipsOnTable -= hardWays[key]
 			hardWays[key] = bet
 			print("Ok, ${bet} on the Hard {num}.".format(bet=hardWays[key], num=key))
 		elif hardWays[key] > 0 and bet == 0:
 			print("Taking down your Hard {}.".format(key))
 			chipsOnTable -= hardWays[key]
+
 			hardWays[key] = bet
 
 
@@ -87,6 +89,7 @@ def hardCheck(roll):
 			hardPress = input(">")
 			if hardPress.lower() in ['y', 'yes']:
 				print("How much on the Hard {}?".format(roll))
+				chipsOnTable -= hardWays[roll]
 				hardWays[roll] = betPrompt()
 				if hardWays[roll] == 0:
 					print("Ok, taking down your Hard {} bet.".format(roll))

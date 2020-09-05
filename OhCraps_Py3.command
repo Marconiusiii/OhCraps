@@ -676,7 +676,12 @@ def layBetting():
 		print("How much on the Lay {}?".format(key))
 		while True:
 			try:
-				bet = int(input(">"))
+				bet = int(input("$>"))
+				if bet > bank - chipsOnTable:
+					print("You don't have enough money to make that bet! Try again.")
+					outOfMoney()
+					print("How much on the Place {}?".format(key))
+					continue
 				break
 			except ValueError:
 				bet = layBets[key]
@@ -797,7 +802,12 @@ def placeBets():
 		print("How much on the Place {}?".format(key))
 		while True:
 			try:
-				bet = int(input(">"))
+				bet = int(input("$>"))
+				if bet > bank - chipsOnTable:
+					print("You don't have enough money to make that bet! Try again.")
+					outOfMoney()
+					print("How much on the Place {}?".format(key))
+					continue
 				break
 			except ValueError:
 				bet = place[key]

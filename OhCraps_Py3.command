@@ -2,15 +2,15 @@
 from random import *
 
 dealerCalls = {
-2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "push the don't", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples"],
+2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "push the don't", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
 3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
-4: ["Double deuce", "Little Joe", "Little Joe from Kokomo", "Hit us in the 2 2", "2 spots and 2 dots"],
+4: ["Double deuce", "Little Joe", "Little Joe from Kokomo", "Hit us in the 2 2", "2 spots and 2 dots", "Ace Tres"],
 5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver"],
 6: ["The national average", "Big Red, catch 'em in the corner", "Sixie from Dixie"],
 7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor"],
 8: ["a square pair", "eighter from the theater", "windows"],
 9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her"],
-10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "64 out the door"],
+10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "two stars from Mars", "64 out the door"],
 11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven"],
 12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps", "Hobo's delight"]
 }
@@ -48,22 +48,23 @@ hardWays = {
 }
 
 def hardWaysBetting():
-	global hardWays
+	global hardWays, chipsOnTable
 	for key in hardWays:
 		if hardWays[key] > 0:
 			print("You have ${bet} on the hard {num}.".format(bet=hardWays[key], num=key))
 		print("How much on the Hard {}?".format(key))
-		while True:
-			try:
-				hardWays[key] = int(input(">"))
-				break
-			except ValueError:
-				break
-		if hardWays[key] > 0:
+		bet = betPrompt()
+		if bet > 0:
+			hardWays[key] = bet
 			print("Ok, ${bet} on the Hard {num}.".format(bet=hardWays[key], num=key))
+		elif hardWays[key] > 0 and bet == 0:
+			print("Taking down your Hard {}.".format(key))
+			chipsOnTable -= hardWays[key]
+			hardWays[key] = bet
+
 
 def hardCheck(roll):
-	global bank, hardWays, rollHard
+	global bank, chipsOnTable, hardWays, rollHard
 	if roll == 7:
 		loss = 0
 		for key in hardWays:
@@ -73,6 +74,7 @@ def hardCheck(roll):
 		if loss > 0:
 			print("You lost ${} from the Hard Ways.".format(loss))
 			bank -= loss
+			chipsOnTable -= loss
 	elif roll in [4, 6, 8, 10]:
 		if hardWays[roll] > 0 and rollHard == True:
 			if roll in [4, 10]:
@@ -95,6 +97,7 @@ def hardCheck(roll):
 		elif hardWays[roll] > 0 and rollHard == False:
 			print("You lost ${loss} from the Hard {num}.".format(loss=hardWays[roll], num=roll))
 			bank -= hardWays[roll]
+			chipsOnTable -= hardWays[roll]
 			print("Go back up on your Hard {} bet?".format(roll))
 			hardBack = input(">")
 			if hardBack.lower() in ['y', 'yes']:
@@ -120,13 +123,7 @@ lineBets = {
 "Don't Pass Odds": 0
 }
 
-def betPrompt():
-	while True:
-		try:
-			return int(input(">"))
-		except ValueError:
-			print("That wasn't a number!")
-			continue
+
 
 def lineBetting():
 	global lineBets
@@ -155,52 +152,60 @@ def lineBetting():
 			print("Ok, moving on!")
 			break
 		else:
-			print("Invalid entry, try again!")
+			print("Invalid entry, try again or type 'x' and hit Enter!")
 			continue
 
 def lineCheck(roll, p2roll):
-	global lineBets, bank, pointIsOn
+	global lineBets, bank, chipsOnTable, pointIsOn
 	if pointIsOn == False:
 		if roll in [7, 11]:
 			if lineBets["Pass"] > 0:
 				print("You won ${} on the Pass Line!.".format(lineBets["Pass"]))
 				bank += lineBets["Pass"]
+				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				bank -= lineBets["Don't Pass"]
+				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 		elif roll in [2, 3, 12]:
 			if lineBets["Pass"] > 0:
 				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
 				bank -= lineBets["Pass"]
+				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
 				bank += lineBets["Don't Pass"]
+				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:
 		if p2roll == roll:
 			if lineBets["Pass"] > 0:
 				print("You won ${} on the Pass Line!".format(lineBets["Pass"]))
 				bank += lineBets["Pass"]
+				chipsOnTable -= lineBets["Pass"]
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				bank -= lineBets["Don't Pass"]
+				chipsOnTable -= lineBets["Don't Pass"]
 			oddsCheck(p2roll)
 		elif p2roll == 7:
 			if lineBets["Pass"] > 0:
 				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
 				bank -= lineBets["Pass"]
+				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
 				bank += lineBets["Don't Pass"]
+				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
 
 def dpPhase2():
-	global lineBets
+	global lineBets, chipsOnTable
 	print("Take down Don't Pass Bet?")
 	while True:
 		try:
@@ -211,6 +216,7 @@ def dpPhase2():
 			continue
 	if takeDown.lower() in ['y', 'yes']:
 		print("Ok, taking down your Don't Pass.")
+		chipsOnTable -= lineBets["Don't Pass"] + lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass"] = lineBets["Don't Pass Odds"] =  0
 	elif takeDown.lower() in ['n', 'no']:
 		print("Ok leaving your Don't Pass bets up.")
@@ -231,7 +237,7 @@ def odds():
 		print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
 
 def oddsCheck(roll):
-	global bank, lineBets, comeOut
+	global bank, chipsOnTable, lineBets, comeOut
 	payout = 0
 	if lineBets["Pass Odds"] > 0 and roll != 7:
 		if roll in [4, 10]:
@@ -242,10 +248,12 @@ def oddsCheck(roll):
 			payout += (lineBets["Pass Odds"]//5) * 6
 		print("You won ${} from your Pass Line Odds!".format(payout))
 		bank += payout
+		chipsOnTable -= lineBets["Pass Odds"]
 		lineBets["Pass Odds"] = 0
 	elif lineBets["Pass Odds"] > 0 and roll == 7:
 		print("You lost ${} from your Pass Line Odds.".format(lineBets["Pass Odds"]))
 		bank -= lineBets["Pass Odds"]
+		chipsOnTable -= lineBets["Pass Odds"]
 		lineBets["Pass Odds"] = 0
 	if lineBets["Don't Pass Odds"] > 0 and roll == 7:
 		if comeOut in [4, 10]:
@@ -255,22 +263,16 @@ def oddsCheck(roll):
 		elif comeOut in [6, 8]:
 			payout += (lineBets["Don't Pass Odds"]//6) * 5
 		print("You won ${} on your Don't Pass Odds!".format(payout))
+		bank += payout
+		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 	elif lineBets["Don't Pass"] > 0 and roll == comeOut:
 		print("You lost ${} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
 		bank -= lineBets["Don't Pass Odds"]
+		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 
-#Place Betting
-
-place = {
-4: 0,
-5: 0,
-6: 0,
-8: 0,
-9: 0,
-10: 0
-}
+# Come Betting
 
 comeBets = {
 4: 0,
@@ -317,7 +319,7 @@ def come():
 	choice = input(">")
 	if choice.lower() in ['c', 'come']:
 		print("How much on the Come?")
-		comeBet = betPrompt()		
+		comeBet = betPrompt()
 		print("Ok, ${} on the Come.".format(comeBet))
 	elif choice.lower() in ["dc", "d", "don't", "don't come", "dontcome"]:
 		print("How much on the Don't Com?")
@@ -334,16 +336,18 @@ def comeShow():
 			print("You have ${bet} on the Don't Come {num} with ${odds} in odds.".format(bet=dComeBets[key], num=key, odds=dComeOdds[key]))
 
 def comeCheck(roll):
-	global comeBet, comeBets, dComeBet, dComeBets, bank, comeOdds, dComeOdds
+	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds
 	comePay(roll)
 	if comeBet > 0:
 		if roll in [7, 11]:
 			print("You won ${} on the Come!".format(comeBet))
 			bank += comeBet
+			chipsOnTable -= comeBet
 			comeBet = 0
 		elif roll in [2, 3, 12]:
 			print("You lost ${} from the Come Bet.".format(comeBet))
 			bank -= comeBet
+			chipsOnTable -= comeBet
 			comeBet = 0
 		else:
 			print("Moving your Come Bet to the {}.".format(roll))
@@ -359,10 +363,12 @@ def comeCheck(roll):
 		if roll in [7, 11]:
 			print("You lost ${} from the Don't Come.".format(dComeBet))
 			bank -= dComeBet
+			chipsOnTable -= dComeBet
 			dComeBet = 0
 		elif roll in [2, 3, 12]:
 			print("You won ${} on the Don't Come!".format(dComeBet))
 			bank += dComeBet
+			chipsOnTable -= dComeBet
 			dComeBet = 0
 		else:
 			print("Moving your Don't Come bet to the {}.".format(roll))
@@ -376,7 +382,7 @@ def comeCheck(roll):
 				print("Ok, ${bet} on the Don't Come {num}.".format(bet=dComeOdds[roll], num=roll))
 
 def comePay(roll):
-	global bank, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn
+	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn
 	if roll == 7:
 		loss = lossOdds = 0
 		for key in comeBets:
@@ -389,6 +395,7 @@ def comePay(roll):
 			if lossOdds > 0:
 				print("You lost ${} from your Come Bet Odds.".format(lossOdds))
 			bank -= loss + lossOdds
+			chipsOnTable -= loss + lossOdds
 			for key in comeBets:
 				comeBets[key] = 0
 			for key in comeOdds:
@@ -396,8 +403,10 @@ def comePay(roll):
 		win = winOdds = 0
 		for key in dComeBets:
 			win += dComeBets[key]
+			chipsOnTable -= dComeBets[key]
 		for key in dComeOdds:
 			if dComeOdds[key] > 0:
+				chipsOnTable -= dComeOdds[key]
 				if key in [4, 10]:
 					winOdds += dComeOdds[key]*2
 				elif key in [5, 9]:
@@ -409,10 +418,15 @@ def comePay(roll):
 			if winOdds > 0:
 				print("You won ${} from your Don't Come Bet Odds!".format(winOdds))
 			bank += win + winOdds
+		for key in dComeBets:
+			dComeBets[key] = 0
+		for key in dComeOdds:
+			dComeOdds[key] = 0
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if comeBets[roll] > 0:
 			print("You won ${win} on the Come {num}!".format(win=comeBets[roll], num=roll))
 			bank += comeBets[roll]
+			chipsOnTable -= comeBets[roll]
 			comeBets[roll] = 0
 			if comeOdds[roll] > 0:
 				cOddsWin = 0
@@ -424,32 +438,42 @@ def comePay(roll):
 					cOddsWin += comeOdds[roll]//5*6
 				print("You won ${oddwin} on the Come {num} Odds!".format(oddwin=cOddsWin, num=roll))
 				bank += cOddsWin
+				chipsOnTable -= comeOdds[roll]
+				comeOdds[roll] = 0
 		if dComeBets[roll] > 0:
 			print("You lost ${dcloss} from the Don't Come {num}.".format(dcloss=dComeBets[roll], num=roll))
 			bank -= dComeBets[roll]
+			chipsOnTable -= dComeBets[roll]
 			dComeBets[roll] = 0
 			if dComeOdds[roll] > 0:
 				print("You lost ${dco} from the Don't Come {num} Odds.".format(dco=dComeOdds[roll], num=roll))
 				bank -= dComeOdds[roll]
+				chipsOnTable -= dComeOdds[roll]
 				dComeOdds[roll] = 0
 
 
 #Field Betting
-fieldBet = 0
 
+fieldBet = 0
 
 def fieldShow():
 	if fieldBet > 0:
 		print("You have ${} on the Field.".format(fieldBet))
 
 def field():
-	global fieldBet
+	global fieldBet, chipsOnTable
 	print("How much on the Field?")
-	fieldBet = betPrompt()
-	print("Ok, ${} on the Field.".format(fieldBet))
+	bet = betPrompt()
+	if bet > 0:
+		fieldBet = bet
+		print("Ok, ${} on the Field.".format(fieldBet))
+	elif fieldBet > 0 and bet == 0:
+		chipsOnTable -= fieldBet
+		print("Taking down your Field bet.")
+		fieldBet = 0
 
 def fieldCheck(roll):
-	global fieldBet, bank
+	global fieldBet, bank, chipsOnTable
 	if fieldBet > 0:
 		if roll in [3, 4, 9, 10, 11]:
 			print("You won ${} on the FIeld!".format(fieldBet))
@@ -463,6 +487,7 @@ def fieldCheck(roll):
 		else:
 			print("You lost ${} from the Field.".format(fieldBet))
 			bank -= fieldBet
+			chipsOnTable -= fieldBet
 			fieldBet = 0
 
 propBets = {
@@ -533,7 +558,7 @@ def propBetting():
 			break
 
 def propPay(roll):
-	global propBets, bank
+	global propBets, bank, chipsOnTable
 	multiplier = 0
 	for key in propBets:
 		if propBets[key] > 0:
@@ -564,6 +589,7 @@ def propPay(roll):
 			else:
 				print("You lost ${loss} from the {bet}.".format(loss=propBets[key], bet=key))
 				bank -= propBets[key]
+				chipsOnTable -= propBets[key]
 				propBets[key] = 0
 
 
@@ -588,7 +614,7 @@ def atsBetting():
 	print("Ok, ${} on the Small.".format(atsSmall))
 
 def ats(roll):
-	global allNums, smallNums, tallNums, bank, atsAll, atsSmall, atsTall, atsOn
+	global allNums, smallNums, tallNums, bank, chipsOnTable, atsAll, atsSmall, atsTall, atsOn
 	smallSet = [2, 3, 4, 5, 6]
 	tallSet = [8, 9, 10, 11, 12]
 	allSet = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
@@ -600,32 +626,35 @@ def ats(roll):
 	if roll in allSet and roll not in allNums:
 		allNums.append(roll)
 
-	if roll == 7:
+	if roll == 7 and (atsAll + atsSmall + atsTall) > 0:
 		atsOn = False
 		print("You lost ${} from the All Tall Small.".format(atsAll+atsTall+atsSmall))
 		bank -= atsAll + atsTall + atsSmall
+		chipsOnTable -= atsAll + atsTall + atsSmall
 		atsAll = atsSmall = atsTall = 0
 		allNums = []
 		smallNums = []
 		tallNums = []
-	else:
+	elif (atsAll + atsSmall + atsTall) > 0:
 		allNums.sort()
 		print("All Tall Small: {}".format(allNums))
-
 
 	if set(smallNums) == set(smallSet):
 		print("You won ${} on the Small!".format(atsSmall * 35))
 		bank += atsSmall * 35
+		chipsOnTable -= atsSmall
 		atsSmall = 0
 		smallNums = []
 	if set(tallNums) == set(tallSet):
 		print("You won ${} from the Tall!".format(atsTall*35))
 		bank += atsTall * 35
+		chipsOnTable -= atsTall
 		atsTall = 0
 		tallNums = []
 	if set(allNums) == set(allSet):
 		print("You won ${} on the All! Holy Crap!".format(atsAll*176))
 		bank += atsAll * 176
+		chipsOnTable -= atsAll
 		atsAll = 0
 		allNums = []
 		atsOn = False
@@ -641,7 +670,7 @@ layBets = {
 }
 
 def layBetting():
-	global layBets
+	global layBets, chipsOnTable
 	for key in layBets:
 		print("You have ${bet} on the Lay {key}.".format(bet=layBets[key], key=key))
 		print("How much on the Lay {}?".format(key))
@@ -653,10 +682,14 @@ def layBetting():
 				bet = layBets[key]
 				break
 		if bet > 0:
+			chipsOnTable -= layBets[key]
 			layBets[key] = bet
+			chipsOnTable += bet
 			print("Ok, ${bet} on the Lay {num}.".format(bet=bet, num=key))
 		elif layBets[key] > 0 and bet == 0:
 			print("Ok, taking down your Lay {num} bet.".format(num=key))
+			chipsOnTable -= layBets[key]
+			layBets[key] = 0
 
 def layShow():
 	global layBets
@@ -665,11 +698,12 @@ def layShow():
 			print("You have ${value} on the Lay {key}.".format(value=layBets[key], key=key))
 
 def layCheck(roll):
-	global layBets, bank
+	global layBets, bank, chipsOnTable
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if layBets[roll] > 0:
 			print("You lost ${loss} from the Lay {num}.".format(loss=layBets[roll], num=roll))
 			bank -= layBets[roll]
+			chipsOnTable -= layBets[roll]
 			layBets[roll] = 0
 	elif roll == 7:
 		for key in layBets:
@@ -683,27 +717,81 @@ def layCheck(roll):
 				elif key in [6, 8]:
 					print("You won ${win} on the Lay {num}!".format(win=layBets[key]//6*5, num=key))
 					bank += layBets[key]//6*5
+				chipsOnTable -= layBets[key]
 				layBets[key] = 0
 
-
-
-# Bank setup
+# Bank and bet setup
 bank = 0
+chipsOnTable = 0
 
 def cashIn():
 	global bank
 	print("How much are you cashing in for your bankroll?")
 	while True:
 		try:
-			bank = int(input("$>"))
-			break
+			cash = int(input("$>"))
 		except ValueError:
 			print("That wasn't a number, doofus!")
 			continue
+		if cash <= 0:
+			print("You won't get very far trying to play without any money, come on now...")
+			continue
+		else:
+			bank += cash
+			break
 	print("Great, starting you off with ${}.".format(bank))
 
+def betPrompt():
+	global bank, chipsOnTable
+	while True:
+		try:
+			playerBet =  int(input("$>"))
+		except ValueError:
+			print("That wasn't a number!")
+			continue
+		if playerBet > bank - chipsOnTable:
+			print("You simply don't have enough money to do that! DO you want to add more to your bankroll?")
+			addMore = input(">")
+			if addMore.lower() in ['y', 'yes', 'atm', 'help', 'more money']:
+				outOfMoney()
+			continue
+		else:
+			chipsOnTable += playerBet
+			return playerBet
+
+def outOfMoney():
+	global bank
+	if bank <= 0:
+		print("\tYou are totally out of money. Let's hit the ATM again and get you more cash. How much do you want?")
+	else:
+		print("Your chips are getting really low. How much would you like to add to your bankroll?")
+	while True:
+		try:
+			cash = int(input("\t$>"))
+		except ValueError:
+			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance. Try again.")
+			continue
+		if cash <= 0:
+			print("What am I, a bank? This is for withdrawals only! Try again.")
+			continue
+		else:
+			bank += cash
+			break
+	print("\tAlright, starting you off again with ${}. Don't lose it all this time!".format(bank))
+
+#Place Betting
+
+place = {
+4: 0,
+5: 0,
+6: 0,
+8: 0,
+9: 0,
+10: 0
+}
+
 def placeBets():
-	global place
+	global place, chipsOnTable
 	for key in place:
 		print("You have ${bet} on the Place {key}.".format(bet=place[key], key=key))
 		print("How much on the Place {}?".format(key))
@@ -715,15 +803,17 @@ def placeBets():
 				bet = place[key]
 				break
 		if bet > 0:
+			chipsOnTable -= place[key]
 			place[key] = bet
+			chipsOnTable += bet
 			if key in [4, 10] and bet >= 25:
 				print("Buying the {num} for ${bet}.".format(bet=bet, num=key))
 			else:
 				print("${bet} on the Place {num}.".format(bet=bet, num=key))
 		elif place[key] > 0 and bet == 0:
 			print("Ok, taking down your Place {num} bet.".format(num=key))
+			chipsOnTable -= place[key]
 			place[key] = 0
-
 
 def placeShow():
 	global place
@@ -736,7 +826,7 @@ def vig(bet):
 	return int(bet*0.05)
 
 def placeCheck(roll):
-	global place, bank
+	global place, bank, chipsOnTable
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if place[roll] > 0:
 			win = 0
@@ -754,10 +844,13 @@ def placeCheck(roll):
 			change = input(">")
 			if change.lower() in ['y', 'yes']:
 				print("How much on the Place {}?".format(roll))
-				place[roll] = betPrompt()
-				if place[roll] == 0:
+				bet = betPrompt()
+				if bet == 0:
+					chipsOnTable -= place[roll]
+					place[roll] = bet
 					print("Ok, taking down your Place {} bet.".format(roll))
 				else:
+					place[roll] = bet
 					print("Ok, ${bet} on the Place {num}.".format(bet=place[roll], num=roll))
 	elif roll == 7:
 		loss = 0
@@ -765,6 +858,7 @@ def placeCheck(roll):
 			loss += place[key]
 			place[key] = 0
 		bank -= loss
+		chipsOnTable -= loss
 		if loss > 0:
 			print("You lost ${} from the Place bets.".format(loss))
 	else:
@@ -780,7 +874,12 @@ throws = 0
 print("Oh Craps! v.5.1\nBy: Marco Salsiccia")
 cashIn()
 while True:
-	print("You have ${} in the bank.".format(bank))
+	if chipsOnTable <= 0:
+		print("You have ${} in the bank.".format(bank))
+	else:
+		print("You have ${bank} in the bank with ${table} out on the table.".format(bank=bank, table=chipsOnTable))
+	if bank <= 0:
+		outOfMoney()
 	print("Rolls: {}\n".format(throws))
 
 # Initial bets
@@ -794,12 +893,10 @@ while True:
 	if plBet in ['y', 'Yes']:
 		placeBets()
 
-
 	print("Lay Bets?")
 	lyBet = input(">")
 	if lyBet.lower() in ['y', 'yes']:
 		layBetting()
-
 
 	fieldShow()
 	print("Field Bet?")
@@ -812,19 +909,20 @@ while True:
 	hWays = input(">")
 	if hWays.lower() in ['y', 'yes']:
 		hardWaysBetting()
-	plCheck = hCheck = 0
+	plCheck = hCheck = lCheck = 0
 	for value in place.values():
 		plCheck += value
 	for value in hardWays.values():
 		hCheck += value
+	for value in layBets.values():
+		lCheck += value
 
-	if plCheck > 0 or hCheck > 0:
+	if plCheck > 0 or hCheck > 0 or lCheck > 0:
 		print("All Bets Working?")
 		work = input(">")
 		if work.lower() in ['y', 'yes']:
 			working = True
 			print("Ok, all bets are working.")
-
 
 	print("Prop Bets?")
 	prBet = input(">")
@@ -868,13 +966,20 @@ while True:
 		pointIsOn = True
 		working = False
 		while True:
-			print("You have ${bank} in the bank; {point} is the Point.".format(bank=bank, point=comeOut))
+			if chipsOnTable > 0:
+				print("You have ${bank} in the bank with ${table} out on the table.".format(bank=bank, table=chipsOnTable))
+			else:
+				print("You have ${bank} in the bank.".format(bank=bank))
+
+			if bank <= 0:
+				outOfMoney()
+			print("{} is the Point!".format(comeOut))
 			print("Rolls: {}".format(throws))
 #Phase 2 Betting
 			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
 				if lineBets["Pass Odds"] > 0:
 					print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-				elif lineBets["Don't Pass Odds"] > 0:
+				if lineBets["Don't Pass Odds"] > 0:
 					print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
 				print("Line Bet Odds?")
 				oddsPrompt = input(">")

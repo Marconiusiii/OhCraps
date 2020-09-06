@@ -338,8 +338,59 @@ def comeShow():
 		if dComeBets[key] > 0:
 			print("You have ${bet} on the Don't Come {num} with ${odds} in odds.".format(bet=dComeBets[key], num=key, odds=dComeOdds[key]))
 
+def comeOddsChange():
+	global comeOdds, dComeOdds, chipsOnTable
+	cO = dCO = 0
+	for value in comeOdds.values():
+		cO += value
+	for value in dComeOdds.values():
+		dCO += value
+	if cO > 0:
+		print("Change your Come Odds?")
+		changeCome = input(">")
+		if changeCome.lower() in ['y', 'yes']:
+			cdcOddsChange(comeOdds)
+	if dCO > 0:
+		print("Change your Don't Come odds?")
+		while True:
+			try:
+				changeDCO = input(">")
+				break
+			except ValueError:
+				pass
+		if changeDCO.lower() in ['y', 'yes']:
+			cdcOddsChange(dComeOdds)
+
+def cdcOddsChange(dict):
+	global chipsOnTable
+	for key in dict:
+		if dict[key] > 0:
+			print("How much for Odds on the {}?".format(key))
+			while True:
+				try:
+					bet = int(input("$>"))
+					if bet > bank - chipsOnTable:
+						print("You don't have enough money to make that bet! Try again.")
+						outOfMoney()
+						print("Change your Odds?")
+						continue
+					break
+				except ValueError:
+					bet = dict[key]
+					break
+			if bet > 0:
+				chipsOnTable -= dict[key]
+				print("Ok, you have ${bet} Odds for your {num}.".format(bet=bet, num=key))
+				dict[key] = bet
+				chipsOnTable += bet
+			elif dict[key] > 0 and bet == 0:
+				print("Ok, taking down your Odds.")
+				chipsOnTable -= dict[key]
+				dict[key] = bet
+
+
 def comeCheck(roll):
-	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds
+	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds, pointIsOn
 	comePay(roll)
 	if comeBet > 0:
 		if roll in [7, 11]:
@@ -1008,6 +1059,7 @@ while True:
 			cChoice = input(">")
 			if cChoice.lower() in ['y', 'yes']:
 				come()
+			comeOddsChange()
 
 			placeShow()
 			print("Place Bets?")

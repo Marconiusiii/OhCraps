@@ -9,6 +9,9 @@ Craps is entirely based on the randomness of thrown dice. When the game starts, 
 
 ## How to Play
 
+After downloading the OhCraps_Py3.command file, double-click or Open the file and it will open the Terminal app and run. Alternatively, with Terminal open, cd to the directory where the command file was downloaded and run:
+$ python3 OhCraps_Py3.command
+
 The game starts off asking you to set up a bankroll. Enter a numeric amount to start.
 
 ### Coming Out Roll
@@ -20,6 +23,8 @@ You've established your bankroll and are now ready to start betting. You have a 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.
 
 Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet.
+
+Once you've set your Line Bets, type 'x' and hit Enter to continue on with the game.
 
 #### Place Bets
 
@@ -36,29 +41,23 @@ Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 r
 
 Check the Pay Table to see how each of the Lay Bets pays out.
 
-#### Hard Ways
-
-The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled.
-
-Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
-
 #### Field Bet
 
 The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is rolled, you win double your bet, and if a 12 is rolled, you will win triple your bet. All other numbers win even money. A 5, 6, 7, or 8 will lose.
 
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
+#### Hard Ways
+
+The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled. If you win a Hard Way bet, you'll be prompted to change your bet. Hit Enter to leave your current bet alone as is, type a number to change the bet, or enter 0 to take the bet down. Alternatively, if you lose the Hard Way bet, you'll be prompted to go back up on the bet; enter a number to bet again on that Hard Way number, or hit Enter to bypass the bet and leave it blank.
+
+Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
+
 #### Working  Bets
 
 If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
 If you've Placed, Laid, or made Hard Ways Bets, the "Place and Hard Ways Bets Working?" option will appear in the list, and entering 'y' and hitting Enter will set them all to be Working on the Come Out Roll.
-
-#### All Tall Small
-
-The All Tall Small bet is an interesting persistent bet where you are betting that a set of numbers will all appear before the 7. Small means you are betting that the 2, 3, 4, 5, and 6 will appear before the 7; Tall means you are betting that the 8. 9. 10, 11, and 12 will appear; All is a bet that both the small and tall numbers will all appear before the 7.
-
-This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll.
 
 #### Proposition Bets
 
@@ -89,6 +88,12 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 
 Check the Pay Table section to understand the various payouts for all these bets.
 
+#### All Tall Small
+
+The All Tall Small bet is an interesting persistent bet where you are betting that a set of numbers will all appear before the 7. Small means you are betting that the 2, 3, 4, 5, and 6 will appear before the 7; Tall means you are betting that the 8. 9. 10, 11, and 12 will appear; All is a bet that both the small and tall numbers will all appear before the 7.
+
+This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll. 
+
 ### Point Phase
 
 If a 4, 5, 6, 8, 9, or 10 is rolled on the Coming Out roll, that number becomes the Point. Roll the dice until the Point is hit to win on the Pass Line and reset the game, or until a 7 is rolled, clearing all the bets in a loss and returning to the Come Out roll.
@@ -98,6 +103,10 @@ New betting modes appear in the Point phase:
 #### Line Odds
 
 When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, you'll be asked if you want Pass Line Odds. If you bet on the Don't Pass Line, you'll be prompted for a Lay Bet. Both are optional and can be bypassed by hitting Enter.
+
+#### Take Down Don't Pass Bet
+
+Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. This game option will only appear if you make a Don't Pass bet before the Come Out roll. Type 'y' and hit Enter to take down the bet, and your DOn't Pass Bet and Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
 
 #### Come and Don't Come
 

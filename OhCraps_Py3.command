@@ -339,17 +339,17 @@ def comeShow():
 			print("You have ${bet} on the Don't Come {num} with ${odds} in odds.".format(bet=dComeBets[key], num=key, odds=dComeOdds[key]))
 
 def comeOddsChange():
-	global comeOdds, dComeOdds, chipsOnTable
+	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable
 	cO = dCO = 0
-	for value in comeOdds.values():
+	for value in comeBets.values():
 		cO += value
-	for value in dComeOdds.values():
+	for value in dComeBets.values():
 		dCO += value
 	if cO > 0:
 		print("Change your Come Odds?")
 		changeCome = input(">")
 		if changeCome.lower() in ['y', 'yes']:
-			cdcOddsChange(comeOdds)
+			cdcOddsChange(comeBets, comeOdds)
 	if dCO > 0:
 		print("Change your Don't Come odds?")
 		while True:
@@ -359,9 +359,9 @@ def comeOddsChange():
 			except ValueError:
 				pass
 		if changeDCO.lower() in ['y', 'yes']:
-			cdcOddsChange(dComeOdds)
+			cdcOddsChange(dComeBets, dComeOdds)
 
-def cdcOddsChange(dict):
+def cdcOddsChange(dict, dict2):
 	global chipsOnTable
 	for key in dict:
 		if dict[key] > 0:
@@ -379,14 +379,14 @@ def cdcOddsChange(dict):
 					bet = dict[key]
 					break
 			if bet > 0:
-				chipsOnTable -= dict[key]
+				chipsOnTable -= dict2[key]
 				print("Ok, you have ${bet} Odds for your {num}.".format(bet=bet, num=key))
-				dict[key] = bet
+				dict2[key] = bet
 				chipsOnTable += bet
-			elif dict[key] > 0 and bet == 0:
+			elif dict2[key] > 0 and bet == 0:
 				print("Ok, taking down your Odds.")
-				chipsOnTable -= dict[key]
-				dict[key] = bet
+				chipsOnTable -= dict2[key]
+				dict2[key] = bet
 
 
 def comeCheck(roll):

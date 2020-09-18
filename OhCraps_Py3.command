@@ -428,12 +428,12 @@ def comeCheck(roll):
 			print("Moving your Don't Come bet to the {}.".format(roll))
 			dComeBets[roll] = dComeBet
 			dComeBet = 0
-			print("Odds on your Don't Come {}?".format(roll))
+			print("Lay odds on your Don't Come {}?".format(roll))
 			dcOdds = input(">")
 			if dcOdds.lower() in ['y', 'yes']:
-				print("How much for your Don't Come Odds?")
+				print("How much to lay for your Don't Come Odds?")
 				dComeOdds[roll] = betPrompt()
-				print("Ok, ${bet} on the Don't Come {num}.".format(bet=dComeOdds[roll], num=roll))
+				print("Ok, ${bet} laid on the Don't Come {num}.".format(bet=dComeOdds[roll], num=roll))
 
 def comePay(roll):
 	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn
@@ -462,11 +462,11 @@ def comePay(roll):
 			if dComeOdds[key] > 0:
 				chipsOnTable -= dComeOdds[key]
 				if key in [4, 10]:
-					winOdds += dComeOdds[key]*2
+					winOdds += dComeOdds[key]//2
 				elif key in [5, 9]:
-					winOdds += dComeOdds[key]//2*3
+					winOdds += dComeOdds[key]//3*2
 				elif key in [6, 8]:
-					winOdds += dComeOdds[key]//5*6
+					winOdds += dComeOdds[key]//6*5
 		if win > 0:
 			print("You won ${} from your Don't Come Bets!".format(win))
 			if winOdds > 0:

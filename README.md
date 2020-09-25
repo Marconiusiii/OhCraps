@@ -92,7 +92,14 @@ Check the Pay Table section to understand the various payouts for all these bets
 
 The All Tall Small bet is an interesting persistent bet where you are betting that a set of numbers will all appear before the 7. Small means you are betting that the 2, 3, 4, 5, and 6 will appear before the 7; Tall means you are betting that the 8. 9. 10, 11, and 12 will appear; All is a bet that both the small and tall numbers will all appear before the 7.
 
-This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll. 
+This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll.
+
+#### FIre Bet
+
+This is the bet for players who think they can hit a hot streak of Point numbers before a 7 out. Like the All Tall Small, the Fire Bet is a persistent bet made in the Come Out phase. This is a bet on how many Point numbers the shooter hits before a 7. For example, if the shooter rolls a Point of 5 in the Come Out roll, and then rolls a 5 and wins the Point, the 5 is marked in the Fire Bet and it now counts as 1 Point Hit. Then if the shooter rolls a 4 on the Come Out, then wins the hand by rolling the Point 4 again, the 4 gets marked in the Fire Bet, counting as 2 Points won. If a Point number is rolled again, such as the shooter rolling a 5 after all of this, that Point will not count if the shooter wins. 
+
+Once a shooter wins 4 Points, the Fire Bet will pay out on the next 7 Out. If the shooter 7s Out while 3 or less points have been hit in the Fire Bet, you lose the Fire Bet and have to start over. This is a risky bet, but can pay off big with just a $1 bet and a lot of luck. If the shooter rolls 4 Points and then 7s out, you win 24:1. If the shooter rolls 5 points and then 7s out, you win 249:1, and if the Fire Bet is at the maximum of 6 points rolled, you will win 999:1!
+
 
 ### Point Phase
 
@@ -231,5 +238,14 @@ These bets are available at all times. If there is a bet on the Field, the Field
 </tr>
 <tr>
 <td>The All</td><td>176:1</td>
+</tr>
+<tr>
+<td>4 Fire Bet Points</td><td>24:1</td>
+</tr>
+<tr>
+<td>5 Fire Bet Points</td><td>249:1</td>
+</tr>
+<tr>
+<td>6 Fire Bet Points</td><td>999:1</td>
 </tr>
 </table>

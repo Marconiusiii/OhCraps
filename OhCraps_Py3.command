@@ -37,6 +37,59 @@ def roll():
 	die2 = d2
 	return total
 
+# Fire Bet Setup
+
+fire = []
+fireBet = 0
+
+"""
+win 4 numbers : 24:1
+win 5 numbers: 249:1
+win 6 numbers: 999:1
+
+2, 3, 7, 11, 12 do not affect fire bet, only 7 outs in phase 2.
+Once point is hit, the same point does not add to the fire bet. Fire bet must hit all 6 different point numbers.
+Payout starts at 4 point numbers on a 7 out. 3 or less is a full loss.
+"""
+
+def fireBetting():
+	global fireBet
+	print("How much on the Fire Bet?")
+	fireBet = betPrompt()
+	print("Ok, ${} on the Fire Bet. Good Luck!".format(fireBet))
+
+def fireCheck():
+	global bank, fire, fireBet, comeOut, p2
+	if p2 == 7:
+		if len(fire) < 4:
+			print("You lost ${} from the Fire Bet.".format(fireBet))
+			bank -= fireBet
+			fireBet = 0
+			fire = []
+		elif len(fire) == 4:
+			print("You won ${} on the Fire Bet! Great job!".format(fireBet * 24))
+			bank += fireBet * 24
+			fireBet = 0
+			fire = []
+		elif len(fire) == 5:
+			print("You won ${} on the Fire Bet! Holy Crap!".format(fireBet * 249))
+			bank += fireBet * 249
+			fireBet = 0
+			fire = []
+		elif len(fire) == 6:
+			print("Wowsers! You nailed the Fire Bet Jackpot and won ${}!!!".format(fireBet * 999))
+			bank += fireBet * 999
+			fireBet = 0
+			fire = []
+	elif p2 in [4, 5, 6, 8, 9, 10] and p2 == comeOut:
+		if p2 not in fire:
+			fire.append(p2)
+			fire.sort()
+			print("Fire Bet Points Hit: {}".format(fire))
+
+	
+
+
 # Hard Ways Setup
 rollHard = False
 
@@ -1002,6 +1055,15 @@ while True:
 		if atsChoice.lower() in ['y', 'yes']:
 			atsBetting()
 
+# Fire Bet
+	if fireBet == 0:
+		print("Fire Bet?")
+		fireChoice = input("> ")
+		if fireChoice.lower() in ['y', 'yes']:
+			fireBetting()
+	else:
+		print("You have ${bet} on the Fire Bet; Points Hit: {fire}.".format(bet=fireBet, fire=fire))
+
 #Coming Out Roll
 	input("Hit Enter to roll!")
 
@@ -1102,6 +1164,8 @@ while True:
 			hardCheck(p2)
 			lineCheck(comeOut, p2)
 			propPay(p2)
+			if fireBet > 0:
+				fireCheck()
 			if atsOn == True:
 				ats(p2)
 
@@ -1110,7 +1174,7 @@ while True:
 				pointIsOn = False
 				break
 			elif p2 == comeOut:
-				print("Point Hit!")
+				print("Point Hit! Front line winner!")
 				pointIsOn = False
 				break
 			else:

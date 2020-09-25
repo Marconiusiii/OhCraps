@@ -59,8 +59,9 @@ def fireBetting():
 	print("Ok, ${} on the Fire Bet. Good Luck!".format(fireBet))
 
 def fireCheck():
-	global bank, fire, fireBet, comeOut, p2
+	global bank, fire, fireBet, comeOut, p2, chipsOnTable
 	if p2 == 7:
+		chipsOnTable -= fireBet
 		if len(fire) < 4:
 			print("You lost ${} from the Fire Bet.".format(fireBet))
 			bank -= fireBet
@@ -85,7 +86,7 @@ def fireCheck():
 		if p2 not in fire:
 			fire.append(p2)
 			fire.sort()
-			print("Fire Bet Points Hit: {}".format(fire))
+			print("Fire Bet Point Numbers: {}".format(fire))
 
 	
 
@@ -494,13 +495,14 @@ def comePay(roll):
 		loss = lossOdds = 0
 		for key in comeBets:
 			loss += comeBets[key]
-		if pointIsOn == True:
-			for key in comeOdds:
-				lossOdds += comeOdds[key]
+		for key in comeOdds:
+			lossOdds += comeOdds[key]
 		if loss > 0:
 			print("You lost ${} from your Come Bets.".format(loss))
-			if lossOdds > 0:
+			if lossOdds > 0 and pointIsOn == True:
 				print("You lost ${} from your Come Bet Odds.".format(lossOdds))
+			elif lossOdds > 0 and pointIsOn == False:
+				print("${odds} returned to you from Come Odds.".format(odds=lossOdds))
 			bank -= loss + lossOdds
 			chipsOnTable -= loss + lossOdds
 			for key in comeBets:
@@ -572,6 +574,7 @@ def field():
 	print("How much on the Field?")
 	bet = betPrompt()
 	if bet > 0:
+		chipsOnTable -= fieldBet
 		fieldBet = bet
 		print("Ok, ${} on the Field.".format(fieldBet))
 	elif fieldBet > 0 and bet == 0:
@@ -989,7 +992,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.2\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.2.1\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:
@@ -1062,7 +1065,7 @@ while True:
 		if fireChoice.lower() in ['y', 'yes']:
 			fireBetting()
 	else:
-		print("You have ${bet} on the Fire Bet; Points Hit: {fire}.".format(bet=fireBet, fire=fire))
+		print("You have ${bet} on the Fire Bet; Numbers Hit: {fire}.".format(bet=fireBet, fire=fire))
 
 #Coming Out Roll
 	input("Hit Enter to roll!")

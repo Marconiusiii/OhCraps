@@ -706,6 +706,8 @@ def propPay(roll):
 			if multiplier > 0:
 				print("You won ${win} on the {bet} bet!".format(win=propBets[key]*multiplier, bet=key))
 				bank += propBets[key] * multiplier
+				chipsOnTable -= propBets[key]
+
 				propBets[key] = 0
 			else:
 				print("You lost ${loss} from the {bet}.".format(loss=propBets[key], bet=key))

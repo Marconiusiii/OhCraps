@@ -181,7 +181,6 @@ lineBets = {
 }
 
 
-
 def lineBetting():
 	global lineBets
 	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
@@ -323,7 +322,7 @@ def oddsCheck(roll):
 		bank += payout
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
-	elif lineBets["Don't Pass"] > 0 and roll == comeOut:
+	elif lineBets["Don't Pass Odds"] > 0 and roll == comeOut:
 		print("You lost ${} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
 		bank -= lineBets["Don't Pass Odds"]
 		chipsOnTable -= lineBets["Don't Pass Odds"]

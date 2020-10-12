@@ -282,15 +282,23 @@ def dpPhase2():
 # Odds Betting
 
 def odds():
-	global lineBets
+	global lineBets, chipsOnTable
 	if lineBets["Pass"] > 0:
+		chipsOnTable -= lineBets["Pass Odds"]
 		print("How Much for your Pass Line Odds?")
 		lineBets["Pass Odds"] = betPrompt()
-		print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
+		if lineBets["Pass Odds"] > 0:
+			print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
+		else:
+			print("Ok, taking down your Pass Line Odds.")
 	if lineBets["Don't Pass"] > 0:
+		chipsOnTable -= lineBets["Don't Pass Odds"]
 		print("How much to Lay for your Odds?")
 		lineBets["Don't Pass Odds"] = betPrompt()
-		print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
+		if lineBets["Don't Pass Odds"] > 0:
+			print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
+		else:
+			print("Ok, taking down your Don't Pass Odds.")
 
 def oddsCheck(roll):
 	global bank, chipsOnTable, lineBets, comeOut

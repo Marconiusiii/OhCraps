@@ -182,7 +182,7 @@ lineBets = {
 
 
 def lineBetting():
-	global lineBets
+	global lineBets, chipsOnTable
 	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
 	while True:
 		if lineBets["Pass"] > 0:
@@ -195,11 +195,13 @@ def lineBetting():
 			print("That won't work, try again.")
 			continue
 		if lBet.lower() in ['p', 'pass', 'passline', 'pass line']:
+			chipsOnTable -= lineBets["Pass"]
 			print("How much on the Pass Line?")
 			lineBets["Pass"] = betPrompt()
 			print("Ok, ${} on the Pass Line.".format(lineBets["Pass"]))
 			continue
 		elif lBet.lower() in ["d", "dp", "don't pass", "don't"]:
+			chipsOnTable -= lineBets["Don't Pass"]
 			print("How much on the Don't Pass line?")
 			lineBets["Don't Pass"] = betPrompt()
 			print("Ok, ${} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
@@ -242,10 +244,12 @@ def lineCheck(roll, p2roll):
 				print("You won ${} on the Pass Line!".format(lineBets["Pass"]))
 				bank += lineBets["Pass"]
 				chipsOnTable -= lineBets["Pass"]
+				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				bank -= lineBets["Don't Pass"]
 				chipsOnTable -= lineBets["Don't Pass"]
+				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
 		elif p2roll == 7:
 			if lineBets["Pass"] > 0:

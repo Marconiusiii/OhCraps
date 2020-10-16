@@ -32,8 +32,7 @@ Typing 'y' and hitting Enter when prompted with the Place Bets will take you thr
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Placing the 4 or 10 for $25 or more will automatically Buy those bets, and the 2% commission is factored into what you win if they hit. For example, Buying the ender
-4 for $25 will win 2 for 1, so you pay $1 to win $50, and will end up collecting $49.
+Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically Buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else. 
 
 #### Lay Bets
 

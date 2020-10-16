@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from random import *
+import math
 
 dealerCalls = {
 2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "push the don't", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
@@ -939,7 +940,7 @@ def placeBets():
 			chipsOnTable -= place[key]
 			place[key] = bet
 			chipsOnTable += bet
-			if key in [4, 10] and bet >= 25:
+			if key in [4, 10] and bet >= 10:
 				print("Buying the {num} for ${bet}.".format(bet=bet, num=key))
 			else:
 				print("${bet} on the Place {num}.".format(bet=bet, num=key))
@@ -955,15 +956,20 @@ def placeShow():
 			print("You have ${value} on the Place {key}.".format(value=place[key], key=key))
 
 def vig(bet):
-	print("${vig} paid to the House for the Buy Bet vig.".format(vig=int(bet*0.05)))
-	return int(bet*0.05)
+	total = bet * 0.05
+	if bet < 25:
+		commission = math.ceil(total)
+	else:
+		commission = math.floor(total)
+	print("${vig} paid to the House for the Buy Bet vig.".format(vig=commission))
+	return commission
 
 def placeCheck(roll):
 	global place, bank, chipsOnTable
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if place[roll] > 0:
 			win = 0
-			if roll in [4, 10] and place[roll] >= 25:
+			if roll in [4, 10] and place[roll] >= 10:
 				win = place[roll] * 2 - vig(place[roll])
 			elif roll in [4, 10]:
 				win = (place[roll]//5) * 9
@@ -1005,7 +1011,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.2.1\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.2.5\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:

@@ -28,15 +28,19 @@ Once you've set your Line Bets, type 'x' and hit Enter to continue on with the g
 
 #### Place Bets
 
-Typing 'y' and hitting Enter when prompted with the Place Bets will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number.
+Typing 'y' and hitting Enter when prompted with the Place Bets will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number.
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically Buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else. 
+Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically Buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
+
+After a Point has been established, when you are prompted with the Place Bet option, typing 'o' or 'off' and hitting Enter will turn your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls.
 
 #### Lay Bets
 
-Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 to leave the bet alone.
+Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
+
+After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. Wht the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
 Check the Pay Table to see how each of the Lay Bets pays out.
 
@@ -46,9 +50,13 @@ The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is roll
 
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
+Field Bets stay up on the table after winning. To take down a Field Bet, enter the prompt and type 0, then hit Enter.
+
 #### Hard Ways
 
 The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled. If you win a Hard Way bet, you'll be prompted to change your bet. Hit Enter to leave your current bet alone as is, type a number to change the bet, or enter 0 to take the bet down. Alternatively, if you lose the Hard Way bet, you'll be prompted to go back up on the bet; enter a number to bet again on that Hard Way number, or hit Enter to bypass the bet and leave it blank.
+
+After a Point has been established, you can turn your Hard Ways bets Off by typing 'o' or 'off' and hitting Enter when you are prompted with the "Hard Ways?" option. This will take your bets out of action for the next roll. Hitting a Hard Way number, and Easy number, or a 7 Out will not affect your bets when they are Off.
 
 Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
 
@@ -99,7 +107,6 @@ This is the bet for players who think they can hit a hot streak of Point numbers
 
 Once a shooter wins 4 Points, the Fire Bet will pay out on the next 7 Out. If the shooter 7s Out while 3 or less points have been hit in the Fire Bet, you lose the Fire Bet and have to start over. This is a risky bet, but can pay off big with just a $1 bet and a lot of luck. If the shooter rolls 4 Points and then 7s out, you win 24:1. If the shooter rolls 5 points and then 7s out, you win 249:1, and if the Fire Bet is at the maximum of 6 points rolled, you will win 999:1!
 
-
 ### Point Phase
 
 If a 4, 5, 6, 8, 9, or 10 is rolled on the Coming Out roll, that number becomes the Point. Roll the dice until the Point is hit to win on the Pass Line and reset the game, or until a 7 is rolled, clearing all the bets in a loss and returning to the Come Out roll.
@@ -125,6 +132,10 @@ A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any 
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.
 
 If Come or Don't Come bets are working during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll. If a 7 is rolled for the Coming Out roll, Come bets will lose but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established.
+
+#### going Off on your bets
+
+As mentioned in the Place Lay, and Hard Ways sections, you can take these bets Off for the next roll by typing 'o' or 'off' and hitting Enter when you are prompted for those bets. After the very next roll, those bets will turn back On.
 
 #### Field and Proposition Bets
 

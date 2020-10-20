@@ -94,6 +94,7 @@ def fireCheck():
 
 # Hard Ways Setup
 rollHard = False
+hardOff = False
 
 hardWays = {
 4: 0,
@@ -784,6 +785,9 @@ def ats(roll):
 		atsOn = False
 
 # Lay Bet Setup
+
+layOff = False
+
 layBets = {
 4: 0,
 5: 0,
@@ -919,6 +923,7 @@ place = {
 10: 0
 }
 
+placeOff = False
 def placeBets():
 	global place, chipsOnTable
 	for key in place:
@@ -1150,12 +1155,18 @@ while True:
 			pl2 = input(">")
 			if pl2.lower() in ['y', 'yes']:
 				placeBets()
+			elif pl2.lower() in ['o', 'off']:
+				placeOff = True
+				print("All your Place Bets are Off.")
 
 			layShow()
 			print("Lay Bets?")
 			ly2Bet = input(">")
 			if ly2Bet.lower() in ['y', 'yes']:
 				layBetting()
+			elif ly2Bet.lower() in ['o', 'off']:
+				layOff = True
+				print("Your Lay Bets are Off.")
 
 			fieldShow()
 			print("FIeld Bet?")
@@ -1168,6 +1179,9 @@ while True:
 			hard2 = input(">")
 			if hard2.lower() in ['y', 'yes']:
 				hardWaysBetting()
+			elif hard2.lower() in ['o', 'off']:
+				hardOff = True
+				print("Your Hard Ways are Off.")
 
 			print("Prop Bets?")
 			pr2Bet = input(">")
@@ -1180,10 +1194,19 @@ while True:
 
 			throws += 1
 			comeCheck(p2)
-			placeCheck(p2)
-			layCheck(p2)
+			if placeOff:
+				placeOff = False
+			else:
+				placeCheck(p2)
+			if layOff:
+				layOff = False
+			else:
+				layCheck(p2)
 			fieldCheck(p2)
-			hardCheck(p2)
+			if hardOff:
+				hardOff = False
+			else:
+				hardCheck(p2)
 			lineCheck(comeOut, p2)
 			propPay(p2)
 			if fireBet > 0:

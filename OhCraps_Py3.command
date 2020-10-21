@@ -120,6 +120,12 @@ def hardWaysBetting():
 
 			hardWays[key] = bet
 
+def hardTakeDown():
+	global hardWays, chipsOnTable
+	print("Taking down your Hard Ways.")
+	for key in hardWays:
+		chipsOnTable -= hardWays[key]
+		hardWays[key] = 0
 
 def hardCheck(roll):
 	global bank, chipsOnTable, hardWays, rollHard
@@ -595,6 +601,12 @@ def field():
 		print("Taking down your Field bet.")
 		fieldBet = 0
 
+def fieldTakeDown():
+	global fieldBet, chipsOnTable
+	chipsOnTable -= fieldBet
+	fieldBet = 0
+	print("Taking down your Field Bet.")
+
 def fieldCheck(roll):
 	global fieldBet, bank, chipsOnTable
 	if fieldBet > 0:
@@ -824,6 +836,13 @@ def layBetting():
 			chipsOnTable -= layBets[key]
 			layBets[key] = 0
 
+def layTakeDown():
+	global layBets, chipsOnTable
+	for key in layBets:
+		chipsOnTable -= layBets[key]
+		layBets[key] = 0
+
+
 def layShow():
 	global layBets
 	for key in layBets:
@@ -960,6 +979,13 @@ def placeShow():
 		if place[key] > 0:
 			print("You have ${value} on the Place {key}.".format(value=place[key], key=key))
 
+def placeTakeDown():
+	global place, chipsOnTable
+	for key in place:
+		chipsOnTable -= place[key]
+		place[key] = 0
+
+
 def vig(bet):
 	total = bet * 0.05
 	if bet < 25:
@@ -1016,7 +1042,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.2.5\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.3\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:
@@ -1037,23 +1063,35 @@ while True:
 	plBet = input(">")
 	if plBet in ['y', 'Yes']:
 		placeBets()
+	elif plBet.lower() in ['d', 'td', 'takedown']:
+		print("Taking down your Place Bets.")
+		placeTakeDown()
 
 	print("Lay Bets?")
 	lyBet = input(">")
 	if lyBet.lower() in ['y', 'yes']:
 		layBetting()
+	elif lyBet.lower() in ['d', 'td', 'takedown']:
+		print("Taking down your Lay Bets.")
+		layTakeDown()
 
 	fieldShow()
 	print("Field Bet?")
 	fBet = input(">")
 	if fBet.lower() in ['y', 'yes']:
 		field()
+	elif fBet.lower() in ['d', 'td', 'takedown']:
+		fieldTakeDown()
 
 	hardShow()
 	print("Hard Ways Bets?")
 	hWays = input(">")
 	if hWays.lower() in ['y', 'yes']:
 		hardWaysBetting()
+	elif hWays.lower() in ['d', 'td', 'takedown']:
+		hardTakeDown()
+
+# Working Bets Setup
 	plCheck = hCheck = lCheck = 0
 	for value in place.values():
 		plCheck += value
@@ -1158,6 +1196,9 @@ while True:
 			elif pl2.lower() in ['o', 'off']:
 				placeOff = True
 				print("All your Place Bets are Off.")
+			elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
+				print("Taking down all of your Place Bets.")
+				placeTakeDown()
 
 			layShow()
 			print("Lay Bets?")
@@ -1167,12 +1208,18 @@ while True:
 			elif ly2Bet.lower() in ['o', 'off']:
 				layOff = True
 				print("Your Lay Bets are Off.")
+			elif ly2Bet.lower() in ['d', 'td', 'takedown']:
+				print("Taking down all of your Lay Bets.")
+				layTakeDown()
+
 
 			fieldShow()
 			print("FIeld Bet?")
 			fb2 = input(">")
 			if fb2.lower() in ['y', 'yes']:
 				field()
+			elif fb2.lower() in ['d', 'td', 'takedown']:
+				fieldTakeDown()
 
 			hardShow()
 			print("Hard Ways bets?")
@@ -1182,6 +1229,8 @@ while True:
 			elif hard2.lower() in ['o', 'off']:
 				hardOff = True
 				print("Your Hard Ways are Off.")
+			elif hard2.lower() in ['d', 'td', 'takedown']:
+				hardTakeDown()
 
 			print("Prop Bets?")
 			pr2Bet = input(">")

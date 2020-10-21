@@ -1,4 +1,4 @@
-# OhCraps
+# OhCraps! v.5.3
 Python-based Craps game for Terminal.
 
 ## About
@@ -34,11 +34,15 @@ If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Ent
 
 Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically Buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
 
+In the Place Bet prompt, if you type 'd' or 'td' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
+
 After a Point has been established, when you are prompted with the Place Bet option, typing 'o' or 'off' and hitting Enter will turn your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls.
 
 #### Lay Bets
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
+
+At the Lay Bet prompt, typing 'd' or 'td' and hitting Enter will take down all your Lay Bets.
 
 After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. Wht the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
@@ -50,11 +54,13 @@ The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is roll
 
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
-Field Bets stay up on the table after winning. To take down a Field Bet, enter the prompt and type 0, then hit Enter.
+Field Bets stay up on the table after winning. To take down a Field Bet, type 'd' or 'td' at the Field Bet prompt and hit Enter. You can also go into the prompt and enter a Field Bet of $0.
 
 #### Hard Ways
 
 The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled. If you win a Hard Way bet, you'll be prompted to change your bet. Hit Enter to leave your current bet alone as is, type a number to change the bet, or enter 0 to take the bet down. Alternatively, if you lose the Hard Way bet, you'll be prompted to go back up on the bet; enter a number to bet again on that Hard Way number, or hit Enter to bypass the bet and leave it blank.
+
+At any point, entering 'd' or 'td' at the Hard Ways bet prompt and hitting Enter will take down all your Hard Ways bets.
 
 After a Point has been established, you can turn your Hard Ways bets Off by typing 'o' or 'off' and hitting Enter when you are prompted with the "Hard Ways?" option. This will take your bets out of action for the next roll. Hitting a Hard Way number, and Easy number, or a 7 Out will not affect your bets when they are Off.
 

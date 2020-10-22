@@ -9,8 +9,8 @@ dealerCalls = {
 5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver"],
 6: ["The national average", "Big Red, catch 'em in the corner", "Sixie from Dixie"],
 7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor"],
-8: ["a square pair", "eighter from the theater", "windows"],
-9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her"],
+8: ["a square pair", "eighter from the theater", "windows", "the Great!", "get 'yer mate"],
+9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her", "El Nine-O", "Niner, nothing finer"],
 10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "two stars from Mars", "64 out the door"],
 11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven"],
 12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps", "Hobo's delight"]
@@ -295,22 +295,32 @@ def dpPhase2():
 
 def odds():
 	global lineBets, chipsOnTable
+	pOddsChange = dpOddsChange = 0
 	if lineBets["Pass"] > 0:
 		chipsOnTable -= lineBets["Pass Odds"]
 		print("How Much for your Pass Line Odds?")
-		lineBets["Pass Odds"] = betPrompt()
-		if lineBets["Pass Odds"] > 0:
+		pOddsChange = betPrompt()
+		if pOddsChange > 0:
+			lineBets["Pass Odds"] = pOddsChange
 			print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-		else:
+		elif lineBets["Pass Odds"] > 0 and pOddsChange == 0:
 			print("Ok, taking down your Pass Line Odds.")
+			lineBet["Pass Odds"] = pOddsChange
+		else:
+			print("No change to your Pass Line Odds.")
+
 	if lineBets["Don't Pass"] > 0:
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		print("How much to Lay for your Odds?")
-		lineBets["Don't Pass Odds"] = betPrompt()
-		if lineBets["Don't Pass Odds"] > 0:
+		dpOddsChange = betPrompt()
+		if dpOddsChange > 0:
+			lineBets["Don't Pass Odds"] = dpOddsChange
 			print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
-		else:
+		elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
 			print("Ok, taking down your Don't Pass Odds.")
+			lineBets["Don't Pass Odds"] = dpOddsChange
+		else:
+			print("Leaving your Don't Pass Odds as is.")
 
 def oddsCheck(roll):
 	global bank, chipsOnTable, lineBets, comeOut

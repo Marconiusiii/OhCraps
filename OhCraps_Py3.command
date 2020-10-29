@@ -880,6 +880,7 @@ def layCheck(roll):
 					print("You won ${win} on the Lay {num}!".format(win=layBets[key]//6*5, num=key))
 					bank += layBets[key]//6*5
 				chipsOnTable -= layBets[key]
+				bank -= vig(layBets[key])
 				layBets[key] = 0
 
 # Bank and bet setup
@@ -1002,7 +1003,7 @@ def vig(bet):
 		commission = math.ceil(total)
 	else:
 		commission = math.floor(total)
-	print("${vig} paid to the House for the Buy Bet vig.".format(vig=commission))
+	print("${vig} paid to the House for the vig.".format(vig=commission))
 	return commission
 
 def placeCheck(roll):

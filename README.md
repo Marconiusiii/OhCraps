@@ -38,6 +38,19 @@ In the Place Bet prompt, if you type 'd' or 'td' instead of 'y' and hit Enter, t
 
 After a Point has been established, when you are prompted with the Place Bet option, typing 'o' or 'off' and hitting Enter will turn your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls.
 
+You can automatically place bets across all the numbers or bet inside using keywords on the Place Bet prompt. Typing 'a' and hitting Enter will activate the Across mode, where you will be prompted how many units you want to bet on each Place number. When using Across mode after a Point has been established, you'll be prompted on whether you'd like to include the Point number or not.
+
+On the Place Bet prompt, typing 'i' and hitting Enter will activate Inside mode, where the Place 4 and 10 will be taken down and you'll be prompted for how many units you'd like to place on the 5, 6, 8, and 9.
+
+Both of these options provide a quick way to make common Place bets without having to jump through each individual number. 1 Unit is equal to $5, with the 6 and 8 automatically adjusting for the $6 bets required for them.
+
+Common Across/Inside Bets:
+* 1 Unit - $32 Across - $22 Inside
+* 2 Units - $64 Across - $44 Inside
+* 3 Units - $96 Across - $66 Inside
+* 4 Units - $128 Across - $88 Inside
+* 5 Units - $160 Across - $$110 Inside 
+
 #### Lay Bets
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.

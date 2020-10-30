@@ -954,6 +954,46 @@ place = {
 }
 
 placeOff = False
+
+def placePreset(pre):
+	global chipsOnTable, pointIsOn, place, comeOut
+	total = 0
+	if pre.lower() in ['a', 'across', 'acr']:
+		print("How many units across the Place Numbers?")
+		unit = int(input("> "))
+		if pointIsOn:
+			print("Include the Point?")
+			try:
+				point = input("> ")
+			except ValueError:
+				pass
+		for key in place:
+			chipsOnTable -= place[key]
+			if key in [4, 5, 9, 10]:
+				place[key] = 5 * unit
+			elif key in [6, 8]:
+				place[key] = 6 * unit
+			if pointIsOn and point not in ['y', 'yes']:
+				if key == comeOut:
+					place[key] = 0
+			chipsOnTable += place[key]
+			total += place[key]
+		print("Placing ${} Across.".format(total))
+	elif pre.lower() in ['i', 'inside']:
+		print("How many units Inside?")
+		unit = int(input("> "))
+		for key in place:
+			chipsOnTable -= place[key]
+			if key in [5, 9]:
+				place[key] = 5 * unit
+			elif key in [6, 8]:
+				place[key] = 6 * unit
+			else:
+				place[key] = 0
+			chipsOnTable += place[key]
+			total += place[key]
+		print("Placing ${} Inside.".format(total))
+
 def placeBets():
 	global place, chipsOnTable
 	for key in place:
@@ -1053,7 +1093,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.3\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.4\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:
@@ -1077,6 +1117,8 @@ while True:
 	elif plBet.lower() in ['d', 'td', 'takedown']:
 		print("Taking down your Place Bets.")
 		placeTakeDown()
+	elif plBet.lower() in ['a', 'i']:
+		placePreset(plBet)
 
 	print("Lay Bets?")
 	lyBet = input(">")
@@ -1210,6 +1252,8 @@ while True:
 			elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
 				print("Taking down all of your Place Bets.")
 				placeTakeDown()
+			elif pl2.lower() in ['a', 'i']:
+				placePreset(pl2)
 
 			layShow()
 			print("Lay Bets?")

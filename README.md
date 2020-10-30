@@ -51,6 +51,10 @@ Common Across/Inside Bets:
 * 4 Units - $128 Across - $88 Inside
 * 5 Units - $160 Across - $$110 Inside 
 
+Once a Point has been established, typing 'm' at the Place Bet prompt will automatically move your Place bet to an open place number if it is not already placed. The bet will automatically adjust to the closest amount if going from the 6 and 8 to the other numbers, and vice versa.
+
+Typing 'p' and hitting Enter on the Place Prompt after the point has been established will take down only the Point number if it is placed. This works if you have already bet all the numbers across and just want to quickly take it down without going through every number in the Place Prompt bet flow.
+
 #### Lay Bets
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.

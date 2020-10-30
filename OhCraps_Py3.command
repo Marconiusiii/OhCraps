@@ -2,14 +2,45 @@
 from random import *
 import math
 
+die1 = 0
+die2 = 0
+
+def roll():
+	global rollHard, pointIsOn, die1, die2
+	rollHard = False
+	d1 = randint(1, 6)
+	d2 = randint(1, 6)
+	if d1 > d2 or d1 == d2:
+		die1 = d1
+		die2 = d2
+	else:
+		die1 = d2
+		die2 = d1
+
+	total = die1 + die2
+	if die1 == die2 and total in [4, 6, 8, 10]:
+		rollHard = True
+		print("{} the Hard Way!".format(total))
+	elif total in [7, 11] and pointIsOn == False:
+		print("{total} winner! Pay the line, take the don't!".format(total=total))
+	else:
+		call = randint(1, 10)
+		if call <=5:
+			print("{tot}, {call}!".format(tot=total, call=stickman(total)))
+		else:
+			print("{tot}, a {d1} {d2} {tot}!".format(tot=total, d1=die1, d2=die2))
+
+	return total
+
+
 dealerCalls = {
 2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "push the don't", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
 3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
 4: ["Double deuce", "Little Joe", "Little Joe from Kokomo", "Hit us in the 2 2", "2 spots and 2 dots", "Ace Tres"],
-5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver"],
+5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver", "Five 5"],
 6: ["The national average", "Big Red, catch 'em in the corner", "Sixie from Dixie"],
 7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor"],
-8: ["a square pair", "eighter from the theater", "windows", "the Great!", "get 'yer mate"],
+8: ["a square pair", "eighter from the theater", "windows", "the Great!", "get yer mate"],
 9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her", "El Nine-O", "Niner, nothing finer"],
 10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "two stars from Mars", "64 out the door"],
 11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven"],
@@ -19,24 +50,6 @@ dealerCalls = {
 def stickman(roll):
 	return dealerCalls[roll][randint(0, len(dealerCalls[roll])-1)]
 
-
-die1 = die2 = 0
-def roll():
-	global rollHard, pointIsOn, die1, die2
-	rollHard = False
-	d1 = randint(1, 6)
-	d2 = randint(1, 6)
-	total = d1 + d2
-	if d1 == d2 and total in [4, 6, 8, 10]:
-		rollHard = True
-		print("{} the Hard Way!".format(total))
-	elif total in [7, 11] and pointIsOn == False:
-		print("{total} winner! Pay the line, take the don't!".format(total=total))
-	else:
-		print("{tot}, {call}!".format(tot=total, call=stickman(total)))
-	die1 = d1
-	die2 = d2
-	return total
 
 # Fire Bet Setup
 
@@ -956,11 +969,18 @@ place = {
 placeOff = False
 
 def placePreset(pre):
-	global chipsOnTable, pointIsOn, place, comeOut
+	global chipsOnTable, bank, pointIsOn, place, comeOut
 	total = 0
 	if pre.lower() in ['a', 'across', 'acr']:
-		print("How many units across the Place Numbers?")
-		unit = int(input("> "))
+		while True:
+			print("How many units across the Place Numbers?")
+			unit = int(input("> "))
+			if (unit*5*4) + (unit*6*2) > bank:
+				print("You don't have enough money for that! Egads!")
+				outOfMoney()
+				continue
+			else:
+				break
 		if pointIsOn:
 			print("Include the Point?")
 			try:
@@ -993,6 +1013,24 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			total += place[key]
 		print("Placing ${} Inside.".format(total))
+
+def placeMover():
+	global place, chipsOnTable, comeOut
+	for key in place:
+		if place[key] == 0 and place[comeOut] > 0:
+			if key in [6, 8] and comeOut in [4, 5, 9, 10]:
+				place[key] = place[comeOut] + place[comeOut]//5
+			elif key in [6, 8] and comeOut in [6, 8]:
+				place[key] = place[comeOut]
+			elif key in [4, 5, 9, 10] and comeOut in [6, 8]:
+				place[key] = place[comeOut] - place[comeOut]//6
+			elif key in [4, 5, 9, 10] and comeOut in [4, 5, 9, 10]:
+				place[key] = place[comeOut]
+			print("Moving your ${original} Place {num1} bet. You now have ${new} on the {num2}.".format(original=place[comeOut], num1=comeOut, new=place[key], num2=key))
+			chipsOnTable -= place[comeOut]
+			chipsOnTable += place[key]
+			place[comeOut] = 0
+
 
 def placeBets():
 	global place, chipsOnTable
@@ -1254,6 +1292,12 @@ while True:
 				placeTakeDown()
 			elif pl2.lower() in ['a', 'i']:
 				placePreset(pl2)
+			elif pl2.lower() in ['m', 'move']:
+				placeMover()
+			elif pl2.lower() in ['p', 'point']:
+				chipsOnTable -= place[comeOut]
+				place[comeOut] = 0
+				print("Taking down the Place {} bet.".format(comeOut))
 
 			layShow()
 			print("Lay Bets?")

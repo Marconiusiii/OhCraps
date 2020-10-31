@@ -25,7 +25,7 @@ def roll():
 		print("{total} winner! Pay the line, take the don't!".format(total=total))
 	else:
 		call = randint(1, 10)
-		if call <=5:
+		if call <=5 or total in [2, 3, 11, 12]:
 			print("{tot}, {call}!".format(tot=total, call=stickman(total)))
 		else:
 			print("{tot}, a {d1} {d2} {tot}!".format(tot=total, d1=die1, d2=die2))
@@ -1131,7 +1131,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.4\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.5\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:

@@ -974,7 +974,11 @@ def placePreset(pre):
 	if pre.lower() in ['a', 'across', 'acr']:
 		while True:
 			print("How many units across the Place Numbers?")
-			unit = int(input("> "))
+			try:
+				unit = int(input("> "))
+			except ValueError:
+				print("That wasn't even a unit! Try again.")
+				continue
 			if (unit*5*4) + (unit*6*2) > bank:
 				print("You don't have enough money for that! Egads!")
 				outOfMoney()

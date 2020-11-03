@@ -287,7 +287,7 @@ def lineCheck(roll, p2roll):
 
 def dpPhase2():
 	global lineBets, chipsOnTable
-	print("Take down Don't Pass Bet?")
+	print("Take down Don't Pass Bet and Odds?")
 	while True:
 		try:
 			takeDown = input(">")
@@ -307,33 +307,56 @@ def dpPhase2():
 # Odds Betting
 
 def odds():
-	global lineBets, chipsOnTable
+	global lineBets, chipsOnTable, comeOut
 	pOddsChange = dpOddsChange = 0
+	if comeOut in [4, 10]:
+		maxOdds = lineBets["Pass"] * 3
+	elif comeOut in [5, 9]:
+		maxOdds = lineBets["Pass"] * 4
+	elif comeOut in [6, 8]:
+		maxOdds = lineBets["Pass"] * 5
+	maxDP = lineBets["Don't Pass"] * 6
 	if lineBets["Pass"] > 0:
-		chipsOnTable -= lineBets["Pass Odds"]
-		print("How Much for your Pass Line Odds?")
-		pOddsChange = betPrompt()
-		if pOddsChange > 0:
-			lineBets["Pass Odds"] = pOddsChange
-			print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-		elif lineBets["Pass Odds"] > 0 and pOddsChange == 0:
-			print("Ok, taking down your Pass Line Odds.")
-			lineBet["Pass Odds"] = pOddsChange
-		else:
-			print("No change to your Pass Line Odds.")
+		while True:
+			chipsOnTable -= lineBets["Pass Odds"]
+			print("How Much for your Pass Line Odds? Max Odds for the {num} is ${max}.".format(num=comeOut, max=maxOdds))
+			pOddsChange = betPrompt()
+			if pOddsChange > 0 and pOddsChange <= maxOdds:
+				lineBets["Pass Odds"] = pOddsChange
+				print("Ok, ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
+				break
+			elif pOddsChange > maxOdds:
+				print("Nope, that bet is over the Max Odds. Try again!")
+				chipsOnTable -= pOddsChange
+				continue
+			elif lineBets["Pass Odds"] > 0 and pOddsChange == 0:
+				print("Ok, taking down your Pass Line Odds.")
+				lineBets["Pass Odds"] = pOddsChange
+				break
+			else:
+				print("No change to your Pass Line Odds.")
+				break
 
 	if lineBets["Don't Pass"] > 0:
-		chipsOnTable -= lineBets["Don't Pass Odds"]
-		print("How much to Lay for your Odds?")
-		dpOddsChange = betPrompt()
-		if dpOddsChange > 0:
-			lineBets["Don't Pass Odds"] = dpOddsChange
-			print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
-		elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
-			print("Ok, taking down your Don't Pass Odds.")
-			lineBets["Don't Pass Odds"] = dpOddsChange
-		else:
-			print("Leaving your Don't Pass Odds as is.")
+		while True:
+			chipsOnTable -= lineBets["Don't Pass Odds"]
+			print("How much to Lay for your Odds? Max Odds for the {num} is ${max}.".format(num=comeOut, max=maxDP))
+			dpOddsChange = betPrompt()
+			if dpOddsChange > 0 and dpOddsChange <= maxDP:
+				lineBets["Don't Pass Odds"] = dpOddsChange
+				print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
+				break
+			elif dpOddsChange > maxDP:
+				print("Nope, you laid too much! Try again.")
+				chipsOnTable -= dpOddsChange
+				continue
+			elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
+				print("Ok, taking down your Don't Pass Odds.")
+				lineBets["Don't Pass Odds"] = dpOddsChange
+				break
+			else:
+				print("Leaving your Don't Pass Odds as is.")
+				break
 
 def oddsCheck(roll):
 	global bank, chipsOnTable, lineBets, comeOut
@@ -1272,6 +1295,19 @@ while True:
 				oddsPrompt = input(">")
 				if oddsPrompt.lower() in ['y', 'yes']:
 					odds()
+				elif oddsPrompt.lower() in ['p', 'pass']:
+					print("Taking down your Pass Line Odds.")
+					chipsOnTable -= lineBets["Pass Odds"]
+					lineBets["Pass Odds"] = 0
+				elif oddsPrompt.lower() in ['d', 'dont']:
+					print("Taking down your Don't Pass Odds.")
+					chipsOnTable -= lineBets["Don't Pass Odds"]
+					lineBets["Don't Pass Odds"] = 0
+				elif oddsPrompt.lower() in ['a', 'all']:
+					print("Taking down all of your Line Bet Odds.")
+					chipsOnTable -= lineBets["Pass Odds"] + lineBets["Don't Pass Odds"]
+					lineBets["Pass Odds"] = lineBets["Don't Pass Odds"] = 0
+
 
 			if lineBets["Don't Pass"] > 0:
 				dpPhase2()

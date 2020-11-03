@@ -140,7 +140,11 @@ New betting modes appear in the Point phase:
 
 When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, you'll be asked if you want Pass Line Odds. If you bet on the Don't Pass Line, you'll be prompted for a Lay Bet. Both are optional and can be bypassed by hitting Enter.
 
-#### Take Down Don't Pass Bet
+This game uses a standard 3x4x5x Odds limit. Odds on the 4 and 10 are limited to 3x your initial Line bet, odds on the 5 and 9 are limited to 4x your bet, and odds on the 6 and 8 are limited to 5x your bet. All Don't Pass lay odds are limited to 6x your Don't Pass bet.
+
+When at the Line Bet Odds prompt, typing 'p' and hitting Enter will take down your Pass Line Odds bet. Typing 'd' and hitting Enter will take down your Don't Pass Lay Odds. Typing 'a' and hitting Enter will take down both Pass and Don't Pass Odds if you have them set.
+
+#### Take Down Don't Pass Bet and Odds
 
 Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. This game option will only appear if you make a Don't Pass bet before the Come Out roll. Type 'y' and hit Enter to take down the bet, and your DOn't Pass Bet and Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
 

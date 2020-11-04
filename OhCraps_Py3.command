@@ -140,6 +140,38 @@ def hardTakeDown():
 		chipsOnTable -= hardWays[key]
 		hardWays[key] = 0
 
+def hardAuto():
+	global chipsOnTable, hardWays
+	print("How many $1 units on each of the Hard Ways?")
+	hardAcr = betPrompt()
+	chipsOnTable -= hardAcr
+	for key in hardWays:
+		chipsOnTable -= hardWays[key]
+		hardWays[key] = hardAcr
+		chipsOnTable += hardAcr
+	print("Ok, ${} on each of the Hard Ways.".format(hardAcr))
+
+def hardHigh(num):
+	global chipsOnTable, hardWays
+	number = int(num[1:])
+	print("How much to spread across the Hard Ways, high on the {}?".format(number))
+	bet = betPrompt()
+	for key in hardWays:
+		chipsOnTable -= hardWays[key]
+		if key == number:
+			hardWays[key] = bet - (bet//5*3)
+		else:
+			hardWays[key] = bet//5
+	print("Ok, ${a} on the Hard {number}, ${b} each on the other Hard Ways for a total of ${bet}.".format(a=(bet-(bet//5*3)), b=(bet//5), number=number, bet=bet))
+
+
+"""
+algorithm for spreading wierd bets across with a high number:
+bet - (bet//5 * 3) = high bet
+bet//5 = low bets
+
+"""
+
 def hardCheck(roll):
 	global bank, chipsOnTable, hardWays, rollHard
 	if roll == 7:
@@ -1158,7 +1190,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.5\nBy: Marco Salsiccia")
+print("Oh Craps! v.5.6\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:
@@ -1208,6 +1240,10 @@ while True:
 		hardWaysBetting()
 	elif hWays.lower() in ['d', 'td', 'takedown']:
 		hardTakeDown()
+	elif hWays.lower() in ['a', 'across', 'all']:
+		hardAuto()
+	elif hWays in ["h4", "h6", "h8", "h10"]:
+		hardHigh(hWays)
 
 # Working Bets Setup
 	plCheck = hCheck = lCheck = 0
@@ -1370,6 +1406,10 @@ while True:
 				print("Your Hard Ways are Off.")
 			elif hard2.lower() in ['d', 'td', 'takedown']:
 				hardTakeDown()
+			elif hard2.lower() in ['a', 'all', 'across']:
+				hardAuto()
+			elif hard2 in ["h4", "h6", "h8", "h10"]:
+				hardHigh(hard2)
 
 			print("Prop Bets?")
 			pr2Bet = input(">")

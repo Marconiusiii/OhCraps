@@ -77,6 +77,12 @@ Field Bets stay up on the table after winning. To take down a Field Bet, type 'd
 
 The Hard Ways bets are Proposition Bets that are not Single-Roll bets. These are bets that a 4, 6, 8, or 10 are rolled  the Hard Way, or with double numbers. Rolling a 4 and 4 will make a Hard 8, for example. Rolling a 6 and 2 is an Easy 8. A Hard Ways bet wins if any of the double numbers are rolled and will lose on either a 7 Out or if the Easy variant of the number is rolled. If you win a Hard Way bet, you'll be prompted to change your bet. Hit Enter to leave your current bet alone as is, type a number to change the bet, or enter 0 to take the bet down. Alternatively, if you lose the Hard Way bet, you'll be prompted to go back up on the bet; enter a number to bet again on that Hard Way number, or hit Enter to bypass the bet and leave it blank.
 
+Rather than going through each individual bet, typing 'a' and hitting Enter at the Hard Ways prompt will allow you to automatically bet units across all of the Hard Ways at the same time. For this prompt, units are $1, so entering 5 will put $5 on each of the Hard Ways, etc.
+
+At the Hard Ways prompt, you can bet a random amount spread across all the hard ways going high on one number by entering 'h4,' 'h6,' 'h8', or 'h10' and hitting Enter for the 4, 6, 8, or 10 respectively. When prompted, entering any amount here will automatically break down the bet to spread across the hard ways, with your chosen number receiving double the bet.
+
+For example, typing 'h4' and hitting Enter will prompt you for your bets going high on the Hard 4; then entering $25 will put $5 bets on the Hard 6, 8, and 10 and $10 on the Hard 4. This will work with any whole number, give it a go! Much better to try it here than at a live game since it annoys the dealers.
+
 At any point, entering 'd' or 'td' at the Hard Ways bet prompt and hitting Enter will take down all your Hard Ways bets.
 
 After a Point has been established, you can turn your Hard Ways bets Off by typing 'o' or 'off' and hitting Enter when you are prompted with the "Hard Ways?" option. This will take your bets out of action for the next roll. Hitting a Hard Way number, and Easy number, or a 7 Out will not affect your bets when they are Off.

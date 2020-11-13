@@ -688,20 +688,33 @@ def fieldTakeDown():
 def fieldCheck(roll):
 	global fieldBet, bank, chipsOnTable
 	if fieldBet > 0:
-		if roll in [3, 4, 9, 10, 11]:
-			print("You won ${} on the FIeld!".format(fieldBet))
-			bank += fieldBet
-		elif roll == 2:
-			print("Double in the Bubble! You win ${} on the 2!".format(fieldBet * 2))
-			bank += fieldBet * 2
-		elif roll == 12:
-			print("Triple in the Field! You win ${} on the 12!".format(fieldBet * 3))
-			bank += fieldBet * 3
+		payout = fieldBet
+		if roll in [2, 3, 4, 9, 10, 11, 12]:
+			if roll == 2:
+				payout *= 2
+				print("Double in the bubble!")
+			elif roll == 12:
+				payout *= 3
+				print("Triple in the Field!")
+			print("You won ${} on the Field!".format(payout))
+			bank += payout
+			print("Change your Field bet?")
+			fChange = input(">")
+			if fChange.lower() in ['y', 'yes']:
+				field()
+			else:
+				pass
 		else:
 			print("You lost ${} from the Field.".format(fieldBet))
 			bank -= fieldBet
 			chipsOnTable -= fieldBet
 			fieldBet = 0
+			print("Go back up on the Field?")
+			fChoice = input(">")
+			if fChoice in ['y', 'yes']:
+				field()
+			else:
+				pass			
 
 propBets = {
 "Snake Eyes": 0,

@@ -1074,6 +1074,13 @@ def placePreset(pre):
 	elif pre.lower() in ['i', 'inside']:
 		print("How many units Inside?")
 		unit = int(input("> "))
+		if pointIsOn:
+			print("Include the Point?")
+			try:
+				insidePoint = input("> ")
+			except ValueError:
+				insidePoint = "n"
+				pass
 		for key in place:
 			chipsOnTable -= place[key]
 			if key in [5, 9]:
@@ -1082,9 +1089,12 @@ def placePreset(pre):
 				place[key] = 6 * unit
 			else:
 				place[key] = 0
-			chipsOnTable += place[key]
-			total += place[key]
-		print("Placing ${} Inside.".format(total))
+			if insidePoint not in ['y', 'yes'] and key == comeOut:
+				place[key] = 0
+			else:
+				chipsOnTable += place[key]
+				total += place[key]
+		print("Ok, placing ${} inside.".format(total))
 
 def placeMover():
 	global place, chipsOnTable, comeOut

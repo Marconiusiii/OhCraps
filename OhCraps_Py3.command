@@ -1081,6 +1081,8 @@ def placePreset(pre):
 			except ValueError:
 				insidePoint = "n"
 				pass
+		else:
+			insidePoint = 'y'
 		for key in place:
 			chipsOnTable -= place[key]
 			if key in [5, 9]:

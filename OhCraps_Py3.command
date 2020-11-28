@@ -1073,7 +1073,13 @@ def placePreset(pre):
 		print("Placing ${} Across.".format(total))
 	elif pre.lower() in ['i', 'inside']:
 		print("How many units Inside?")
-		unit = int(input("> "))
+		while True:
+			try:
+				unit = int(input("> "))
+				break
+			except ValueError:
+				print("Invalid entry, try again.")
+				continue
 		if pointIsOn:
 			print("Include the Point?")
 			try:

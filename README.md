@@ -115,12 +115,22 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• Bet Code: "h", "horn"
 8. Yo - Betting that an Eleven will be the next roll outcome.
 	• BetCodes: "11", "eleven", "56"
-9. All - See all prop bets you've placed.
+9. Hop Bets - Betting on specific outcomes of the dice; hopping the 4s is betting that the dice roll 3, 1 or 2, 2, etc.
+	• Bet Codes: h4, h5, h6, h7, h8, h9, h10
+10. Hop the Easies - Placing a bet on all the easy way Hop Bets.
+	• Bet Code: hez
+11. All - See all prop bets you've placed.
 	• Code: all
-10. Help - See a list of all Prop Bet commands.
+12. Help - See a list of all Prop Bet commands.
 	• Code: help
-11. Exit Prop betting and return to the game.
+13. Exit Prop betting and return to the game.
 	• Code: x
+
+##### Hop Bets
+
+Hop Bets are where you can bet that a specific number will appear on the next roll. Hopping the number places a unit on each of the outcomes possible for that number. For example, hopping the 6 places a bet on the dice rolling as 3 and 3, 4 and 2, or5 and 1 on the next roll. If one of those outcomes hits, you get paid for that but lose the other bets on the other outcomes for the number. Hard Way hop bets pay 30:1, while all the other bets pay 15:1. You will be prompted to make a correct bet amount for the specific number you bet on. There are 3 ways to make a 6, so any Hop 6 bets must be made in multiples of 3, adn so on.
+
+The Hop the Easies bet, or 'hez' as the bet code, places a single unit on all 15 easy way outcomes for the dice.
 
 Check the Pay Table section to understand the various payouts for all these bets.
 
@@ -275,6 +285,12 @@ These bets are available at all times. If there is a bet on the Field, the Field
 </tr>
 <tr>
 <td>Hard 6 and 8</td><td>9:1</td>
+</tr>
+<tr>
+<td>Hop easy way</td><td>15:1</td>
+</tr>
+<tr>
+<td>Hop hard number</td><td>30:1</td>
 </tr>
 <tr>
 <td>Small and Tall</td><td>35:1</td>

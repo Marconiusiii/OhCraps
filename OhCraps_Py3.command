@@ -783,6 +783,54 @@ def propBetting():
 			propBets["Eleven"] = betPrompt()
 			print("Ok, ${} on Eleven.".format(propBets["Eleven"]))
 			continue
+		elif bet.lower() in ['w', 'world', 'whirl']:
+			print("How much on the World bet? Must be a multiple of 5.")
+			while True:
+				chipsOnTable -= propBets["World"]
+				propBets["World"] = betPrompt()
+				if propBets["World"]%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5! Try again, genius.")
+					continue
+			propBets["Any Seven"] = propBets["World"]//5
+			propBets["World"] -= propBets["World"]//5
+			propBets["Horn"] = propBets["World"]
+			print("Ok, you have ${seven} bet on the Any Seven and ${horn} on the Horn.".format(seven=propBets["Any Seven"], horn=propBets["Horn"]))
+			propBets["World"] = 0
+			if propBets["Buffalo"] > 0 and propBets["Eleven"] > 0:
+				print("You've got yourself a Whirly Buffalo!")
+		elif bet.lower() in ['buffalo', 'buff', 'bf']:
+			print("How much for the Buffalo bet? Must be a multiple of 5.")
+			while True:
+				chipsOnTable -= propBets["Buffalo"]
+				propBets["Buffalo"] = betPrompt()
+				if propBets["Buffalo"]%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5! Try again, genius.")
+					continue
+			print("Ok, ${} each on the Any 7 and hard ways hopping.".format(propBets["Buffalo"]//5))
+			propBets["Any Seven"] = propBets["Buffalo"]//5
+			propBets["Buffalo"] -= propBets["Buffalo"]//5
+			if propBets["Horn"] > 0 and propBets["Any Seven"] > 0:
+				print("You've got yourself a Whirly Buffalo!")
+		elif bet.lower() in ['buffalo11', 'buff11', 'bf11', 'by']:
+			print("How much for the Buffalo bet with the Yo? Must be a multiple of 5.")
+			while True:
+				chipsOnTable -= propBets["Buffalo"]
+				propBets["Buffalo"] = betPrompt()
+				if propBets["Buffalo"]%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5! Try again, genius.")
+					continue
+			print("Ok, ${} each on the Yo Eleven and hard ways hopping.".format(propBets["Buffalo"]//5))
+			propBets["Eleven"] = propBets["Buffalo"]//5
+			propBets["Buffalo"] -= propBets["Buffalo"]//5
+
+			if propBets["Horn"] > 0 and propBets["Any Seven"] > 0:
+				print("You've got yourself a Whirly Buffalo!")
 		elif bet.lower() in ['h4', 'hop 4', 'hop the 4', '4 on the hop']:
 			print("How much to Hop the 4? Must be an even number.")
 			while True:
@@ -912,6 +960,10 @@ def propPay(roll):
 				propBets[key] = propBets[key]//4
 			elif key == "Horn" and roll in [3, 11]:
 				multiplier = 15
+				propBets[key] = propBets[key]//4
+			elif key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
+				multiplier = 30
+				sub = propBets[key]//4*3
 				propBets[key] = propBets[key]//4
 			elif key == "Hop 4" and roll == 4:
 				if die1 == 3:

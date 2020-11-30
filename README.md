@@ -119,11 +119,17 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• Bet Codes: h4, h5, h6, h7, h8, h9, h10
 10. Hop the Easies - Placing a bet on all the easy way Hop Bets.
 	• Bet Code: hez
-11. All - See all prop bets you've placed.
+11. World - Also known as the Whirl Bet, this places a bet across the Horn and the Any 7.
+	• Code: 'w', 'world', 'wh'
+12. Buffalo - A bet that contains Any 7 along with the Hard Ways hopping.
+	• Code: 'bf', 'buff', 'buffalo'
+13. Buffalo Yo - Hard Ways hopping with the Eleven rather than the Any 7.
+	• Code: 'bf11', 'by'
+14. All - See all prop bets you've placed.
 	• Code: all
-12. Help - See a list of all Prop Bet commands.
+15. Help - See a list of all Prop Bet commands.
 	• Code: help
-13. Exit Prop betting and return to the game.
+16. Exit Prop betting and return to the game.
 	• Code: x
 
 ##### Hop Bets
@@ -131,6 +137,8 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 Hop Bets are where you can bet that a specific number will appear on the next roll. Hopping the number places a unit on each of the outcomes possible for that number. For example, hopping the 6 places a bet on the dice rolling as 3 and 3, 4 and 2, or5 and 1 on the next roll. If one of those outcomes hits, you get paid for that but lose the other bets on the other outcomes for the number. Hard Way hop bets pay 30:1, while all the other bets pay 15:1. You will be prompted to make a correct bet amount for the specific number you bet on. There are 3 ways to make a 6, so any Hop 6 bets must be made in multiples of 3, adn so on.
 
 The Hop the Easies bet, or 'hez' as the bet code, places a single unit on all 15 easy way outcomes for the dice.
+
+The Buffalo Prop bet places bets across the Hard Ways Hop bets and either the Any 7 or Eleven. 
 
 Check the Pay Table section to understand the various payouts for all these bets.
 

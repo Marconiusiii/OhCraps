@@ -727,6 +727,7 @@ propBets = {
 "Eleven": 0,
 "World": 0,
 "Buffalo": 0,
+"Hi Low": 0,
 "Hop 4": 0,
 "Hop 5": 0,
 "Hop 6": 0,
@@ -737,6 +738,8 @@ propBets = {
 "Hop EZ": 0
 }
 
+def propHelp():
+	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h3-h10': Hop bets\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
 
 def propBetting():
 	global propBets, chipsOnTable
@@ -828,9 +831,23 @@ def propBetting():
 			print("Ok, ${} each on the Yo Eleven and hard ways hopping.".format(propBets["Buffalo"]//5))
 			propBets["Eleven"] = propBets["Buffalo"]//5
 			propBets["Buffalo"] -= propBets["Buffalo"]//5
-
 			if propBets["Horn"] > 0 and propBets["Any Seven"] > 0:
 				print("You've got yourself a Whirly Buffalo!")
+		elif bet.lower() in ['hl', 'hilo', 'high low', 'hilow']:
+			print("How much on the Hi-Low? Must be a multiple of 2.")
+			while True:
+				chipsOnTable -= propBets["Hi Low"]
+				propBets["Hi Low"] = betPrompt()
+				if propBets["Hi Low"]%2 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 2! Try again, genius.")
+					continue
+			print("Ok, ${} each on the 2 and 12.".format(propBets["Hi Low"]//2))
+			propBets["Snake Eyes"] = propBets["Hi Low"]//2
+			propBets["Boxcars"] = propBets["Hi Low"]//2
+			propBets["Hi Low"] = 0
+
 		elif bet.lower() in ['h4', 'hop 4', 'hop the 4', '4 on the hop']:
 			print("How much to Hop the 4? Must be an even number.")
 			while True:
@@ -934,6 +951,9 @@ def propBetting():
 				if propBets[key] > 0:
 					print("${bet} on {prop}.".format(bet=str(propBets[key]), prop=key))
 			continue
+		elif bet.lower() == 'help':
+			propHelp()
+			continue 
 		elif bet.lower() in ['x', 'close', 'exit', 'done']:
 			break
 

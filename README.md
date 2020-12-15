@@ -125,11 +125,13 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• Code: 'bf', 'buff', 'buffalo'
 13. Buffalo Yo - Hard Ways hopping with the Eleven rather than the Any 7.
 	• Code: 'bf11', 'by'
-14. All - See all prop bets you've placed.
+14. Hi-Lo, betting evenly on the 2 and 12.
+	• Code: 'hl'w
+15. All - See all prop bets you've placed.
 	• Code: all
-15. Help - See a list of all Prop Bet commands.
-	• Code: help
-16. Exit Prop betting and return to the game.
+16. Help - See a list of all Prop Bet commands.
+	• Code: 'help'
+17. Exit Prop betting and return to the game.
 	• Code: x
 
 ##### Hop Bets

@@ -61,7 +61,7 @@ Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 r
 
 At the Lay Bet prompt, typing 'd' or 'td' and hitting Enter will take down all your Lay Bets.
 
-After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. Wht the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
+After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
 Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission paid back to the House when a Lay bet wins.
 

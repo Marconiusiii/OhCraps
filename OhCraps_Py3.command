@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.8.0"
+version = "5.8.1"
 
 
 #Roll and Dice Setup
@@ -474,16 +474,22 @@ dComeBet = 0
 
 def come():
 	global comeBet, dComeBet
-	print("Come or Don't Come?")
-	choice = input(">")
-	if choice.lower() in ['c', 'come']:
-		print("How much on the Come?")
-		comeBet = betPrompt()
-		print("Ok, ${} on the Come.".format(comeBet))
-	elif choice.lower() in ["dc", "d", "don't", "don't come", "dontcome"]:
-		print("How much on the Don't Com?")
-		dComeBet = betPrompt()
-		print("Ok, ${} on the Don't Come.".format(dComeBet))
+	while True:
+		print("Come or Don't Come?")
+		choice = input(">")
+		if choice.lower() in ['c', 'come']:
+			print("How much on the Come?")
+			comeBet = betPrompt()
+			print("Ok, ${} on the Come.".format(comeBet))
+			break
+		elif choice.lower() in ["dc", "d", "don't", "don't come", "dontcome"]:
+			print("How much on the Don't Com?")
+			dComeBet = betPrompt()
+			print("Ok, ${} on the Don't Come.".format(dComeBet))
+			break
+		else:
+			print("Invalid choice, try again.")
+			continue
 
 def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
@@ -724,12 +730,12 @@ def fieldCheck(roll):
 propBets = {
 "Snake Eyes": 0,
 "Acey Deucey": 0,
+"Eleven": 0,
+"Boxcars": 0,
 "Any Craps": 0,
 "Any Seven": 0,
 "C and E": 0,
 "Horn": 0,
-"Boxcars": 0,
-"Eleven": 0,
 "World": 0,
 "Buffalo": 0,
 "Hi Low": 0,
@@ -780,6 +786,62 @@ def propBetting():
 			print("How much on the Horn Bet?")
 			propBets["Horn"] = betPrompt()
 			print("Ok, ${} on the Horn Bet.".format(propBets["Horn"]))
+			continue
+		elif bet.lower() == 'hh2':
+			print("How much on the Horn High Deuce? Must be multiple of 5.")
+			while True:
+				hornHigh2 = betPrompt()
+				if hornHigh2%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5, try again!")
+					chipsOnTable -= hornHigh2
+					continue
+			propBets["Snake Eyes"] = hornHigh2//5*2
+			propBets["Acey Deucey"] = propBets["Eleven"] = propBets["Boxcars"] = hornHigh2//5
+			print("Ok, ${} on the Horn High Deuce.".format(hornHigh2))
+			continue
+		elif bet.lower() == 'hh3':
+			print("How much on the Horn High Ace-Deuce?")
+			while True:
+				hornHigh3 = betPrompt()
+				if hornHigh3%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5, doofus. Try again!")
+					chipsOnTable -= hornHigh3
+					continue
+			propBets["Acey Deucey"] = hornHigh3//5*2
+			propBets["Snake Eyes"] = propBets["Eleven"] = propBets["Boxcars"] = hornHigh3//5
+			print("Ok, ${} on the Horn High Ace-Deuce.".format(hornHigh3))
+			continue
+		elif bet.lower() in ['hhy', 'hh11']:
+			print("How much on the Horn High Yo?")
+			while True:
+				hornHigh11 = betPrompt()
+				if hornHigh11%5 == 0:
+					break
+				else:
+					print("Not a multiple of 5, try again!")
+					chipsOnTable -= hornHigh11
+					continue
+			propBets["Eleven"] = hornHigh11//5*2
+			propBets["Snake Eyes"] = propBets["Acey Deucey"] = propBets["Boxcars"] = hornHigh11//5
+			print("Ok, ${} on the Horn High Yo!".format(hornHigh11))
+			continue
+		elif bet.lower() in ['hh12', 'hhm', 'hhb']:
+			print("How much on the Horn High 12?")
+			while True:
+				hornHigh12 = betPrompt()
+				if hornHigh12%5 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 5, try again!")
+					chipsOnTable -= hornHigh12
+					continue
+			propBets["Boxcars"] = hornHigh12//5*2
+			propBets["Snake Eyes"] = propBets["Acey Deucey"] = propBets["Eleven"] = hornHigh12//5
+			print("Ok, ${} on the Horn High Midnight.".format(hornHigh12))
 			continue
 		elif bet.lower() in ['boxcars', 'b', 12, 'midnight']:
 			print("How much on Boxcars?")

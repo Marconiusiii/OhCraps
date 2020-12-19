@@ -1,4 +1,4 @@
-# OhCraps! v.5.8.0
+# OhCraps! v.5.8.1
 Python-based Craps game for Terminal.
 
 ## About
@@ -113,6 +113,14 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• Bet Code: "b" or "12"
 7. Horn - Bet that a 2, 3, 11, or 12 comes up.
 	• Bet Code: "h", "horn"
+	Horn High Deuce:
+	• Code: 'hh2'
+	Horn High Ace-Deuce:
+	• Code: 'hh3'
+	Horn High Yo
+	• Code: 'hhy', 'hh11'
+	Horn High 12
+	• Code: 'hhb', 'hhm', 'hh12'
 8. Yo - Betting that an Eleven will be the next roll outcome.
 	• BetCodes: "11", "eleven", "56"
 9. Hop Bets - Betting on specific outcomes of the dice; hopping the 4s is betting that the dice roll 3, 1 or 2, 2, etc.

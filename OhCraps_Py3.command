@@ -2,6 +2,11 @@
 from random import *
 import math
 
+#Version Number
+version = "5.8.0"
+
+
+#Roll and Dice Setup
 die1 = 0
 die2 = 0
 
@@ -977,9 +982,11 @@ def propPay(roll):
 				multiplier = 7
 			elif key == "Horn" and roll in [2, 12]:
 				multiplier = 30
+				sub = propBets[key]//4 * 3
 				propBets[key] = propBets[key]//4
 			elif key == "Horn" and roll in [3, 11]:
 				multiplier = 15
+				sub = propBets[key]//4*3
 				propBets[key] = propBets[key]//4
 			elif key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
 				multiplier = 30
@@ -1032,7 +1039,7 @@ def propPay(roll):
 			else:
 				multiplier = 0
 			if multiplier > 0:
-				print("You won ${win} on the {bet} bet!".format(win=propBets[key]*multiplier, bet=key))
+				print("You won ${win} on the {bet} bet!".format(win=propBets[key]*multiplier-sub, bet=key))
 				bank += propBets[key] * multiplier - sub
 				chipsOnTable -= propBets[key] + sub
 				propBets[key] = 0
@@ -1443,7 +1450,7 @@ working = False
 throws = 0
 
 # Game Start
-print("Oh Craps! v.5.75\nBy: Marco Salsiccia")
+print("Oh Craps! v.{version}\nBy: Marco Salsiccia".format(version=version))
 cashIn()
 while True:
 	if chipsOnTable <= 0:

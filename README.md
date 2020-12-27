@@ -5,7 +5,7 @@ Python-based Craps game for Terminal.
 
 Craps is one of the best games you can play in a casino and contains a variety of bets that have some of the lowest house advantage percentages over you. This game is built to run within a Terminal environment and is accessible for blind players.
 
-Craps is entirely based on the randomness of thrown dice. When the game starts, a bet on the Pass Line will win if a 7 or 11 is thrown with the first roll, also known as the Coming Out roll. A 2, 3, or 12 will lose on the first roll. Any other number thrown on the first roll becomes the Point number, and then the shooter continues to roll until they either roll the Point number or throw a 7. Hitting the Point number is a Pass Line win, the game resets and everything starts up again. Rolling a 7 on the other hand after a Point is established is a loss, and all bets on the table lose, with the exception of Don't Pass/Don't Come bets and Any 7 proposition bets.
+Craps is entirely based on the randomness of thrown dice. When the game starts, a bet on the Pass Line will win if a 7 or 11 is thrown with the first roll, also known as the Coming Out roll. A 2, 3, or 12 will lose on the first roll. Any other number thrown on the first roll becomes the Point number, and then the shooter continues to roll until they either roll the Point number or throw a 7. Hitting the Point number is a Pass Line win, the game resets and everything starts up again. Rolling a 7 on the other hand after a Point is established is a loss, and all bets on the table lose with the exception of Don't Pass/Don't Come bets and Any 7 proposition bets.
 
 ## How to Play
 
@@ -32,7 +32,7 @@ Typing 'y' and hitting Enter when prompted with the Place Bets will take you thr
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically Buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
+Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
 
 In the Place Bet prompt, if you type 'd' or 'td' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
 
@@ -49,7 +49,7 @@ Common Across/Inside Bets:
 * 2 Units - $64 Across - $44 Inside
 * 3 Units - $96 Across - $66 Inside
 * 4 Units - $128 Across - $88 Inside
-* 5 Units - $160 Across - $$110 Inside 
+* 5 Units - $160 Across - $110 Inside 
 
 Once a Point has been established, typing 'm' at the Place Bet prompt will automatically move your Place bet to an open place number if it is not already placed. The bet will automatically adjust to the closest amount if going from the 6 and 8 to the other numbers, and vice versa.
 
@@ -100,7 +100,7 @@ If you've Placed, Laid, or made Hard Ways Bets, the "Place and Hard Ways Bets Wo
 These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
 
 1. Any 7 - Bet on any 7 to come up.
-	• Bet Code: "7"
+	• Bet Code: "7", 'a7', 's'
 2. Any Craps - Bet on a 2, 3, or 12 to come up.
 	• Bet Code: "cr"
 3. C & E - Bet on a 2, 3, 11, or 12 to come up.
@@ -134,7 +134,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 13. Buffalo Yo - Hard Ways hopping with the Eleven rather than the Any 7.
 	• Code: 'bf11', 'by'
 14. Hi-Lo, betting evenly on the 2 and 12.
-	• Code: 'hl'w
+	• Code: 'hl'
 15. All - See all prop bets you've placed.
 	• Code: all
 16. Help - See a list of all Prop Bet commands.
@@ -144,7 +144,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 
 ##### Hop Bets
 
-Hop Bets are where you can bet that a specific number will appear on the next roll. Hopping the number places a unit on each of the outcomes possible for that number. For example, hopping the 6 places a bet on the dice rolling as 3 and 3, 4 and 2, or5 and 1 on the next roll. If one of those outcomes hits, you get paid for that but lose the other bets on the other outcomes for the number. Hard Way hop bets pay 30:1, while all the other bets pay 15:1. You will be prompted to make a correct bet amount for the specific number you bet on. There are 3 ways to make a 6, so any Hop 6 bets must be made in multiples of 3, adn so on.
+Hop Bets are where you can bet that a specific number will appear on the next roll. Hopping the number places a unit on each of the outcomes possible for that number. For example, hopping the 6 places a bet on the dice rolling as 3 and 3, 4 and 2, or5 and 1 on the next roll. If one of those outcomes hits, you get paid for that but lose the other bets on the other outcomes for the number. Hard Way hop bets pay 30:1, while all the other bets pay 15:1. You will be prompted to make a correct bet amount for the specific number you bet on. There are 3 ways to make a 6, so any Hop 6 bets must be made in multiples of 3, and so on.
 
 The Hop the Easies bet, or 'hez' as the bet code, places a single unit on all 15 easy way outcomes for the dice.
 
@@ -158,7 +158,7 @@ The All Tall Small bet is an interesting persistent bet where you are betting th
 
 This bet is made at the Come Out roll and will not appear again until a 7 out. The game will keep track of your rolls and display them each time you roll the dice. You will only lose this bet on a 7 Out or a 7 on the Come Out roll.
 
-#### FIre Bet
+#### Fire Bet
 
 This is the bet for players who think they can hit a hot streak of Point numbers before a 7 out. Like the All Tall Small, the Fire Bet is a persistent bet made in the Come Out phase. This is a bet on how many Point numbers the shooter hits before a 7. For example, if the shooter rolls a Point of 5 in the Come Out roll, and then rolls a 5 and wins the Point, the 5 is marked in the Fire Bet and it now counts as 1 Point Hit. Then if the shooter rolls a 4 on the Come Out, then wins the hand by rolling the Point 4 again, the 4 gets marked in the Fire Bet, counting as 2 Points won. If a Point number is rolled again, such as the shooter rolling a 5 after all of this, that Point will not count if the shooter wins. 
 
@@ -180,7 +180,7 @@ When at the Line Bet Odds prompt, typing 'p' and hitting Enter will take down yo
 
 #### Take Down Don't Pass Bet and Odds
 
-Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. This game option will only appear if you make a Don't Pass bet before the Come Out roll. Type 'y' and hit Enter to take down the bet, and your DOn't Pass Bet and Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
+Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. This game option will only appear if you make a Don't Pass bet before the Come Out roll. Type 'y' and hit Enter to take down the bet, and your Don't Pass Bet along with your Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
 
 #### Come and Don't Come
 
@@ -192,7 +192,7 @@ A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any 
 ##### Don't Come Bet
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.
 
-If Come or Don't Come bets are working during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll. If a 7 is rolled for the Coming Out roll, Come bets will lose but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established.
+If Come or Don't Come bets are working during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll. If a 7 is rolled for the Coming Out roll, Come bets will lose, but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established.
 
 #### going Off on your bets
 

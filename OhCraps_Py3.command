@@ -73,9 +73,9 @@ Payout starts at 4 point numbers on a 7 out. 3 or less is a full loss.
 
 def fireBetting():
 	global fireBet
-	print("How much on the Fire Bet?")
+	print("\tHow much on the Fire Bet?")
 	fireBet = betPrompt()
-	print("Ok, ${} on the Fire Bet. Good Luck!".format(fireBet))
+	print("\tOk, ${} on the Fire Bet. Good Luck!".format(fireBet))
 
 def fireCheck():
 	global bank, fire, fireBet, comeOut, p2, chipsOnTable
@@ -767,7 +767,7 @@ def propBetting():
 			propBets["Acey Deucey"] = betPrompt()
 			print("Ok, ${} on Acey-Deucey.".format(propBets["Acey Deucey"]))
 			continue
-		elif bet.lower() in [7, 'a7', 'any 7', 'seven', 'any seven', 'big red']:
+		elif bet.lower() in [7, 'a7', 'any 7', 'seven', 'any seven', 'big red', 's']:
 			print("How much on Any 7?")
 			propBets["Any Seven"] = betPrompt()
 			print("Ok, ${} on Any Seven.".format(propBets["Any Seven"]))
@@ -1280,12 +1280,12 @@ def betPrompt():
 	global bank, chipsOnTable
 	while True:
 		try:
-			playerBet =  int(input("$>"))
+			playerBet =  int(input("\t$>"))
 		except ValueError:
-			print("That wasn't a number!")
+			print("\tThat wasn't a number!")
 			continue
 		if playerBet > bank - chipsOnTable:
-			print("You simply don't have enough money to do that! DO you want to add more to your bankroll?")
+			print("\tYou simply don't have enough money to do that! DO you want to add more to your bankroll?")
 			addMore = input(">")
 			if addMore.lower() in ['y', 'yes', 'atm', 'help', 'more money']:
 				outOfMoney()
@@ -1299,7 +1299,7 @@ def outOfMoney():
 	if bank <= 0:
 		print("\tYou are totally out of money. Let's hit the ATM again and get you more cash. How much do you want?")
 	else:
-		print("Your chips are getting really low. How much would you like to add to your bankroll?")
+		print("\tYour chips are getting really low. How much would you like to add to your bankroll?")
 	while True:
 		try:
 			cash = int(input("\t$>"))
@@ -1307,7 +1307,7 @@ def outOfMoney():
 			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance. Try again.")
 			continue
 		if cash <= 0:
-			print("What am I, a bank? This is for withdrawals only! Try again.")
+			print("\tWhat am I, a bank? This is for withdrawals only! Try again.")
 			continue
 		else:
 			bank += cash

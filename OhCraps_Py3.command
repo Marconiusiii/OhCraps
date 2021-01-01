@@ -1614,8 +1614,9 @@ while True:
 	if working == True:
 		placeCheck(comeOut)
 		layCheck(comeOut)
+		fieldCheck(comeOut)
 		hardCheck(comeOut)
-	fieldCheck(comeOut)
+
 	propPay(comeOut)
 	if atsOn == True:
 		ats(comeOut)
@@ -1643,6 +1644,7 @@ while True:
 				outOfMoney()
 			print("{} is the Point!".format(comeOut))
 			print("Rolls: {}".format(throws))
+
 #Phase 2 Betting
 			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
 				if lineBets["Pass Odds"] > 0:

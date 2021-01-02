@@ -276,62 +276,62 @@ These bets are available at all times. If there is a bet on the Field, the Field
 </thead>
 <tbody>
 <tr>
-<td>Any 7</td><td>4:1</td>
+<th scope="row">Any 7</th><td>4:1</td>
 </tr>
 <tr>
-<td>Any Craps</td><td>7:1</td>
+<th scope="row">Any Craps</th><td>7:1</td>
 </tr>
 <tr>
-<td>C & E with Craps</td><td>3:1</td>
+<th scope="row">C & E with Craps</th><td>3:1</td>
 </tr>
 <tr>
-<td>C&E with 11</td><td>7:1</td>
+<th scope="row">C&E with 11</th><td>7:1</td>
 </tr>
 <tr>
-<td>Snake Eyes</td><td>30:1</td>
-<tr>
-<tr>
-<td>Acey-Deucey</td><td>15:1</td>
+<th scope="row">Snake Eyes/Aces</th><td>30:1</td>
 </tr>
 <tr>
-<td>Boxcars</td><td>30:1</td>
+<th scope="row">Acey-Deucey</th><td>15:1</td>
 </tr>
 <tr>
-<td>Horn Bet on 2, 12</td><td>30:1 - 3/4 of initial bet</td>
+<th scope="row">Boxcars</th><td>30:1</td>
 </tr>
 <tr>
-<td>Horn Bet on 3, 11</td><td>15:1 - 3/4 of initial bet</td>
+<th scope="row">Horn Bet on 2, 12</th><td>30:1 - 3/4 of initial bet</td>
 </tr>
 <tr>
-<td>Yo Eleven</td>
+<th scope="row">Horn Bet on 3, 11</th><td>15:1 - 3/4 of initial bet</td>
+</tr>
+<tr>
+<th scope="row">Yo Eleven</th>
 <td>15:1</td>
 </tr>
 <tr>
-<td>Hard 4 and 10</td><td>7:1</td>
+<th scope="row">Hard 4 and 10</th><td>7:1</td>
 </tr>
 <tr>
-<td>Hard 6 and 8</td><td>9:1</td>
+<th scope="row">Hard 6 and 8</th><td>9:1</td>
 </tr>
 <tr>
-<td>Hop easy way</td><td>15:1</td>
+<th scope="row">Hop easy way</th><td>15:1</td>
 </tr>
 <tr>
-<td>Hop hard number</td><td>30:1</td>
+<th scope="row">Hop hard number</th><td>30:1</td>
 </tr>
 <tr>
-<td>Small and Tall</td><td>35:1</td>
+<th scope="row">Small and Tall</th><td>35:1</td>
 </tr>
 <tr>
-<td>The All</td><td>176:1</td>
+<th scope="row">The All</th><td>176:1</td>
 </tr>
 <tr>
-<td>4 Fire Bet Points</td><td>24:1</td>
+<th scope="row">4 Fire Bet Points</th><td>24:1</td>
 </tr>
 <tr>
-<td>5 Fire Bet Points</td><td>249:1</td>
+<th scope="row">5 Fire Bet Points</th><td>249:1</td>
 </tr>
 <tr>
-<td>6 Fire Bet Points</td><td>999:1</td>
+<th scope="row">6 Fire Bet Points</th><td>999:1</td>
 </tr>
 </tbody>
 </table>

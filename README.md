@@ -206,67 +206,75 @@ These bets are available at all times. If there is a bet on the Field, the Field
 
 <table>
 <caption>Line, Field, and Come Payouts</caption>
+<thead>
 <tr>
-<th>Bet</th>
-<th>Payout</th>
+<th scope="col">Bet</th>
+<th scope="col">Payout</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">Pass/Don't Pass Line</th><td>1:1</td>
 </tr>
 <tr>
-<td>Pass/Don't Pass Line</td><td>1:1</td>
+<th scope="row">Pass Line Odds 4 and 10</th><td>2:1</td>
 </tr>
 <tr>
-<td>Pass Line Odds 4 and 10</td><td>2:1</td>
+<th scope="row">Pass Line Odds 5 and 9</th><td>3:2</td>
 </tr>
 <tr>
-<td>Pass Line Odds 5 and 9</td><td>3:2</td>
+<th scope="row">Pass Line Odds 6 and 8</th><td>6:5</td>
 </tr>
 <tr>
-<td>Pass Line Odds 6 and 8</td><td>6:5</td>
+<th scope="row">Field Bet</th><td>1:1</td>
 </tr>
 <tr>
-<td>Field Bet</td><td>1:1</td>
+<th scope="row">Field Bet 2</th><td>2:1</td>
 </tr>
 <tr>
-<td>Field Bet 2</td><td>2:1</td>
+<th scope="row">Field Bet 12</th><td>3:1</td>
 </tr>
 <tr>
-<td>Field Bet 12</td><td>3:1</td>
+<th scope="row">Place 4 and 10</th><td>9:5</td>
 </tr>
 <tr>
-<td>Place 4 and 10</td><td>9:5</td>
+<th scope="row">Place 5 and 9</th><td>7:5</td>
 </tr>
 <tr>
-<td>Place 5 and 9</td><td>7:5</td>
+<th scope="row">Place 6 and 8</th><td>7:6</td>
 </tr>
 <tr>
-<td>Place 6 and 8</td><td>7:6</td>
+<th scope="row">Come/Don't Come Bet</th><td>1:1</td>
 </tr>
 <tr>
-<td>Come/Don't Come Bet</td><td>1:1</td>
+<th scope="row">Come Odds 4 and 10</th><td>2:1</td>
 </tr>
 <tr>
-<td>Come/DC Odds 4 and 10</td><td>2:1</td>
+<th scope="row">Come Odds 5 and 9</th><td>3:2</td>
 </tr>
 <tr>
-<td>Come/DC Odds 5 and 9</td><td>3:2</td>
+<th scope="row">Come Odds 6 and 8</th><td>6:5</td>
 </tr>
 <tr>
-<td>Come/DC Odds 6 and 8</td><td>6:5</td>
+<th scope="row">Lay/DC Odds 4, 10</th><td>1:2</td>
 </tr>
 <tr>
-<td>Lay 4, 10</td><td>1:2</td>
+<th scope="row">Lay/DC Odds 5, 9</th><td>2:3</td>
 </tr>
 <tr>
-<td>Lay 5, 9</td><td>2:3</td>
+<th scope="row">Lay/DC Odds 6, 8</th><td>5:6</td>
 </tr>
-<tr>
-<td>Lay 6, 8</td><td>5:6</td>
-</tr>
+</tbody>
 </table>
+
 <table>
 <caption>Proposition Bet Payouts</caption>
+<thead>
 <tr>
-<th>Bet</th><th>Payout</th>
+<th scope="col">Bet</th><th scope="col">Payout</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td>Any 7</td><td>4:1</td>
 </tr>
@@ -325,4 +333,5 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <tr>
 <td>6 Fire Bet Points</td><td>999:1</td>
 </tr>
+</tbody>
 </table>

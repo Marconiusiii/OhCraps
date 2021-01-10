@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.8.2"
+version = "5.8.3"
 
 
 #Roll and Dice Setup
@@ -1539,6 +1539,7 @@ while True:
 	elif plBet.lower() in ['a', 'i']:
 		placePreset(plBet)
 
+	layShow()
 	print("Lay Bets?")
 	lyBet = input(">")
 	if lyBet.lower() in ['y', 'yes']:

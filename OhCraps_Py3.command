@@ -1239,6 +1239,15 @@ def layCheck(roll):
 			bank -= layBets[roll]
 			chipsOnTable -= layBets[roll]
 			layBets[roll] = 0
+			print("Go back up on your Lay {}?".format(roll))
+			layAgain = input("> ")
+			if layAgain.lower() == 'y':
+				print("How much on the Lay {}?".format(roll))
+				layBets[roll] = betPrompt()
+				print("Ok, ${amount} on the Lay {num}.".format(amount=layBets[roll], num=roll))
+			else:
+				pass
+
 	elif roll == 7:
 		for key in layBets:
 			win = 0
@@ -1251,9 +1260,9 @@ def layCheck(roll):
 					win = layBets[key]//6*5
 				print("You won ${win} on the Lay {num}!".format(win=win, num=key))
 				bank += win
-				chipsOnTable -= layBets[key]
+#				chipsOnTable -= layBets[key]
 				bank -= vig(win)
-				layBets[key] = 0
+#				layBets[key] = 0
 
 # Bank and bet setup
 bank = 0

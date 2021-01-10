@@ -63,7 +63,7 @@ At the Lay Bet prompt, typing 'd' or 'td' and hitting Enter will take down all y
 
 After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
-Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission/vig paid back to the House based on your winnings when a Lay bet wins.
+Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission/vig paid back to the House based on your winnings when a Lay bet wins. When your Lay Bets win, they will stay up until you take them down or they lose.
 
 #### Field Bet
 

@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.8.1"
+version = "5.8.2"
 
 
 #Roll and Dice Setup
@@ -1241,18 +1241,18 @@ def layCheck(roll):
 			layBets[roll] = 0
 	elif roll == 7:
 		for key in layBets:
+			win = 0
 			if layBets[key] > 0:
 				if key in [4, 10]:
-					print("You won ${win} on the Lay {num}!".format(win=layBets[key]//2, num=key))
-					bank += layBets[key]//2
+					win = layBets[key]//2
 				elif key in [5, 9]:
-					print("You won ${win} on the Lay {num}!".format(win=layBets[key]//3*2, num=key))
-					bank += layBets[key]//3*2
+					win = layBets[key]//3*2
 				elif key in [6, 8]:
-					print("You won ${win} on the Lay {num}!".format(win=layBets[key]//6*5, num=key))
-					bank += layBets[key]//6*5
+					win = layBets[key]//6*5
+				print("You won ${win} on the Lay {num}!".format(win=win, num=key))
+				bank += win
 				chipsOnTable -= layBets[key]
-				bank -= vig(layBets[key])
+				bank -= vig(win)
 				layBets[key] = 0
 
 # Bank and bet setup

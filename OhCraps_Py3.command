@@ -1621,10 +1621,10 @@ while True:
 	comeOut  = roll()
 	throws += 1
 	comeCheck(comeOut)
+	fieldCheck(comeOut)
 	if working == True:
 		placeCheck(comeOut)
 		layCheck(comeOut)
-		fieldCheck(comeOut)
 		hardCheck(comeOut)
 
 	propPay(comeOut)

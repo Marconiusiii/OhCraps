@@ -69,6 +69,8 @@ Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% comm
 
 The Field Bet is a bet on the numbers 2, 3, 4, 9, 10, 11, and 12. If a 2 is rolled, you win double your bet, and if a 12 is rolled, you will win triple your bet. All other numbers win even money. A 5, 6, 7, or 8 will lose.
 
+This is a one-roll bet, so this bet is always working for the next roll.
+
 Type 'y' if you'd like to bet on the Field, otherwise hit Enter to bypass it. Follow the prompts to place your bet.
 
 Field Bets stay up on the table after winning. To take down a Field Bet, type 'd' or 'td' at the Field Bet prompt and hit Enter. You can also go into the prompt and enter a Field Bet of $0.

@@ -1303,21 +1303,10 @@ def betPrompt():
 	while True:
 		try:
 			playerBet =  int(input("\t$> "))
-			bank -=playerBet
-#			if chipsOnTable >= bank:
-#				print("\tYou don't have enough money for that bet! Need more chips? y/n")
-#				moreChips = input("> ")
-#				if moreChips in ['y', 'yes']:
-#					outOfMoney()
-#					continue
-#				else:
-#					print("Alright, no more chips for you!")
-#					playerBet = 0
-#				return playerBet
 		except ValueError:
 			print("\tThat wasn't a number!")
 			continue
-		if playerBet > bank and bank != 0:
+		if playerBet > bank:
 			print("\tYou simply don't have enough money to do that! DO you want to add more to your bankroll?")
 			addMore = input(">")
 			if addMore.lower() in ['y', 'yes', 'atm', 'help', 'more money']:
@@ -1325,7 +1314,9 @@ def betPrompt():
 			continue
 		else:
 			chipsOnTable += playerBet
+			bank -= playerBet
 			return playerBet
+
 def outOfMoney():
 	global bank
 	if bank <= 0:
@@ -1458,8 +1449,7 @@ def placeBets():
 		while True:
 			try:
 				bet = int(input("$>"))
-				bank -= bet
-				if bet > bank - chipsOnTable:
+				if bet > bank:
 					print("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
 					print("How much on the Place {}?".format(key))
@@ -1470,6 +1460,7 @@ def placeBets():
 				break
 		if bet > 0:
 			chipsOnTable -= place[key]
+			bank -= bet 
 			place[key] = bet
 			chipsOnTable += bet
 			if key in [4, 10] and bet >= 10:
@@ -1524,14 +1515,16 @@ def placeCheck(roll):
 			change = input(">")
 			if change.lower() in ['y', 'yes']:
 				print("How much on the Place {}?".format(roll))
+				bank += place[roll]
 				bet = betPrompt()
 				if bet == 0:
 					chipsOnTable -= place[roll]
-					bank += place[roll]
+					#bank += place[roll]
 					place[roll] = bet
 					print("Ok, taking down your Place {} bet.".format(roll))
 				else:
 					chipsOnTable -= place[roll]
+					#bank += place[roll]
 					place[roll] = bet
 					print("Ok, ${bet} on the Place {num}.".format(bet=place[roll], num=roll))
 	elif roll == 7:
@@ -1560,7 +1553,7 @@ while True:
 		print("You have ${} in the bank.".format(bank))
 	else:
 		print("You have ${bank} in the bank with ${table} out on the table.".format(bank=bank, table=chipsOnTable))
-	if bank <= 0:
+	if bank <= 0 and chipsOnTable <= 0:
 		outOfMoney()
 	print("Rolls: {}\n".format(throws))
 
@@ -1682,8 +1675,9 @@ while True:
 			else:
 				print("You have ${bank} in the bank.".format(bank=bank))
 
-			if bank <= 0:
+			if bank <= 0 and chipsOnTable <= 0:
 				outOfMoney()
+
 			print("{} is the Point!".format(comeOut))
 			print("Rolls: {}".format(throws))
 

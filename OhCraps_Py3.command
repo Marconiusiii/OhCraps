@@ -1423,7 +1423,7 @@ def placePreset(pre):
 		print("Ok, placing ${} inside.".format(total))
 
 def placeMover():
-	global place, chipsOnTable, comeOut
+	global place, chipsOnTable, bank, comeOut
 	for key in place:
 		if place[key] == 0 and place[comeOut] > 0:
 			if key in [6, 8] and comeOut in [4, 5, 9, 10]:

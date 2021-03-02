@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9"
+version = "5.9.1"
 
 
 #Roll and Dice Setup
@@ -592,7 +592,7 @@ def comeCheck(roll):
 			chipsOnTable -= dComeBet
 			dComeBet = 0
 		elif roll in [2, 3, 12]:
-			if roll in [2. 3]:
+			if roll in [2, 3]:
 				print("You won ${} on the Don't Come!".format(dComeBet))
 				bank += dComeBet * 2
 			elif roll == 12:

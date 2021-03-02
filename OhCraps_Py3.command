@@ -295,8 +295,11 @@ def lineCheck(roll, p2roll):
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
-				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
-				bank += lineBets["Don't Pass"] * 2
+				if roll in [2, 3]:
+					print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+					bank += lineBets["Don't Pass"] * 2
+				elif roll == 12:
+					print("12 is a Push!")
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:
@@ -589,8 +592,11 @@ def comeCheck(roll):
 			chipsOnTable -= dComeBet
 			dComeBet = 0
 		elif roll in [2, 3, 12]:
-			print("You won ${} on the Don't Come!".format(dComeBet))
-			bank += dComeBet * 2
+			if roll in [2. 3]:
+				print("You won ${} on the Don't Come!".format(dComeBet))
+				bank += dComeBet * 2
+			elif roll == 12:
+				print("12 is a Push!")
 			chipsOnTable -= dComeBet
 			dComeBet = 0
 		else:

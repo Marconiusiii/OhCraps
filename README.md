@@ -20,9 +20,9 @@ You've established your bankroll and are now ready to start betting. You have a 
 
 #### Line Bets
 
-Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.
+Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.
 
-Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet.
+Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet. This bet wins if a 2 or 3 rolls on the Come Out roll. Rolling a 12 will push, so you will not lose nor win and the bet will be returned to you. This bet loses when rolling a 7 or 11 on the Come Out roll, and if any other number rolls that will become the point for the point phase of the game. If the shooter rolls a 7 in the Point phase of the game, the Don't Pass bet will win.
 
 Once you've set your Line Bets, type 'x' and hit Enter to continue on with the game.
 

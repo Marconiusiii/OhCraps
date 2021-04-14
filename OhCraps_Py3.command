@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9.1"
+version = "5.9.2"
 
 
 #Roll and Dice Setup
@@ -1213,7 +1213,7 @@ def layBetting():
 		while True:
 			try:
 				bet = int(input("$>"))
-				if bet > bank - chipsOnTable:
+				if bet > bank + chipsOnTable - chipsOnTable:
 					print("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
 					print("How much on the Place {}?".format(key))
@@ -1449,24 +1449,28 @@ def placeMover():
 
 def placeBets():
 	global place, chipsOnTable, bank
+	madeBet = True
 	for key in place:
 		print("You have ${bet} on the Place {key}.".format(bet=place[key], key=key))
 		print("How much on the Place {}?".format(key))
 		while True:
 			try:
 				bet = int(input("$>"))
-				if bet > bank:
+				if bet > bank + chipsOnTable:
 					print("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
 					print("How much on the Place {}?".format(key))
 					continue
+				madeBet = True
 				break
 			except ValueError:
 				bet = place[key]
+				madeBet = False
 				break
 		if bet > 0:
 			chipsOnTable -= place[key]
-			bank -= bet 
+			if madeBet and bet != place[key]:
+				bank -= bet - place[key] 
 			place[key] = bet
 			chipsOnTable += bet
 			if key in [4, 10] and bet >= 10:
@@ -1478,6 +1482,7 @@ def placeBets():
 			chipsOnTable -= place[key]
 			bank += place[key]
 			place[key] = 0
+#		print("Bank: {bank}, Chips: {chips}".format(bank=bank, chips=chipsOnTable))
 
 def placeShow():
 	global place

@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9.2"
+version = "5.9.3"
 
 
 #Roll and Dice Setup
@@ -359,7 +359,7 @@ def odds():
 		maxOdds = lineBets["Pass"] * 4
 	elif comeOut in [6, 8]:
 		maxOdds = lineBets["Pass"] * 5
-	maxDP = lineBets["Don't Pass"] * 6
+	maxDP = lineBets["Don't Pass"] * 10
 	if lineBets["Pass"] > 0:
 		while True:
 			chipsOnTable -= lineBets["Pass Odds"]
@@ -535,9 +535,20 @@ def comeOddsChange():
 
 def cdcOddsChange(dict, dict2):
 	global chipsOnTable
+	maxDC = 10
+	maxC = 0
 	for key in dict:
 		if dict[key] > 0:
-			print("How much for Odds on the {}?".format(key))
+			if key in [4, 10]:
+				maxC = 3
+			elif key in [5, 9]:
+				maxC = 4
+			elif key in [6, 8]:
+				maxC = 5
+			if dict == "comeBets":
+				print("How much for Odds on the {num}? Max Odds is ${odds}.".format(num=key, odds=maxC * dict[key]))
+			else:
+				print("How much to Lay against the {num}? Max Lay is ${lay}.".format(num=key, lay=maxDC*dict[key]))
 			while True:
 				try:
 					bet = int(input("$>"))

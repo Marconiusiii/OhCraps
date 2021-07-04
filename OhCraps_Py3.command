@@ -300,6 +300,7 @@ def lineCheck(roll, p2roll):
 					bank += lineBets["Don't Pass"] * 2
 				elif roll == 12:
 					print("12 is a Push!")
+					bank += lineBets["Don't Pass"]
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:

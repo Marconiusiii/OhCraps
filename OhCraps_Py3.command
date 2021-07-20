@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9.3"
+version = "5.9.4"
 
 
 #Roll and Dice Setup
@@ -734,7 +734,7 @@ def fieldCheck(roll):
 				payout *= 3
 				print("Triple in the Field!")
 			print("You won ${} on the Field!".format(payout))
-			bank += payout + fieldBet
+			bank += payout
 			print("Change your Field bet?")
 			fChange = input(">")
 			if fChange.lower() in ['y', 'yes']:
@@ -751,7 +751,7 @@ def fieldCheck(roll):
 			if fChoice in ['y', 'yes']:
 				field()
 			else:
-				pass			
+				pass
 
 propBets = {
 "Snake Eyes": 0,

@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9.4"
+version = "5.9.5"
 
 
 #Roll and Dice Setup
@@ -119,7 +119,7 @@ hardWays = {
 }
 
 def hardWaysBetting():
-	global hardWays, chipsOnTable
+	global hardWays, bank, chipsOnTable
 	for key in hardWays:
 		if hardWays[key] > 0:
 			print("You have ${bet} on the hard {num}.".format(bet=hardWays[key], num=key))

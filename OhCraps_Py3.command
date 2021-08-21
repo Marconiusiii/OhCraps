@@ -3,7 +3,7 @@ from random import *
 import math
 
 #Version Number
-version = "5.9.5"
+version = "5.9.6"
 
 
 #Roll and Dice Setup
@@ -1127,8 +1127,8 @@ def propPay(roll):
 			else:
 				multiplier = 0
 			if multiplier > 0:
-				print("You won ${win} on the {bet} bet!".format(win=propBets[key]*multiplier-sub, bet=key))
-				bank += propBets[key] + propBets[key] * multiplier - sub
+				print("You won ${win} on the {bet} bet!".format(win=propBets[key]+(propBets[key]*multiplier)-sub, bet=key))
+				bank += propBets[key] + (propBets[key] * multiplier) - sub
 				chipsOnTable -= propBets[key] + sub
 				propBets[key] = 0
 			else:

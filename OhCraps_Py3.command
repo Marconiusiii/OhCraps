@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 from random import *
 import math
+import os
 
 #Version Number
-version = "5.9.6"
+version = "5.9.7"
 
 
 #Roll and Dice Setup
@@ -1581,13 +1582,14 @@ while True:
 	print("Rolls: {}\n".format(throws))
 
 # Initial bets
-	lbet = input("Line Bets? >")
+	print("Line Bets?")
+	lbet = input(">\n ")
 	if lbet in ['y', 'yes']:
 		lineBetting()
 
 	placeShow()
 	print("Place Bets?")
-	plBet = input(">")
+	plBet = input(">\n")
 	if plBet in ['y', 'Yes']:
 		placeBets()
 	elif plBet.lower() in ['d', 'td', 'takedown']:
@@ -1598,7 +1600,7 @@ while True:
 
 	layShow()
 	print("Lay Bets?")
-	lyBet = input(">")
+	lyBet = input(">\n")
 	if lyBet.lower() in ['y', 'yes']:
 		layBetting()
 	elif lyBet.lower() in ['d', 'td', 'takedown']:
@@ -1607,7 +1609,7 @@ while True:
 
 	fieldShow()
 	print("Field Bet?")
-	fBet = input(">")
+	fBet = input(">\n")
 	if fBet.lower() in ['y', 'yes']:
 		field()
 	elif fBet.lower() in ['d', 'td', 'takedown']:
@@ -1615,7 +1617,7 @@ while True:
 
 	hardShow()
 	print("Hard Ways Bets?")
-	hWays = input(">")
+	hWays = input(">\n")
 	if hWays.lower() in ['y', 'yes']:
 		hardWaysBetting()
 	elif hWays.lower() in ['d', 'td', 'takedown']:
@@ -1636,13 +1638,13 @@ while True:
 
 	if plCheck > 0 or hCheck > 0 or lCheck > 0:
 		print("All Bets Working?")
-		work = input(">")
+		work = input(">\n")
 		if work.lower() in ['y', 'yes']:
 			working = True
 			print("Ok, all bets are working.")
 
 	print("Prop Bets?")
-	prBet = input(">")
+	prBet = input(">\n")
 	if prBet.lower() in ['y', 'yes']:
 		propBetting()
 
@@ -1650,21 +1652,21 @@ while True:
 		print("All Tall Small: {}".format(allNums))
 	elif throws == 0:
 		print("All Tall Small?")
-		atsChoice = input(">")
+		atsChoice = input(">\n")
 		if atsChoice.lower() in ['y', 'yes']:
 			atsBetting()
 
 # Fire Bet
 	if fireBet == 0:
 		print("Fire Bet?")
-		fireChoice = input("> ")
+		fireChoice = input(">\n")
 		if fireChoice.lower() in ['y', 'yes']:
 			fireBetting()
 	else:
 		print("You have ${bet} on the Fire Bet; Numbers Hit: {fire}.".format(bet=fireBet, fire=fire))
 
 #Coming Out Roll
-	input("Hit Enter to roll!")
+	input("Hit Enter to roll!\n")
 
 	comeOut  = roll()
 	throws += 1
@@ -1829,6 +1831,7 @@ while True:
 			if p2 == 7:
 				throws = 0
 				pointIsOn = False
+				os.system("clear")
 				break
 			elif p2 == comeOut:
 				print("Point Hit! Front line winner!")

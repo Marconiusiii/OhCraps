@@ -1582,13 +1582,17 @@ while True:
 	print("Rolls: {}\n".format(throws))
 
 # Initial bets
-	print("Line Bets?")
-	lbet = input(">\n ")
-	if lbet in ['y', 'yes']:
-		lineBetting()
 
-	placeShow()
-	print("Place Bets?")
+	while True:
+		print("Place your Bets!\n")
+		round1 = input("> ")
+		if round1.lower() in ["l", "line", "line bets"]:
+			print("Line Bets:\n")
+			lineBetting()
+			continue
+		elif round1.lower() in ["p", "place", "place bets"]:
+			placeShow()
+			print("Place Bets:\n")
 	plBet = input(">\n")
 	if plBet in ['y', 'Yes']:
 		placeBets()

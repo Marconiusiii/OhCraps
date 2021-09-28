@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "5.9.7"
+version = "6.0"
 
 
 #Roll and Dice Setup
@@ -1590,88 +1590,131 @@ while True:
 			print("Line Bets:\n")
 			lineBetting()
 			continue
+
 		elif round1.lower() in ["p", "place", "place bets"]:
-			placeShow()
-			print("Place Bets:\n")
-	plBet = input(">\n")
-	if plBet in ['y', 'Yes']:
-		placeBets()
-	elif plBet.lower() in ['d', 'td', 'takedown']:
-		print("Taking down your Place Bets.")
-		placeTakeDown()
-	elif plBet.lower() in ['a', 'i']:
-		placePreset(plBet)
+			while True:
+				placeShow()
+				print("Place Bets:\n")
+				plBet = input(">\n")
+				if plBet in ['y', 'Yes']:
+					placeBets()
+					continue
+				elif plBet.lower() in ['d', 'td', 'takedown']:
+					print("Taking down your Place Bets.")
+					placeTakeDown()
+					continue
+				elif plBet.lower() in ['a', 'i']:
+					placePreset(plBet)
+					continue
+				elif plBet.lower() == "h":
+					print("Place Betting Codes:\n\ty: Enter individual Place Betting mode.\n\td: Take down all Place Bets.\n\ta: Auto-bet Across all the numbers.\n\ti: Auto-bet on the Inside numbers.\n\th: Show this Help Menu.\n\tx: Exit Place Betting.\n")
+				elif plBet.lower() == "x":
+					print("Done Place Betting!")
+					break
 
-	layShow()
-	print("Lay Bets?")
-	lyBet = input(">\n")
-	if lyBet.lower() in ['y', 'yes']:
-		layBetting()
-	elif lyBet.lower() in ['d', 'td', 'takedown']:
-		print("Taking down your Lay Bets.")
-		layTakeDown()
+		elif round1.lower() in ["ly", "lay"]:
+			while True:
+				layShow()
+				print("Lay Bets?")
+				lyBet = input(">\n")
+				if lyBet.lower() in ['y', 'yes']:
+					layBetting()
+					continue
+				elif lyBet.lower() in ['d', 'td', 'takedown']:
+					print("Taking down your Lay Bets.")
+					layTakeDown()
+					continue
+				elif lyBet.lower() == "h":
+					print("Lay Bet Codes:\n\n\ty: Enter Individual Lay Betting mode.\n\td: Take down all Lay Bets.\n\th: Show this Help menu.\n\tx: Finish Lay Betting.\n")
+				elif lyBet.lower() == "x":
+					print("Done Lay Betting!")
+					break
 
-	fieldShow()
-	print("Field Bet?")
-	fBet = input(">\n")
-	if fBet.lower() in ['y', 'yes']:
-		field()
-	elif fBet.lower() in ['d', 'td', 'takedown']:
-		fieldTakeDown()
+		elif round1.lower() in ["f", "field"]:
+			fieldShow()
+			print("Field Bet?")
+			fBet = input(">\n")
+			if fBet.lower() in ['y', 'yes']:
+				field()
+			elif fBet.lower() in ['d', 'td', 'takedown']:
+				fieldTakeDown()
+			continue
 
-	hardShow()
-	print("Hard Ways Bets?")
-	hWays = input(">\n")
-	if hWays.lower() in ['y', 'yes']:
-		hardWaysBetting()
-	elif hWays.lower() in ['d', 'td', 'takedown']:
-		hardTakeDown()
-	elif hWays.lower() in ['a', 'across', 'all']:
-		hardAuto()
-	elif hWays in ["h4", "h6", "h8", "h10"]:
-		hardHigh(hWays)
+		elif round1.lower() in ["hd", "hard", "hw"]:
+			while True:
+				hardShow()
+				print("Hard Ways Bets?")
+				hWays = input(">\n")
+				if hWays.lower() in ['y', 'yes']:
+					hardWaysBetting()
+					continue
+				elif hWays.lower() in ['d', 'td', 'takedown']:
+					hardTakeDown()
+					continue
+				elif hWays.lower() in ['a', 'across', 'all']:
+					hardAuto()
+					continue
+				elif hWays in ["h4", "h6", "h8", "h10"]:
+					hardHigh(hWays)
+					continue
+				elif hWays.lower() == "h":
+					print("Hard Ways Codes:\n\n\ty: Enter Individual Hard Ways Betting mode.\n\td: Take down all Hard Ways bets.\n\ta: Auto-bet across all Hard Ways numbers.\n\th4: Bet all numbers, Hard 4 high.\n\th6: Bet all numbers, Hard 6 high.\n\th8: Bet all numbers, Hard 8 high.\n\th10: Bet all numbers, Hard 10 high.\n\th: Show this Help Menu.\n\tx: Finish Hard Ways betting.\n")
+					continue
+				elif hWays.lower() == "x":
+					print("Done betting the Hard Ways!")
+					break
 
 # Working Bets Setup
-	plCheck = hCheck = lCheck = 0
-	for value in place.values():
-		plCheck += value
-	for value in hardWays.values():
-		hCheck += value
-	for value in layBets.values():
-		lCheck += value
+		elif round1.lower() in ["w", "work", "working"]:
+			plCheck = hCheck = lCheck = 0
+			for value in place.values():
+				plCheck += value
+			for value in hardWays.values():
+				hCheck += value
+			for value in layBets.values():
+				lCheck += value
 
-	if plCheck > 0 or hCheck > 0 or lCheck > 0:
-		print("All Bets Working?")
-		work = input(">\n")
-		if work.lower() in ['y', 'yes']:
-			working = True
-			print("Ok, all bets are working.")
+			if plCheck > 0 or hCheck > 0 or lCheck > 0:
+				if working:
+					print("Your bets are On!")
+				else:
+					print("Your bets are Off!")
+				print("All Bets Working?")
+				work = input(">\n")
+				if work.lower() in ['y', 'yes']:
+					working = True
+					print("Ok, all bets are working.")
+				elif work.lower() in ["n", "no", "off"]:
+					working = False
+					print("Ok, all bets are off!")
+			else:
+				print("Make some bets first so they can Work!")
+			continue
 
-	print("Prop Bets?")
-	prBet = input(">\n")
-	if prBet.lower() in ['y', 'yes']:
-		propBetting()
+		elif round1.lower() in ["pr", "prop"]:
+			propBetting()
+			continue
 
-	if atsOn == True:
-		print("All Tall Small: {}".format(allNums))
-	elif throws == 0:
-		print("All Tall Small?")
-		atsChoice = input(">\n")
-		if atsChoice.lower() in ['y', 'yes']:
-			atsBetting()
+		elif round1.lower() == "ats":
+			if atsOn == True:
+				print("All Tall Small: {}".format(allNums))
+			elif throws == 0:
+				print("All Tall Small:\n")
+				atsBetting()
+			continue
 
 # Fire Bet
-	if fireBet == 0:
-		print("Fire Bet?")
-		fireChoice = input(">\n")
-		if fireChoice.lower() in ['y', 'yes']:
-			fireBetting()
-	else:
-		print("You have ${bet} on the Fire Bet; Numbers Hit: {fire}.".format(bet=fireBet, fire=fire))
-
+		elif round1.lower() == "fire":
+			if fireBet == 0:
+				print("Fire Bet:\n")
+				fireBetting()
+			else:
+				print("You have ${bet} on the Fire Bet; Numbers Hit: {fire}.".format(bet=fireBet, fire=fire))
+			continue
 #Coming Out Roll
-	input("Hit Enter to roll!\n")
-
+		elif round1.lower() in ["x", "r"]:
+			print("Rolling the dice!")
+			break
 	comeOut  = roll()
 	throws += 1
 	comeCheck(comeOut)
@@ -1711,27 +1754,46 @@ while True:
 			print("Rolls: {}".format(throws))
 
 #Phase 2 Betting
-			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
-				if lineBets["Pass Odds"] > 0:
-					print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-				if lineBets["Don't Pass Odds"] > 0:
-					print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
-				print("Line Bet Odds?")
-				oddsPrompt = input(">")
-				if oddsPrompt.lower() in ['y', 'yes']:
-					odds()
-				elif oddsPrompt.lower() in ['p', 'pass']:
-					print("Taking down your Pass Line Odds.")
-					chipsOnTable -= lineBets["Pass Odds"]
-					lineBets["Pass Odds"] = 0
-				elif oddsPrompt.lower() in ['d', 'dont']:
-					print("Taking down your Don't Pass Odds.")
-					chipsOnTable -= lineBets["Don't Pass Odds"]
-					lineBets["Don't Pass Odds"] = 0
-				elif oddsPrompt.lower() in ['a', 'all']:
-					print("Taking down all of your Line Bet Odds.")
-					chipsOnTable -= lineBets["Pass Odds"] + lineBets["Don't Pass Odds"]
-					lineBets["Pass Odds"] = lineBets["Don't Pass Odds"] = 0
+
+			while True:
+				print("Place your bets!\n")
+				round2 = input("> ")
+
+				if round2.lower() in {"o", "po", "odds"]:
+					if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
+						if lineBets["Pass Odds"] > 0:
+							print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
+						if lineBets["Don't Pass Odds"] > 0:
+							print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
+						print("Line Bet Odds?\n")
+						oddsPrompt = input(">")
+						if oddsPrompt.lower() in ['d', 'dont']:
+							print("Taking down your Don't Pass Odds.")
+							chipsOnTable -= lineBets["Don't Pass Odds"]
+							lineBets["Don't Pass Odds"] = 0
+				if round2.lower() in ["do", "dpo"]:
+					if lineBets["Don't Pass"] > 0:
+						if lineBets["Pass Odds"] > 0:
+							print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
+						if lineBets["Don't Pass Odds"] > 0:
+							print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
+						print("Line Bet Odds?\n")
+						oddsPrompt = input(">")
+						if oddsPrompt.lower() in ['y', 'yes']:
+							odds()
+						elif oddsPrompt.lower() in ['p', 'pass']:
+							print("Taking down your Pass Line Odds.")
+							chipsOnTable -= lineBets["Pass Odds"]
+							lineBets["Pass Odds"] = 0
+						elif oddsPrompt.lower() in ['d', 'dont']:
+							print("Taking down your Don't Pass Odds.")
+							chipsOnTable -= lineBets["Don't Pass Odds"]
+							lineBets["Don't Pass Odds"] = 0
+						elif oddsPrompt.lower() in ['a', 'all']:
+							print("Taking down all of your Line Bet Odds.")
+							chipsOnTable -= lineBets["Pass Odds"] + lineBets["Don't Pass Odds"]
+							lineBets["Pass Odds"] = lineBets["Don't Pass Odds"] = 0
+
 
 
 			if lineBets["Don't Pass"] > 0:

@@ -363,6 +363,7 @@ def odds():
 		maxOdds = lineBets["Pass"] * 5
 	maxDP = lineBets["Don't Pass"] * 10
 	if lineBets["Pass"] > 0:
+		print("You have ${} for your odds.".format(lineBets["Pass Odds"]))
 		while True:
 			chipsOnTable -= lineBets["Pass Odds"]
 			bank += lineBets["Pass Odds"]
@@ -385,6 +386,7 @@ def odds():
 				break
 
 	if lineBets["Don't Pass"] > 0:
+		print("You have $0 for your lay odds.".format(lineBets["Don't Pass Odds"]))
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
@@ -1759,74 +1761,69 @@ while True:
 				print("Place your bets!\n")
 				round2 = input("> ")
 
-				if round2.lower() in {"o", "po", "odds"]:
+				if round2.lower() in ["o", "po", "dpo"]:
 					if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
-						if lineBets["Pass Odds"] > 0:
-							print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-						if lineBets["Don't Pass Odds"] > 0:
-							print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
-						print("Line Bet Odds?\n")
-						oddsPrompt = input(">")
-						if oddsPrompt.lower() in ['d', 'dont']:
-							print("Taking down your Don't Pass Odds.")
-							chipsOnTable -= lineBets["Don't Pass Odds"]
-							lineBets["Don't Pass Odds"] = 0
-				if round2.lower() in ["do", "dpo"]:
+						odds()
+					else:
+						print("You don't have a Line bet, silly!")
+					continue
+
+				if round2.lower() == "dp":
 					if lineBets["Don't Pass"] > 0:
-						if lineBets["Pass Odds"] > 0:
-							print("You have ${} on your Pass Line Odds.".format(lineBets["Pass Odds"]))
-						if lineBets["Don't Pass Odds"] > 0:
-							print("You have ${} on your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
-						print("Line Bet Odds?\n")
-						oddsPrompt = input(">")
-						if oddsPrompt.lower() in ['y', 'yes']:
-							odds()
-						elif oddsPrompt.lower() in ['p', 'pass']:
-							print("Taking down your Pass Line Odds.")
-							chipsOnTable -= lineBets["Pass Odds"]
-							lineBets["Pass Odds"] = 0
-						elif oddsPrompt.lower() in ['d', 'dont']:
-							print("Taking down your Don't Pass Odds.")
-							chipsOnTable -= lineBets["Don't Pass Odds"]
-							lineBets["Don't Pass Odds"] = 0
-						elif oddsPrompt.lower() in ['a', 'all']:
-							print("Taking down all of your Line Bet Odds.")
-							chipsOnTable -= lineBets["Pass Odds"] + lineBets["Don't Pass Odds"]
-							lineBets["Pass Odds"] = lineBets["Don't Pass Odds"] = 0
+						dpPhase2()
+					else:
+						print("You don't have a Don't Pass bet!")
+					continue
 
+				if round2.lower() == "c":
+					comeShow()
+					print("Come Bet:\n")
+					come()
+					continue
 
+				if round2.lower() == "co":
+					comeOddsChange()
+					continue
 
-			if lineBets["Don't Pass"] > 0:
-				dpPhase2()
-
-			comeShow()
-			print("Come Bet?")
-			cChoice = input(">")
-			if cChoice.lower() in ['y', 'yes']:
-				come()
-			comeOddsChange()
-
-			placeShow()
-			print("Place Bets?")
-			pl2 = input(">")
-			if pl2.lower() in ['y', 'yes']:
-				placeBets()
-			elif pl2.lower() in ['o', 'off']:
-				placeOff = True
-				print("All your Place Bets are Off.")
-			elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
-				print("Taking down all of your Place Bets.")
-				placeTakeDown()
-			elif pl2.lower() in ['a', 'i']:
-				placePreset(pl2)
-			elif pl2.lower() in ['m', 'move']:
-				placeMover()
-			elif pl2.lower() in ['p', 'point']:
-				chipsOnTable -= place[comeOut]
-				bank += place[comeOut]
-				place[comeOut] = 0
-				print("Taking down the Place {} bet.".format(comeOut))
-
+				elif round2.lower() == "p":
+					while True:
+						placeShow()
+						print("Place Bets?")
+						pl2 = input(">")
+						if pl2.lower() in ['y', 'yes']:
+							placeBets()
+							continue
+						elif pl2.lower() in ['o', 'off']:
+							placeOff = True
+							print("All your Place Bets are Off.")
+							continue
+						elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
+							print("Taking down all of your Place Bets.")
+							placeTakeDown()
+							continue
+						elif pl2.lower() in ['a', 'i']:
+							placePreset(pl2)
+							continue
+						elif pl2.lower() in ['m', 'move']:
+							placeMover()
+							continue
+						elif pl2.lower() in ['p', 'point']:
+							chipsOnTable -= place[comeOut]
+							bank += place[comeOut]
+							place[comeOut] = 0
+							print("Taking down the Place {} bet.".format(comeOut))
+							continue
+						elif pl2.lower() == "h":
+							print("Place Bet Codes:\n\n\ty: Enter individual Place Betting mode.\n\ta: Auto-bet across all numbers.\n\ti: Auto-bet inside numbers.\n\to: Turn Place Bets Off for next roll.\n\td: Take down all Place Bets.\n\tm: Move Point number to empty Place Bet.\n\tp: Take down Point number place bet.\n\th: Show this Help menu.\n\tx: Finish Place Betting.")
+							continue
+						elif pl2.lower() == "x":
+							print("Done Place Betting!")
+							break
+						else:
+							print("That's not a valid option!")
+						continue
+					continue
+### Bookmark
 			layShow()
 			print("Lay Bets?")
 			ly2Bet = input(">")

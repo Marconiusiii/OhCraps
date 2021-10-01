@@ -1823,50 +1823,98 @@ while True:
 							print("That's not a valid option!")
 						continue
 					continue
-### Bookmark
-			layShow()
-			print("Lay Bets?")
-			ly2Bet = input(">")
-			if ly2Bet.lower() in ['y', 'yes']:
-				layBetting()
-			elif ly2Bet.lower() in ['o', 'off']:
-				layOff = True
-				print("Your Lay Bets are Off.")
-			elif ly2Bet.lower() in ['d', 'td', 'takedown']:
-				print("Taking down all of your Lay Bets.")
-				layTakeDown()
+				elif round2  in ["ly", "lay"]:
+					while True:
+						layShow()
+						print("Lay Bets?\n")
+						ly2Bet = input(">")
+						if ly2Bet.lower() in ['y', 'yes']:
+							layBetting()
+							continue
+						elif ly2Bet.lower() in ['o', 'off']:
+							if layOff == False:
+								layOff = True
+								print("Your Lay Bets are Off.")
+							else:
+								layOff = False
+								print("Your Lay Bets are On.")
+							continue
+						elif ly2Bet.lower() in ['d', 'td', 'takedown']:
+							print("Taking down all of your Lay Bets.")
+							layTakeDown()
+							continue
+						elif ly2Bet.lower() == "h":
+							print("Lay Bet Codes:\n\n\ty: Enter Lay Betting Mode\n\to: Toggle Lay Bets Off or On for next roll\n\td: Take all Lay Bets down.\n\th: Show this Help menu\n\tx: Finish Lay Betting")
+							continue
+						elif ly2Bet.lower() == "x":
+							print("Done Lay Betting!")
+							break
+						else:
+							print("That's not an option!")
+							continue
+					continue
 
+				elif round2 == "f":
+					fieldShow()
+					print("Field Bet?\n")
+					fb2 = input(">")
+					if fb2.lower() in ['y', 'yes']:
+						field()
+					elif fb2.lower() in ['d', 'td', 'takedown']:
+						fieldTakeDown()
+					continue
 
-			fieldShow()
-			print("FIeld Bet?")
-			fb2 = input(">")
-			if fb2.lower() in ['y', 'yes']:
-				field()
-			elif fb2.lower() in ['d', 'td', 'takedown']:
-				fieldTakeDown()
+				elif round2 == "h":
+					while True:
+						hardShow()
+						print("Hard Ways bets?\n")
+						hard2 = input(">")
+						if hard2.lower() in ['y', 'yes']:
+							hardWaysBetting()
+							continue
+						elif hard2.lower() in ['o', 'off']:
+							if hardOff == False:
+								hardOff = True
+								print("Your Hard Ways are Off.")
+							else:
+								hardOff = True
+								print("Hard Ways are On.")
+							continue
+						elif hard2.lower() in ['d', 'td', 'takedown']:
+							hardTakeDown()
+							continue
+						elif hard2.lower() in ['a', 'all', 'across']:
+							hardAuto()
+							continue
+						elif hard2.lower() in ["h4", "h6", "h8", "h10"]:
+							hardHigh(hard2)
+							continue
+						elif hard2.lower() == "h":
+							print("Hard Ways Codes:\n\n\ty: Enter Hard Ways betting mode\n\to: Toggle Hard Ways Bets On or Off for next roll\n\td: Take down Hard Ways bets\n\ta: Auto-bet Across all Hard Ways\n\t:h4: Bet all Hard Ways High 4\n\th6: Bet all Hard Ways High 6\n\th8: Bet all Hard Ways High 8\n\th10: Bet all Hard Ways High 10\n\th: Show this Help Menu\n\tx: Finish Hard Ways Betting")
+							continue
+						elif hard2.lower() == "x":
+							print("Finished betting on the Hard Ways!")
+							break
+						else:
+							print("That's not an option!")
+							continue
+					continue
 
-			hardShow()
-			print("Hard Ways bets?")
-			hard2 = input(">")
-			if hard2.lower() in ['y', 'yes']:
-				hardWaysBetting()
-			elif hard2.lower() in ['o', 'off']:
-				hardOff = True
-				print("Your Hard Ways are Off.")
-			elif hard2.lower() in ['d', 'td', 'takedown']:
-				hardTakeDown()
-			elif hard2.lower() in ['a', 'all', 'across']:
-				hardAuto()
-			elif hard2 in ["h4", "h6", "h8", "h10"]:
-				hardHigh(hard2)
+				elif round2.lower() in ["pr", "prop"]:
+					propBetting()
+					continue
 
-			print("Prop Bets?")
-			pr2Bet = input(">")
-			if pr2Bet.lower() in ['y', 'yes']:
-				propBetting()
 # phase 2 roll
-			input("Hit Enter to Roll!")
+				elif round2.lower() in ["r", "x"]:
+					print("Dice are rolling!")
+					break
+				elif round2.lower() == "help":
+					print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tf: Field Bet\n\th: Hard Ways Bets\n\tpr: Prop Bets\n\thelp: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+					continue
 
+				else:
+					print("That's not a betting option, silly!")
+					continue
 			p2 = roll()
 
 			throws += 1

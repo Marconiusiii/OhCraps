@@ -172,7 +172,7 @@ def hardHigh(num):
 
 
 """
-algorithm for spreading wierd bets across with a high number:
+algorithm for spreading weird bets across with a high number:
 bet - (bet//5 * 3) = high bet
 bet//5 = low bets
 
@@ -453,7 +453,8 @@ comeBets = {
 6: 0,
 8: 0,
 9: 0,
-10: 0
+10: 0,
+	"Come": 0
 }
 
 comeOdds = {
@@ -471,7 +472,7 @@ dComeBets = {
 6: 0,
 8: 0,
 9: 0,
-10: 0
+10: 0,
 }
 
 dComeOdds = {
@@ -501,6 +502,9 @@ def come():
 			dComeBet = betPrompt()
 			print("Ok, ${} on the Don't Come.".format(dComeBet))
 			break
+		elif choice.lower() == "x":
+			print("Finished betting the Come.")
+			break
 		else:
 			print("Invalid choice, try again.")
 			continue
@@ -517,13 +521,13 @@ def comeShow():
 def comeOddsChange():
 	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable
 	cO = dCO = 0
-	for value in comeBets.values():
-		cO += value
-	for value in dComeBets.values():
-		dCO += value
+	for value in comeBets:
+		cO += comeBets[value]
+	for value in dComeBets:
+		dCO += dComeBets[value]
 	if cO > 0:
 		print("Change your Come Odds?")
-		changeCome = input(">")
+		changeCome = input("> ")
 		if changeCome.lower() in ['y', 'yes']:
 			cdcOddsChange(comeBets, comeOdds)
 	if dCO > 0:
@@ -536,6 +540,8 @@ def comeOddsChange():
 				pass
 		if changeDCO.lower() in ['y', 'yes']:
 			cdcOddsChange(dComeBets, dComeOdds)
+		else:
+			Pass
 
 def cdcOddsChange(dict, dict2):
 	global chipsOnTable
@@ -549,7 +555,7 @@ def cdcOddsChange(dict, dict2):
 				maxC = 4
 			elif key in [6, 8]:
 				maxC = 5
-			if dict == "comeBets":
+			if 'Come' in dict:
 				print("How much for Odds on the {num}? Max Odds is ${odds}.".format(num=key, odds=maxC * dict[key]))
 			else:
 				print("How much to Lay against the {num}? Max Lay is ${lay}.".format(num=key, lay=maxDC*dict[key]))
@@ -597,9 +603,25 @@ def comeCheck(roll):
 			print("Odds on your Come Bet?")
 			oddChoice = input(">")
 			if oddChoice.lower() in ['y', 'yes']:
-				print("How much on the Come {}?".format(roll))
-				comeOdds[roll] = betPrompt()
-				print("Ok, ${oBet} on your Come {num} odds.".format(oBet=comeOdds[roll], num=roll))
+				max = 0
+				if roll in [4, 10]:
+					max = comeBets[roll] * 3
+				elif roll in [5, 9]:
+					max = comeBets[roll] * 4
+				elif roll in [6, 8]:
+					max = comeBets[roll] * 5
+				print("How much on the Come {num}? Max Odds is ${max}.".format(num=roll, max=max))
+				while True:
+					comeOdds[roll] = betPrompt()
+					if comeOdds[roll] > max:
+						print("Way to high on your Odds, there. Try again.")
+						chipsOnTable -= comeOdds[roll]
+						bank += comeOdds[roll]
+						comeOdds[roll] = 0
+						continue
+					else:
+						print("Ok, ${oBet} on your Come {num} odds.".format(oBet=comeOdds[roll], num=roll))
+						break
 	elif dComeBet > 0:
 		if roll in [7, 11]:
 			print("You lost ${} from the Don't Come.".format(dComeBet))
@@ -621,9 +643,19 @@ def comeCheck(roll):
 			print("Lay odds on your Don't Come {}?".format(roll))
 			dcOdds = input(">")
 			if dcOdds.lower() in ['y', 'yes']:
-				print("How much to lay for your Don't Come Odds?")
-				dComeOdds[roll] = betPrompt()
-				print("Ok, ${bet} laid on the Don't Come {num}.".format(bet=dComeOdds[roll], num=roll))
+				dMax = dComeBets[roll] * 10
+				print("How much to lay for your Don't Come Odds? Max Lay is ${}.".format(dMax))
+				while True:
+					dComeOdds[roll] = betPrompt()
+					if dComeOdds[roll] > dMax:
+						print("Way too much for your Lay Odds! Try again.")
+						chipsOnTable -= dComeOdds[roll]
+						bank += dComeOdds[roll]
+						dComeOdds[roll] = 0
+						continue
+					else:
+						print("Ok, ${bet} laid on the Don't Come {num}.".format(bet=dComeOdds[roll], num=roll))
+						break
 
 def comePay(roll):
 	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn
@@ -1565,6 +1597,23 @@ def placeCheck(roll):
 	else:
 		pass
 
+def showAllBets():
+	global fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
+	for value in lineBets:
+		if lineBets[value] > 0:
+			print("You have ${val} on the {bet}.".format(val=lineBets[value], bet=value))
+		comeShow()
+	placeShow()
+	layShow() 
+	fieldShow()
+	hardShow()
+	for value in propBets:
+		if propBets[value] > 0:
+			print("${val} on {bet}.".format(val=propBets[value], bet=value))
+	if atsAll + atsSmall + atsTall > 0:
+		print("You have ${a} on the All, ${t} on the Tall, and ${s} on the Small.".format(a=atsAll, t=atsTall, s=atsSmall))
+	if fireBet > 0:
+		print("You have ${} on the Fire Bet.".format(fireBet))
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -1678,17 +1727,11 @@ while True:
 
 			if plCheck > 0 or hCheck > 0 or lCheck > 0:
 				if working:
-					print("Your bets are On!")
-				else:
-					print("Your bets are Off!")
-				print("All Bets Working?")
-				work = input(">\n")
-				if work.lower() in ['y', 'yes']:
-					working = True
-					print("Ok, all bets are working.")
-				elif work.lower() in ["n", "no", "off"]:
 					working = False
-					print("Ok, all bets are off!")
+					print("Ok, all bets are Off.")
+				else:
+					working = True
+					print("Ok, all bets are Working!")
 			else:
 				print("Make some bets first so they can Work!")
 			continue
@@ -1717,6 +1760,21 @@ while True:
 		elif round1.lower() in ["x", "r"]:
 			print("Rolling the dice!")
 			break
+
+		elif round1.lower() == "h":
+			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+			continue
+		elif round1.lower() == "b":
+			print("You have ${bank} in the Bank and ${chips} out on the table.".format(bank=bank, chips=chipsOnTable))
+			continue
+		elif round1.lower() == "a":
+			showAllBets()
+			continue
+		else:
+			print("That's not an option, silly!")
+			continue
+
+
 	comeOut  = roll()
 	throws += 1
 	comeCheck(comeOut)

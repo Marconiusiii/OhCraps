@@ -1,4 +1,4 @@
-# OhCraps! v.5.9.7
+# OhCraps! v.6.0
 Python-based Craps game for Terminal.
 
 ## About
@@ -16,7 +16,57 @@ The game starts off asking you to set up a bankroll. Enter a numeric amount to s
 
 ### Coming Out Roll
 
-You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the letter 'y' and then hitting Enter to proceed. You can bypass any of the bets by simply hitting Enter to move on through the game.
+You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the the bet code at the prompt and hitting Enter.
+
+#### Bet Codes for Round 1 Betting
+
+<table>
+<caption>Come Out Roll Bet Codes</caption>
+<thead>
+<tr>
+<th scope="col">Code</th>
+<th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>l</td><td>Line Bets: Pass and Don't Pass</td>
+</tr>
+<tr>
+<td>p</td><td>Place Bets</td>
+</tr>
+<tr>
+<td>ly</td><td>Lay Bets</td>
+</tr>
+<tr>
+<td>f</td><td>Field Bet</td>
+</tr>
+<tr>
+<td>hd</td><td>Hard Ways Bets</td>
+</tr>
+<tr>
+<td>w</td><td>Toggle Working Bets On or Off</td>
+</tr>
+<tr>
+<td>pr</td><td>Prop Bets</td>
+</tr>
+<tr>
+<td>ats</td><td>All Tall Small</td>
+</tr>
+<tr>
+<td>fire</td><td>Fire Bet</td>
+</tr>
+<tr>
+<td>h</td><td>Show Help Menu for Bet Codes</td>
+</tr>
+<tr>
+<td>a</td><td>Show all current bets</td>
+</tr>
+<tr>
+<td>r</td><td>Roll the Dice!</td>
+</tr>
+</tbody>
+</table>
 
 #### Line Bets
 
@@ -28,7 +78,7 @@ Once you've set your Line Bets, type 'x' and hit Enter to continue on with the g
 
 #### Place Bets
 
-Typing 'y' and hitting Enter when prompted with the Place Bets will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number.
+Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number.
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
@@ -43,6 +93,10 @@ You can automatically place bets across all the numbers or bet inside using keyw
 On the Place Bet prompt, typing 'i' and hitting Enter will activate Inside mode, where the Place 4 and 10 will be taken down and you'll be prompted for how many units you'd like to place on the 5, 6, 8, and 9.
 
 Both of these options provide a quick way to make common Place bets without having to jump through each individual number. 1 Unit is equal to $5, with the 6 and 8 automatically adjusting for the $6 bets required for them.
+
+Typing 'h' in the Place Bets prompt and hitting Enter will open the help menu that displays the various codes for Place Betting.
+
+Finish your Place Betting by typing 'x' and hitting Enter. You will be returned to the Place Your Bets prompt.
 
 Common Across/Inside Bets:
 * 1 Unit - $32 Across - $22 Inside
@@ -64,6 +118,10 @@ At the Lay Bet prompt, typing 'd' or 'td' and hitting Enter will take down all y
 After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
 Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission/vig paid back to the House based on your winnings when a Lay bet wins. When your Lay Bets win, they will stay up until you take them down or they lose.
+
+Type 'h' and hit Enter to show the Lay Betting codes.
+
+Type 'x' and hit Enter to finish Lay Betting and return to the Place Your Bets prompt.
 
 #### Field Bet
 
@@ -87,19 +145,23 @@ For example, typing 'h4' and hitting Enter will prompt you for your bets going h
 
 At any point, entering 'd' or 'td' at the Hard Ways bet prompt and hitting Enter will take down all your Hard Ways bets.
 
-After a Point has been established, you can turn your Hard Ways bets Off by typing 'o' or 'off' and hitting Enter when you are prompted with the "Hard Ways?" option. This will take your bets out of action for the next roll. Hitting a Hard Way number, and Easy number, or a 7 Out will not affect your bets when they are Off.
+After a Point has been established, you can turn your Hard Ways bets Off by typing 'o' or 'off' and hitting Enter when you are in the Hard Ways Betting menu. This will take your bets out of action for the next roll. Hitting a Hard Way number, and Easy number, or a 7 Out will not affect your bets when they are Off.
 
 Much like the Place Bets, you will be prompted to bet on the 4, 6, 8, and 10 in order, then you will get a confirmation on what you've bet before the game continues on. Enter 0 to clear a bet or not bet on any of the numbers.
+
+Enter 'h' in the hard Ways betting prompt to display the bet codes.
+
+Type 'x' and hit Enter to exit Hard Ways Betting mode and return to the Place Your Bets prompt.
 
 #### Working  Bets
 
 If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
-If you've Placed, Laid, or made Hard Ways Bets, the "Place and Hard Ways Bets Working?" option will appear in the list, and entering 'y' and hitting Enter will set them all to be Working on the Come Out Roll.
+If you've Placed, Laid, or made Hard Ways Bets, typing 'w' in the Place Your Bets prompt and hitting Enter will set them all to be Working on the Come Out Roll. You can toggle this on and off by typing 'w' again.
 
 #### Proposition Bets
 
-These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet by typing "y", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
+These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet Mode by typing "pr", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
 
 1. Any 7 - Bet on any 7 to come up.
 	• Bet Code: "7", 'a7', 's'
@@ -170,11 +232,34 @@ Once a shooter wins 4 Points, the Fire Bet will pay out on the next 7 Out. If th
 
 If a 4, 5, 6, 8, 9, or 10 is rolled on the Coming Out roll, that number becomes the Point. Roll the dice until the Point is hit to win on the Pass Line and reset the game, or until a 7 is rolled, clearing all the bets in a loss and returning to the Come Out roll.
 
-New betting modes appear in the Point phase:
+New betting modes appear in the Point phase, and are accessed through the following codes.
+
+#### Point Phase Bet Codes
+
+<table>
+<caption>Point Phase Bet Codes</caption>
+<thead>
+<tr>
+<th scope="col">Code</th><th scope="col">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>o</td><td>Line Odds for Pass and Don't Pass bets.</td>
+</tr>
+<tr>
+<td>c</td><td>Come Bets, opens prompt for Come and Don't Come bets.</td>
+</tr>
+<tr>
+<td>dp</td><td>Take down Don't Pass bet and Odds.</td>
+</tr>
+<tr>
+<td>co</td><td>Change Come or Don't Come Bet Odds.</td>
+</tr>
 
 #### Line Odds
 
-When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, you'll be asked if you want Pass Line Odds. If you bet on the Don't Pass Line, you'll be prompted for a Lay Bet. Both are optional and can be bypassed by hitting Enter.
+When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, typing 'o' and hitting Enter in the Place Your Bets prompt will open the Odds Betting mode. You'll be able to set Pass Line Odds and Lay Odds for Don't Pass bets.
 
 This game uses a standard 3x4x5x Odds limit. Odds on the 4 and 10 are limited to 3x your initial Line bet, odds on the 5 and 9 are limited to 4x your bet, and odds on the 6 and 8 are limited to 5x your bet. All Don't Pass lay odds are limited to 10x your Don't Pass bet.
 
@@ -182,11 +267,11 @@ When at the Line Bet Odds prompt, typing 'p' and hitting Enter will take down yo
 
 #### Take Down Don't Pass Bet and Odds
 
-Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. This game option will only appear if you make a Don't Pass bet before the Come Out roll. Type 'y' and hit Enter to take down the bet, and your Don't Pass Bet along with your Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
+Due to the overall low House edge that Don't Pass bets have in casinos, the Don't Pass Bet and Don't Pass Odds can actually be taken down at any point of game play. It is not a contractual bet like the Pass Line, which has to stay up until a Point is hit or a 7 out. Type 'dp' at the Place Your Bets prompt and hit Enter and your Don't Pass Bet along with your Odds will be returned to you, and you will not be able to make another Don't Pass bet until the next Come Out roll.
 
 #### Come and Don't Come
 
-The Come and Don't Come Fields act like additional Pass Line Bets after a Point has been established. Placing these bets is only possible after the Point Phase has started. Enter 'y' if you want to bet on these fields when prompted, then Enter a 'c' for Come or a 'd' for Don't Come.
+The Come and Don't Come Fields act like additional Pass Line Bets after a Point has been established. Placing these bets is only possible after the Point Phase has started. Enter 'c' if you want to bet on these fields when prompted, then Enter a 'c' for Come or a 'd' for Don't Come.
 
 ##### Come Bet
 A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any other number is rolled, the Come Bet moves to that number, and you will be prompted for Come Bet Odds.  If that Come Bet number is rolled before a 7, you will win. If a 7 is rolled before any of the Come Bet numbers are hit, all Come bets are cleared and you lose.
@@ -198,7 +283,7 @@ If Come or Don't Come bets are working during the Coming Out roll, all Come and 
 
 #### going Off on your bets
 
-As mentioned in the Place Lay, and Hard Ways sections, you can take these bets Off for the next roll by typing 'o' or 'off' and hitting Enter when you are prompted for those bets. After the very next roll, those bets will turn back On.
+As mentioned in the Place Lay, and Hard Ways sections, you can take these bets Off for the next roll by typing 'o' or 'off' and hitting Enter when you are in those betting modes. After the very next roll, those bets will turn back On.
 
 #### Field and Proposition Bets
 

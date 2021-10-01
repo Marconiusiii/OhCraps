@@ -1414,7 +1414,7 @@ def placePreset(pre):
 			except ValueError:
 				print("That wasn't even a unit! Try again.")
 				continue
-			if (unit*5*4) + (unit*6*2) > bank:
+			if (unit*5)*4 + (unit*6)*2 > bank:
 				print("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
@@ -1445,10 +1445,16 @@ def placePreset(pre):
 		while True:
 			try:
 				unit = int(input("> "))
-				break
 			except ValueError:
 				print("Invalid entry, try again.")
 				continue
+			if (unit*5)*4 + (unit*6)*2 > bank:
+				print("You don't have enough money for that! Egads!")
+				outOfMoney()
+				continue
+			else:
+				break
+
 		if pointIsOn:
 			print("Include the Point?")
 			try:

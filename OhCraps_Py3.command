@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0"
+version = "6.0.1"
 
 
 #Roll and Dice Setup
@@ -1620,6 +1620,7 @@ def showAllBets():
 		print("You have ${a} on the All, ${t} on the Tall, and ${s} on the Small.".format(a=atsAll, t=atsTall, s=atsSmall))
 	if fireBet > 0:
 		print("You have ${} on the Fire Bet.".format(fireBet))
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -1968,6 +1969,9 @@ while True:
 					propBetting()
 					continue
 
+				elif round2.lower() == "a":
+					showAllBets()
+					continue
 # phase 2 roll
 				elif round2.lower() in ["r", "x"]:
 					print("Dice are rolling!")

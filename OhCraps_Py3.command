@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.1"
+version = "6.0.2"
 
 
 #Roll and Dice Setup
@@ -614,7 +614,7 @@ def comeCheck(roll):
 				while True:
 					comeOdds[roll] = betPrompt()
 					if comeOdds[roll] > max:
-						print("Way to high on your Odds, there. Try again.")
+						print("Way too high on your Odds, there. Try again.")
 						chipsOnTable -= comeOdds[roll]
 						bank += comeOdds[roll]
 						comeOdds[roll] = 0
@@ -635,6 +635,7 @@ def comeCheck(roll):
 			elif roll == 12:
 				print("12 is a Push!")
 			chipsOnTable -= dComeBet
+			bank += dComeBet
 			dComeBet = 0
 		else:
 			print("Moving your Don't Come bet to the {}.".format(roll))
@@ -671,7 +672,7 @@ def comePay(roll):
 				print("You lost ${} from your Come Bet Odds.".format(lossOdds))
 			elif lossOdds > 0 and pointIsOn == False:
 				print("${odds} returned to you from Come Odds.".format(odds=lossOdds))
-			#bank -= loss + lossOdds
+				bank += lossOdds
 			chipsOnTable -= loss + lossOdds
 			for key in comeBets:
 				comeBets[key] = 0
@@ -724,10 +725,9 @@ def comePay(roll):
 			dComeBets[roll] = 0
 			if dComeOdds[roll] > 0:
 				print("You lost ${dco} from the Don't Come {num} Odds.".format(dco=dComeOdds[roll], num=roll))
-				#bank -= dComeOdds[roll]
+				bank -= dComeOdds[roll]
 				chipsOnTable -= dComeOdds[roll]
 				dComeOdds[roll] = 0
-
 
 #Field Betting
 
@@ -1604,11 +1604,15 @@ def placeCheck(roll):
 		pass
 
 def showAllBets():
-	global fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
+	global comeBet, dComeBet, fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
 	for value in lineBets:
 		if lineBets[value] > 0:
 			print("You have ${val} on the {bet}.".format(val=lineBets[value], bet=value))
-		comeShow()
+	if comeBet > 0:
+		print("You have ${} on the Come.".format(comeBet))
+	if dComeBet > 0:
+		print("You have ${} on the Don't Come.".format(dComeBet))
+	comeShow()
 	placeShow()
 	layShow() 
 	fieldShow()
@@ -1831,6 +1835,10 @@ while True:
 						odds()
 					else:
 						print("You don't have a Line bet, silly!")
+					continue
+
+				if round2.lower() == "b":
+					print("You have ${bank} in your rack with ${chips} on the table.".format(bank=bank, chips=chipsOnTable))
 					continue
 
 				if round2.lower() == "dp":

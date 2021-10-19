@@ -1,4 +1,4 @@
-# OhCraps! v.6.0.2
+# OhCraps! v.6.0.3
 Python-based Craps game for Terminal.
 
 ## About
@@ -78,7 +78,7 @@ Once you've set your Line Bets, type 'x' and hit Enter to continue on with the g
 
 #### Place Bets
 
-Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number.
+Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number. Once you enter a bet or pass the Place 10, you'll be brought back to the Place Bets prompt.
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 

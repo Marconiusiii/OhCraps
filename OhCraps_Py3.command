@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.2"
+version = "6.0.3"
 
 
 #Roll and Dice Setup
@@ -1507,6 +1507,7 @@ def placeBets():
 		print("You have ${bet} on the Place {key}.".format(bet=place[key], key=key))
 		print("How much on the Place {}?".format(key))
 		while True:
+			bet = 0
 			try:
 				bet = int(input("$>"))
 				if bet > bank + chipsOnTable:
@@ -1520,6 +1521,7 @@ def placeBets():
 				bet = place[key]
 				madeBet = False
 				break
+
 		if bet > 0:
 			chipsOnTable -= place[key]
 			if madeBet and bet != place[key]:

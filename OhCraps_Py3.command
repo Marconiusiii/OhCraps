@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.3"
+version = "6.0.4"
 
 
 #Roll and Dice Setup
@@ -193,9 +193,9 @@ def hardCheck(roll):
 	elif roll in [4, 6, 8, 10]:
 		if hardWays[roll] > 0 and rollHard == True:
 			if roll in [4, 10]:
-				win = hardWays[roll] * 8
+				win = hardWays[roll] * 7
 			elif roll in [6, 8]:
-				win = hardWays[roll] * 10
+				win = hardWays[roll] * 9
 			print("You won ${win} on the Hard {num}!".format(win=win, num=roll))
 			bank += win
 			print("Press your bet?")
@@ -488,17 +488,21 @@ comeBet = 0
 dComeBet = 0
 
 def come():
-	global comeBet, dComeBet
+	global comeBet, dComeBet, chipsOnTable, bank
 	while True:
 		print("Come or Don't Come?")
 		choice = input(">")
 		if choice.lower() in ['c', 'come']:
 			print("How much on the Come?")
+			chipsOnTable -= comeBet
+			bank += comeBet
 			comeBet = betPrompt()
 			print("Ok, ${} on the Come.".format(comeBet))
 			break
 		elif choice.lower() in ["dc", "d", "don't", "don't come", "dontcome"]:
 			print("How much on the Don't Com?")
+			chipsOnTable -= dComeBet
+			bank += dComeBet
 			dComeBet = betPrompt()
 			print("Ok, ${} on the Don't Come.".format(dComeBet))
 			break
@@ -725,7 +729,7 @@ def comePay(roll):
 			dComeBets[roll] = 0
 			if dComeOdds[roll] > 0:
 				print("You lost ${dco} from the Don't Come {num} Odds.".format(dco=dComeOdds[roll], num=roll))
-				bank -= dComeOdds[roll]
+				#bank -= dComeOdds[roll]
 				chipsOnTable -= dComeOdds[roll]
 				dComeOdds[roll] = 0
 
@@ -1840,7 +1844,7 @@ while True:
 					continue
 
 				if round2.lower() == "b":
-					print("You have ${bank} in your rack with ${chips} on the table.".format(bank=bank, chips=chipsOnTable))
+					print("You have ${bank} in your rack with ${chips} on the table. The Point is {p}.".format(bank=bank, chips=chipsOnTable, p=comeOut))
 					continue
 
 				if round2.lower() == "dp":

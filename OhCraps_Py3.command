@@ -597,7 +597,6 @@ def comeCheck(roll):
 			comeBet = 0
 		elif roll in [2, 3, 12]:
 			print("You lost ${} from the Come Bet.".format(comeBet))
-			#bank -= comeBet
 			chipsOnTable -= comeBet
 			comeBet = 0
 		else:
@@ -629,7 +628,6 @@ def comeCheck(roll):
 	elif dComeBet > 0:
 		if roll in [7, 11]:
 			print("You lost ${} from the Don't Come.".format(dComeBet))
-			#bank -= dComeBet
 			chipsOnTable -= dComeBet
 			dComeBet = 0
 		elif roll in [2, 3, 12]:
@@ -639,7 +637,6 @@ def comeCheck(roll):
 			elif roll == 12:
 				print("12 is a Push!")
 			chipsOnTable -= dComeBet
-			bank += dComeBet
 			dComeBet = 0
 		else:
 			print("Moving your Don't Come bet to the {}.".format(roll))
@@ -696,7 +693,7 @@ def comePay(roll):
 				elif key in [6, 8]:
 					winOdds += dComeOdds[key]//6*5
 		if win > 0:
-			print("You won ${} from your Don't Come Bets!".format(win))
+			print("You won ${} from your Don't Come Bets!".format(win//2))
 			if winOdds > 0:
 				print("You won ${} from your Don't Come Bet Odds!".format(winOdds))
 			bank += win + winOdds + dComeOdds[key]

@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.5"
+version = "6.0.6"
 
 
 #Roll and Dice Setup
@@ -121,12 +121,45 @@ hardWays = {
 
 def hardWaysBetting():
 	global hardWays, bank, chipsOnTable
+	madeBet = True
 	for key in hardWays:
 		if hardWays[key] > 0:
 			print("You have ${bet} on the hard {num}.".format(bet=hardWays[key], num=key))
 		print("How much on the Hard {}?".format(key))
+		while True:
+			bet = 0
+			try:
+				bet = int(input("$>"))
+				if bet > bank + chipsOnTable:
+					print("You don't have enough money to make that bet! Try again.")
+					outOfMoney()
+					print("How much on the Hard {}?".format(key))
+					continue
+				madeBet = True
+				break
+			except ValueError:
+				bet = hardWays[key]
+				madeBet = False
+				break
+
+		if bet > 0:
+			chipsOnTable -= hardWays[key]
+			if madeBet and bet != hardWays[key]:
+				bank -= bet - hardWays[key] 
+			hardWays[key] = bet
+			chipsOnTable += bet
+			print("${bet} on the Hard {num}.".format(bet=bet, num=key))
+		elif hardWays[key] > 0 and bet == 0:
+			print("Ok, taking down your Hard {num} bet.".format(num=key))
+			chipsOnTable -= hardWays[key]
+			bank += place[key]
+			hardWays[key] = 0
+
+
+"""
 		bet = betPrompt()
 		if bet > 0:
+			bank += hardWays[key]
 			chipsOnTable -= hardWays[key]
 			hardWays[key] = bet
 			print("Ok, ${bet} on the Hard {num}.".format(bet=hardWays[key], num=key))
@@ -135,7 +168,7 @@ def hardWaysBetting():
 			chipsOnTable -= hardWays[key]
 			bank += hardWays[key]
 			hardWays[key] = bet
-
+"""
 def hardTakeDown():
 	global hardWays, bank, chipsOnTable
 	print("Taking down your Hard Ways.")
@@ -149,11 +182,13 @@ def hardAuto():
 	print("How many $1 units on each of the Hard Ways?")
 	hardAcr = betPrompt()
 	chipsOnTable -= hardAcr
+	bank += hardAcr
 	for key in hardWays:
 		chipsOnTable -= hardWays[key]
 		bank += hardWays[key]
 		hardWays[key] = hardAcr
 		chipsOnTable += hardAcr
+		bank -= hardAcr
 	print("Ok, ${} on each of the Hard Ways.".format(hardAcr))
 
 def hardHigh(num):
@@ -161,6 +196,7 @@ def hardHigh(num):
 	number = int(num[1:])
 	print("How much to spread across the Hard Ways, high on the {}?".format(number))
 	bet = betPrompt()
+	#chipsOnTable -= bet
 	for key in hardWays:
 		chipsOnTable -= hardWays[key]
 		bank += hardWays[key]

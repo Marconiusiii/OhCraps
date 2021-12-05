@@ -86,7 +86,7 @@ Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will
 
 In the Place Bet prompt, if you type 'd' or 'td' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
 
-After a Point has been established, when you are prompted with the Place Bet option, typing 'o' or 'off' and hitting Enter will turn your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls.
+After a Point has been established, when you are prompted with the Place Bet option, typing 'o' and hitting Enter will toggle your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls. When still in the prompt, entering 'o' again and hitting Enter will toggle the bets back On.
 
 You can automatically place bets across all the numbers or bet inside using keywords on the Place Bet prompt. Typing 'a' and hitting Enter will activate the Across mode, where you will be prompted how many units you want to bet on each Place number. When using Across mode after a Point has been established, you'll be prompted on whether you'd like to include the Point number or not.
 

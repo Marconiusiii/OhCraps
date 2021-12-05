@@ -1590,7 +1590,6 @@ def placeBets():
 			chipsOnTable -= place[key]
 			bank += place[key]
 			place[key] = 0
-#		print("Bank: {bank}, Chips: {chips}".format(bank=bank, chips=chipsOnTable))
 
 def placeShow():
 	global place
@@ -1604,7 +1603,6 @@ def placeTakeDown():
 		chipsOnTable -= place[key]
 		bank += place[key]
 		place[key] = 0
-
 
 def vig(bet):
 	total = bet * 0.05
@@ -1922,8 +1920,12 @@ while True:
 							placeBets()
 							continue
 						elif pl2.lower() in ['o', 'off']:
-							placeOff = True
-							print("All your Place Bets are Off.")
+							if placeOff:
+								placeOff = False
+								print("Ok, your Place Bets are back on.")
+							else:
+								placeOff = True
+								print("All your Place Bets are Off.")
 							continue
 						elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
 							print("Taking down all of your Place Bets.")

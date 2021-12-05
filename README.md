@@ -1,4 +1,4 @@
-# OhCraps! v.6.0.4
+# OhCraps! v.6.0.5
 Python-based Craps game for Terminal.
 
 ## About
@@ -164,19 +164,19 @@ If you've Placed, Laid, or made Hard Ways Bets, typing 'w' in the Place Your Bet
 These bets are all single-roll bets. If they do not come up on the very next roll, they will lose. When you activate the Prop Bet Mode by typing "pr", another text prompt will come up asking you for which specific bet you'd like to add. Type in the bet code and hit Enter to bring up the betting prompt for your choice. After you've entered your bet, you'll be returned to the Prop Bet prompt. Type in another code to make another bet, type "all" to see all the bets you've made, type 'help' to see a list of all commands, or type 'x' and hit Enter to finish up and move onwards with the game.
 
 1. Any 7 - Bet on any 7 to come up.
-	• Bet Code: "7", 'a7', 's'
+	• Bet Code: '7', 'a7', 's'
 2. Any Craps - Bet on a 2, 3, or 12 to come up.
-	• Bet Code: "cr"
+	• Bet Code: 'c'
 3. C & E - Bet on a 2, 3, 11, or 12 to come up.
-	• Bet Code: "ce"
+	• Bet Code: 'ce'
 4. Snake Eyes - Bet that a 2 comes up.
-	• Bet Code: "s" or "2"
+	• Bet Code: '2', 's'
 5. Acey-Deucey - Bet on a 3 to come up.
-	• Bet Code: "ad" or "3"
+	• Bet Code: '3', 'ad'
 6. Boxcars - Bet that a 12 comes up.
-	• Bet Code: "b" or "12"
+	• Bet Code: '12', 'b'
 7. Horn - Bet that a 2, 3, 11, or 12 comes up.
-	• Bet Code: "h", "horn"
+	• Bet Code: 'h'
 	Horn High Deuce:
 	• Code: 'hh2'
 	Horn High Ace-Deuce:
@@ -186,11 +186,11 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	Horn High 12
 	• Code: 'hhb', 'hhm', 'hh12'
 8. Yo - Betting that an Eleven will be the next roll outcome.
-	• BetCodes: "11", "eleven", "56"
+	• BetCodes: '11', 'e'
 9. Hop Bets - Betting on specific outcomes of the dice; hopping the 4s is betting that the dice roll 3, 1 or 2, 2, etc.
-	• Bet Codes: h4, h5, h6, h7, h8, h9, h10
+	• Bet Codes: 'h4', 'h5', 'h6', 'h7', 'h8', 'h9', 'h10'
 10. Hop the Easies - Placing a bet on all the easy way Hop Bets.
-	• Bet Code: hez
+	• Bet Code: 'hez'
 11. World - Also known as the Whirl Bet, this places a bet across the Horn and the Any 7.
 	• Code: 'w', 'world', 'wh'
 12. Buffalo - A bet that contains Any 7 along with the Hard Ways hopping.
@@ -200,7 +200,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 14. Hi-Lo, betting evenly on the 2 and 12.
 	• Code: 'hl'
 15. All - See all prop bets you've placed.
-	• Code: all
+	• Code: 'a', 'all'
 16. Help - See a list of all Prop Bet commands.
 	• Code: 'help'
 17. Exit Prop betting and return to the game.

@@ -559,7 +559,7 @@ def comeShow():
 			print("You have ${bet} on the Don't Come {num} with ${odds} in odds.".format(bet=dComeBets[key], num=key, odds=dComeOdds[key]))
 
 def comeOddsChange():
-	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable
+	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable, bank
 	cO = dCO = 0
 	for value in comeBets:
 		cO += comeBets[value]
@@ -580,11 +580,9 @@ def comeOddsChange():
 				pass
 		if changeDCO.lower() in ['y', 'yes']:
 			cdcOddsChange(dComeBets, dComeOdds)
-		else:
-			Pass
 
 def cdcOddsChange(dict, dict2):
-	global chipsOnTable
+	global chipsOnTable, bank
 	maxDC = 10
 	maxC = 0
 	for key in dict:
@@ -596,9 +594,9 @@ def cdcOddsChange(dict, dict2):
 			elif key in [6, 8]:
 				maxC = 5
 			if 'Come' in dict:
-				print("How much for Odds on the {num}? Max Odds is ${odds}.".format(num=key, odds=maxC * dict[key]))
+				print("How much for Odds on the {num}? Max Odds is ${odds}; you have ${current} in Odds.".format(num=key, odds=maxC * dict[key], current=dict2[key]))
 			else:
-				print("How much to Lay against the {num}? Max Lay is ${lay}.".format(num=key, lay=maxDC*dict[key]))
+				print("How much to Lay against the {num}? Max Lay is ${lay}; you have ${current} in Lay Odds.".format(num=key, lay=maxDC*dict[key], current=dict2[key]))
 			while True:
 				try:
 					bet = int(input("$>"))
@@ -609,16 +607,19 @@ def cdcOddsChange(dict, dict2):
 						continue
 					break
 				except ValueError:
-					bet = dict[key]
+					bet = dict2[key]
 					break
 			if bet > 0:
 				chipsOnTable -= dict2[key]
+				bank += dict2[key]
 				print("Ok, you have ${bet} Odds for your {num}.".format(bet=bet, num=key))
 				dict2[key] = bet
 				chipsOnTable += bet
+				bank -= bet
 			elif dict2[key] > 0 and bet == 0:
 				print("Ok, taking down your Odds.")
 				chipsOnTable -= dict2[key]
+				bank += dict2[key]
 				dict2[key] = bet
 
 

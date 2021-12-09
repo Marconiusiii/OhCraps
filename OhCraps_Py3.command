@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.6"
+version = "6.0.7"
 
 
 #Roll and Dice Setup
@@ -600,7 +600,7 @@ def cdcOddsChange(dict, dict2):
 			while True:
 				try:
 					bet = int(input("$>"))
-					if bet > bank - chipsOnTable:
+					if bet > bank:
 						print("You don't have enough money to make that bet! Try again.")
 						outOfMoney()
 						print("Change your Odds?")
@@ -1472,7 +1472,7 @@ def outOfMoney():
 		except ValueError:
 			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance. Try again.")
 			continue
-		if cash <= 0:
+		if cash < 0:
 			print("\tWhat am I, a bank? This is for withdrawals only! Try again.")
 			continue
 		else:

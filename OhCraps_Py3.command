@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.7"
+version = "6.0.8"
 
 
 #Roll and Dice Setup
@@ -1496,7 +1496,10 @@ placeOff = False
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
 	total = 0
-	if pre.lower() in ['a', 'across', 'acr']:
+	outlay = 0
+	for number in place:
+		outlay += place[number]
+	if pre.lower() == 'a':
 		while True:
 			print("How many units across the Place Numbers?")
 			try:
@@ -1504,7 +1507,7 @@ def placePreset(pre):
 			except ValueError:
 				print("That wasn't even a unit! Try again.")
 				continue
-			if (unit*5)*4 + (unit*6)*2 > bank:
+			if ((unit*5)*4 + (unit*6)*2) > bank + outlay:
 				print("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
@@ -1530,7 +1533,7 @@ def placePreset(pre):
 			bank -= place[key]
 			total += place[key]
 		print("Placing ${} Across.".format(total))
-	elif pre.lower() in ['i', 'inside']:
+	elif pre.lower() == 'i':
 		print("How many units Inside?")
 		while True:
 			try:
@@ -1538,7 +1541,7 @@ def placePreset(pre):
 			except ValueError:
 				print("Invalid entry, try again.")
 				continue
-			if (unit*5)*4 + (unit*6)*2 > bank:
+			if ((unit*5)*2 + (unit*6)*2) > bank + outlay:
 				print("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue

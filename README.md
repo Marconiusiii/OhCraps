@@ -1,4 +1,4 @@
-# OhCraps! v.6.0.8
+# OhCraps! v.6.0.9
 Python-based Craps game for Terminal.
 
 ## About

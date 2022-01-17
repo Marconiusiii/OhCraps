@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.8"
+version = "6.0.9"
 
 
 #Roll and Dice Setup
@@ -776,7 +776,7 @@ def fieldShow():
 		print("You have ${} on the Field.".format(fieldBet))
 
 def field():
-	global fieldBet, chipsOnTable
+	global fieldBet, chipsOnTable, bank
 	print("How much on the Field?")
 	bet = betPrompt()
 	if bet > 0:
@@ -784,6 +784,7 @@ def field():
 		fieldBet = bet
 		print("Ok, ${} on the Field.".format(fieldBet))
 	elif fieldBet > 0 and bet == 0:
+		bank += fieldBet
 		chipsOnTable -= fieldBet
 		print("Taking down your Field bet.")
 		fieldBet = 0

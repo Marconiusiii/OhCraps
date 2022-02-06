@@ -1,4 +1,4 @@
-# OhCraps! v.6.0.9
+# OhCraps! v.6.1.0
 Python-based Craps game for Terminal.
 
 ## About
@@ -189,6 +189,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• BetCodes: '11', 'e'
 9. Hop Bets - Betting on specific outcomes of the dice; hopping the 4s is betting that the dice roll 3, 1 or 2, 2, etc.
 	• Bet Codes: 'h4', 'h5', 'h6', 'h7', 'h8', 'h9', 'h10'
+	• 'h6e' and 'h8e' will allow you to hop only the easy outcomes for the 6 and 8.
 10. Hop the Easies - Placing a bet on all the easy way Hop Bets.
 	• Bet Code: 'hez'
 11. World - Also known as the Whirl Bet, this places a bet across the Horn and the Any 7.
@@ -400,7 +401,7 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <th scope="row">Hard 6 and 8</th><td>9:1</td>
 </tr>
 <tr>
-<th scope="row">Hop easy way</th><td>15:1</td>
+<th scope="row">Hop easy way/6-8 Easies</th><td>15:1</td>
 </tr>
 <tr>
 <th scope="row">Hop hard number</th><td>30:1</td>

@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.0.9"
+version = "6.1.0"
 
 
 #Roll and Dice Setup
@@ -840,17 +840,21 @@ propBets = {
 "Buffalo": 0,
 "Hi Low": 0,
 "Hop 4": 0,
+"Hop 4 Easy": 0,
 "Hop 5": 0,
 "Hop 6": 0,
+"Hop 6 Easy": 0,
 "Hop 7": 0,
 "Hop 8": 0,
+"Hop 8 Easy": 0,
 "Hop 9": 0,
 "Hop 10": 0,
+"Hop 10 Easy": 0,
 "Hop EZ": 0
 }
 
 def propHelp():
-	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h3-h10': Hop bets\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
+	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h6e, h8e': Hop 6 or 8 Easies\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
 
 def propBetting():
 	global propBets, chipsOnTable, bank
@@ -1120,6 +1124,19 @@ def propBetting():
 					continue
 			print("Ok, ${} hopping the 6s.".format(propBets["Hop 6"]))
 			continue
+		elif bet.lower() == 'h6e':
+			print("How much to Hop the 6 Easies? Must be a multiple of 2.")
+			while True:
+				bank += propBets["Hop 6 Easy"]
+				chipsOnTable -= propBets["Hop 6 Easy"]
+				propBets["Hop 6 Easy"] = betPrompt()
+				if propBets["Hop 6 Easy"]%2 == 0:
+					break
+				else:
+					print("That's not a multiple of 2! Can't you math?")
+					continue
+			print("Ok, ${} hopping the 6 Easies.".format(propBets["Hop 6 Easy"]))
+			continue
 		elif bet.lower() == 'h7':
 			print("How much to Hop Big Red? Must be a multiple of 3.")
 			while True:
@@ -1146,6 +1163,19 @@ def propBetting():
 					continue
 			print("Ok, ${} hopping the 8s.".format(propBets["Hop 8"]))
 			continue
+		elif bet.lower() == 'h8e':
+			print("How much to Hop the 8 Easies? Must be a multiple of 2.")
+			while True:
+				bank += propBets["Hop 8 Easy"]
+				chipsOnTable -= propBets["Hop 8 Easy"]
+				propBets["Hop 8 Easy"] = betPrompt()
+				if propBets["Hop 8 Easy"]%2 == 0:
+					break
+				else:
+					print("That's not a multiple of 2! Can't you math?")
+					continue
+			print("Ok, ${} hopping the 8 Easies.".format(propBets["Hop 8 Easy"]))
+			continue
 		elif bet.lower() == 'hez':
 			print("How much to Hop the Easies? Must be a multiple of 15.")
 			while True:
@@ -1159,7 +1189,6 @@ def propBetting():
 					continue
 			print("Ok, ${} hopping the Easies.".format(propBets["Hop EZ"]))
 			continue
-
 		elif bet.lower() == 'a':
 			print("Showing your Prop Bets:\n")
 			for key in propBets:
@@ -1235,6 +1264,13 @@ def propPay(roll):
 					multiplier = 30
 				sub = propBets[key]//3*2
 				propBets[key] = propBets[key]//3
+			elif key == "Hop 6 Easy" and roll == 6:
+				if (die1, die2) in [(5, 1), (4, 2)]:
+					multiplier = 15
+				else:
+					multiplier = 0
+				sub = propBets[key]//2
+				propBets[key] = propBets[key]//2
 			elif key == "Hop 8" and roll == 8:
 				if (die1, die2) in [(5, 3), (6, 2)]:
 					multiplier = 15
@@ -1242,6 +1278,14 @@ def propPay(roll):
 					multiplier = 30
 				sub = propBets[key]//3*2
 				propBets[key] = propBets[key]//3
+			elif key == "Hop 8 Easy" and roll == 8:
+				if (die1, die2) in [(5, 3), (6, 2)]:
+					multiplier = 15
+				else:
+					multiplier = 0
+				sub = propBets[key]//2
+				propBets[key] = propBets[key]//2
+
 			elif key == "Hop 7" and roll == 7:
 				multiplier = 15
 				sub = propBets[key]//3*2

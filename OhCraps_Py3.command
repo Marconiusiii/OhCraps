@@ -1267,10 +1267,10 @@ def propPay(roll):
 			elif key == "Hop 6 Easy" and roll == 6:
 				if (die1, die2) in [(5, 1), (4, 2)]:
 					multiplier = 15
+					sub = propBets[key]//2
+					propBets[key] = propBets[key]//2
 				else:
 					multiplier = 0
-				sub = propBets[key]//2
-				propBets[key] = propBets[key]//2
 			elif key == "Hop 8" and roll == 8:
 				if (die1, die2) in [(5, 3), (6, 2)]:
 					multiplier = 15
@@ -1281,11 +1281,10 @@ def propPay(roll):
 			elif key == "Hop 8 Easy" and roll == 8:
 				if (die1, die2) in [(5, 3), (6, 2)]:
 					multiplier = 15
+					sub = propBets[key]//2
+					propBets[key] = propBets[key]//2
 				else:
 					multiplier = 0
-				sub = propBets[key]//2
-				propBets[key] = propBets[key]//2
-
 			elif key == "Hop 7" and roll == 7:
 				multiplier = 15
 				sub = propBets[key]//3*2

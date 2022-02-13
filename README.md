@@ -1,4 +1,4 @@
-# OhCraps! v.6.1.0
+# OhCraps! v.6.1.1
 Python-based Craps game for Terminal.
 
 ## About
@@ -257,6 +257,11 @@ New betting modes appear in the Point phase, and are accessed through the follow
 <tr>
 <td>co</td><td>Change Come or Don't Come Bet Odds.</td>
 </tr>
+<tr>
+<td>dcd</td><td>Take down Don't Come and Odds</td>
+</tr>
+</tbody>
+</table>
 
 #### Line Odds
 

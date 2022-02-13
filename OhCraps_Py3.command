@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.0"
+version = "6.1.1"
 
 
 #Roll and Dice Setup
@@ -548,6 +548,18 @@ def come():
 		else:
 			print("Invalid choice, try again.")
 			continue
+
+def dComeDown():
+	global dComeBets, dComeOdds, chipsOnTable, bank
+	for bet in dComeBets:
+		if dComeBets[bet] > 0:
+			chipsOnTable -= dComeBets[bet] + dComeOdds[bet]
+			bank += dComeBets[bet] + dComeOdds[bet]
+			if dComeOdds[bet] > 0:
+				print("Taking down your No {num} and Odds. Returning ${ret} to your rack.".format(num=bet, ret=dComeBets[bet] + dComeOdds[bet]))
+			else:
+				print("Taking down your No {num} bet.".format(num=bet))
+			dComeBets[bet] = dComeOdds[bet] = 0
 
 def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
@@ -1993,6 +2005,10 @@ while True:
 
 				if round2.lower() == "co":
 					comeOddsChange()
+					continue
+
+				if round2.lower() == "dcd":
+					dComeDown()
 					continue
 
 				elif round2.lower() == "p":

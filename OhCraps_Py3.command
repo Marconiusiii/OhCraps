@@ -1803,7 +1803,7 @@ while True:
 			continue
 
 		elif round1.lower() == "q":
-			print("Coloring up and leaving the Craps table. See you next time!\n")")
+			print("Coloring up and leaving the Craps table. See you next time!\n")
 			raise SystemExit
 
 
@@ -2017,7 +2017,7 @@ while True:
 					continue
 
 				elif round2.lower() == "q":
-					print("All done? Alright, time to color up. Thanks for playing!\n")
+					print("All done? Alright, time to color up. Thanks for playing! \n")
 					raise SystemExit
 
 				elif round2.lower() == "p":

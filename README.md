@@ -7,12 +7,13 @@ Craps is one of the best games you can play in a casino and contains a variety o
 
 Craps is entirely based on the randomness of thrown dice. When the game starts, a bet on the Pass Line will win if a 7 or 11 is thrown with the first roll, also known as the Coming Out roll. A 2, 3, or 12 will lose on the first roll. Any other number thrown on the first roll becomes the Point number, and then the shooter continues to roll until they either roll the Point number or throw a 7. Hitting the Point number is a Pass Line win, the game resets and everything starts up again. Rolling a 7 on the other hand after a Point is established is a loss, and all bets on the table lose with the exception of Don't Pass/Don't Come bets and Any 7 proposition bets.
 
+If you'd enjoy checking through some strategies to play, be sure to visit my [Oh Craps! Strategy Page.](https://www.marconius.com/craps)
+
 ## How to Play
 
 After downloading the OhCraps_Py3.command file, double-click or Open the file and it will open the Terminal app and run. Alternatively, with Terminal open, cd to the directory where the command file was downloaded and run:
-$ python3 OhCraps_Py3.command
 
-If you'd enjoy checking through some strategies to play, be sure to visit my [Oh Craps! Strategy Page.](https://www.marconius.com/craps)
+$ python3 OhCraps_Py3.command
 
 The game starts off asking you to set up a bankroll. Enter a numeric amount to start.
 

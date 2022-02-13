@@ -12,6 +12,8 @@ Craps is entirely based on the randomness of thrown dice. When the game starts, 
 After downloading the OhCraps_Py3.command file, double-click or Open the file and it will open the Terminal app and run. Alternatively, with Terminal open, cd to the directory where the command file was downloaded and run:
 $ python3 OhCraps_Py3.command
 
+If you'd enjoy checking through some strategies to play, be sure to visit my [Oh Craps! Strategy Page.](https://www.marconius.com/craps)
+
 The game starts off asking you to set up a bankroll. Enter a numeric amount to start.
 
 ### Coming Out Roll

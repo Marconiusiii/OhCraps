@@ -260,6 +260,15 @@ New betting modes appear in the Point phase, and are accessed through the follow
 <tr>
 <td>dcd</td><td>Take down Don't Come and Odds</td>
 </tr>
+<tr>
+<td>hd</td><td>Hard Ways betting mode</td>
+</tr>
+<tr>
+<td>pr</td><td>Prop Bets mode</td>
+</tr>
+<tr>
+<td>h</td><td>Help Menu for Bet Codes</td>
+</tr>
 </tbody>
 </table>
 

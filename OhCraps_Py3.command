@@ -2094,7 +2094,7 @@ while True:
 						fieldTakeDown()
 					continue
 
-				elif round2 == "h":
+				elif round2 == "hd":
 					while True:
 						hardShow()
 						print("Hard Ways bets?\n")
@@ -2141,8 +2141,8 @@ while True:
 				elif round2.lower() in ["r", "x"]:
 					print("Dice are rolling!")
 					break
-				elif round2.lower() == "help":
-					print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tf: Field Bet\n\th: Hard Ways Bets\n\tpr: Prop Bets\n\thelp: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+				elif round2.lower() == "h":
+					print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
 					continue
 
 				else:

@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.1"
+version = "6.1.2"
 
 
 #Roll and Dice Setup
@@ -1802,6 +1802,11 @@ while True:
 			lineBetting()
 			continue
 
+		elif round1.lower() == "q":
+			print("Coloring up and leaving the Craps table. See you next time!\n")")
+			raise SystemExit
+
+
 		elif round1.lower() in ["p", "place", "place bets"]:
 			while True:
 				placeShow()
@@ -2010,6 +2015,10 @@ while True:
 				if round2.lower() == "dcd":
 					dComeDown()
 					continue
+
+				elif round2.lower() == "q":
+					print("All done? Alright, time to color up. Thanks for playing!\n")
+					raise SystemExit
 
 				elif round2.lower() == "p":
 					while True:

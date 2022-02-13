@@ -1,4 +1,4 @@
-# OhCraps! v.6.1.1
+# OhCraps! v.6.1.2
 Python-based Craps game for Terminal.
 
 ## About
@@ -64,6 +64,9 @@ You've established your bankroll and are now ready to start betting. You have a 
 </tr>
 <tr>
 <td>r</td><td>Roll the Dice!</td>
+</tr>
+<tr>
+<td>q</td><td>Quit game</td>
 </tr>
 </tbody>
 </table>
@@ -268,6 +271,9 @@ New betting modes appear in the Point phase, and are accessed through the follow
 </tr>
 <tr>
 <td>h</td><td>Help Menu for Bet Codes</td>
+</tr>
+<tr>
+<td>q</td><td>Quit game</td>
 </tr>
 </tbody>
 </table>

@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.2"
+version = "6.1.3"
 
 
 #Roll and Dice Setup
@@ -26,15 +26,15 @@ def roll():
 	total = die1 + die2
 	if die1 == die2 and total in [4, 6, 8, 10]:
 		rollHard = True
-		print("{} the Hard Way!".format(total))
+		print("\n{} the Hard Way!\n".format(total))
 	elif total in [7, 11] and pointIsOn == False:
-		print("{total} winner! Pay the line, take the don't!".format(total=total))
+		print("\n{total} winner! Pay the line, take the don't!\n".format(total=total))
 	else:
 		call = randint(1, 10)
 		if call <=5 or total in [2, 3, 11, 12]:
-			print("{tot}, {call}!".format(tot=total, call=stickman(total)))
+			print("\n{tot}, {call}!\n".format(tot=total, call=stickman(total)))
 		else:
-			print("{tot}, a {d1} {d2} {tot}!".format(tot=total, d1=die1, d2=die2))
+			print("\n{tot}, a {d1} {d2} {tot}!\n".format(tot=total, d1=die1, d2=die2))
 
 	return total
 
@@ -1790,7 +1790,7 @@ while True:
 		print("You have ${bank} in the bank with ${table} out on the table.".format(bank=bank, table=chipsOnTable))
 	if bank <= 0 and chipsOnTable <= 0:
 		outOfMoney()
-	print("Rolls: {}\n".format(throws))
+	print("Throws: {}\n".format(throws))
 
 # Initial bets
 
@@ -1976,7 +1976,7 @@ while True:
 				outOfMoney()
 
 			print("{} is the Point!".format(comeOut))
-			print("Rolls: {}".format(throws))
+			print("Throws: {}".format(throws))
 
 #Phase 2 Betting
 

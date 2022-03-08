@@ -4,8 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.3"
-
+version = "6.1.4"
 
 #Roll and Dice Setup
 die1 = 0
@@ -551,15 +550,20 @@ def come():
 
 def dComeDown():
 	global dComeBets, dComeOdds, chipsOnTable, bank
+	checkVal = 0
 	for bet in dComeBets:
+		checkVal += dComeBets[bet]
 		if dComeBets[bet] > 0:
 			chipsOnTable -= dComeBets[bet] + dComeOdds[bet]
 			bank += dComeBets[bet] + dComeOdds[bet]
 			if dComeOdds[bet] > 0:
 				print("Taking down your No {num} and Odds. Returning ${ret} to your rack.".format(num=bet, ret=dComeBets[bet] + dComeOdds[bet]))
 			else:
-				print("Taking down your No {num} bet.".format(num=bet))
+				print("Taking down your No {num} bet. Returning ${bet} to your rack.".format(num=bet, bet=dComeBets[bet]))
 			dComeBets[bet] = dComeOdds[bet] = 0
+	if checkVal == 0:
+		print("Nothing to take down, silly!")
+
 
 def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
@@ -1806,7 +1810,6 @@ while True:
 			print("Coloring up and leaving the Craps table. See you next time!\n")
 			raise SystemExit
 
-
 		elif round1.lower() in ["p", "place", "place bets"]:
 			while True:
 				placeShow()
@@ -1905,6 +1908,10 @@ while True:
 			propBetting()
 			continue
 
+		elif round1.lower() == "dcd":
+			dComeDown()
+			continue
+
 		elif round1.lower() == "ats":
 			if atsOn == True:
 				print("All Tall Small: {}".format(allNums))
@@ -1927,7 +1934,7 @@ while True:
 			break
 
 		elif round1.lower() == "h":
-			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
 			continue
 		elif round1.lower() == "b":
 			print("You have ${bank} in the Bank and ${chips} out on the table.".format(bank=bank, chips=chipsOnTable))

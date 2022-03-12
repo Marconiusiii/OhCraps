@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.4"
+version = "6.1.5"
 
 #Roll and Dice Setup
 die1 = 0
@@ -1481,10 +1481,11 @@ def layCheck(roll):
 
 # Bank and bet setup
 bank = 0
+initBank = 0
 chipsOnTable = 0
 
 def cashIn():
-	global bank
+	global bank, initBank
 	print("How much are you cashing in for your bankroll?")
 	while True:
 		try:
@@ -1497,9 +1498,19 @@ def cashIn():
 			continue
 		else:
 			bank += cash
+			initBank = cash
 			break
 	print("Great, starting you off with ${}.".format(bank))
 
+def quitGame():
+	global bank, initBank
+	if bank > initBank:
+		print("\nNice work coloring up! Come back soon!\n")
+	elif bank == initBank:
+		print("\nWell, at least you didn't lose anything! Try again soon!\n")
+	else:
+		print("\nOops, tough loss today. Better luck next time!\n")
+	raise SystemExit
 
 def betPrompt():
 	global bank, chipsOnTable
@@ -1807,9 +1818,7 @@ while True:
 			continue
 
 		elif round1.lower() == "q":
-			print("Coloring up and leaving the Craps table. See you next time!\n")
-			raise SystemExit
-
+			quitGame()
 		elif round1.lower() in ["p", "place", "place bets"]:
 			while True:
 				placeShow()
@@ -2024,8 +2033,7 @@ while True:
 					continue
 
 				elif round2.lower() == "q":
-					print("All done? Alright, time to color up. Thanks for playing! \n")
-					raise SystemExit
+					quitGame()
 
 				elif round2.lower() == "p":
 					while True:

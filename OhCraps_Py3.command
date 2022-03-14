@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.5"
+version = "6.1.6"
 
 #Roll and Dice Setup
 die1 = 0
@@ -690,6 +690,7 @@ def comeCheck(roll):
 			elif roll == 12:
 				print("12 is a Push!")
 			chipsOnTable -= dComeBet
+			bank += dComeBet
 			dComeBet = 0
 		else:
 			print("Moving your Don't Come bet to the {}.".format(roll))

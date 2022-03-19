@@ -4,7 +4,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.6"
+version = "6.1.7"
 
 #Roll and Dice Setup
 die1 = 0
@@ -829,6 +829,9 @@ def fieldCheck(roll):
 			print("Change your Field bet?")
 			fChange = input(">")
 			if fChange.lower() in ['y', 'yes']:
+				chipsOnTable -= fieldBet
+				bank += fieldBet
+				fieldBet = 0
 				field()
 			else:
 				pass

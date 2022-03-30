@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
+
 from random import *
+
 import math
+
 import os
 
 #Version Number
-version = "6.1.7"
+version = "6.1.8"
 
 #Roll and Dice Setup
 die1 = 0
@@ -761,7 +764,7 @@ def comePay(roll):
 			bank += comeBets[roll] * 2
 			chipsOnTable -= comeBets[roll]
 			comeBets[roll] = 0
-			if comeOdds[roll] > 0:
+			if comeOdds[roll] > 0 and pointIsOn:
 				cOddsWin = 0
 				if roll in [4, 10]:
 					cOddsWin = comeOdds[roll] * 2
@@ -773,6 +776,12 @@ def comePay(roll):
 				bank += cOddsWin + comeOdds[roll]
 				chipsOnTable -= comeOdds[roll]
 				comeOdds[roll] = 0
+			elif comeOdds[roll] and pointIsOn == False:
+				print("Returning ${bet} to you from your Come {num} odds.".format(bet=comeOdds[roll], num=roll))
+				chipsOnTable -= comeOdds[roll]
+				bank += comeOdds[roll]
+				comeOdds[roll] = 0
+
 		if dComeBets[roll] > 0:
 			print("You lost ${dcloss} from the Don't Come {num}.".format(dcloss=dComeBets[roll], num=roll))
 			#bank -= dComeBets[roll]
@@ -1995,7 +2004,7 @@ while True:
 			if bank <= 0 and chipsOnTable <= 0:
 				outOfMoney()
 
-			print("{} is the Point!".format(comeOut))
+			print("\n{} is the Point!\n".format(comeOut))
 			print("Throws: {}".format(throws))
 
 #Phase 2 Betting

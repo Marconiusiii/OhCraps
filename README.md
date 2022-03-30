@@ -1,4 +1,4 @@
-# OhCraps! v.6.1.7
+# OhCraps! v.6.1.8
 Python-based Craps game for Terminal.
 
 ## About
@@ -299,6 +299,8 @@ The Come and Don't Come Fields act like additional Pass Line Bets after a Point 
 
 ##### Come Bet
 A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any other number is rolled, the Come Bet moves to that number, and you will be prompted for Come Bet Odds.  If that Come Bet number is rolled before a 7, you will win. If a 7 is rolled before any of the Come Bet numbers are hit, all Come bets are cleared and you lose.
+
+If you still have Come Bets up with odds in the Come Out phase, such as if you made Come Bets and then the Point was hit, rolling a 7 at this stage will result in all Come Bets losing but all Odds returned to you. If you happen to roll a Come Bet number as the Point in the come out phase, you will win the flat bet, but the odds once again will be returned to you since they are off during the come out phase.
 
 ##### Don't Come Bet
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.

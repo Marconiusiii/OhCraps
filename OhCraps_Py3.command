@@ -7,7 +7,7 @@ import math
 import os
 
 #Version Number
-version = "6.1.8"
+version = "6.1.9"
 
 #Roll and Dice Setup
 die1 = 0
@@ -741,7 +741,7 @@ def comePay(roll):
 			win += dComeBets[key] * 2
 			chipsOnTable -= dComeBets[key]
 		for key in dComeOdds:
-			if dComeOdds[key] > 0:
+			if dComeOdds[key] > 0 and pointIsOn:
 				chipsOnTable -= dComeOdds[key]
 				if key in [4, 10]:
 					winOdds += dComeOdds[key]//2
@@ -749,10 +749,16 @@ def comePay(roll):
 					winOdds += dComeOdds[key]//3*2
 				elif key in [6, 8]:
 					winOdds += dComeOdds[key]//6*5
+			else:
+				chipsOnTable -= dComeOdds[key]
+				winOdds += dComeOdds[key]
+				dComeOdds[key] = 0
 		if win > 0:
 			print("You won ${} from your Don't Come Bets!".format(win//2))
-			if winOdds > 0:
+			if winOdds > 0 and pointIsOn:
 				print("You won ${} from your Don't Come Bet Odds!".format(winOdds))
+			else:
+				print("Returning ${odds} to you from your Don't Come odds.".format(odds=winOdds))
 			bank += win + winOdds + dComeOdds[key]
 		for key in dComeBets:
 			dComeBets[key] = 0

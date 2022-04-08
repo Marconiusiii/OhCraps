@@ -1522,10 +1522,10 @@ def cashIn():
 	print("Great, starting you off with ${}.".format(bank))
 
 def quitGame():
-	global bank, initBank
-	if bank > initBank:
+	global bank, chipsOnTable, initBank
+	if bank+chipsOnTable > initBank:
 		print("\nNice work coloring up! Come back soon!\n")
-	elif bank == initBank:
+	elif bank+chipsOnTable == initBank:
 		print("\nWell, at least you didn't lose anything! Try again soon!\n")
 	else:
 		print("\nOops, tough loss today. Better luck next time!\n")

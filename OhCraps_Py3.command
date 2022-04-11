@@ -7,7 +7,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.1"
+version = "6.2.2"
 
 #Roll and Dice Setup
 die1 = 0
@@ -1389,20 +1389,20 @@ def ats(roll):
 		print("All Tall Small: {}".format(allNums))
 
 	if set(smallNums) == set(smallSet):
-		print("You won ${} on the Small!".format(atsSmall * 36))
-		bank += atsSmall * 36
+		print("You won ${} on the Small!".format(atsSmall * 34))
+		bank += atsSmall * 34
 		chipsOnTable -= atsSmall
 		atsSmall = 0
 		smallNums = []
 	if set(tallNums) == set(tallSet):
-		print("You won ${} from the Tall!".format(atsTall*36))
-		bank += atsTall * 36
+		print("You won ${} from the Tall!".format(atsTall*34))
+		bank += atsTall * 34
 		chipsOnTable -= atsTall
 		atsTall = 0
 		tallNums = []
 	if set(allNums) == set(allSet):
-		print("You won ${} on the All! Holy Crap!".format(atsAll*177))
-		bank += atsAll * 177
+		print("You won ${} on the All! Holy Crap!".format(atsAll*175))
+		bank += atsAll * 175
 		chipsOnTable -= atsAll
 		atsAll = 0
 		allNums = []
@@ -1458,7 +1458,6 @@ def layTakeDown():
 		bank += layBets[key]
 		layBets[key] = 0
 
-
 def layShow():
 	global layBets
 	for key in layBets:
@@ -1470,7 +1469,6 @@ def layCheck(roll):
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if layBets[roll] > 0:
 			print("You lost ${loss} from the Lay {num}.".format(loss=layBets[roll], num=roll))
-			#bank -= layBets[roll]
 			chipsOnTable -= layBets[roll]
 			layBets[roll] = 0
 			print("Go back up on your Lay {}?".format(roll))
@@ -1492,11 +1490,13 @@ def layCheck(roll):
 					win = layBets[key]//3*2
 				elif key in [6, 8]:
 					win = layBets[key]//6*5
-				print("You won ${win} on the Lay {num}!".format(win=win, num=key))
-				bank += win 
-#				chipsOnTable -= layBets[key]
-				#bank -= vig(win)
-#				layBets[key] = 0
+				vig = layBets[key]*0.05
+				if vig < 1:
+					vig = math.ceil(vig)
+				else:
+					vig = math.floor(vig)
+				print("You won ${win} on the Lay {num}! Taking out ${vig} for the vig.".format(win=win, num=key, vig=vig))
+				bank += win - vig
 
 # Bank and bet setup
 bank = 0

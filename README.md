@@ -1,4 +1,4 @@
-# OhCraps! v.6.2.1
+# OhCraps! v.6.2.2
 Python-based Craps game for Terminal.
 
 ## About
@@ -432,10 +432,10 @@ These bets are available at all times. If there is a bet on the Field, the Field
 <th scope="row">Hop hard number</th><td>30:1</td>
 </tr>
 <tr>
-<th scope="row">Small and Tall</th><td>35:1</td>
+<th scope="row">Small and Tall</th><td>34:1</td>
 </tr>
 <tr>
-<th scope="row">The All</th><td>176:1</td>
+<th scope="row">The All</th><td>175:1</td>
 </tr>
 <tr>
 <th scope="row">4 Fire Bet Points</th><td>24:1</td>

@@ -1,4 +1,4 @@
-# OhCraps! v.6.2.2
+# OhCraps! v.6.2.3
 Python-based Craps game for Terminal.
 
 ## About
@@ -119,9 +119,11 @@ Typing 'p' and hitting Enter on the Place Prompt after the point has been establ
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
 
-At the Lay Bet prompt, typing 'd' or 'td' and hitting Enter will take down all your Lay Bets.
+At the Lay Bet prompt, typing 'd' and hitting Enter will take down all your Lay Bets.
 
-After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' or 'off' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
+Also at the prompt, typing 'a' and hitting enter will allow you to make Lay bets across all of the numbers. Enter a unit amount and it will multiply by 5 and lay that amount on each of the box numbers.
+
+After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
 Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission/vig paid back to the House based on your winnings when a Lay bet wins. When your Lay Bets win, they will stay up until you take them down or they lose.
 

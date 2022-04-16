@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
 from random import *
-
 import math
-
 import os
 
 #Version Number
-version = "6.2.2"
+version = "6.2.3"
 
 #Roll and Dice Setup
 die1 = 0
@@ -37,17 +35,15 @@ def roll():
 			print("\n{tot}, {call}!\n".format(tot=total, call=stickman(total)))
 		else:
 			print("\n{tot}, a {d1} {d2} {tot}!\n".format(tot=total, d1=die1, d2=die2))
-
 	return total
 
-
 dealerCalls = {
-2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "push the don't", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
+2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
 3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
 4: ["Double deuce", "Little Joe", "Little Joe from Kokomo", "Hit us in the 2 2", "2 spots and 2 dots", "Ace Tres"],
 5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver", "Five 5"],
-6: ["The national average", "Big Red, catch 'em in the corner", "Sixie from Dixie"],
-7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor"],
+6: ["The national average", "Catch 'em in the corner", "Sixie from Dixie"],
+7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor", "Big Red"],
 8: ["a square pair", "eighter from the theater", "windows", "the Great!", "get yer mate"],
 9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her", "El Nine-O", "Niner, nothing finer"],
 10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "two stars from Mars", "64 out the door"],
@@ -63,16 +59,6 @@ def stickman(roll):
 
 fire = []
 fireBet = 0
-
-"""
-win 4 numbers : 24:1
-win 5 numbers: 249:1
-win 6 numbers: 999:1
-
-2, 3, 7, 11, 12 do not affect fire bet, only 7 outs in phase 2.
-Once point is hit, the same point does not add to the fire bet. Fire bet must hit all 6 different point numbers.
-Payout starts at 4 point numbers on a 7 out. 3 or less is a full loss.
-"""
 
 def fireBetting():
 	global fireBet
@@ -1421,6 +1407,34 @@ layBets = {
 10: 0
 }
 
+def layAll():
+	global chipsOnTable, bank, layBets
+	total = 0
+	outlay = 0
+	for number in layBets:
+		outlay += layBets[number]
+	while True:
+		print("How many units across the Lay Numbers?")
+		try:
+			unit = int(input("> "))
+		except ValueError:
+			print("That wasn't even a unit! Try again.")
+			continue
+		if (unit*5)*6 > bank + outlay:
+			print("You don't have enough money for that! Egads!")
+			outOfMoney()
+			continue
+		else:
+			break
+	for key in layBets:
+		chipsOnTable -= layBets[key]
+		bank += layBets[key]
+		layBets[key] = 5 * unit
+		chipsOnTable += layBets[key]
+		bank -= layBets[key]
+		total += layBets[key]
+	print("Laying ${} Across.".format(total))
+
 def layBetting():
 	global layBets, bank, chipsOnTable
 	for key in layBets:
@@ -1867,12 +1881,15 @@ while True:
 				if lyBet.lower() in ['y', 'yes']:
 					layBetting()
 					continue
-				elif lyBet.lower() in ['d', 'td', 'takedown']:
+				elif lyBet.lower() == "d":
 					print("Taking down your Lay Bets.")
 					layTakeDown()
 					continue
+				elif lyBet.lower() == "a":
+					layAll()
+					continue 
 				elif lyBet.lower() == "h":
-					print("Lay Bet Codes:\n\n\ty: Enter Individual Lay Betting mode.\n\td: Take down all Lay Bets.\n\th: Show this Help menu.\n\tx: Finish Lay Betting.\n")
+					print("Lay Bet Codes:\n\n\ty: Enter Individual Lay Betting mode.\n\ta: Lay Bets across all numbers.\n\td: Take down all Lay Bets.\n\th: Show this Help menu.\n\tx: Finish Lay Betting.\n")
 				elif lyBet.lower() == "x":
 					print("Done Lay Betting!")
 					break
@@ -2104,7 +2121,7 @@ while True:
 						if ly2Bet.lower() in ['y', 'yes']:
 							layBetting()
 							continue
-						elif ly2Bet.lower() in ['o', 'off']:
+						elif ly2Bet.lower() == "o":
 							if layOff == False:
 								layOff = True
 								print("Your Lay Bets are Off.")
@@ -2112,12 +2129,15 @@ while True:
 								layOff = False
 								print("Your Lay Bets are On.")
 							continue
-						elif ly2Bet.lower() in ['d', 'td', 'takedown']:
+						elif ly2Bet.lower() == "a":
+							layAll()
+							continue
+						elif ly2Bet.lower() in "d":
 							print("Taking down all of your Lay Bets.")
 							layTakeDown()
 							continue
 						elif ly2Bet.lower() == "h":
-							print("Lay Bet Codes:\n\n\ty: Enter Lay Betting Mode\n\to: Toggle Lay Bets Off or On for next roll\n\td: Take all Lay Bets down.\n\th: Show this Help menu\n\tx: Finish Lay Betting")
+							print("Lay Bet Codes:\n\n\ty: Enter Lay Betting Mode\n\ta: Lay Bets across all numbers.\n\to: Toggle Lay Bets Off or On for next roll\n\td: Take all Lay Bets down.\n\th: Show this Help menu\n\tx: Finish Lay Betting")
 							continue
 						elif ly2Bet.lower() == "x":
 							print("Done Lay Betting!")

@@ -1480,6 +1480,7 @@ def layShow():
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
+	vigPay = 0
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if layBets[roll] > 0:
 			print("You lost ${loss} from the Lay {num}.".format(loss=layBets[roll], num=roll))
@@ -1506,11 +1507,13 @@ def layCheck(roll):
 					win = layBets[key]//6*5
 				vig = layBets[key]*0.05
 				if vig < 1:
-					vig = math.ceil(vig)
+					vigPay += math.ceil(vig)
 				else:
-					vig = math.floor(vig)
-				print("You won ${win} on the Lay {num}! Taking out ${vig} for the vig.".format(win=win, num=key, vig=vig))
+					vigPay += math.floor(vig)
+				print("You won ${win} on the Lay {num}!".format(win=win, num=key))
 				bank += win - vig
+		if vigPay > 0:
+			print("Taking out ${} for the vig.".format(vigPay))
 
 # Bank and bet setup
 bank = 0

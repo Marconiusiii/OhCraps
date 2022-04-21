@@ -1,4 +1,4 @@
-# OhCraps! v.6.2.3
+# OhCraps! v.6.2.4
 Python-based Craps game for Terminal.
 
 ## About
@@ -90,7 +90,7 @@ If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Ent
 
 Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
 
-In the Place Bet prompt, if you type 'd' or 'td' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
+In the Place Bet prompt, if you type 'd' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
 
 After a Point has been established, when you are prompted with the Place Bet option, typing 'o' and hitting Enter will toggle your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls. When still in the prompt, entering 'o' again and hitting Enter will toggle the bets back On.
 
@@ -98,7 +98,9 @@ You can automatically place bets across all the numbers or bet inside using keyw
 
 On the Place Bet prompt, typing 'i' and hitting Enter will activate Inside mode, where the Place 4 and 10 will be taken down and you'll be prompted for how many units you'd like to place on the 5, 6, 8, and 9.
 
-Both of these options provide a quick way to make common Place bets without having to jump through each individual number. 1 Unit is equal to $5, with the 6 and 8 automatically adjusting for the $6 bets required for them.
+Typing 'c' and hitting Enter will activate the center betting mode, where you'll be asked how many units you'd like to place on the 6 and 8 together. So typing '2' will place the 6 and 8 for 2 units, or $12, each.
+
+These options provide a quick way to make common Place bets without having to jump through each individual number. 1 Unit is equal to $5, with the 6 and 8 automatically adjusting for the $6 bets required for them.
 
 Typing 'h' in the Place Bets prompt and hitting Enter will open the help menu that displays the various codes for Place Betting.
 

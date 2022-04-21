@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.3"
+version = "6.2.4"
 
 #Roll and Dice Setup
 die1 = 0
@@ -14,8 +14,8 @@ die2 = 0
 def roll():
 	global rollHard, pointIsOn, die1, die2
 	rollHard = False
-	d1 = randint(1, 6)
-	d2 = randint(1, 6)
+	d1 = randrange(1, 7)
+	d2 = randrange(1, 7)
 	if d1 > d2 or d1 == d2:
 		die1 = d1
 		die2 = d2
@@ -1681,6 +1681,34 @@ def placePreset(pre):
 				total += place[key]
 		print("Ok, placing ${} inside.".format(total))
 
+	elif pre.lower() == "c":
+		print("How many units on the 6 and 8?")
+		while True:
+			try:
+				unit = int(input("> "))
+			except ValueError:
+				print("Invalid entry, try again.")
+				continue
+			if (unit*6)*2 > bank + outlay:
+				print("You don't have enough money for that! Egads!")
+				outOfMoney()
+				continue
+			else:
+				break
+
+		for key in place:
+			chipsOnTable -= place[key]
+			bank += place[key]
+			if key in [6, 8]:
+				place[key] = 6 * unit
+			else:
+				place[key] = 0
+			chipsOnTable += place[key]
+			bank -= place[key]
+			total += place[key]
+		print("Ok, placing ${} on the 6 and 8.".format(total))
+
+
 def placeMover():
 	global place, chipsOnTable, bank, comeOut
 	for key in place:
@@ -1855,23 +1883,23 @@ while True:
 
 		elif round1.lower() == "q":
 			quitGame()
-		elif round1.lower() in ["p", "place", "place bets"]:
+		elif round1.lower() == "p":
 			while True:
 				placeShow()
 				print("Place Bets:\n")
 				plBet = input(">\n")
-				if plBet in ['y', 'Yes']:
+				if plBet == "y":
 					placeBets()
 					continue
-				elif plBet.lower() in ['d', 'td', 'takedown']:
+				elif plBet.lower() == "d":
 					print("Taking down your Place Bets.")
 					placeTakeDown()
 					continue
-				elif plBet.lower() in ['a', 'i']:
+				elif plBet.lower() in ['a', 'i', 'c']:
 					placePreset(plBet)
 					continue
 				elif plBet.lower() == "h":
-					print("Place Betting Codes:\n\ty: Enter individual Place Betting mode.\n\td: Take down all Place Bets.\n\ta: Auto-bet Across all the numbers.\n\ti: Auto-bet on the Inside numbers.\n\th: Show this Help Menu.\n\tx: Exit Place Betting.\n")
+					print("Place Betting Codes:\n\ty: Enter individual Place Betting mode.\n\td: Take down all Place Bets.\n\ta: Auto-bet Across all the numbers.\n\ti: Auto-bet on the Inside numbers.\n\tc: Auto-bet on the 6 and 8\n\th: Show this Help Menu.\n\tx: Exit Place Betting.\n")
 				elif plBet.lower() == "x":
 					print("Done Place Betting!")
 					break
@@ -2079,10 +2107,10 @@ while True:
 						placeShow()
 						print("Place Bets?")
 						pl2 = input(">")
-						if pl2.lower() in ['y', 'yes']:
+						if pl2.lower() == "y":
 							placeBets()
 							continue
-						elif pl2.lower() in ['o', 'off']:
+						elif pl2.lower() == "o":
 							if placeOff:
 								placeOff = False
 								print("Ok, your Place Bets are back on.")
@@ -2090,24 +2118,24 @@ while True:
 								placeOff = True
 								print("All your Place Bets are Off.")
 							continue
-						elif pl2.lower() in ['d', 'td', 'takedown', 'take down']:
+						elif pl2.lower() == "d":
 							print("Taking down all of your Place Bets.")
 							placeTakeDown()
 							continue
-						elif pl2.lower() in ['a', 'i']:
+						elif pl2.lower() in ['a', 'i', 'c']:
 							placePreset(pl2)
 							continue
-						elif pl2.lower() in ['m', 'move']:
+						elif pl2.lower() == "m":
 							placeMover()
 							continue
-						elif pl2.lower() in ['p', 'point']:
+						elif pl2.lower() == "p":
 							chipsOnTable -= place[comeOut]
 							bank += place[comeOut]
 							place[comeOut] = 0
 							print("Taking down the Place {} bet.".format(comeOut))
 							continue
 						elif pl2.lower() == "h":
-							print("Place Bet Codes:\n\n\ty: Enter individual Place Betting mode.\n\ta: Auto-bet across all numbers.\n\ti: Auto-bet inside numbers.\n\to: Turn Place Bets Off for next roll.\n\td: Take down all Place Bets.\n\tm: Move Point number to empty Place Bet.\n\tp: Take down Point number place bet.\n\th: Show this Help menu.\n\tx: Finish Place Betting.")
+							print("Place Bet Codes:\n\n\ty: Enter individual Place Betting mode.\n\ta: Auto-bet across all numbers.\n\ti: Auto-bet inside numbers.\n\tc: Auto-bet on the 6 and 8\n\to: Turn Place Bets Off for next roll.\n\td: Take down all Place Bets.\n\tm: Move Point number to empty Place Bet.\n\tp: Take down Point number place bet.\n\th: Show this Help menu.\n\tx: Finish Place Betting.")
 							continue
 						elif pl2.lower() == "x":
 							print("Done Place Betting!")

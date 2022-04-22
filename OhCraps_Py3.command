@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.4"
+version = "6.2.5"
 
 #Roll and Dice Setup
 die1 = 0
@@ -27,33 +27,47 @@ def roll():
 	if die1 == die2 and total in [4, 6, 8, 10]:
 		rollHard = True
 		print("\n{} the Hard Way!\n".format(total))
+		print("\n" + stickman(total))
 	elif total in [7, 11] and pointIsOn == False:
 		print("\n{total} winner! Pay the line, take the don't!\n".format(total=total))
 	else:
-		call = randint(1, 10)
-		if call <=5 or total in [2, 3, 11, 12]:
+		call = randrange(1, 21)
+
+# Call picks a random number between 1 and 20. If the number is 10 or below, it triggers one of the random dealer calls based on the roll. Otherwise it calls out a standard dice call.
+
+		if call <=10 or total in [2, 3, 11, 12]:
 			print("\n{tot}, {call}!\n".format(tot=total, call=stickman(total)))
 		else:
 			print("\n{tot}, a {d1} {d2} {tot}!\n".format(tot=total, d1=die1, d2=die2))
 	return total
 
 dealerCalls = {
-2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
-3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
-4: ["Double deuce", "Little Joe", "Little Joe from Kokomo", "Hit us in the 2 2", "2 spots and 2 dots", "Ace Tres"],
-5: ["After 5 the Field's alive", "Fiver Fiver Race Track Driver", "No Field 5", "Little Phoebe", "We got the fiver", "Five 5"],
-6: ["The national average", "Catch 'em in the corner", "Sixie from Dixie"],
-7: ["Line Away, grab the money", "the bruiser", "point 7", "Out", "Loser 7", "Nevada Breakfast", "Cinco Dos, Adios", "Adios", "3 4 on the floor", "Big Red"],
-8: ["a square pair", "eighter from the theater", "windows", "the Great!", "get yer mate"],
-9: ["niner 9", "center field 9", "Center of the garden", "ocean liner niner", "Nina from Pasadena", "nina Niner, wine and dine her", "El Nine-O", "Niner, nothing finer"],
-10: ["puppy paws", "pair o' roses", "The big one on the end", "55 to stay alive", "pair of sunflowers", "two stars from Mars", "64 out the door"],
-11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven"],
-12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps", "Hobo's delight"]
+2: ["Craps!", "eye balls.", "two aces.", "rats eyes.", "snake eyes.", "eleven in a shoe store.", "twice in the rice.", "two craps two, two bad boys from Illinois.", "two crap aces.", "aces in both places.", "a spot and a dot.", "dimples.", "double the Field!"],
+3: ["Craps!", "ace-deuce.", "three craps, ace caught a deuce, no use.", "divorce roll, come up single.", "winner on the dark side!", "three craps three, the indicator.", "crap and a half.", "small ace deuce, can't produce.", "2 , 1, son of a gun."],
+4: ["Little Joe.", "Little Joe from Kokomo.", "Ace Tres.", "Ace Tres the easy way.", "Little Billy from Piccadilly.", "Little Joe from Idaho."],
+5: ["After 5 the Field's alive.", "Fiver Fiver Racecar Driver.", "No Field 5.", "Little Phoebe.", "We got the fiver.", "Five 5.", "Take a dive!"],
+6: ["The national average.", "Catch 'em in the corner.", "Sixie from Dixie."],
+7: ["Line Away, grab the money!", "the bruiser.", "point 7.", "Out!", "Loser 7.", "Nevada Breakfast, two rolls and no coffee.", "Cinco Dos, Adios!", "Adios.", "3 4 on the floor.", "Big Red!"],
+8: ["eighter from the theater.", "the Great!", "get yer mate."],
+9: ["niner 9.", "center field 9.", "Center of the garden.", "ocean liner niner.", "Nina from Pasadena.", "nina Niner, wine and dine her!", "El Nine-O.", "Niner, nothing finer.", "Neener Neener from Pasadeener."],
+10: ["The big one on the end!", "64 out the door.", "The Big One!"],
+11: ["Yo Eleven.", "Yo!", "6 5, no drive.", "yo 'leven.", "It's not my eleven, it's Yo Eleven.", "Bow wow wow yippie Yo yippie yay!"],
+12: ["craps!", "midnight.", "a whole lotta crap!", "craps to the max.", "boxcars.", "all the spots we gots!", "triple field!", "atomic craps.", "Hobo's delight."]
+}
+
+hardCalls = {
+4: ["Double deuce.", "2 2 Ballerina Special.", "Hit us in the tutu.", "2 spots and 2 dots.", "It's little but it came Hard!"],
+6: ["Sixie from Dixie.", "tree tre.", "Pair of trees.", "Double 3s."],
+8: ["Double 4s.", "Ozzy and Harriet.", "A square pair!", "A square pair will take ya there.", "Pair of windows.", "Windows."],
+10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s.", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses."]
 }
 
 def stickman(roll):
-	return dealerCalls[roll][randint(0, len(dealerCalls[roll])-1)]
-
+	global rollHard
+	if rollHard:
+		return hardCalls[roll][randrange(0, len(hardCalls[roll]))]
+	else:
+		return dealerCalls[roll][randrange(0, len(dealerCalls[roll]))]
 
 # Fire Bet Setup
 
@@ -1559,7 +1573,7 @@ def betPrompt():
 		if playerBet > bank:
 			print("\tYou simply don't have enough money to do that! DO you want to add more to your bankroll?")
 			addMore = input(">")
-			if addMore.lower() in ['y', 'yes', 'atm', 'help', 'more money']:
+			if addMore.lower() == "y":
 				outOfMoney()
 			continue
 		else:
@@ -1570,17 +1584,17 @@ def betPrompt():
 def outOfMoney():
 	global bank
 	if bank <= 0:
-		print("\tYou are totally out of money. Let's hit the ATM again and get you more cash. How much do you want?")
+		print("\tYou are totally out of money.\n\tLet's hit the ATM again and get you more cash.\n\tHow much do you want?")
 	else:
-		print("\tYour chips are getting really low. How much would you like to add to your bankroll?")
+		print("\tYour chips are getting really low.\n\tHow much would you like to add to your bankroll?")
 	while True:
 		try:
 			cash = int(input("\t$>"))
 		except ValueError:
-			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance. Try again.")
+			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance.\n\tTry again.")
 			continue
 		if cash < 0:
-			print("\tWhat am I, a bank? This is for withdrawals only! Try again.")
+			print("\tWhat am I, a bank?\n\tThis is for withdrawals only! Try again.")
 			continue
 		else:
 			bank += cash
@@ -1994,6 +2008,8 @@ while True:
 			elif throws == 0:
 				print("All Tall Small:\n")
 				atsBetting()
+			else:
+				print("All Tall Small will be available after the next 7 rolls.")
 			continue
 
 # Fire Bet

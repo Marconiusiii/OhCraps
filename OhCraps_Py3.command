@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.5"
+version = "6.2.6"
 
 #Roll and Dice Setup
 die1 = 0
@@ -57,9 +57,9 @@ dealerCalls = {
 
 hardCalls = {
 4: ["Double deuce.", "2 2 Ballerina Special.", "Hit us in the tutu.", "2 spots and 2 dots.", "It's little but it came Hard!"],
-6: ["Sixie from Dixie.", "tree tre.", "Pair of trees.", "Double 3s."],
-8: ["Double 4s.", "Ozzy and Harriet.", "A square pair!", "A square pair will take ya there.", "Pair of windows.", "Windows."],
-10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s.", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses."]
+6: ["Sixie from Dixie.", "tree tre.", "Pair of trees.", "Double 3s"],
+8: ["Double 4s", "Ozzy and Harriet.", "A square pair!", "A square pair will take ya there.", "Pair of windows.", "Windows."],
+10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses."]
 }
 
 def stickman(roll):
@@ -1814,7 +1814,10 @@ def placeCheck(roll):
 			elif roll in [5, 9]:
 				win = (place[roll]//5) * 7
 			elif roll in [6, 8]:
-				win = (place[roll]//6) * 7
+				win = (place[roll]//6) * 7 + place[roll]%6
+
+# Modulo accounts for improper bets, such as $@5 on the 6 or 8. Dealers would pay odds on the first $24 and then the remainder would get paid out as $1.
+
 			bank += win
 			print("You won ${win} on the Place {num}!".format(win=win, num=roll))
 			print("Change your bet?")

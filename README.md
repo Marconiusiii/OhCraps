@@ -1,4 +1,4 @@
-# OhCraps! v.6.2.6
+# OhCraps! v.6.2.7
 Python-based Craps game for Terminal.
 
 ## About
@@ -167,7 +167,9 @@ Type 'x' and hit Enter to exit Hard Ways Betting mode and return to the Place Yo
 
 If you've made Place Bets, Lay Bets, or Hard Ways bets, you can have them Working on the Come Out roll. Generally, when you make a Place Bet or Hard Ways bet before a Point is established, the bets are Off by default, meaning they will not be affected by the roll of the dice. Having your bets "Working" means that you are turning them on and they will be affected by the next roll of the dice.
 
-If you've Placed, Laid, or made Hard Ways Bets, typing 'w' in the Place Your Bets prompt and hitting Enter will set them all to be Working on the Come Out Roll. You can toggle this on and off by typing 'w' again.
+If you've made Come or Don't Come bets in a previous hand and they are still on the table during the Come Out roll, the Come or Don't Come bets will always be working, but any odds that have been bet will automatically be off by default. Toggling Working bets on in this case will turn the Odds or Lay Odds back on for those bets.
+
+If you've Placed, Laid, or made Hard Ways  or Come/Don't Come Bets, typing 'w' in the Place Your Bets prompt and hitting Enter will set them all to be Working on the Come Out Roll. You can toggle this on and off by typing 'w' again.
 
 #### Proposition Bets
 
@@ -304,12 +306,12 @@ The Come and Don't Come Fields act like additional Pass Line Bets after a Point 
 ##### Come Bet
 A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any other number is rolled, the Come Bet moves to that number, and you will be prompted for Come Bet Odds.  If that Come Bet number is rolled before a 7, you will win. If a 7 is rolled before any of the Come Bet numbers are hit, all Come bets are cleared and you lose.
 
-If you still have Come Bets up with odds in the Come Out phase, such as if you made Come Bets and then the Point was hit, rolling a 7 at this stage will result in all Come Bets losing but all Odds returned to you. If you happen to roll a Come Bet number as the Point in the come out phase, you will win the flat bet, but the odds once again will be returned to you since they are off during the come out phase.
+If you still have Come Bets up with odds in the Come Out phase, such as if you made Come Bets and then the Point was hit, rolling a 7 at this stage will result in all Come Bets losing but all Odds returned to you. If you happen to roll a Come Bet number as the Point in the come out phase, you will win the flat bet, but the odds once again will be returned to you since they are off during the come out phase unless you've turned Working on.
 
 ##### Don't Come Bet
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.
 
-If Come or Don't Come bets are working during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll. If a 7 is rolled for the Coming Out roll, Come bets will lose, but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established.
+If Come or Don't Come bets are up during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll unless Working has been turned on. If a 7 is rolled for the Coming Out roll, Come bets will lose, but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established. If Working is Off, the Odds will be returned to your bankroll.
 
 #### going Off on your bets
 

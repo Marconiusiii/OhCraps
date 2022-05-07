@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.6"
+version = "6.2.7"
 
 #Roll and Dice Setup
 die1 = 0
@@ -717,7 +717,7 @@ def comeCheck(roll):
 						break
 
 def comePay(roll):
-	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn
+	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn, working
 	if roll == 7:
 		loss = lossOdds = 0
 		for key in comeBets:
@@ -726,7 +726,7 @@ def comePay(roll):
 			lossOdds += comeOdds[key]
 		if loss > 0:
 			print("You lost ${} from your Come Bets.".format(loss))
-			if lossOdds > 0 and pointIsOn == True:
+			if lossOdds > 0 and pointIsOn or lossOdds > 0 and working:
 				print("You lost ${} from your Come Bet Odds.".format(lossOdds))
 			elif lossOdds > 0 and pointIsOn == False:
 				print("${odds} returned to you from Come Odds.".format(odds=lossOdds))
@@ -741,7 +741,7 @@ def comePay(roll):
 			win += dComeBets[key] * 2
 			chipsOnTable -= dComeBets[key]
 		for key in dComeOdds:
-			if dComeOdds[key] > 0 and pointIsOn:
+			if dComeOdds[key] > 0 and pointIsOn or dComeOdds[key] > 0 and working:
 				chipsOnTable -= dComeOdds[key]
 				if key in [4, 10]:
 					winOdds += dComeOdds[key]//2
@@ -755,7 +755,7 @@ def comePay(roll):
 				dComeOdds[key] = 0
 		if win > 0:
 			print("You won ${} from your Don't Come Bets!".format(win//2))
-			if winOdds > 0 and pointIsOn:
+			if winOdds > 0 and pointIsOn or winOdds > 0 and working:
 				print("You won ${} from your Don't Come Bet Odds!".format(winOdds))
 			elif winOdds > 0 and pointIsOn == False:
 				print("Returning ${odds} to you from your Don't Come odds.".format(odds=winOdds))
@@ -770,7 +770,7 @@ def comePay(roll):
 			bank += comeBets[roll] * 2
 			chipsOnTable -= comeBets[roll]
 			comeBets[roll] = 0
-			if comeOdds[roll] > 0 and pointIsOn:
+			if comeOdds[roll] > 0 and pointIsOn or comeOdds[roll] > 0 and working:
 				cOddsWin = 0
 				if roll in [4, 10]:
 					cOddsWin = comeOdds[roll] * 2
@@ -1978,15 +1978,19 @@ while True:
 
 # Working Bets Setup
 		elif round1.lower() in ["w", "work", "working"]:
-			plCheck = hCheck = lCheck = 0
+			plCheck = hCheck = lCheck = cCheck = 0
 			for value in place.values():
 				plCheck += value
 			for value in hardWays.values():
 				hCheck += value
 			for value in layBets.values():
 				lCheck += value
+			for value in comeBets.values():
+				cCheck += value
+			for value in dComeBets.values():
+				cCheck += value
 
-			if plCheck > 0 or hCheck > 0 or lCheck > 0:
+			if plCheck > 0 or hCheck > 0 or lCheck > 0 or cCheck > 0:
 				if working:
 					working = False
 					print("Ok, all bets are Off.")

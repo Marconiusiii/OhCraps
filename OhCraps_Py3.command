@@ -59,7 +59,7 @@ hardCalls = {
 4: ["Double deuce.", "2 2 Ballerina Special.", "Hit us in the tutu.", "2 spots and 2 dots.", "It's little but it came Hard!"],
 6: ["Sixie from Dixie.", "tree tre.", "Pair of trees.", "Double 3s"],
 8: ["Double 4s", "Ozzy and Harriet.", "A square pair!", "A square pair will take ya there.", "Pair of windows.", "Windows."],
-10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses."]
+10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses.", "Two starfish walkin'!"]
 }
 
 def stickman(roll):

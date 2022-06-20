@@ -885,7 +885,8 @@ propBets = {
 "Hop 9": 0,
 "Hop 10": 0,
 "Hop 10 Easy": 0,
-"Hop EZ": 0
+"Hop EZ": 0,
+"Hop Hard": 0
 }
 
 def propHelp():
@@ -1093,6 +1094,21 @@ def propBetting():
 			propBets["Snake Eyes"] = propBets["Hi Low"]//2
 			propBets["Boxcars"] = propBets["Hi Low"]//2
 			propBets["Hi Low"] = 0
+
+		elif bet.lower() == 'hh':
+			print("How much to Hop the Hard Ways? Must be a multiple of 6.")
+			while True:
+				bank += propBets["Hop Hard"]
+				chipsOnTable -= propBets["Hop Hard"]
+				propBets["Hop Hard"] = betPrompt()
+				if propBets["Hop Hard"]%6 == 0:
+					break
+				else:
+					print("That wasn't a multiple of 6! Math again!")
+					continue
+			print("Ok, ${} hopping the Hard Ways.".format(propBets["Hop Hard"]))
+			continue
+
 
 		elif bet.lower() == 'h4':
 			print("How much to Hop the 4? Must be an even number.")
@@ -1328,8 +1344,18 @@ def propPay(roll):
 				multiplier = 15
 				sub = propBets[key]//15*14
 				propBets[key] = propBets[key]//15
+			elif key == "Hop Hard" and roll in [2, 4, 6, 8, 10, 12]:
+				if die1 == die2:
+					multiplier = 30
+					sub = propBets[key]//6*5
+					propBets[key] = propBets[key]//6
+				else:
+					multiplier = 0
 			else:
 				multiplier = 0
+
+
+
 			if multiplier > 0:
 				print("You won ${win} on the {bet} bet!".format(win=(propBets[key]*multiplier)-sub, bet=key))
 				bank += (propBets[key] * multiplier) - sub

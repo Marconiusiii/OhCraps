@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.7"
+version = "6.2.8"
 
 #Roll and Dice Setup
 die1 = 0
@@ -876,21 +876,24 @@ propBets = {
 "Hi Low": 0,
 "Hop 4": 0,
 "Hop 4 Easy": 0,
+"Hop Hard 4": 0,
 "Hop 5": 0,
 "Hop 6": 0,
 "Hop 6 Easy": 0,
+"Hop Hard 6": 0,
 "Hop 7": 0,
 "Hop 8": 0,
 "Hop 8 Easy": 0,
+"Hop Hard 8": 0,
 "Hop 9": 0,
 "Hop 10": 0,
 "Hop 10 Easy": 0,
-"Hop EZ": 0,
-"Hop Hard": 0
+"Hop Hard 10": 0,
+"Hop EZ": 0
 }
 
 def propHelp():
-	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h6e, h8e': Hop 6 or 8 Easies\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
+	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h6e, h8e': Hop 6 or 8 Easies\n\t'hez': Hop the Easies\n\t'hh': Hop the Hard Ways\n\t'hh4-hh10': Hop Hard 4, 6, 8, or 10\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
 
 def propBetting():
 	global propBets, chipsOnTable, bank
@@ -903,6 +906,18 @@ def propBetting():
 			chipsOnTable -= propBets["Snake Eyes"]
 			propBets["Snake Eyes"] = betPrompt()
 			print("Ok, ${} on Snake Eyes.".format(propBets["Snake Eyes"]))
+			continue
+		elif bet.lower() in ['hh4', 'hh6', 'hh8', 'hh10']:
+			if len(bet) == 3:
+				number = bet[-1]
+			else:
+				number = bet[2:]
+			outKey = "Hop Hard " + str(number)
+			print("How much to Hop the Hard {}?".format(number))
+			bank += propBets[outKey]
+			chipsOnTable -= propBets[outKey]
+			propBets[outKey] = betPrompt()
+			print("Ok, ${bet} on the {num}.".format(bet=propBets[outKey], num=outKey))
 			continue
 		elif bet.lower() in ['ad', '3']:
 			print("How much on Acey Deucey?")
@@ -1094,22 +1109,23 @@ def propBetting():
 			propBets["Snake Eyes"] = propBets["Hi Low"]//2
 			propBets["Boxcars"] = propBets["Hi Low"]//2
 			propBets["Hi Low"] = 0
-
 		elif bet.lower() == 'hh':
+			hardBets = ['Snake Eyes', 'Boxcars', 'Hop Hard 4', 'Hop Hard 6', 'Hop Hard 8', 'Hop Hard 10']
 			print("How much to Hop the Hard Ways? Must be a multiple of 6.")
 			while True:
-				bank += propBets["Hop Hard"]
-				chipsOnTable -= propBets["Hop Hard"]
-				propBets["Hop Hard"] = betPrompt()
-				if propBets["Hop Hard"]%6 == 0:
+				for item in hardBets:
+					bank += propBets[item]
+					chipsOnTable -= propBets[item]
+				hardAmount = betPrompt()
+				if hardAmount%6 == 0:
+					for item in hardBets:
+						propBets[item] = hardAmount//6
 					break
 				else:
 					print("That wasn't a multiple of 6! Math again!")
 					continue
-			print("Ok, ${} hopping the Hard Ways.".format(propBets["Hop Hard"]))
+			print("Ok, ${} hopping the Hard Ways.".format(hardAmount))
 			continue
-
-
 		elif bet.lower() == 'h4':
 			print("How much to Hop the 4? Must be an even number.")
 			while True:
@@ -1286,6 +1302,14 @@ def propPay(roll):
 				multiplier = 30
 				sub = propBets[key]//4*3
 				propBets[key] = propBets[key]//4
+
+			elif key in ['Hop Hard 4', 'Hop Hard 6', 'Hop Hard 8', 'Hop Hard 10'] and roll in [4, 6, 8, 10]:
+				val = "Hop Hard " + str(roll)
+				if die1 == die2 and val == key:
+					multiplier = 30
+				else:
+					multiplier = 0
+
 			elif key == "Hop 4" and roll == 4:
 				if die1 == 3:
 					multipler = 15

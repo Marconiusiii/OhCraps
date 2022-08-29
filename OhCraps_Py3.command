@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.2.8"
+version = "6.2.9"
 
 #Roll and Dice Setup
 die1 = 0
@@ -1544,7 +1544,7 @@ def layShow():
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
-	vigPay = 0
+	vigPay = vig = 0
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if layBets[roll] > 0:
 			print("You lost ${loss} from the Lay {num}.".format(loss=layBets[roll], num=roll))
@@ -1569,15 +1569,17 @@ def layCheck(roll):
 					win = layBets[key]//3*2
 				elif key in [6, 8]:
 					win = layBets[key]//6*5
-				vig = layBets[key]*0.05
+				vig = win*0.05
 				if vig < 1:
-					vigPay += math.ceil(vig)
+					vigPay += 1
 				else:
 					vigPay += math.floor(vig)
 				print("You won ${win} on the Lay {num}!".format(win=win, num=key))
-				bank += win - vig
+				bank += win
 		if vigPay > 0:
 			print("Taking out ${} for the vig.".format(vigPay))
+			bank -= vigPay
+			vigPay = 0
 
 # Bank and bet setup
 bank = 0

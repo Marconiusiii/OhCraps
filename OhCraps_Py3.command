@@ -5,11 +5,10 @@ import math
 import os
 
 #Version Number
-version = "6.2.9"
+version = "6.3.0"
 
 #Roll and Dice Setup
-die1 = 0
-die2 = 0
+die1 = die2 = 0
 
 def roll():
 	global rollHard, pointIsOn, die1, die2
@@ -86,7 +85,6 @@ def fireCheck():
 		chipsOnTable -= fireBet
 		if len(fire) < 4:
 			print("You lost ${} from the Fire Bet.".format(fireBet))
-			#bank -= fireBet
 			fireBet = 0
 			fire = []
 		elif len(fire) == 4:
@@ -157,20 +155,6 @@ def hardWaysBetting():
 			bank += place[key]
 			hardWays[key] = 0
 
-
-"""
-		bet = betPrompt()
-		if bet > 0:
-			bank += hardWays[key]
-			chipsOnTable -= hardWays[key]
-			hardWays[key] = bet
-			print("Ok, ${bet} on the Hard {num}.".format(bet=hardWays[key], num=key))
-		elif hardWays[key] > 0 and bet == 0:
-			print("Taking down your Hard {}.".format(key))
-			chipsOnTable -= hardWays[key]
-			bank += hardWays[key]
-			hardWays[key] = bet
-"""
 def hardTakeDown():
 	global hardWays, bank, chipsOnTable
 	print("Taking down your Hard Ways.")
@@ -198,7 +182,6 @@ def hardHigh(num):
 	number = int(num[1:])
 	print("How much to spread across the Hard Ways, high on the {}?".format(number))
 	bet = betPrompt()
-	#chipsOnTable -= bet
 	for key in hardWays:
 		chipsOnTable -= hardWays[key]
 		bank += hardWays[key]
@@ -213,7 +196,6 @@ def hardHigh(num):
 algorithm for spreading weird bets across with a high number:
 bet - (bet//5 * 3) = high bet
 bet//5 = low bets
-
 """
 
 def hardCheck(roll):
@@ -226,7 +208,6 @@ def hardCheck(roll):
 				hardWays[key] = 0
 		if loss > 0:
 			print("You lost ${} from the Hard Ways.".format(loss))
-			#bank -= loss
 			chipsOnTable -= loss
 	elif roll in [4, 6, 8, 10]:
 		if hardWays[roll] > 0 and rollHard == True:
@@ -241,14 +222,11 @@ def hardCheck(roll):
 			if hardPress.lower() in ['y', 'yes']:
 				print("How much on the Hard {}?".format(roll))
 				chipsOnTable -= hardWays[roll]
-				#bank += hardWays[roll]
 				hardWays[roll] = betPrompt()
 				if hardWays[roll] == 0:
 					print("Ok, taking down your Hard {} bet.".format(roll))
 				else:
 					print("Ok, bumping up your Hard {num} bet to ${bet}.".format(num=roll, bet=hardWays[roll]))
-			else:
-				pass
 		elif hardWays[roll] > 0 and rollHard == False:
 			print("You lost ${loss} from the Hard {num}.".format(loss=hardWays[roll], num=roll))
 			#bank -= hardWays[roll]

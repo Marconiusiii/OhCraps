@@ -259,6 +259,9 @@ lineBets = {
 
 def lineBetting():
 	global lineBets, bank, chipsOnTable
+	for key in lineBets:
+		if lineBets[key] > 0:
+			print("You have ${num} on the {bet} bet.".format(num=lineBets[key], bet=key))
 	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
 	while True:
 		if lineBets["Pass"] > 0:
@@ -297,29 +300,27 @@ def lineCheck(roll, p2roll):
 		if roll in [7, 11]:
 			if lineBets["Pass"] > 0:
 				print("You won ${} on the Pass Line!.".format(lineBets["Pass"]))
-				bank += lineBets["Pass"] * 2
-				chipsOnTable -= lineBets["Pass"]
-				lineBets["Pass"] = 0
+				bank += lineBets["Pass"]
+#				chipsOnTable -= lineBets["Pass"]
+#				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
-				#bank -= lineBets["Don't Pass"]
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 		elif roll in [2, 3, 12]:
 			if lineBets["Pass"] > 0:
 				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
-				#bank -= lineBets["Pass"]
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				if roll in [2, 3]:
 					print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
-					bank += lineBets["Don't Pass"] * 2
+					bank += lineBets["Don't Pass"]
 				elif roll == 12:
 					print("12 is a Push!")
-					bank += lineBets["Don't Pass"]
-				chipsOnTable -= lineBets["Don't Pass"]
-				lineBets["Don't Pass"] = 0
+#					bank += lineBets["Don't Pass"]
+#				chipsOnTable -= lineBets["Don't Pass"]
+#				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:
 		if p2roll == roll:
 			if lineBets["Pass"] > 0:
@@ -329,14 +330,12 @@ def lineCheck(roll, p2roll):
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
-				#bank -= lineBets["Don't Pass"]
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
 		elif p2roll == 7:
 			if lineBets["Pass"] > 0:
 				print("You lost ${} from the Pass Line.".format(lineBets["Pass"]))
-				#bank -= lineBets["Pass"]
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
@@ -1252,10 +1251,10 @@ def propBetting():
 
 def propPay(roll):
 	global propBets, bank, chipsOnTable, die1, die2
-	multiplier = 0
+#	multiplier = 0
 	for key in propBets:
-		sub = 0
 		if propBets[key] > 0:
+			multiplier = sub = 0
 			if (key == "Snake Eyes" and roll == 2) or (key == "Boxcars" and roll == 12):
 				multiplier = 30
 			elif (key == "Acey Deucey" and roll == 3) or (key == "Eleven" and roll == 11):
@@ -1356,16 +1355,13 @@ def propPay(roll):
 			else:
 				multiplier = 0
 
-
-
 			if multiplier > 0:
 				print("You won ${win} on the {bet} bet!".format(win=(propBets[key]*multiplier)-sub, bet=key))
 				bank += (propBets[key] * multiplier) - sub
 				chipsOnTable -= propBets[key] + sub
 				propBets[key] = 0
-			else:
+			elif multiplier == 0:
 				print("You lost ${loss} from the {bet}.".format(loss=propBets[key], bet=key))
-				#bank -= propBets[key]
 				chipsOnTable -= propBets[key]
 				propBets[key] = 0
 

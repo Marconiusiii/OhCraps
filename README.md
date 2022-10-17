@@ -1,4 +1,4 @@
-# OhCraps! v.6.3.0
+# OhCraps! v.6.3.1
 Python-based Craps game for Terminal.
 
 ## About
@@ -80,7 +80,7 @@ Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to 
 
 Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet. This bet wins if a 2 or 3 rolls on the Come Out roll. Rolling a 12 will push, so you will not lose nor win and the bet will be returned to you. This bet loses when rolling a 7 or 11 on the Come Out roll, and if any other number rolls that will become the point for the point phase of the game. If the shooter rolls a 7 in the Point phase of the game, the Don't Pass bet will win.
 
-Once you've set your Line Bets, type 'x' and hit Enter to continue on with the game.
+Once you've set your Line Bets, type 'x' and hit Enter to continue on with the game. Should your Line bets win in the come out phase, the bets will stay out on the table for you.
 
 #### Place Bets
 

@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.3.0"
+version = "6.3.1"
 
 #Roll and Dice Setup
 die1 = die2 = 0
@@ -301,8 +301,6 @@ def lineCheck(roll, p2roll):
 			if lineBets["Pass"] > 0:
 				print("You won ${} on the Pass Line!.".format(lineBets["Pass"]))
 				bank += lineBets["Pass"]
-#				chipsOnTable -= lineBets["Pass"]
-#				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				chipsOnTable -= lineBets["Don't Pass"]
@@ -318,9 +316,6 @@ def lineCheck(roll, p2roll):
 					bank += lineBets["Don't Pass"]
 				elif roll == 12:
 					print("12 is a Push!")
-#					bank += lineBets["Don't Pass"]
-#				chipsOnTable -= lineBets["Don't Pass"]
-#				lineBets["Don't Pass"] = 0
 	elif pointIsOn == True:
 		if p2roll == roll:
 			if lineBets["Pass"] > 0:
@@ -401,7 +396,7 @@ def odds():
 				break
 
 	if lineBets["Don't Pass"] > 0:
-		print("You have $0 for your lay odds.".format(lineBets["Don't Pass Odds"]))
+		print("You have ${} for your lay odds.".format(lineBets["Don't Pass Odds"]))
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
@@ -422,6 +417,8 @@ def odds():
 				break
 			else:
 				print("Leaving your Don't Pass Odds as is.")
+				chipsOnTable += lineBets["Don't Pass Odds"]
+				bank -= lineBets["Don't Pass Odds"]
 				break
 
 def oddsCheck(roll):
@@ -440,7 +437,6 @@ def oddsCheck(roll):
 		lineBets["Pass Odds"] = 0
 	elif lineBets["Pass Odds"] > 0 and roll == 7:
 		print("You lost ${} from your Pass Line Odds.".format(lineBets["Pass Odds"]))
-		#bank -= lineBets["Pass Odds"]
 		chipsOnTable -= lineBets["Pass Odds"]
 		lineBets["Pass Odds"] = 0
 	if lineBets["Don't Pass Odds"] > 0 and roll == 7:
@@ -456,7 +452,6 @@ def oddsCheck(roll):
 		lineBets["Don't Pass Odds"] = 0
 	elif lineBets["Don't Pass Odds"] > 0 and roll == comeOut:
 		print("You lost ${} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
-		#bank -= lineBets["Don't Pass Odds"]
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 
@@ -499,8 +494,7 @@ dComeOdds = {
 10: 0
 }
 
-comeBet = 0
-dComeBet = 0
+comeBet = dComeBet = 0
 
 def come():
 	global comeBet, dComeBet, chipsOnTable, bank
@@ -543,7 +537,6 @@ def dComeDown():
 			dComeBets[bet] = dComeOdds[bet] = 0
 	if checkVal == 0:
 		print("Nothing to take down, silly!")
-
 
 def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
@@ -666,11 +659,11 @@ def comeCheck(roll):
 		elif roll in [2, 3, 12]:
 			if roll in [2, 3]:
 				print("You won ${} on the Don't Come!".format(dComeBet))
-				bank += dComeBet * 2
+				bank += dComeBet * 2 
 			elif roll == 12:
 				print("12 is a Push!")
+				bank += dComeBet
 			chipsOnTable -= dComeBet
-			bank += dComeBet
 			dComeBet = 0
 		else:
 			print("Moving your Don't Come bet to the {}.".format(roll))
@@ -720,6 +713,7 @@ def comePay(roll):
 		for key in dComeOdds:
 			if dComeOdds[key] > 0 and pointIsOn or dComeOdds[key] > 0 and working:
 				chipsOnTable -= dComeOdds[key]
+				bank += dComeOdds[key]
 				if key in [4, 10]:
 					winOdds += dComeOdds[key]//2
 				elif key in [5, 9]:
@@ -767,12 +761,10 @@ def comePay(roll):
 
 		if dComeBets[roll] > 0:
 			print("You lost ${dcloss} from the Don't Come {num}.".format(dcloss=dComeBets[roll], num=roll))
-			#bank -= dComeBets[roll]
 			chipsOnTable -= dComeBets[roll]
 			dComeBets[roll] = 0
 			if dComeOdds[roll] > 0:
 				print("You lost ${dco} from the Don't Come {num} Odds.".format(dco=dComeOdds[roll], num=roll))
-				#bank -= dComeOdds[roll]
 				chipsOnTable -= dComeOdds[roll]
 				dComeOdds[roll] = 0
 

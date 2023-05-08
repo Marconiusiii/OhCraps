@@ -77,28 +77,28 @@ def fireBetting():
 	global fireBet
 	print("\tHow much on the Fire Bet?")
 	fireBet = betPrompt()
-	print(f"\tOk, ${fireBet} on the Fire Bet. Good Luck!")
+	print(f"\tOk, ${fireBet:,} on the Fire Bet. Good Luck!")
 
 def fireCheck():
 	global bank, fire, fireBet, comeOut, p2, chipsOnTable
 	if p2 == 7:
 		chipsOnTable -= fireBet
 		if len(fire) < 4:
-			print(f"You lost ${fireBet} from the Fire Bet.")
+			print(f"You lost ${fireBet:,} from the Fire Bet.")
 			fireBet = 0
 			fire = []
 		elif len(fire) == 4:
-			print(f"You won ${fireBet * 25} on the Fire Bet! Great job!")
+			print(f"You won ${fireBet * 25:,} on the Fire Bet! Great job!")
 			bank += fireBet * 25
 			fireBet = 0
 			fire = []
 		elif len(fire) == 5:
-			print(f"You won ${fireBet * 250} on the Fire Bet! Holy Crap!")
+			print(f"You won ${fireBet * 250:,} on the Fire Bet! Holy Crap!")
 			bank += fireBet * 250
 			fireBet = 0
 			fire = []
 		elif len(fire) == 6:
-			print(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000}!!!")
+			print(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000:,}!!!")
 			bank += fireBet * 1000
 			fireBet = 0
 			fire = []
@@ -124,7 +124,7 @@ def hardWaysBetting():
 	madeBet = True
 	for key in hardWays:
 		if hardWays[key] > 0:
-			print(f"You have ${hardWays[key]} on the hard {key}.")
+			print(f"You have ${hardWays[key]:,} on the hard {key}.")
 		print(f"How much on the Hard {key}?")
 		while True:
 			bet = 0
@@ -148,7 +148,7 @@ def hardWaysBetting():
 				bank -= bet - hardWays[key] 
 			hardWays[key] = bet
 			chipsOnTable += bet
-			print(f"${bet} on the Hard {key}.")
+			print(f"${bet:,} on the Hard {key}.")
 		elif hardWays[key] > 0 and bet == 0:
 			print(f"Ok, taking down your Hard {key} bet.")
 			chipsOnTable -= hardWays[key]
@@ -175,7 +175,7 @@ def hardAuto():
 		hardWays[key] = hardAcr
 		chipsOnTable += hardAcr
 		bank -= hardAcr
-	print(f"Ok, ${hardAcr} on each of the Hard Ways.")
+	print(f"Ok, ${hardAcr:,} on each of the Hard Ways.")
 
 def hardHigh(num):
 	global chipsOnTable, bank, hardWays
@@ -189,7 +189,7 @@ def hardHigh(num):
 			hardWays[key] = bet - (bet//5*3)
 		else:
 			hardWays[key] = bet//5
-	print(f"Ok, ${bet-(bet//5*3)} on the Hard {number}, ${b} each on the other Hard Ways for a total of ${bet}.")
+	print(f"Ok, ${bet - (bet//5*3):,} on the Hard {number}, ${b:,} each on the other Hard Ways for a total of ${bet:,}.")
 
 
 """
@@ -207,7 +207,7 @@ def hardCheck(roll):
 				loss += hardWays[key]
 				hardWays[key] = 0
 		if loss > 0:
-			print(f"You lost ${loss} from the Hard Ways.")
+			print(f"You lost ${loss:,} from the Hard Ways.")
 			chipsOnTable -= loss
 	elif roll in [4, 6, 8, 10]:
 		if hardWays[roll] > 0 and rollHard == True:
@@ -215,7 +215,7 @@ def hardCheck(roll):
 				win = hardWays[roll] * 7
 			elif roll in [6, 8]:
 				win = hardWays[roll] * 9
-			print(f"You won ${win} on the Hard {roll}!")
+			print(f"You won ${win:,} on the Hard {roll}!")
 			bank += win
 			print("Press your bet?")
 			hardPress = input(">")
@@ -226,9 +226,9 @@ def hardCheck(roll):
 				if hardWays[roll] == 0:
 					print(f"Ok, taking down your Hard {roll} bet.")
 				else:
-					print(f"Ok, bumping up your Hard {roll} bet to ${hardWays[roll]}.")
+					print(f"Ok, bumping up your Hard {roll} bet to ${hardWays[roll]:,}.")
 		elif hardWays[roll] > 0 and rollHard == False:
-			print(f"You lost ${hardWays[roll]} from the Hard {roll}.")
+			print(f"You lost ${hardWays[roll]:,} from the Hard {roll}.")
 			#bank -= hardWays[roll]
 			chipsOnTable -= hardWays[roll]
 			print(f"Go back up on your Hard {roll} bet?")
@@ -236,7 +236,7 @@ def hardCheck(roll):
 			if hardBack.lower() in ['y', 'yes']:
 				print(f"How much on the Hard {roll}?")
 				hardWays[roll] = betPrompt()
-				print(f"Ok, going back up on the Hard {roll} for ${hardWays[roll]}.")
+				print(f"Ok, going back up on the Hard {roll} for ${hardWays[roll]:,}.")
 			else:
 				hardWays[roll] = 0
 
@@ -245,7 +245,7 @@ def hardShow():
 	global hardWays
 	for key in hardWays:
 		if hardWays[key] > 0:
-			print(f"You have ${hardWays[key]} on the Hard {key}.")
+			print(f"You have ${hardWays[key]:,} on the Hard {key}.")
 
 #Line Bets
 
@@ -261,13 +261,13 @@ def lineBetting():
 	global lineBets, bank, chipsOnTable
 	for key in lineBets:
 		if lineBets[key] > 0:
-			print(f"You have ${lineBets[key]} on the {key} bet.")
+			print(f"You have ${lineBets[key]:,} on the {key} bet.")
 	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
 	while True:
 		if lineBets["Pass"] > 0:
-			print(f'You have ${lineBets["Pass"]} on the Pass Line.')
+			print(f'You have ${lineBets["Pass"]:,} on the Pass Line.')
 		if lineBets["Don't Pass"] > 0:
-			print("You have ${} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
+			print("You have ${:,} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
 		try:
 			lBet = input(">")
 		except ValueError:
@@ -278,14 +278,14 @@ def lineBetting():
 			bank += lineBets["Pass"]
 			print("How much on the Pass Line?")
 			lineBets["Pass"] = betPrompt()
-			print(f'Ok, ${lineBets["Pass"]} on the Pass Line.')
+			print(f'Ok, ${lineBets["Pass"]:,} on the Pass Line.')
 			continue
 		elif lBet.lower() in ["d", "dp", "don't pass", "don't"]:
 			chipsOnTable -= lineBets["Don't Pass"]
 			bank += lineBets["Don't Pass"]
 			print("How much on the Don't Pass line?")
 			lineBets["Don't Pass"] = betPrompt()
-			print("Ok, ${} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
+			print("Ok, ${:,} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
 			continue
 		elif lBet.lower() in ['x', 'close', 'esc', 'exit', 'done']:
 			print("Ok, moving on!")
@@ -299,42 +299,42 @@ def lineCheck(roll, p2roll):
 	if pointIsOn == False:
 		if roll in [7, 11]:
 			if lineBets["Pass"] > 0:
-				print(f"You won ${lineBets['Pass']} on the Pass Line!")
+				print(f"You won ${lineBets['Pass']:,} on the Pass Line!")
 				bank += lineBets["Pass"]
 			if lineBets["Don't Pass"] > 0:
-				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				print("You lost ${:,} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 		elif roll in [2, 3, 12]:
 			if lineBets["Pass"] > 0:
-				print(f"You lost ${lineBets['Pass']} from the Pass Line.")
+				print(f"You lost ${lineBets['Pass']:,} from the Pass Line.")
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				if roll in [2, 3]:
-					print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+					print("You won ${:,} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
 					bank += lineBets["Don't Pass"]
 				elif roll == 12:
 					print("12 is a Push!")
 	elif pointIsOn == True:
 		if p2roll == roll:
 			if lineBets["Pass"] > 0:
-				print(f"You won ${lineBets['Pass']} on the Pass Line!")
+				print(f"You won ${lineBets['Pass']:,} on the Pass Line!")
 				bank += lineBets["Pass"] * 2
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
-				print("You lost ${} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				print("You lost ${:,} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
 		elif p2roll == 7:
 			if lineBets["Pass"] > 0:
-				print(f"You lost ${lineBets['Pass']} from the Pass Line.")
+				print(f"You lost ${lineBets['Pass']:,} from the Pass Line.")
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
-				print("You won ${} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+				print("You won ${:,} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
 				bank += lineBets["Don't Pass"] * 2
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
@@ -373,15 +373,15 @@ def odds():
 		maxOdds = lineBets["Pass"] * 5
 	maxDP = lineBets["Don't Pass"] * 10
 	if lineBets["Pass"] > 0:
-		print(f"You have ${lineBets['Pass Odds']} for your odds.")
+		print(f"You have ${lineBets['Pass Odds']:,} for your odds.")
 		while True:
 			chipsOnTable -= lineBets["Pass Odds"]
 			bank += lineBets["Pass Odds"]
-			print(f"How Much for your Pass Line Odds? Max Odds for the {comeOut} is ${maxOdds}.")
+			print(f"How Much for your Pass Line Odds? Max Odds for the {comeOut} is ${maxOdds:,}.")
 			pOddsChange = betPrompt()
 			if pOddsChange > 0 and pOddsChange <= maxOdds:
 				lineBets["Pass Odds"] = pOddsChange
-				print(f"Ok, ${lineBets['Pass Odds']} on your Pass Line Odds.")
+				print(f"Ok, ${lineBets['Pass Odds']:,} on your Pass Line Odds.")
 				break
 			elif pOddsChange > maxOdds:
 				print("Nope, that bet is over the Max Odds. Try again!")
@@ -396,15 +396,15 @@ def odds():
 				break
 
 	if lineBets["Don't Pass"] > 0:
-		print("You have ${} for your lay odds.".format(lineBets["Don't Pass Odds"]))
+		print("You have ${:,} for your lay odds.".format(lineBets["Don't Pass Odds"]))
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
-			print(f"How much to Lay for your Odds? Max Odds for the {comeOut} is ${maxDP}.")
+			print(f"How much to Lay for your Odds? Max Odds for the {comeOut} is ${maxDP:,}.")
 			dpOddsChange = betPrompt()
 			if dpOddsChange > 0 and dpOddsChange <= maxDP:
 				lineBets["Don't Pass Odds"] = dpOddsChange
-				print("Ok, ${} laid against the Point.".format(lineBets["Don't Pass Odds"]))
+				print("Ok, ${:,} laid against the Point.".format(lineBets["Don't Pass Odds"]))
 				break
 			elif dpOddsChange > maxDP:
 				print("Nope, you laid too much! Try again.")
@@ -431,12 +431,12 @@ def oddsCheck(roll):
 			payout += (lineBets["Pass Odds"]//2) * 3
 		elif roll in [6, 8]:
 			payout += (lineBets["Pass Odds"]//5) * 6
-		print(f"You won ${payout} from your Pass Line Odds!")
+		print(f"You won ${payout:,} from your Pass Line Odds!")
 		bank += payout + lineBets["Pass Odds"]
 		chipsOnTable -= lineBets["Pass Odds"]
 		lineBets["Pass Odds"] = 0
 	elif lineBets["Pass Odds"] > 0 and roll == 7:
-		print(f"You lost ${lineBets['Pass Odds']} from your Pass Line Odds.")
+		print(f"You lost ${lineBets['Pass Odds']:,} from your Pass Line Odds.")
 		chipsOnTable -= lineBets["Pass Odds"]
 		lineBets["Pass Odds"] = 0
 	if lineBets["Don't Pass Odds"] > 0 and roll == 7:
@@ -446,12 +446,12 @@ def oddsCheck(roll):
 			payout += (lineBets["Don't Pass Odds"]//3) * 2
 		elif comeOut in [6, 8]:
 			payout += (lineBets["Don't Pass Odds"]//6) * 5
-		print(f"You won ${payout} on your Don't Pass Odds!")
+		print(f"You won ${payout:,} on your Don't Pass Odds!")
 		bank += payout + lineBets["Don't Pass Odds"]
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 	elif lineBets["Don't Pass Odds"] > 0 and roll == comeOut:
-		print("You lost ${} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
+		print("You lost ${:,} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 
@@ -506,14 +506,14 @@ def come():
 			chipsOnTable -= comeBet
 			bank += comeBet
 			comeBet = betPrompt()
-			print(f"Ok, ${comeBet} on the Come.")
+			print(f"Ok, ${comeBet:,} on the Come.")
 			break
 		elif choice.lower() in ["dc", "d", "don't", "don't come", "dontcome"]:
 			print("How much on the Don't Com?")
 			chipsOnTable -= dComeBet
 			bank += dComeBet
 			dComeBet = betPrompt()
-			print(f"Ok, ${dComeBet} on the Don't Come.")
+			print(f"Ok, ${dComeBet:,} on the Don't Come.")
 			break
 		elif choice.lower() == "x":
 			print("Finished betting the Come.")
@@ -531,9 +531,9 @@ def dComeDown():
 			chipsOnTable -= dComeBets[bet] + dComeOdds[bet]
 			bank += dComeBets[bet] + dComeOdds[bet]
 			if dComeOdds[bet] > 0:
-				print(f"Taking down your No {bet} and Odds. Returning ${dComeBets[bet] + dComeOdds[bet]} to your rack.")
+				print(f"Taking down your No {bet} and Odds. Returning ${dComeBets[bet] + dComeOdds[bet]:,} to your rack.")
 			else:
-				print(f"Taking down your No {bet} bet. Returning ${dComeBets[bet]} to your rack.")
+				print(f"Taking down your No {bet} bet. Returning ${dComeBets[bet]:,} to your rack.")
 			dComeBets[bet] = dComeOdds[bet] = 0
 	if checkVal == 0:
 		print("Nothing to take down, silly!")
@@ -542,10 +542,10 @@ def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
 	for key in comeBets:
 		if comeBets[key] > 0:
-			print(f"You have ${comeBets[key]} on the Come {key} with ${comeOdds[key]} in Odds.")
+			print(f"You have ${comeBets[key]:,} on the Come {key} with ${comeOdds[key]:,} in Odds.")
 	for key in dComeBets:
 		if dComeBets[key] > 0:
-			print(f"You have ${dComeBets[key]} on the Don't Come {key} with ${dComeOdds[key]} in odds.")
+			print(f"You have ${dComeBets[key]:,} on the Don't Come {key} with ${dComeOdds[key]:,} in odds.")
 
 def comeOddsChange():
 	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable, bank
@@ -583,9 +583,9 @@ def cdcOddsChange(dict, dict2):
 			elif key in [6, 8]:
 				maxC = 5
 			if 'Come' in dict:
-				print(f"How much for Odds on the {key}? Max Odds is ${maxC * dict[key]}; you have ${dict2[key]} in Odds.")
+				print(f"How much for Odds on the {key}? Max Odds is ${maxC * dict[key]:,}; you have ${dict2[key]:,} in Odds.")
 			else:
-				print(f"How much to Lay against the {key}? Max Lay is ${maxDC*dict[key]}; you have ${dict2[key]} in Lay Odds.")
+				print(f"How much to Lay against the {key}? Max Lay is ${maxDC*dict[key]:,}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
 					bet = int(input("$>"))
@@ -601,7 +601,7 @@ def cdcOddsChange(dict, dict2):
 			if bet > 0:
 				chipsOnTable -= dict2[key]
 				bank += dict2[key]
-				print(f"Ok, you have ${bet} Odds for your {key}.")
+				print(f"Ok, you have ${bet:,} Odds for your {key}.")
 				dict2[key] = bet
 				chipsOnTable += bet
 				bank -= bet
@@ -617,12 +617,12 @@ def comeCheck(roll):
 	comePay(roll)
 	if comeBet > 0:
 		if roll in [7, 11]:
-			print(f"You won ${comeBet} on the Come!")
+			print(f"You won ${comeBet:,} on the Come!")
 			bank += comeBet * 2
 			chipsOnTable -= comeBet
 			comeBet = 0
 		elif roll in [2, 3, 12]:
-			print(f"You lost ${comeBet} from the Come Bet.")
+			print(f"You lost ${comeBet:,} from the Come Bet.")
 			chipsOnTable -= comeBet
 			comeBet = 0
 		else:
@@ -639,7 +639,7 @@ def comeCheck(roll):
 					max = comeBets[roll] * 4
 				elif roll in [6, 8]:
 					max = comeBets[roll] * 5
-				print(f"How much on the Come {roll}? Max Odds is ${max}.")
+				print(f"How much on the Come {roll}? Max Odds is ${max:,}.")
 				while True:
 					comeOdds[roll] = betPrompt()
 					if comeOdds[roll] > max:
@@ -649,16 +649,16 @@ def comeCheck(roll):
 						comeOdds[roll] = 0
 						continue
 					else:
-						print(f"Ok, ${comeOdds[roll]} on your Come {roll} odds.")
+						print(f"Ok, ${comeOdds[roll]:,} on your Come {roll} odds.")
 						break
 	elif dComeBet > 0:
 		if roll in [7, 11]:
-			print(f"You lost ${dComeBet} from the Don't Come.")
+			print(f"You lost ${dComeBet:,} from the Don't Come.")
 			chipsOnTable -= dComeBet
 			dComeBet = 0
 		elif roll in [2, 3, 12]:
 			if roll in [2, 3]:
-				print(f"You won ${dComeBet} on the Don't Come!")
+				print(f"You won ${dComeBet:,} on the Don't Come!")
 				bank += dComeBet * 2 
 			elif roll == 12:
 				print("12 is a Push!")
@@ -673,7 +673,7 @@ def comeCheck(roll):
 			dcOdds = input(">")
 			if dcOdds.lower() in ['y', 'yes']:
 				dMax = dComeBets[roll] * 10
-				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax}.")
+				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax:,}.")
 				while True:
 					dComeOdds[roll] = betPrompt()
 					if dComeOdds[roll] > dMax:
@@ -683,7 +683,7 @@ def comeCheck(roll):
 						dComeOdds[roll] = 0
 						continue
 					else:
-						print(f"Ok, ${dComeOdds[roll]} laid on the Don't Come {roll}.")
+						print(f"Ok, ${dComeOdds[roll]:,} laid on the Don't Come {roll}.")
 						break
 
 def comePay(roll):
@@ -695,11 +695,11 @@ def comePay(roll):
 		for key in comeOdds:
 			lossOdds += comeOdds[key]
 		if loss > 0:
-			print(f"You lost ${loss} from your Come Bets.")
+			print(f"You lost ${loss:,} from your Come Bets.")
 			if lossOdds > 0 and pointIsOn or lossOdds > 0 and working:
-				print(f"You lost ${lossOdds} from your Come Bet Odds.")
+				print(f"You lost ${lossOdds:,} from your Come Bet Odds.")
 			elif lossOdds > 0 and pointIsOn == False:
-				print(f"${lossOdds} returned to you from Come Odds.")
+				print(f"${lossOdds:,} returned to you from Come Odds.")
 				bank += lossOdds
 			chipsOnTable -= loss + lossOdds
 			for key in comeBets:
@@ -725,11 +725,11 @@ def comePay(roll):
 				winOdds += dComeOdds[key]
 				dComeOdds[key] = 0
 		if win > 0:
-			print(f"You won ${win//2} from your Don't Come Bets!")
+			print(f"You won ${win//2:,} from your Don't Come Bets!")
 			if winOdds > 0 and pointIsOn or winOdds > 0 and working:
-				print(f"You won ${winOdds} from your Don't Come Bet Odds!")
+				print(f"You won ${winOdds:,} from your Don't Come Bet Odds!")
 			elif winOdds > 0 and pointIsOn == False:
-				print(f"Returning ${winOdds} to you from your Don't Come odds.")
+				print(f"Returning ${winOdds:,} to you from your Don't Come odds.")
 			bank += win + winOdds + dComeOdds[key]
 		for key in dComeBets:
 			dComeBets[key] = 0
@@ -737,7 +737,7 @@ def comePay(roll):
 			dComeOdds[key] = 0
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if comeBets[roll] > 0:
-			print(f"You won ${comeBets[roll]} on the Come {roll}!")
+			print(f"You won ${comeBets[roll]:,} on the Come {roll}!")
 			bank += comeBets[roll] * 2
 			chipsOnTable -= comeBets[roll]
 			comeBets[roll] = 0
@@ -749,22 +749,22 @@ def comePay(roll):
 					cOddsWin += comeOdds[roll]//2*3
 				elif roll in [6, 8]:
 					cOddsWin += comeOdds[roll]//5*6
-				print(f"You won ${cOddsWin} on the Come {roll} Odds!")
+				print(f"You won ${cOddsWin:,} on the Come {roll} Odds!")
 				bank += cOddsWin + comeOdds[roll]
 				chipsOnTable -= comeOdds[roll]
 				comeOdds[roll] = 0
 			elif comeOdds[roll] > 0 and pointIsOn == False:
-				print(f"Returning ${comeOdds[roll]} to you from your Come {roll} odds.")
+				print(f"Returning ${comeOdds[roll]:,} to you from your Come {roll} odds.")
 				chipsOnTable -= comeOdds[roll]
 				bank += comeOdds[roll]
 				comeOdds[roll] = 0
 
 		if dComeBets[roll] > 0:
-			print(f"You lost ${dComeBets[roll]} from the Don't Come {roll}.")
+			print(f"You lost ${dComeBets[roll]:,} from the Don't Come {roll}.")
 			chipsOnTable -= dComeBets[roll]
 			dComeBets[roll] = 0
 			if dComeOdds[roll] > 0:
-				print(f"You lost ${dComeOdds[roll]} from the Don't Come {roll} Odds.")
+				print(f"You lost ${dComeOdds[roll]:,} from the Don't Come {roll} Odds.")
 				chipsOnTable -= dComeOdds[roll]
 				dComeOdds[roll] = 0
 
@@ -774,7 +774,7 @@ fieldBet = 0
 
 def fieldShow():
 	if fieldBet > 0:
-		print(f"You have ${fieldBet} on the Field.")
+		print(f"You have ${fieldBet:,} on the Field.")
 
 def field():
 	global fieldBet, chipsOnTable, bank
@@ -783,7 +783,7 @@ def field():
 	if bet > 0:
 		chipsOnTable -= fieldBet
 		fieldBet = bet
-		print(f"Ok, ${fieldBet} on the Field.")
+		print(f"Ok, ${fieldBet:,} on the Field.")
 	elif fieldBet > 0 and bet == 0:
 		bank += fieldBet
 		chipsOnTable -= fieldBet
@@ -808,7 +808,7 @@ def fieldCheck(roll):
 			elif roll == 12:
 				payout *= 3
 				print("Triple in the Field!")
-			print(f"You won ${payout} on the Field!")
+			print(f"You won ${payout:,} on the Field!")
 			bank += payout
 			print("Change your Field bet?")
 			fChange = input(">")
@@ -820,7 +820,7 @@ def fieldCheck(roll):
 			else:
 				pass
 		else:
-			print(f"You lost ${fieldBet} from the Field.")
+			print(f"You lost ${fieldBet:,} from the Field.")
 			#bank -= fieldBet
 			chipsOnTable -= fieldBet
 			fieldBet = 0
@@ -874,7 +874,7 @@ def propBetting():
 			bank += propBets["Snake Eyes"]
 			chipsOnTable -= propBets["Snake Eyes"]
 			propBets["Snake Eyes"] = betPrompt()
-			print(f"Ok, ${propBets['Snake Eyes']} on Snake Eyes.")
+			print(f"Ok, ${propBets['Snake Eyes']:,} on Snake Eyes.")
 			continue
 		elif bet.lower() in ['hh4', 'hh6', 'hh8', 'hh10']:
 			if len(bet) == 3:
@@ -886,42 +886,42 @@ def propBetting():
 			bank += propBets[outKey]
 			chipsOnTable -= propBets[outKey]
 			propBets[outKey] = betPrompt()
-			print(f"Ok, ${propBets[outKey]} on the {outKey}.")
+			print(f"Ok, ${propBets[outKey]:,} on the {outKey}.")
 			continue
 		elif bet.lower() in ['ad', '3']:
 			print("How much on Acey Deucey?")
 			bank += propBets["Acey Deucey"]
 			chipsOnTable -= propBets["Acey Deucey"]
 			propBets["Acey Deucey"] = betPrompt()
-			print(f"Ok, ${propBets['Acey Deucey']} on Acey-Deucey.")
+			print(f"Ok, ${propBets['Acey Deucey']:,} on Acey-Deucey.")
 			continue
 		elif bet.lower() in ['7', 'a7']:
 			print("How much on Any 7?")
 			bank += propBets["Any Seven"]
 			chipsOnTable -= propBets["Any Seven"]
 			propBets["Any Seven"] = betPrompt()
-			print(f"Ok, ${propBets['Any Seven']} on Any Seven.")
+			print(f"Ok, ${propBets['Any Seven']:,} on Any Seven.")
 			continue
 		elif bet.lower() in ['ac', 'c', 'cr']:
 			print("How much on Any Craps?")
 			bank += propBets["Any Craps"]
 			chipsOnTable -= propBets["Any Craps"]
 			propBets["Any Craps"] = betPrompt()
-			print(f"Ok, ${propBets['Any Craps']} on Any Craps.")
+			print(f"Ok, ${propBets['Any Craps']:,} on Any Craps.")
 			continue
 		elif bet.lower() == 'ce':
 			print("How much on C and E?")
 			bank += propBets["C and E"]
 			chipsOnTable -= propBets["C and E"]
 			propBets["C and E"] = betPrompt()
-			print(f"Ok, ${propBets['C and E']} on C and E.")
+			print(f"Ok, ${propBets['C and E']:,} on C and E.")
 			continue
 		elif bet.lower() in ['h', 'horn']:
 			print("How much on the Horn Bet?")
 			bank += propBets["Horn"]
 			chipsOnTable -= propBets["Horn"]
 			propBets["Horn"] = betPrompt()
-			print(f"Ok, ${propBets['Horn']} on the Horn Bet.")
+			print(f"Ok, ${propBets['Horn']:,} on the Horn Bet.")
 			continue
 		elif bet.lower() == 'hh2':
 			print("How much on the Horn High Deuce? Must be multiple of 5.")
@@ -938,7 +938,7 @@ def propBetting():
 					continue
 			propBets["Snake Eyes"] = hornHigh2//5*2
 			propBets["Acey Deucey"] = propBets["Eleven"] = propBets["Boxcars"] = hornHigh2//5
-			print(f"Ok, ${hornHigh2} on the Horn High Deuce.")
+			print(f"Ok, ${hornHigh2:,} on the Horn High Deuce.")
 			continue
 		elif bet.lower() == 'hh3':
 			print("How much on the Horn High Ace-Deuce?")
@@ -955,7 +955,7 @@ def propBetting():
 					continue
 			propBets["Acey Deucey"] = hornHigh3//5*2
 			propBets["Snake Eyes"] = propBets["Eleven"] = propBets["Boxcars"] = hornHigh3//5
-			print(f"Ok, ${hornHigh3} on the Horn High Ace-Deuce.")
+			print(f"Ok, ${hornHigh3:,} on the Horn High Ace-Deuce.")
 			continue
 		elif bet.lower() in ['hhy', 'hh11']:
 			print("How much on the Horn High Yo?")
@@ -972,7 +972,7 @@ def propBetting():
 					continue
 			propBets["Eleven"] = hornHigh11//5*2
 			propBets["Snake Eyes"] = propBets["Acey Deucey"] = propBets["Boxcars"] = hornHigh11//5
-			print(f"Ok, ${hornHigh11} on the Horn High Yo!")
+			print(f"Ok, ${hornHigh11:,} on the Horn High Yo!")
 			continue
 		elif bet.lower() in ['hh12', 'hhm', 'hhb']:
 			print("How much on the Horn High 12?")
@@ -989,21 +989,21 @@ def propBetting():
 					continue
 			propBets["Boxcars"] = hornHigh12//5*2
 			propBets["Snake Eyes"] = propBets["Acey Deucey"] = propBets["Eleven"] = hornHigh12//5
-			print(f"Ok, ${hornHigh12} on the Horn High Midnight.")
+			print(f"Ok, ${hornHigh12:,} on the Horn High Midnight.")
 			continue
 		elif bet.lower() in ['b', '12']:
 			print("How much on Boxcars?")
 			bank += propBets["Boxcars"]
 			chipsOnTable -= propBets["Boxcars"]
 			propBets["Boxcars"] = betPrompt()
-			print(f"Ok, ${propBets['Boxcars']} on Boxcars.")
+			print(f"Ok, ${propBets['Boxcars']:,} on Boxcars.")
 			continue
 		elif bet in ['11', 'e', 'yo']:
 			print("How much on Yo Eleven?")
 			bank += propBets["Eleven"]
 			chipsOnTable -= propBets["Eleven"]
 			propBets["Eleven"] = betPrompt()
-			print(f"Ok, ${propBets['Eleven']} on Eleven.")
+			print(f"Ok, ${propBets['Eleven']:,} on Eleven.")
 			continue
 		elif bet.lower() == 'w':
 			print("How much on the World bet? Must be a multiple of 5.")
@@ -1021,7 +1021,7 @@ def propBetting():
 			propBets["Any Seven"] = propBets["World"]//5
 			propBets["World"] -= propBets["World"]//5
 			propBets["Horn"] = propBets["World"]
-			print(f"Ok, you have ${propBets['Any Seven']} bet on the Any Seven and ${propBets['Horn']} on the Horn.")
+			print(f"Ok, you have ${propBets['Any Seven']:,} bet on the Any Seven and ${propBets['Horn']:,} on the Horn.")
 			propBets["World"] = 0
 			if propBets["Buffalo"] > 0 and propBets["Eleven"] > 0:
 				print("You've got yourself a Whirly Buffalo!")
@@ -1038,7 +1038,7 @@ def propBetting():
 					print("That wasn't a multiple of 5! Try again, genius.")
 					bank += propBets["Buffalo"]
 					continue
-			print(f"Ok, ${propBets['Buffalo']//5} each on the Any 7 and hard ways hopping.")
+			print(f"Ok, ${propBets['Buffalo']//5:,} each on the Any 7 and hard ways hopping.")
 			propBets["Any Seven"] = propBets["Buffalo"]//5
 			propBets["Buffalo"] -= propBets["Buffalo"]//5
 			if propBets["Horn"] > 0 and propBets["Any Seven"] > 0:
@@ -1056,7 +1056,7 @@ def propBetting():
 					print("That wasn't a multiple of 5! Try again, genius.")
 					bank += propBets["Buffalo"]
 					continue
-			print(f"Ok, ${propBets['Buffalo']//5} each on the Yo Eleven and hard ways hopping.")
+			print(f"Ok, ${propBets['Buffalo']//5:,} each on the Yo Eleven and hard ways hopping.")
 			propBets["Eleven"] = propBets["Buffalo"]//5
 			propBets["Buffalo"] -= propBets["Buffalo"]//5
 			if propBets["Horn"] > 0 and propBets["Any Seven"] > 0:
@@ -1074,7 +1074,7 @@ def propBetting():
 					print("That wasn't a multiple of 2! Try again, genius.")
 					bank += propBets["Hi Low"]
 					continue
-			print(f"Ok, ${propBets['Hi Low']//2} each on the 2 and 12.")
+			print(f"Ok, ${propBets['Hi Low']//2:,} each on the 2 and 12.")
 			propBets["Snake Eyes"] = propBets["Hi Low"]//2
 			propBets["Boxcars"] = propBets["Hi Low"]//2
 			propBets["Hi Low"] = 0
@@ -1093,7 +1093,7 @@ def propBetting():
 				else:
 					print("That wasn't a multiple of 6! Math again!")
 					continue
-			print(f"Ok, ${hardAmount} hopping the Hard Ways.")
+			print(f"Ok, ${hardAmount:,} hopping the Hard Ways.")
 			continue
 		elif bet.lower() == 'h4':
 			print("How much to Hop the 4? Must be an even number.")
@@ -1106,7 +1106,7 @@ def propBetting():
 				else:
 					print("That wasn't an even number! You can't even!")
 					continue
-			print(f"Ok, ${propBets['Hop 4']} hopping the 4s.")
+			print(f"Ok, ${propBets['Hop 4']:,} hopping the 4s.")
 			continue
 		elif bet.lower() == 'h10':
 			print("How much to Hop the 10? Must be an even number.")
@@ -1119,7 +1119,7 @@ def propBetting():
 				else:
 					print("That wasn't an even number! You can't even!")
 					continue
-			print(f"Ok, ${propBets['Hop 10']} hopping the 10s.")
+			print(f"Ok, ${propBets['Hop 10']:,} hopping the 10s.")
 			continue
 		elif bet.lower() == 'h5':
 			print("How much to Hop the 5? Must be an even number.")
@@ -1132,7 +1132,7 @@ def propBetting():
 				else:
 					print("That wasn't an even number! You can't even!")
 					continue
-			print(f"Ok, ${propBets['Hop 5']} hopping the 5s.")
+			print(f"Ok, ${propBets['Hop 5']:,} hopping the 5s.")
 			continue
 		elif bet.lower() == 'h9':
 			print("How much to Hop the 9? Must be an even number.")
@@ -1145,7 +1145,7 @@ def propBetting():
 				else:
 					print("That wasn't an even number! You can't even!")
 					continue
-			print(f"Ok, ${propBets['Hop 9']} hopping the 9s.")
+			print(f"Ok, ${propBets['Hop 9']:,} hopping the 9s.")
 			continue
 		elif bet.lower() == 'h6':
 			print("How much to Hop the 6? Must be a multiple of 3.")
@@ -1158,7 +1158,7 @@ def propBetting():
 				else:
 					print("That's not a multiple of 3! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop 6']} hopping the 6s.")
+			print(f"Ok, ${propBets['Hop 6']:,} hopping the 6s.")
 			continue
 		elif bet.lower() == 'h6e':
 			print("How much to Hop the 6 Easies? Must be a multiple of 2.")
@@ -1171,7 +1171,7 @@ def propBetting():
 				else:
 					print("That's not a multiple of 2! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop 6 Easy']} hopping the 6 Easies.")
+			print(f"Ok, ${propBets['Hop 6 Easy']:,} hopping the 6 Easies.")
 			continue
 		elif bet.lower() == 'h7':
 			print("How much to Hop Big Red? Must be a multiple of 3.")
@@ -1184,7 +1184,7 @@ def propBetting():
 				else:
 					print("That's not a multiple of 3! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop 7']} hopping the 7s.")
+			print(f"Ok, ${propBets['Hop 7']:,} hopping the 7s.")
 			continue
 		elif bet.lower() == 'h8':
 			print("How much to Hop the 8? Must be a multiple of 3.")
@@ -1197,7 +1197,7 @@ def propBetting():
 				else:
 					print("That's not a multiple of 3! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop 8']} hopping the 8s.")
+			print(f"Ok, ${propBets['Hop 8']:,} hopping the 8s.")
 			continue
 		elif bet.lower() == 'h8e':
 			print("How much to Hop the 8 Easies? Must be a multiple of 2.")
@@ -1210,7 +1210,7 @@ def propBetting():
 				else:
 					print("That's not a multiple of 2! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop 8 Easy']} hopping the 8 Easies.")
+			print(f"Ok, ${propBets['Hop 8 Easy']:,} hopping the 8 Easies.")
 			continue
 		elif bet.lower() == 'hez':
 			print("How much to Hop the Easies? Must be a multiple of 15.")
@@ -1223,13 +1223,13 @@ def propBetting():
 				else:
 					print("That's not a multiple of 15! Can't you math?")
 					continue
-			print(f"Ok, ${propBets['Hop EZ']} hopping the Easies.")
+			print(f"Ok, ${propBets['Hop EZ']:,} hopping the Easies.")
 			continue
 		elif bet.lower() == 'a':
 			print("Showing your Prop Bets:\n")
 			for key in propBets:
 				if propBets[key] > 0:
-					print(f"\t${str(propBets[key])} on {key}.")
+					print(f"\t${str(propBets[key]):,} on {key}.")
 			continue
 		elif bet.lower() == 'help':
 			propHelp()
@@ -1348,12 +1348,12 @@ def propPay(roll):
 				multiplier = 0
 
 			if multiplier > 0:
-				print(f"You won ${(propBets[key]*multiplier)-sub} on the {key} bet!")
+				print(f"You won ${(propBets[key]*multiplier)-sub:,} on the {key} bet!")
 				bank += propBets[key] + (propBets[key] * multiplier) - sub
 				chipsOnTable -= propBets[key] + sub
 				propBets[key] = 0
 			elif multiplier == 0:
-				print(f"You lost ${propBets[key]} from the {key}.")
+				print(f"You lost ${propBets[key]:,} from the {key}.")
 				chipsOnTable -= propBets[key]
 				propBets[key] = 0
 
@@ -1370,13 +1370,13 @@ def atsBetting():
 	atsOn = True
 	print("How much on the All?")
 	atsAll = betPrompt()
-	print(f"Ok, ${atsAll} on the All.")
+	print(f"Ok, ${atsAll:,} on the All.")
 	print("How much on the Tall?")
 	atsTall = betPrompt()
-	print(f"Ok, ${atsTall} on the Tall.")
+	print(f"Ok, ${atsTall:,} on the Tall.")
 	print("How much on the Small?")
 	atsSmall = betPrompt()
-	print(f"Ok, ${atsSmall} on the Small.")
+	print(f"Ok, ${atsSmall:,} on the Small.")
 
 def ats(roll):
 	global allNums, smallNums, tallNums, bank, chipsOnTable, atsAll, atsSmall, atsTall, atsOn
@@ -1393,7 +1393,7 @@ def ats(roll):
 
 	if roll == 7 and (atsAll + atsSmall + atsTall) > 0:
 		atsOn = False
-		print(f"You lost ${atsAll+atsTall+atsSmall} from the All Tall Small.")
+		print(f"You lost ${atsAll+atsTall+atsSmall:,} from the All Tall Small.")
 		#bank -= atsAll + atsTall + atsSmall
 		chipsOnTable -= atsAll + atsTall + atsSmall
 		atsAll = atsSmall = atsTall = 0
@@ -1405,19 +1405,19 @@ def ats(roll):
 		print(f"All Tall Small: {allNums}")
 
 	if set(smallNums) == set(smallSet):
-		print(f"You won ${atsSmall * 34} on the Small!")
+		print(f"You won ${atsSmall * 34:,} on the Small!")
 		bank += atsSmall * 34
 		chipsOnTable -= atsSmall
 		atsSmall = 0
 		smallNums = []
 	if set(tallNums) == set(tallSet):
-		print(f"You won ${atsTall*34} from the Tall!")
+		print(f"You won ${atsTall*34:,} from the Tall!")
 		bank += atsTall * 34
 		chipsOnTable -= atsTall
 		atsTall = 0
 		tallNums = []
 	if set(allNums) == set(allSet):
-		print(f"You won ${atsAll*175} on the All! Holy Crap!")
+		print(f"You won ${atsAll*175:,} on the All! Holy Crap!")
 		bank += atsAll * 175
 		chipsOnTable -= atsAll
 		atsAll = 0
@@ -1463,12 +1463,12 @@ def layAll():
 		chipsOnTable += layBets[key]
 		bank -= layBets[key]
 		total += layBets[key]
-	print(f"Laying ${total} Across.")
+	print(f"Laying ${total:,} Across.")
 
 def layBetting():
 	global layBets, bank, chipsOnTable
 	for key in layBets:
-		print(f"You have ${layBets[key]} on the Lay {key}.")
+		print(f"You have ${layBets[key]:,} on the Lay {key}.")
 		print(f"How much on the Lay {key}?")
 		while True:
 			try:
@@ -1488,7 +1488,7 @@ def layBetting():
 			layBets[key] = bet
 			chipsOnTable += bet
 			bank -= bet
-			print(f"Ok, ${bet} on the Lay {key}.")
+			print(f"Ok, ${bet:,} on the Lay {key}.")
 		elif layBets[key] > 0 and bet == 0:
 			print(f"Ok, taking down your Lay {key} bet.")
 			chipsOnTable -= layBets[key]
@@ -1506,14 +1506,14 @@ def layShow():
 	global layBets
 	for key in layBets:
 		if layBets[key] > 0:
-			print(f"You have ${layBets[key]} on the Lay {key}.")
+			print(f"You have ${layBets[key]:,} on the Lay {key}.")
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
 	vigPay = vig = 0
 	if roll in [4, 5, 6, 8, 9, 10]:
 		if layBets[roll] > 0:
-			print(f"You lost ${layBets[roll]} from the Lay {roll}.")
+			print(f"You lost ${layBets[roll]:,} from the Lay {roll}.")
 			chipsOnTable -= layBets[roll]
 			layBets[roll] = 0
 			print(f"Go back up on your Lay {roll}?")
@@ -1521,7 +1521,7 @@ def layCheck(roll):
 			if layAgain.lower() == 'y':
 				print(f"How much on the Lay {roll}?")
 				layBets[roll] = betPrompt()
-				print(f"Ok, ${layBets[roll]} on the Lay {roll}.")
+				print(f"Ok, ${layBets[roll]:,} on the Lay {roll}.")
 			else:
 				pass
 
@@ -1540,10 +1540,10 @@ def layCheck(roll):
 					vigPay += 1
 				else:
 					vigPay += math.floor(vig)
-				print(f"You won ${win} on the Lay {key}!")
+				print(f"You won ${win:,} on the Lay {key}!")
 				bank += win
 		if vigPay > 0:
-			print(f"Taking out ${vigPay} for the vig.")
+			print(f"Taking out ${vigPay:,} for the vig.")
 			bank -= vigPay
 			vigPay = 0
 
@@ -1568,7 +1568,7 @@ def cashIn():
 			bank += cash
 			initBank = cash
 			break
-	print(f"Great, starting you off with ${bank}.")
+	print(f"Great, starting you off with ${bank:,}.")
 
 def quitGame():
 	global bank, chipsOnTable, initBank
@@ -1617,7 +1617,7 @@ def outOfMoney():
 		else:
 			bank += cash
 			break
-	print(f"\tAlright, starting you off again with ${bank}. Don't lose it all this time!")
+	print(f"\tAlright, starting you off again with ${bank:,}. Don't lose it all this time!")
 
 #Place Betting
 
@@ -1671,7 +1671,7 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Placing ${total} Across.")
+		print(f"Placing ${total:,} Across.")
 	elif pre.lower() == 'i':
 		print("How many units Inside?")
 		while True:
@@ -1711,7 +1711,7 @@ def placePreset(pre):
 				chipsOnTable += place[key]
 				bank -= place[key]
 				total += place[key]
-		print(f"Ok, placing ${total} inside.")
+		print(f"Ok, placing ${total:,} inside.")
 
 	elif pre.lower() == "c":
 		print("How many units on the 6 and 8?")
@@ -1738,7 +1738,7 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Ok, placing ${total} on the 6 and 8.")
+		print(f"Ok, placing ${total:,} on the 6 and 8.")
 
 
 def placeMover():
@@ -1753,7 +1753,7 @@ def placeMover():
 				place[key] = place[comeOut] - place[comeOut]//6
 			elif key in [4, 5, 9, 10] and comeOut in [4, 5, 9, 10]:
 				place[key] = place[comeOut]
-			print(f"Moving your ${place[comeOut]} Place {comeOut} bet. You now have ${place[key]} on the {key}.")
+			print(f"Moving your ${place[comeOut]:,} Place {comeOut} bet. You now have ${place[key]:,} on the {key}.")
 			chipsOnTable -= place[comeOut]
 			bank += place[comeOut]
 			chipsOnTable += place[key]
@@ -1764,7 +1764,7 @@ def placeBets():
 	global place, chipsOnTable, bank
 	madeBet = True
 	for key in place:
-		print(f"You have ${place[key]} on the Place {key}.")
+		print(f"You have ${place[key]:,} on the Place {key}.")
 		print(f"How much on the Place {key}?")
 		while True:
 			bet = 0
@@ -1789,9 +1789,9 @@ def placeBets():
 			place[key] = bet
 			chipsOnTable += bet
 			if key in [4, 10] and bet >= 10:
-				print(f"Buying the {key} for ${bet}.")
+				print(f"Buying the {key} for ${bet:,}.")
 			else:
-				print(f"${bet} on the Place {key}.")
+				print(f"${bet:,} on the Place {key}.")
 		elif place[key] > 0 and bet == 0:
 			print(f"Ok, taking down your Place {key} bet.")
 			chipsOnTable -= place[key]
@@ -1802,7 +1802,7 @@ def placeShow():
 	global place
 	for key in place:
 		if place[key] > 0:
-			print(f"You have ${place[key]} on the Place {key}.")
+			print(f"You have ${place[key]:,} on the Place {key}.")
 
 def placeTakeDown():
 	global place, bank, chipsOnTable
@@ -1817,7 +1817,7 @@ def vig(bet):
 		commission = math.ceil(total)
 	else:
 		commission = math.floor(total)
-	print(f"${commission} paid to the House for the vig.")
+	print(f"${commission:,} paid to the House for the vig.")
 	return commission
 
 def placeCheck(roll):
@@ -1837,7 +1837,7 @@ def placeCheck(roll):
 # Modulo accounts for improper bets, such as $@5 on the 6 or 8. Dealers would pay odds on the first $24 and then the remainder would get paid out as $1.
 
 			bank += win
-			print(f"You won ${win} on the Place {roll}!")
+			print(f"You won ${win:,} on the Place {roll}!")
 			print("Change your bet?")
 			change = input(">")
 			if change.lower() in ['y', 'yes']:
@@ -1853,7 +1853,7 @@ def placeCheck(roll):
 					chipsOnTable -= place[roll]
 					#bank += place[roll]
 					place[roll] = bet
-					print(f"Ok, ${place[roll]} on the Place {roll}.")
+					print(f"Ok, ${place[roll]:,} on the Place {roll}.")
 	elif roll == 7:
 		loss = 0
 		for key in place:
@@ -1862,7 +1862,7 @@ def placeCheck(roll):
 		#bank -= loss
 		chipsOnTable -= loss
 		if loss > 0:
-			print(f"You lost ${loss} from the Place bets.")
+			print(f"You lost ${loss:,} from the Place bets.")
 	else:
 		pass
 
@@ -1870,11 +1870,11 @@ def showAllBets():
 	global comeBet, dComeBet, fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
 	for value in lineBets:
 		if lineBets[value] > 0:
-			print(f"You have ${lineBets[value]} on the {value}.")
+			print(f"You have ${lineBets[value]:,} on the {value}.")
 	if comeBet > 0:
-		print(f"You have ${comeBet} on the Come.")
+		print(f"You have ${comeBet:,} on the Come.")
 	if dComeBet > 0:
-		print(f"You have ${dComeBet} on the Don't Come.")
+		print(f"You have ${dComeBet:,} on the Don't Come.")
 	comeShow()
 	placeShow()
 	layShow() 
@@ -1882,11 +1882,11 @@ def showAllBets():
 	hardShow()
 	for value in propBets:
 		if propBets[value] > 0:
-			print(f"${propBets[value]} on {value}.")
+			print(f"${propBets[value]:,} on {value}.")
 	if atsAll + atsSmall + atsTall > 0:
-		print(f"You have ${atsAll} on the All, ${atsTall} on the Tall, and ${atsSmall} on the Small.")
+		print(f"You have ${atsAll:,} on the All, ${atsTall:,} on the Tall, and ${atsSmall:,} on the Small.")
 	if fireBet > 0:
-		print(f"You have ${fireBet} on the Fire Bet.")
+		print(f"You have ${fireBet:,} on the Fire Bet.")
 
 #Additional Global Variables
 p2 = 0
@@ -1899,9 +1899,9 @@ print(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
 cashIn()
 while True:
 	if chipsOnTable <= 0:
-		print(f"You have ${bank} in the bank.")
+		print(f"You have ${bank:,} in the bank.")
 	else:
-		print(f"You have ${bank} in the bank with ${chipsOnTable} out on the table.")
+		print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
 	if bank <= 0 and chipsOnTable <= 0:
 		outOfMoney()
 	print(f"Throws: {throws}\n")
@@ -2043,7 +2043,7 @@ while True:
 				print("Fire Bet:\n")
 				fireBetting()
 			else:
-				print(f"You have ${fireBet} on the Fire Bet; Numbers Hit: {fire}.")
+				print(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
 			continue
 #Coming Out Roll
 		elif round1.lower() in ["x", "r"]:
@@ -2054,7 +2054,7 @@ while True:
 			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
 			continue
 		elif round1.lower() == "b":
-			print(f"You have ${bank} in the Bank and ${chipsOnTable} out on the table.")
+			print(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
 			continue
 		elif round1.lower() == "a":
 			showAllBets()
@@ -2092,9 +2092,9 @@ while True:
 		working = False
 		while True:
 			if chipsOnTable > 0:
-				print(f"You have ${bank} in the bank with ${chipsOnTable} out on the table.")
+				print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
 			else:
-				print(f"You have ${bank} in the bank.")
+				print(f"You have ${bank:,} in the bank.")
 
 			if bank <= 0 and chipsOnTable <= 0:
 				outOfMoney()
@@ -2116,7 +2116,7 @@ while True:
 					continue
 
 				if round2.lower() == "b":
-					print(f"You have ${bank} in your rack with ${chipsOnTable} on the table. The Point is {comeOut}.")
+					print(f"You have ${bank:,} in your rack with ${chipsOnTable:,} on the table. The Point is {comeOut}.")
 					continue
 
 				if round2.lower() == "dp":

@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.4.1"
+version = "6.4.2"
 
 #Roll and Dice Setup
 die1 = die2 = 0
@@ -1812,7 +1812,8 @@ def placeCheck(roll):
 
 			bank += win
 			print(f"You won ${win:,} on the Place {roll}!")
-			if str(input("Change your bet? > ")).strip().lower() in ['y', 'yes']:
+			press = str(input("Change your bet? 'y' to change, 'p' to full-press, 'hp' to half-press, or 'u' to press 1 unit, or Enter to do nothing.\n > ")).strip().lower()
+			if press == 'y':
 				print(f"How much on the Place {roll}?")
 				bank += place[roll]
 				bet = betPrompt()
@@ -1824,6 +1825,30 @@ def placeCheck(roll):
 					chipsOnTable -= place[roll]
 					place[roll] = bet
 					print(f"Ok, ${place[roll]:,} on the Place {roll}.")
+			elif press == 'p':
+				bank += place[roll]
+				chipsOnTable -= place[roll]
+				place[roll] *= 2
+				bank -= place[roll]
+				chipsOnTable += place[roll]
+				print(f"Full Press! You now have ${place[roll]} on the Place {roll}")
+			elif press == 'hp':
+				bank += place[roll]
+				chipsOnTable -= place[roll]
+				place[roll] *= 1.5
+				bank -= place[roll]
+				chipsOnTable += place[roll]
+				print(f"Half Press! You now have ${place[roll]} on the Place {roll}")
+			elif press == 'u':
+				bank += place[roll]
+				chipsOnTable -= place[roll]
+				if roll in [4, 5, 9, 10]:
+					place[roll] += 5
+				else:
+					place[roll] += 6
+				bank -= place[roll]
+				chipsOnTable += place[roll]
+				print(f"Pressing up one unit. You now have ${place[roll]} on the Place {roll}")
 	elif roll == 7:
 		loss = 0
 		for key in place:

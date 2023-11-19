@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.4.2"
+version = "6.4.3"
 
 #Roll and Dice Setup
 die1 = die2 = 0
@@ -1207,7 +1207,7 @@ def propBetting():
 			print("Showing your Prop Bets:\n")
 			for key in propBets:
 				if propBets[key] > 0:
-					print(f"\t${str(propBets[key]):,} on {key}.")
+					print(f"\t${propBets[key]:,} on {key}.")
 			continue
 		elif bet == 'help':
 			propHelp()
@@ -1239,12 +1239,11 @@ def propPay(roll):
 				multiplier = 7
 			elif key == "Horn" and roll in [2, 12]:
 				multiplier = 30
-				sub = propBets[key]//4 * 3
-				propBets[key] = propBets[key]//4
+
+#				sub = propBets[key]//4 * 3
 			elif key == "Horn" and roll in [3, 11]:
 				multiplier = 15
-				sub = propBets[key]//4*3
-				propBets[key] = propBets[key]//4
+#				sub = propBets[key]//4*3
 			elif key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
 				multiplier = 30
 				sub = propBets[key]//4*3
@@ -1326,10 +1325,15 @@ def propPay(roll):
 				multiplier = 0
 
 			if multiplier > 0:
-				print(f"You won ${(propBets[key]*multiplier)-sub:,} on the {key} bet!")
-				bank += propBets[key] + (propBets[key] * multiplier) - sub
-				chipsOnTable -= propBets[key] + sub
-				propBets[key] = 0
+				if key == "Horn":
+					print(f"You won ${(propBets[key]//4 * multiplier - propBets[key]):,} on the {key} bet!")
+					bank += (propBets[key]//4) * multiplier - propBets[key]
+					print("If it pays it stays! Horn bets are still up.")
+				else:
+					print(f"You won ${(propBets[key]*multiplier)-sub:,} on the {key} bet!")
+					bank += propBets[key] + (propBets[key] * multiplier) - sub
+					chipsOnTable -= propBets[key] + sub
+					propBets[key] = 0
 			elif multiplier == 0:
 				print(f"You lost ${propBets[key]:,} from the {key}.")
 				chipsOnTable -= propBets[key]

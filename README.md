@@ -1,13 +1,13 @@
-# OhCraps! v.6.4.2
+# OhCraps! v.6.5
 Python-based Craps game for Terminal.
 
 ## About
 
-Craps is one of the best games you can play in a casino and contains a variety of bets that have some of the lowest house advantage percentages over you. This game is built to run within a Terminal environment and is accessible for blind players.
+The game of Craps is one of the best table games you can play in a casino and contains a variety of bets that have some of the lowest house advantage percentages over you. This game is built to run within a Terminal environment and is accessible for blind players.
 
 Craps is entirely based on the randomness of thrown dice. When the game starts, a bet on the Pass Line will win if a 7 or 11 is thrown with the first roll, also known as the Coming Out roll. A 2, 3, or 12 will lose on the first roll. Any other number thrown on the first roll becomes the Point number, and then the shooter continues to roll until they either roll the Point number or throw a 7. Hitting the Point number is a Pass Line win, the game resets and everything starts up again. Rolling a 7 on the other hand after a Point is established is a loss, and all bets on the table lose with the exception of Don't Pass/Don't Come bets and Any 7 proposition bets.
 
-If you'd enjoy checking through some strategies to play, be sure to visit my [Oh Craps! Strategy Page.](https://www.marconius.com/craps)
+If you'd enjoy checking through some strategies to play, be sure to visit my [Oh Craps! Strategy Page.](https://www.marconius.com/craps/)
 
 ## How to Play
 
@@ -19,7 +19,7 @@ The game starts off asking you to set up a bankroll. Enter a numeric amount to s
 
 ### Coming Out Roll
 
-You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the the bet code at the prompt and hitting Enter.
+You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the bet code at the prompt and hitting Enter.
 
 #### Bet Codes for Round 1 Betting
 
@@ -123,11 +123,13 @@ Typing 'p' and hitting Enter on the Place Prompt after the point has been establ
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
 
+Lay bets are always working on the Come Out roll.
+
 At the Lay Bet prompt, typing 'd' and hitting Enter will take down all your Lay Bets.
 
 Also at the prompt, typing 'a' and hitting enter will allow you to make Lay bets across all of the numbers. Enter a unit amount and it will multiply by 5 and lay that amount on each of the box numbers.
 
-After  point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
+After a point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
 Check the Pay Table to see how each of the Lay Bets pays out. There is a 5% commission/vig paid back to the House based on your winnings when a Lay bet wins. When your Lay Bets win, they will stay up until you take them down or they lose.
 

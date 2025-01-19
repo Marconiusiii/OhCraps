@@ -262,7 +262,7 @@ def lineBetting():
 		if lineBets["Pass"] > 0:
 			print(f'You have ${lineBets["Pass"]:,} on the Pass Line.')
 		if lineBets["Don't Pass"] > 0:
-			print("You have ${:,} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
+			print("You have ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
 		try:
 			lBet = input(">")
 		except ValueError:
@@ -280,7 +280,7 @@ def lineBetting():
 			bank += lineBets["Don't Pass"]
 			print("How much on the Don't Pass line?")
 			lineBets["Don't Pass"] = betPrompt()
-			print("Ok, ${:,} on the Don't Pass Line.".format(lineBets["Don't Pass"]))
+			print(f"Ok, ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
 			continue
 		elif lBet.lower() in ['x', 'close', 'esc', 'exit', 'done']:
 			print("Ok, moving on!")
@@ -297,7 +297,7 @@ def lineCheck(roll, p2roll):
 				print(f"You won ${lineBets['Pass']:,} on the Pass Line!")
 				bank += lineBets["Pass"]
 			if lineBets["Don't Pass"] > 0:
-				print("You lost ${:,} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				print(f"You lost ${lineBets["Don't Pass"]:,} from the Don't Pass Line.")
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 		elif roll in [2, 3, 12]:
@@ -307,7 +307,7 @@ def lineCheck(roll, p2roll):
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
 				if roll in [2, 3]:
-					print("You won ${:,} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+					print(f"You won ${lineBets["Don't Pass"]:,} on the Don't Pass Line!")
 					bank += lineBets["Don't Pass"]
 				elif roll == 12:
 					print("12 is a Push!")
@@ -319,7 +319,7 @@ def lineCheck(roll, p2roll):
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
-				print("You lost ${:,} from the Don't Pass Line.".format(lineBets["Don't Pass"]))
+				print(f"You lost ${lineBets["Don't Pass"]:,} from the Don't Pass Line.")
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
 			oddsCheck(p2roll)
@@ -329,7 +329,7 @@ def lineCheck(roll, p2roll):
 				chipsOnTable -= lineBets["Pass"]
 				lineBets["Pass"] = 0
 			if lineBets["Don't Pass"] > 0:
-				print("You won ${:,} on the Don't Pass Line!".format(lineBets["Don't Pass"]))
+				print(f"You won ${lineBets["Don't Pass"]:,} on the Don't Pass Line!")
 				bank += lineBets["Don't Pass"] * 2
 				chipsOnTable -= lineBets["Don't Pass"]
 				lineBets["Don't Pass"] = 0
@@ -391,7 +391,7 @@ def odds():
 				break
 
 	if lineBets["Don't Pass"] > 0:
-		print("You have ${:,} for your lay odds.".format(lineBets["Don't Pass Odds"]))
+		print(f"You have ${lineBets["Don't Pass Odds"]:,} for your lay odds.")
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
@@ -399,7 +399,7 @@ def odds():
 			dpOddsChange = betPrompt()
 			if dpOddsChange > 0 and dpOddsChange <= maxDP:
 				lineBets["Don't Pass Odds"] = dpOddsChange
-				print("Ok, ${:,} laid against the Point.".format(lineBets["Don't Pass Odds"]))
+				print(f"Ok, ${lineBets["Don't Pass Odds"]:,} laid against the Point.")
 				break
 			elif dpOddsChange > maxDP:
 				print("Nope, you laid too much! Try again.")
@@ -446,7 +446,7 @@ def oddsCheck(roll):
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 	elif lineBets["Don't Pass Odds"] > 0 and roll == comeOut:
-		print("You lost ${:,} from your Don't Pass Odds.".format(lineBets["Don't Pass Odds"]))
+		print(f"You lost ${lineBets["Don't Pass Odds"]:,} from your Don't Pass Odds.")
 		chipsOnTable -= lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass Odds"] = 0
 
@@ -1887,7 +1887,7 @@ def showAllBets():
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
-working = False
+working = plWork = hdWork = lyWork = coWork = False
 throws = 0
 
 # Game Start
@@ -2060,10 +2060,10 @@ while True:
 	comeOut  = roll()
 	throws += 1
 	comeCheck(comeOut)
+	layCheck(comeOut)
 	fieldCheck(comeOut)
-	if working == True:
+	if working:
 		placeCheck(comeOut)
-		layCheck(comeOut)
 		hardCheck(comeOut)
 
 	propPay(comeOut)

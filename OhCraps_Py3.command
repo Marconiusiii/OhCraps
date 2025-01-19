@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.4.3"
+version = "6.5"
 
 #Roll and Dice Setup
 die1 = die2 = 0
@@ -41,24 +41,24 @@ def roll():
 	return total
 
 dealerCalls = {
-2: ["Craps!", "eye balls.", "two aces.", "rats eyes.", "snake eyes.", "eleven in a shoe store.", "twice in the rice.", "two craps two, two bad boys from Illinois.", "two crap aces.", "aces in both places.", "a spot and a dot.", "dimples.", "double the Field!"],
-3: ["Craps!", "ace-deuce.", "three craps, ace caught a deuce, no use.", "divorce roll, come up single.", "winner on the dark side!", "three craps three, the indicator.", "crap and a half.", "small ace deuce, can't produce.", "2 , 1, son of a gun."],
-4: ["Little Joe.", "Little Joe from Kokomo.", "Ace Tres.", "Ace Tres the easy way.", "Little Billy from Piccadilly.", "Little Joe from Idaho."],
-5: ["After 5 the Field's alive.", "Fiver Fiver Racecar Driver.", "No Field 5.", "Little Phoebe.", "We got the fiver.", "Five 5.", "Take a dive!"],
-6: ["The national average.", "Catch 'em in the corner.", "Sixie from Dixie."],
-7: ["Line Away, grab the money!", "the bruiser.", "point 7.", "Out!", "Loser 7.", "Nevada Breakfast, two rolls and no coffee.", "Cinco Dos, Adios!", "Adios.", "3 4 on the floor.", "Big Red!"],
-8: ["eighter from the theater.", "the Great!", "get yer mate."],
-9: ["niner 9.", "center field 9.", "Center of the garden.", "ocean liner niner.", "Nina from Pasadena.", "nina Niner, wine and dine her!", "El Nine-O.", "Niner, nothing finer.", "Neener Neener from Pasadeener."],
-10: ["The big one on the end!", "64 out the door.", "The Big One!"],
-11: ["Yo Eleven.", "Yo!", "6 5, no drive.", "yo 'leven.", "It's not my eleven, it's Yo Eleven.", "Bow wow wow yippie Yo yippie yay!"],
-12: ["craps!", "midnight.", "a whole lotta crap!", "craps to the max.", "boxcars.", "all the spots we gots!", "triple field!", "atomic craps.", "Hobo's delight."]
+2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
+3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
+4: ["Little Joe", "Little Joe from Kokomo", "Ace Tres", "Ace Tres the easy way", "Little Billy from Piccadilly", "Little Joe from Idaho"],
+5: ["After 5 the Field's alive", "Fiver Fiver Race car Driver", "No Field 5", "Little Phoebe", "We got the fiver", "Five 5", "Take a dive"],
+6: ["The national average", "Catch 'em in the corner", "Sixie from Dixie"],
+7: ["Line Away, grab the money", "the bruiser", "Out", "Loser 7", "Nevada Breakfast, two rolls and no coffee", "Cinco Dos, Adios", "Adios", "3 4 on the floor", "Big Red"],
+8: ["eighter from the theater", "the Great", "get yer mate"],
+9: ["niner 9.", "center field 9", "Center of the garden", "ocean liner Niner", "Nina from Pasadena", "nina Niner, wine and dine her", "El Nine-O", "Niner, nothing finer", "Neener Neener from Pasadeener"],
+10: ["The big one on the end", "64 out the door", "The Big One"],
+11: ["Yo Eleven", "Yo", "6 5, no drive", "yo 'leven", "It's not my eleven, it's Yo Eleven", "Bow wow wow yippie Yo yippie yay"],
+12: ["craps", "midnight", "a whole lotta crap", "craps to the max", "boxcars", "all the spots we gots", "triple field", "atomic craps", "Hobo's delight"]
 }
 
 hardCalls = {
-4: ["Double deuce.", "2 2 Ballerina Special.", "Hit us in the tutu.", "2 spots and 2 dots.", "It's little but it came Hard!"],
-6: ["Sixie from Dixie.", "tree tre.", "Pair of trees.", "Double 3s"],
-8: ["Double 4s", "Ozzy and Harriet.", "A square pair!", "A square pair will take ya there.", "Pair of windows.", "Windows."],
-10: ["Pair of sunflowers.", "Two stars from Mars.", "Double 5s", "A Hard 10 to please 'er.", "Girl's best friend.", "Puppy paws.", "55 to stay alive.",  "Pair of roses.", "Two starfish walkin'!"]
+4: ["Double deuce", "2 2 Ballerina Special", "Hit us in the tutu", "2 spots and 2 dots", "It's little but it came Hard"],
+6: ["Sixie from Dixie", "tree tre", "Pair of trees", "Double 3s"],
+8: ["Double 4s", "Ozzy and Harriet", "A square pair", "A square pair will take ya there", "Pair of windows", "Windows"],
+10: ["Pair of sunflowers", "Two stars from Mars", "Double 5s", "A Hard 10 to please 'er", "Girl's best friend", "Puppy paws", "55 to stay alive", "Pair of roses", "Two starfish walkin'"]
 }
 
 def stickman(roll):
@@ -98,7 +98,7 @@ def fireCheck():
 			fireBet = 0
 			fire = []
 		elif len(fire) == 6:
-			print(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000:,}!!!")
+			print(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000:,}!!")
 			bank += fireBet * 1000
 			fireBet = 0
 			fire = []

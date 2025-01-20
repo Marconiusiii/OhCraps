@@ -262,7 +262,7 @@ def lineBetting():
 		if lineBets["Pass"] > 0:
 			print(f'You have ${lineBets["Pass"]:,} on the Pass Line.')
 		if lineBets["Don't Pass"] > 0:
-			print("You have ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
+			print(f"You have ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
 		try:
 			lBet = input(">")
 		except ValueError:

@@ -5,7 +5,7 @@ import math
 import os
 
 #Version Number
-version = "6.5"
+version = "6.5.1"
 
 #Roll and Dice Setup
 die1 = die2 = 0
@@ -2299,7 +2299,7 @@ while True:
 			if p2 == 7:
 				throws = 0
 				pointIsOn = False
-				os.system("clear")
+#				os.system("clear")
 				break
 			elif p2 == comeOut:
 				print("Point Hit! Front line winner!")

@@ -27,6 +27,39 @@ class GameState:
 			return self.comeOut
 		return None
 
+from enum import Enum, auto
+
+class RollOutcome(Enum):
+	NATURAL = auto()
+	CRAPS = auto()
+	POINT_ESTABLISHED = auto()
+	POINT_HIT = auto()
+	SEVEN_OUT = auto()
+	NEUTRAL = auto()
+
+def evaluateRoll(gameState, rollValue):
+	"""
+	Classify the meaning of a dice roll based on current game state.
+	No printing, no payouts, no side effects.
+	"""
+
+	# Phase 1: Come-out roll
+	if not gameState.pointIsOn:
+		if rollValue in (7, 11):
+			return RollOutcome.NATURAL
+		elif rollValue in (2, 3, 12):
+			return RollOutcome.CRAPS
+		else:
+			return RollOutcome.POINT_ESTABLISHED
+
+	# Phase 2: Point is on
+	else:
+		if rollValue == 7:
+			return RollOutcome.SEVEN_OUT
+		elif rollValue == gameState.comeOut:
+			return RollOutcome.POINT_HIT
+		else:
+			return RollOutcome.NEUTRAL
 def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
 	"""
 	Engine-level dice roll.
@@ -2117,7 +2150,10 @@ while True:
 
 
 	comeOut = roll()
+	outcome = evaluateRoll(gameState, comeOut)
+
 	throws += 1
+
 	comeCheck(comeOut)
 	layCheck(comeOut)
 	fieldCheck(comeOut)
@@ -2345,7 +2381,10 @@ while True:
 					continue
 			p2 = roll()
 
+			outcome = evaluateRoll(gameState, p2)
+
 			throws += 1
+
 			comeCheck(p2)
 			if placeOff:
 				placeOff = False

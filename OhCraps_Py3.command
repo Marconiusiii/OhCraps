@@ -1,21 +1,33 @@
 #!/usr/bin/env python3
 
-from random import *
+import random
 import math
 import os
+from dataclasses import dataclass
+from typing import Optional
 
-#Version Number
-version = "6.5.1"
+@dataclass(frozen=True)
+class DiceRoll:
+	die1: int
+	die2: int
+	total: int
+	isHard: bool
 
-#Roll and Dice Setup
-die1 = die2 = 0
+def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
+	"""
+	Engine-level dice roll.
+	- Keeps your existing convention of ordering die1 >= die2.
+	- isHard is True only for doubles.
+	- Optional rng injection enables deterministic tests.
+	"""
+	if rng is None:
+		d1 = random.randint(1, 6)
+		d2 = random.randint(1, 6)
+	else:
+		d1 = rng.randint(1, 6)
+		d2 = rng.randint(1, 6)
 
-def roll():
-	global rollHard, pointIsOn, die1, die2
-	rollHard = False
-	d1 = randint(1, 6)
-	d2 = randint(1, 6)
-	if d1 > d2 or d1 == d2:
+	if d1 >= d2:
 		die1 = d1
 		die2 = d2
 	else:
@@ -23,6 +35,26 @@ def roll():
 		die2 = d1
 
 	total = die1 + die2
+	isHard = (die1 == die2)
+
+	return DiceRoll(die1=die1, die2=die2, total=total, isHard=isHard)
+
+#Version Number
+version = "7.0.0"
+
+#Roll and Dice Setup
+die1 = die2 = 0
+
+def roll():
+	global rollHard, pointIsOn, die1, die2
+
+	rollHard = False
+
+	dice = rollDice()
+	die1 = dice.die1
+	die2 = dice.die2
+	total = dice.total
+
 	if die1 == die2 and total in [4, 6, 8, 10]:
 		rollHard = True
 		print(f"\n{total} the Hard Way!\n")
@@ -30,14 +62,16 @@ def roll():
 	elif total in [7, 11] and pointIsOn == False:
 		print(f"\n{total} winner! Pay the line, take the don't!\n")
 	else:
-		call = randrange(1, 21)
+		call = random.randrange(1, 21)
 
-# Call picks a random number between 1 and 20. If the number is 10 or below, it triggers one of the random dealer calls based on the roll. Otherwise it calls out a standard dice call.
-
-		if call <=10 or total in [2, 3, 11, 12]:
+		# Call picks a random number between 1 and 20. If the number is <= 10,
+		# or if the total is in [2, 3, 11, 12], it uses stickman.
+		# Otherwise it calls out the dice faces.
+		if call <= 10 or total in [2, 3, 11, 12]:
 			print(f"\n{total}, {stickman(total)}!\n")
 		else:
 			print(f"\n{total}, a {die1} {die2} {total}!\n")
+
 	return total
 
 dealerCalls = {
@@ -64,9 +98,9 @@ hardCalls = {
 def stickman(roll):
 	global rollHard
 	if rollHard:
-		return hardCalls[roll][randrange(0, len(hardCalls[roll]))]
+		return hardCalls[roll][random.randrange(0, len(hardCalls[roll]))]
 	else:
-		return dealerCalls[roll][randrange(0, len(dealerCalls[roll]))]
+		return dealerCalls[roll][random.randrange(0, len(dealerCalls[roll]))]
 
 # Fire Bet Setup
 

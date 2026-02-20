@@ -30,12 +30,12 @@ class GameState:
 from enum import Enum, auto
 
 class RollOutcome(Enum):
-	NATURAL = auto()
-	CRAPS = auto()
-	POINT_ESTABLISHED = auto()
-	POINT_HIT = auto()
-	SEVEN_OUT = auto()
-	NEUTRAL = auto()
+	natural = auto()
+	craps = auto()
+	pointEstablished = auto()
+	pointHit = auto()
+	sevenOut = auto()
+	neutral = auto()
 
 def evaluateRoll(gameState, rollValue):
 	"""
@@ -46,20 +46,20 @@ def evaluateRoll(gameState, rollValue):
 	# Phase 1: Come-out roll
 	if not gameState.pointIsOn:
 		if rollValue in (7, 11):
-			return RollOutcome.NATURAL
+			return RollOutcome.natural
 		elif rollValue in (2, 3, 12):
-			return RollOutcome.CRAPS
+			return RollOutcome.craps
 		else:
-			return RollOutcome.POINT_ESTABLISHED
+			return RollOutcome.pointEstablished
 
 	# Phase 2: Point is on
 	else:
 		if rollValue == 7:
-			return RollOutcome.SEVEN_OUT
+			return RollOutcome.sevenOut
 		elif rollValue == gameState.comeOut:
-			return RollOutcome.POINT_HIT
+			return RollOutcome.pointHit
 		else:
-			return RollOutcome.NEUTRAL
+			return RollOutcome.neutral
 def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
 	"""
 	Engine-level dice roll.

@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1526,40 +1526,20 @@ def layShow():
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
-	vigPay = vig = 0
-	if roll in [4, 5, 6, 8, 9, 10]:
-		if layBets[roll] > 0:
-			print(f"You lost ${layBets[roll]:,} from the Lay {roll}.")
-			chipsOnTable -= layBets[roll]
-			layBets[roll] = 0
-			if str(input(f"Go back up on your Lay {roll}? > ")).strip().lower() == 'y':
-				print(f"How much on the Lay {roll}?")
-				layBets[roll] = betPrompt()
-				print(f"Ok, ${layBets[roll]:,} on the Lay {roll}.")
-			else:
-				print("Got it, you are done being Layed.")
+	settlement = settleLayBets(layBets=layBets, roll=roll)
+	layBets = settlement.layBets
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
 
-	elif roll == 7:
-		for key in layBets:
-			win = 0
-			if layBets[key] > 0:
-				if key in [4, 10]:
-					win = layBets[key]//2
-				elif key in [5, 9]:
-					win = layBets[key]//3*2
-				elif key in [6, 8]:
-					win = layBets[key]//6*5
-				vig = win*0.05
-				if vig < 1:
-					vigPay += 1
-				else:
-					vigPay += math.floor(vig)
-				print(f"You won ${win:,} on the Lay {key}!")
-				bank += win
-		if vigPay > 0:
-			print(f"Taking out ${vigPay:,} for the vig.")
-			bank -= vigPay
-			vigPay = 0
+	if settlement.lostNumber is not None:
+		if str(input(f"Go back up on your Lay {settlement.lostNumber}? > ")).strip().lower() == 'y':
+			print(f"How much on the Lay {settlement.lostNumber}?")
+			layBets[settlement.lostNumber] = betPrompt()
+			print(f"Ok, ${layBets[settlement.lostNumber]:,} on the Lay {settlement.lostNumber}.")
+		else:
+			print("Got it, you are done being Layed.")
 
 # Bank and bet setup
 bank = 0

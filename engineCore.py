@@ -50,6 +50,18 @@ class PlaceSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class LaySettlement:
+	layBets: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	lostNumber: int | None
+	lostAmount: int
+	totalWinAmount: int
+	totalVigAmount: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -226,6 +238,83 @@ def settlePlaceBets(placeBets: dict, roll: int) -> PlaceSettlement:
 		winAmount=winAmount,
 		commissionPaid=commissionPaid,
 		lossAmount=lossAmount,
+		messages=messages
+	)
+
+
+def normalizeLayBets(layBets: dict) -> dict:
+	normalized = {
+		4: 0,
+		5: 0,
+		6: 0,
+		8: 0,
+		9: 0,
+		10: 0
+	}
+	for key in normalized:
+		if key in layBets:
+			normalized[key] = int(layBets[key])
+	return normalized
+
+
+def calculateLayWin(number: int, bet: int) -> int:
+	if number in [4, 10]:
+		return bet//2
+	if number in [5, 9]:
+		return (bet//3) * 2
+	if number in [6, 8]:
+		return (bet//6) * 5
+	return 0
+
+
+def calculateLayVig(win: int) -> int:
+	if win <= 0:
+		return 0
+	vig = win * 0.05
+	if vig < 1:
+		return 1
+	return math.floor(vig)
+
+
+def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
+	updatedLayBets = normalizeLayBets(layBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	lostNumber = None
+	lostAmount = 0
+	totalWinAmount = 0
+	totalVigAmount = 0
+	messages = []
+
+	if roll in [4, 5, 6, 8, 9, 10] and updatedLayBets[roll] > 0:
+		lostNumber = roll
+		lostAmount = updatedLayBets[roll]
+		messages.append(f"You lost ${lostAmount:,} from the Lay {roll}.")
+		chipsOnTableDelta -= lostAmount
+		updatedLayBets[roll] = 0
+
+	elif roll == 7:
+		for key in updatedLayBets:
+			if updatedLayBets[key] > 0:
+				win = calculateLayWin(key, updatedLayBets[key])
+				vigPay = calculateLayVig(win)
+				totalWinAmount += win
+				totalVigAmount += vigPay
+				messages.append(f"You won ${win:,} on the Lay {key}!")
+		if totalWinAmount > 0:
+			bankDelta += totalWinAmount
+		if totalVigAmount > 0:
+			messages.append(f"Taking out ${totalVigAmount:,} for the vig.")
+			bankDelta -= totalVigAmount
+
+	return LaySettlement(
+		layBets=updatedLayBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		lostNumber=lostNumber,
+		lostAmount=lostAmount,
+		totalWinAmount=totalWinAmount,
+		totalVigAmount=totalVigAmount,
 		messages=messages
 	)
 

@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -114,6 +114,31 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.lossAmount, 90)
 		self.assertEqual(settlement.chipsOnTableDelta, -90)
 		self.assertEqual(settlement.placeBets, {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+
+	def testSettleLayBetsLosesOnLayNumber(self):
+		layBets = {4: 30, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settleLayBets(layBets=layBets, roll=4)
+		self.assertEqual(settlement.lostNumber, 4)
+		self.assertEqual(settlement.lostAmount, 30)
+		self.assertEqual(settlement.chipsOnTableDelta, -30)
+		self.assertEqual(settlement.layBets[4], 0)
+
+	def testSettleLayBetsSevenPayoutAndVig(self):
+		layBets = {4: 40, 5: 30, 6: 36, 8: 0, 9: 0, 10: 0}
+		settlement = settleLayBets(layBets=layBets, roll=7)
+		self.assertEqual(settlement.totalWinAmount, 70)
+		self.assertEqual(settlement.totalVigAmount, 3)
+		self.assertEqual(settlement.bankDelta, 67)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertEqual(settlement.layBets, layBets)
+
+	def testSettleLayBetsNeutralRollNoChange(self):
+		layBets = {4: 25, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settleLayBets(layBets=layBets, roll=8)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertEqual(settlement.lostNumber, None)
+		self.assertEqual(settlement.layBets, layBets)
 
 
 if __name__ == "__main__":

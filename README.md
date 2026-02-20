@@ -328,6 +328,31 @@ Why this matters:
 - Removes invalid intermediate bets (like $27 on 6/8).
 - Locks behavior with deterministic tests for regression protection.
 
+### Milestone 20: Engine state container adoption (phase 1)
+
+This milestone starts replacing repeated manual state syncing in the terminal loop with engine-owned helpers.
+
+Engine additions:
+
+- `createGameState(bank, chipsOnTable, throws, pointIsOn, comeOut, p2)`
+- `syncGameState(gameState, bank, chipsOnTable, throws, pointIsOn, comeOut, p2)`
+
+What changed in terminal flow:
+
+- Initial runtime state creation now uses `createGameState(...)`.
+- Repeated manual assignment blocks (`gameState.bank = ...`, etc.) were replaced with single `syncGameState(...)` calls in roll-cycle transition points.
+
+Why this matters for iOS readiness:
+
+- Reduces duplicated state-write logic in UI-layer code.
+- Creates one explicit pathway for state synchronization.
+- Lowers risk of partial state updates during future UI adapter refactors.
+
+Phase 1 scope note:
+
+- This does not yet remove all globals from terminal code.
+- It standardizes high-frequency core state synchronization while preserving existing gameplay behavior.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

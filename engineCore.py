@@ -230,6 +230,27 @@ def evaluateRoll(gameState: GameState, rollValue: int) -> RollOutcome:
 	return RollOutcome.neutral
 
 
+def createGameState(bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int) -> GameState:
+	return GameState(
+		bank=int(bank),
+		chipsOnTable=int(chipsOnTable),
+		throws=int(throws),
+		pointIsOn=bool(pointIsOn),
+		comeOut=int(comeOut),
+		p2=int(p2)
+	)
+
+
+def syncGameState(gameState: GameState, bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int) -> GameState:
+	gameState.bank = int(bank)
+	gameState.chipsOnTable = int(chipsOnTable)
+	gameState.throws = int(throws)
+	gameState.pointIsOn = bool(pointIsOn)
+	gameState.comeOut = int(comeOut)
+	gameState.p2 = int(p2)
+	return gameState
+
+
 def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
 	source = rng if rng is not None else random
 	d1 = source.randint(1, 6)

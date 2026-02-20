@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -41,6 +41,25 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(evaluateRoll(state, 7), RollOutcome.sevenOut)
 		self.assertEqual(evaluateRoll(state, 6), RollOutcome.pointHit)
 		self.assertEqual(evaluateRoll(state, 8), RollOutcome.neutral)
+
+	def testCreateGameState(self):
+		state = createGameState(bank=1500, chipsOnTable=120, throws=9, pointIsOn=True, comeOut=8, p2=6)
+		self.assertEqual(state.bank, 1500)
+		self.assertEqual(state.chipsOnTable, 120)
+		self.assertEqual(state.throws, 9)
+		self.assertEqual(state.pointIsOn, True)
+		self.assertEqual(state.comeOut, 8)
+		self.assertEqual(state.p2, 6)
+
+	def testSyncGameState(self):
+		state = createGameState(bank=100, chipsOnTable=10, throws=1, pointIsOn=False, comeOut=0, p2=0)
+		syncGameState(gameState=state, bank=200, chipsOnTable=50, throws=7, pointIsOn=True, comeOut=5, p2=9)
+		self.assertEqual(state.bank, 200)
+		self.assertEqual(state.chipsOnTable, 50)
+		self.assertEqual(state.throws, 7)
+		self.assertEqual(state.pointIsOn, True)
+		self.assertEqual(state.comeOut, 5)
+		self.assertEqual(state.p2, 9)
 
 	def testSettleLineBetsComeOutNatural(self):
 		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 0}

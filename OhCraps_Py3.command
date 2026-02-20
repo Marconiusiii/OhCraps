@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1668,7 +1668,7 @@ working = plWork = hdWork = lyWork = coWork = False
 throws = 0
 comeOut = 0
 
-gameState = GameState(
+gameState = createGameState(
 	bank=bank,
 	chipsOnTable=chipsOnTable,
 	throws=throws,
@@ -1866,22 +1866,12 @@ while True:
 			throws = 0
 		lineCheck(comeOut, p2)
 		working = False
-		gameState.bank = bank
-		gameState.chipsOnTable = chipsOnTable
-		gameState.throws = throws
-		gameState.pointIsOn = pointIsOn
-		gameState.comeOut = comeOut
-		gameState.p2 = p2
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		continue
 	elif comeOut in [2, 3, 12]:
 		lineCheck(comeOut, p2)
 		working = False
-		gameState.bank = bank
-		gameState.chipsOnTable = chipsOnTable
-		gameState.throws = throws
-		gameState.pointIsOn = pointIsOn
-		gameState.comeOut = comeOut
-		gameState.p2 = p2
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		continue
 	else:
 		pointIsOn = True
@@ -2106,30 +2096,15 @@ while True:
 				throws = 0
 				pointIsOn = False
 #				os.system("clear")
-				gameState.bank = bank
-				gameState.chipsOnTable = chipsOnTable
-				gameState.throws = throws
-				gameState.pointIsOn = pointIsOn
-				gameState.comeOut = comeOut
-				gameState.p2 = p2
+				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 				break
 			elif p2 == comeOut:
 				print("Point Hit! Front line winner!")
 				pointIsOn = False
-				gameState.bank = bank
-				gameState.chipsOnTable = chipsOnTable
-				gameState.throws = throws
-				gameState.pointIsOn = pointIsOn
-				gameState.comeOut = comeOut
-				gameState.p2 = p2
+				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 				break
 			else:
-				gameState.bank = bank
-				gameState.chipsOnTable = chipsOnTable
-				gameState.throws = throws
-				gameState.pointIsOn = pointIsOn
-				gameState.comeOut = comeOut
-				gameState.p2 = p2
+				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 				continue
 
 	continue

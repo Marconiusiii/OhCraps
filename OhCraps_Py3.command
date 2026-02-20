@@ -223,18 +223,18 @@ def hardWaysBetting():
 				madeBet = False
 				break
 
-		if bet > 0:
-			chipsOnTable -= hardWays[key]
-			if madeBet and bet != hardWays[key]:
-				bank -= bet - hardWays[key] 
-			hardWays[key] = bet
-			chipsOnTable += bet
-			print(f"${bet:,} on the Hard {key}.")
-		elif hardWays[key] > 0 and bet == 0:
-			print(f"Ok, taking down your Hard {key} bet.")
-			chipsOnTable -= hardWays[key]
-			bank += place[key]
-			hardWays[key] = 0
+			if bet > 0:
+				chipsOnTable -= hardWays[key]
+				if madeBet and bet != hardWays[key]:
+					bank -= bet - hardWays[key] 
+				hardWays[key] = bet
+				chipsOnTable += bet
+				print(f"${bet:,} on the Hard {key}.")
+			elif hardWays[key] > 0 and bet == 0:
+				print(f"Ok, taking down your Hard {key} bet.")
+				chipsOnTable -= hardWays[key]
+				bank += hardWays[key]
+				hardWays[key] = 0
 
 def hardTakeDown():
 	global hardWays, bank, chipsOnTable
@@ -263,14 +263,16 @@ def hardHigh(num):
 	number = int(num[1:])
 	print(f"How much to spread across the Hard Ways, high on the {number}?")
 	bet = betPrompt()
+	lowBet = bet//5
+	highBet = bet - (lowBet*3)
 	for key in hardWays:
 		chipsOnTable -= hardWays[key]
 		bank += hardWays[key]
 		if key == number:
-			hardWays[key] = bet - (bet//5*3)
+			hardWays[key] = highBet
 		else:
-			hardWays[key] = bet//5
-	print(f"Ok, ${bet - (bet//5*3):,} on the Hard {number}, ${b:,} each on the other Hard Ways for a total of ${bet:,}.")
+			hardWays[key] = lowBet
+	print(f"Ok, ${highBet:,} on the Hard {number}, ${lowBet:,} each on the other Hard Ways for a total of ${bet:,}.")
 
 
 """
@@ -1920,7 +1922,7 @@ def placeCheck(roll):
 			elif press == 'hp':
 				bank += place[roll]
 				chipsOnTable -= place[roll]
-				place[roll] *= 1.5
+				place[roll] += place[roll]//2
 				bank -= place[roll]
 				chipsOnTable += place[roll]
 				print(f"Half Press! You now have ${place[roll]} on the Place {roll}")
@@ -2338,7 +2340,7 @@ while True:
 								hardOff = True
 								print("Your Hard Ways are Off.")
 							else:
-								hardOff = True
+								hardOff = False
 								print("Hard Ways are On.")
 							continue
 						elif hard2 in ['d', 'td', 'takedown']:

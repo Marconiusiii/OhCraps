@@ -1,2 +1,5 @@
 .DS_Store
 AGENTS.md
+__pycache__/
+*.pyc
+docs/refactor-learning-guide.md

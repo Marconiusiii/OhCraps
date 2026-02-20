@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -820,28 +820,22 @@ def fieldTakeDown():
 
 def fieldCheck(roll):
 	global fieldBet, bank, chipsOnTable
-	if fieldBet > 0:
-		payout = fieldBet
-		if roll in [2, 3, 4, 9, 10, 11, 12]:
-			if roll == 2:
-				payout *= 2
-				print("Double in the bubble!")
-			elif roll == 12:
-				payout *= 3
-				print("Triple in the Field!")
-			print(f"You won ${payout:,} on the Field!")
-			bank += payout
-			if str(input("Change your Field bet? > ")).strip().lower() in ['y', 'yes']:
-				chipsOnTable -= fieldBet
-				bank += fieldBet
-				fieldBet = 0
-				field()
-		else:
-			print(f"You lost ${fieldBet:,} from the Field.")
+	settlement = settleFieldBet(fieldBet=fieldBet, roll=roll)
+	fieldBet = settlement.fieldBet
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
+
+	if settlement.didWin and fieldBet > 0:
+		if str(input("Change your Field bet? > ")).strip().lower() in ['y', 'yes']:
 			chipsOnTable -= fieldBet
+			bank += fieldBet
 			fieldBet = 0
-			if str(input("Go back up on the Field? > ")).strip().lower() in ['y', 'yes']:
-				field()
+			field()
+	elif settlement.lossAmount > 0:
+		if str(input("Go back up on the Field? > ")).strip().lower() in ['y', 'yes']:
+			field()
 
 propBets = {
 "Snake Eyes": 0,

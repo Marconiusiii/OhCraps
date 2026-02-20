@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -139,6 +139,36 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, 0)
 		self.assertEqual(settlement.lostNumber, None)
 		self.assertEqual(settlement.layBets, layBets)
+
+	def testSettleFieldBetStandardWin(self):
+		settlement = settleFieldBet(fieldBet=10, roll=9)
+		self.assertEqual(settlement.didWin, True)
+		self.assertEqual(settlement.winAmount, 10)
+		self.assertEqual(settlement.bankDelta, 10)
+		self.assertEqual(settlement.fieldBet, 10)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
+	def testSettleFieldBetDoubleOnTwo(self):
+		settlement = settleFieldBet(fieldBet=10, roll=2)
+		self.assertEqual(settlement.didWin, True)
+		self.assertEqual(settlement.winAmount, 20)
+		self.assertEqual(settlement.bankDelta, 20)
+		self.assertIn("Double in the bubble!", settlement.messages)
+
+	def testSettleFieldBetTripleOnTwelve(self):
+		settlement = settleFieldBet(fieldBet=10, roll=12)
+		self.assertEqual(settlement.didWin, True)
+		self.assertEqual(settlement.winAmount, 30)
+		self.assertEqual(settlement.bankDelta, 30)
+		self.assertIn("Triple in the Field!", settlement.messages)
+
+	def testSettleFieldBetLosesOnNonFieldRoll(self):
+		settlement = settleFieldBet(fieldBet=10, roll=6)
+		self.assertEqual(settlement.didWin, False)
+		self.assertEqual(settlement.lossAmount, 10)
+		self.assertEqual(settlement.fieldBet, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.bankDelta, 0)
 
 
 if __name__ == "__main__":

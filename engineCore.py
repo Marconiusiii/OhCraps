@@ -62,6 +62,17 @@ class LaySettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class FieldSettlement:
+	fieldBet: int
+	bankDelta: int
+	chipsOnTableDelta: int
+	winAmount: int
+	lossAmount: int
+	didWin: bool
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -315,6 +326,45 @@ def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
 		lostAmount=lostAmount,
 		totalWinAmount=totalWinAmount,
 		totalVigAmount=totalVigAmount,
+		messages=messages
+	)
+
+
+def settleFieldBet(fieldBet: int, roll: int) -> FieldSettlement:
+	currentFieldBet = int(fieldBet)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	winAmount = 0
+	lossAmount = 0
+	didWin = False
+	messages = []
+
+	if currentFieldBet > 0:
+		payout = currentFieldBet
+		if roll in [2, 3, 4, 9, 10, 11, 12]:
+			didWin = True
+			if roll == 2:
+				payout *= 2
+				messages.append("Double in the bubble!")
+			elif roll == 12:
+				payout *= 3
+				messages.append("Triple in the Field!")
+			winAmount = payout
+			bankDelta += payout
+			messages.append(f"You won ${payout:,} on the Field!")
+		else:
+			lossAmount = currentFieldBet
+			chipsOnTableDelta -= currentFieldBet
+			currentFieldBet = 0
+			messages.append(f"You lost ${lossAmount:,} from the Field.")
+
+	return FieldSettlement(
+		fieldBet=currentFieldBet,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		winAmount=winAmount,
+		lossAmount=lossAmount,
+		didWin=didWin,
 		messages=messages
 	)
 

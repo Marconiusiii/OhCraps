@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -733,35 +733,7 @@ def fieldCheck(roll):
 		if str(input("Go back up on the Field? > ")).strip().lower() in ['y', 'yes']:
 			field()
 
-propBets = {
-"Snake Eyes": 0,
-"Acey Deucey": 0,
-"Eleven": 0,
-"Boxcars": 0,
-"Any Craps": 0,
-"Any Seven": 0,
-"C and E": 0,
-"Horn": 0,
-"World": 0,
-"Buffalo": 0,
-"Hi Low": 0,
-"Hop 4": 0,
-"Hop 4 Easy": 0,
-"Hop Hard 4": 0,
-"Hop 5": 0,
-"Hop 6": 0,
-"Hop 6 Easy": 0,
-"Hop Hard 6": 0,
-"Hop 7": 0,
-"Hop 8": 0,
-"Hop 8 Easy": 0,
-"Hop Hard 8": 0,
-"Hop 9": 0,
-"Hop 10": 0,
-"Hop 10 Easy": 0,
-"Hop Hard 10": 0,
-"Hop EZ": 0
-}
+propBets = createDefaultPropBets()
 
 def propHelp():
 	print("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h6e, h8e': Hop 6 or 8 Easies\n\t'hez': Hop the Easies\n\t'hh': Hop the Hard Ways\n\t'hh4-hh10': Hop Hard 4, 6, 8, or 10\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
@@ -1145,6 +1117,10 @@ def propBetting():
 
 def propPay(roll):
 	global propBets, bank, chipsOnTable, die1, die2
+	aliasResolution = resolvePropAliases(propBets=propBets)
+	propBets = aliasResolution.propBets
+	for message in aliasResolution.messages:
+		print(message)
 	subsetSettlement = settlePropSubsetBets(propBets=propBets, roll=roll)
 	propBets = subsetSettlement.propBets
 	bank += subsetSettlement.bankDelta
@@ -1164,38 +1140,16 @@ def propPay(roll):
 	for message in hopSettlement.messages:
 		print(message)
 #	multiplier = 0
-	extractedPropKeys = [
-		"Any Seven",
-		"Any Craps",
-		"Eleven",
-		"C and E",
-		"Snake Eyes",
-		"Acey Deucey",
-		"Boxcars",
-		"Horn",
-		"Buffalo",
-		"Hop Hard 4",
-		"Hop Hard 6",
-		"Hop Hard 8",
-		"Hop Hard 10",
-		"Hop 4",
-		"Hop 4 Easy",
-		"Hop 5",
-		"Hop 6",
-		"Hop 6 Easy",
-		"Hop 7",
-		"Hop 8",
-		"Hop 8 Easy",
-		"Hop 9",
-		"Hop 10",
-		"Hop 10 Easy",
-		"Hop EZ",
-		"Hop Hard"
-	]
+	propKeyMatrix = getPropKeyMatrix()
+	extractedPropKeys = []
+	for key in propKeyMatrix:
+		if propKeyMatrix[key] == "engineSettled":
+			extractedPropKeys.append(key)
 	for key in propBets:
 		if key in extractedPropKeys:
 			continue
-		continue
+		if propBets[key] > 0:
+			print(f"{key} remains up for manual player management.")
 
 
 #All Tall Small setup

@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -439,6 +439,32 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -10)
 		self.assertEqual(settlement.propBets["Hop Hard 8"], 0)
 		self.assertIn("You lost $10 from the Hop Hard 8.", settlement.messages)
+
+	def testPropKeyMatrixAccountsForEveryConfiguredPropKey(self):
+		propKeyMatrix = getPropKeyMatrix()
+		self.assertEqual(set(propKeyMatrix.keys()), set(PROP_BET_KEYS))
+		for key in propKeyMatrix:
+			self.assertIn(propKeyMatrix[key], ["engineSettled", "entryAlias"])
+		entryAliasKeys = [key for key, owner in propKeyMatrix.items() if owner == "entryAlias"]
+		self.assertEqual(set(entryAliasKeys), set(["World", "Hi Low"]))
+
+	def testCreateDefaultPropBetsUsesCanonicalKeys(self):
+		propBets = createDefaultPropBets()
+		self.assertEqual(set(propBets.keys()), set(PROP_BET_KEYS))
+		for key in propBets:
+			self.assertEqual(propBets[key], 0)
+
+	def testResolvePropAliasesConvertsWorldAndHiLow(self):
+		propBets = createDefaultPropBets()
+		propBets["World"] = 25
+		propBets["Hi Low"] = 20
+		resolution = resolvePropAliases(propBets=propBets)
+		self.assertEqual(resolution.propBets["World"], 0)
+		self.assertEqual(resolution.propBets["Hi Low"], 0)
+		self.assertEqual(resolution.propBets["Any Seven"], 5)
+		self.assertEqual(resolution.propBets["Horn"], 20)
+		self.assertEqual(resolution.propBets["Snake Eyes"], 10)
+		self.assertEqual(resolution.propBets["Boxcars"], 10)
 
 
 if __name__ == "__main__":

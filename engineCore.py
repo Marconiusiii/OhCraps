@@ -124,6 +124,12 @@ class PropSubsetSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class PropAliasResolution:
+	propBets: dict
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -131,6 +137,82 @@ class RollOutcome(Enum):
 	pointHit = auto()
 	sevenOut = auto()
 	neutral = auto()
+
+
+PROP_BET_KEYS = [
+	"Snake Eyes",
+	"Acey Deucey",
+	"Eleven",
+	"Boxcars",
+	"Any Craps",
+	"Any Seven",
+	"C and E",
+	"Horn",
+	"World",
+	"Buffalo",
+	"Hi Low",
+	"Hop 4",
+	"Hop 4 Easy",
+	"Hop Hard 4",
+	"Hop 5",
+	"Hop 6",
+	"Hop 6 Easy",
+	"Hop Hard 6",
+	"Hop 7",
+	"Hop 8",
+	"Hop 8 Easy",
+	"Hop Hard 8",
+	"Hop 9",
+	"Hop 10",
+	"Hop 10 Easy",
+	"Hop Hard 10",
+	"Hop EZ",
+	"Hop Hard"
+]
+
+
+def createDefaultPropBets() -> dict:
+	defaultPropBets = {}
+	for key in PROP_BET_KEYS:
+		defaultPropBets[key] = 0
+	return defaultPropBets
+
+
+def getPropKeyMatrix() -> dict:
+	matrix = {}
+	for key in PROP_BET_KEYS:
+		matrix[key] = "engineSettled"
+	for key in ["World", "Hi Low"]:
+		matrix[key] = "entryAlias"
+	return matrix
+
+
+def resolvePropAliases(propBets: dict) -> PropAliasResolution:
+	updatedPropBets = dict(propBets)
+	messages = []
+
+	worldBet = int(updatedPropBets.get("World", 0))
+	if worldBet > 0:
+		anySevenPart = worldBet//5
+		hornPart = worldBet - anySevenPart
+		updatedPropBets["Any Seven"] = int(updatedPropBets.get("Any Seven", 0)) + anySevenPart
+		updatedPropBets["Horn"] = int(updatedPropBets.get("Horn", 0)) + hornPart
+		updatedPropBets["World"] = 0
+		messages.append("World bet resolved into Any Seven and Horn for settlement.")
+
+	hiLowBet = int(updatedPropBets.get("Hi Low", 0))
+	if hiLowBet > 0:
+		snakeEyesPart = hiLowBet//2
+		boxcarsPart = hiLowBet - snakeEyesPart
+		updatedPropBets["Snake Eyes"] = int(updatedPropBets.get("Snake Eyes", 0)) + snakeEyesPart
+		updatedPropBets["Boxcars"] = int(updatedPropBets.get("Boxcars", 0)) + boxcarsPart
+		updatedPropBets["Hi Low"] = 0
+		messages.append("Hi Low resolved into Snake Eyes and Boxcars for settlement.")
+
+	return PropAliasResolution(
+		propBets=updatedPropBets,
+		messages=messages
+	)
 
 
 def evaluateRoll(gameState: GameState, rollValue: int) -> RollOutcome:

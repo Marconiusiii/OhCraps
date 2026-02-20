@@ -273,6 +273,33 @@ Why this matters:
 - This prevents subtle bankroll drift bugs and makes engine behavior safer to reuse in iOS UI layers.
 - Deterministic tests can now assert both payout display and accounting invariants.
 
+### Milestone 17: Proposition key ownership matrix
+
+This milestone formalized proposition key ownership so every configured key is explicitly classified.
+
+Engine additions:
+
+- Canonical key list: `PROP_BET_KEYS`
+- Canonical default map: `createDefaultPropBets()`
+- Ownership map: `getPropKeyMatrix()`
+- Alias resolution: `resolvePropAliases(propBets)`
+
+Ownership model:
+
+- `engineSettled`: key is settled directly by engine settlement helpers on roll resolution.
+- `entryAlias`: key is decomposed into engine-settled components before settlement.
+
+Current entry aliases:
+
+- `World` -> `Any Seven` + `Horn`
+- `Hi Low` -> `Snake Eyes` + `Boxcars`
+
+Why this matters:
+
+- Prevents key drift between terminal setup and engine settlement.
+- Allows tests to assert full proposition coverage.
+- Makes wrapper behavior explicit: unclassified keys are a model error, not silent game behavior.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

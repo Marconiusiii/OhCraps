@@ -245,6 +245,34 @@ Behavioral impact:
 - Hop outcomes are still fully handled by `settleHopBets(...)`.
 - Existing tests remain the guardrail to confirm no regressions after cleanup.
 
+### Milestone 16: Payout accounting normalization
+
+This milestone is a rules-accounting hardening step, not just a refactor. The goal is internal consistency:
+
+- printed win amount
+- `bankDelta`
+- `chipsOnTableDelta`
+
+These three values should describe the same outcome from different angles.
+
+Locked house rules for this project:
+
+- Field 12 always pays 3:1.
+- Horn follows if-it-pays-it-stays behavior.
+- Vig implementation remains locked as currently implemented.
+
+What was normalized:
+
+- Horn win math now subtracts only the losing horn components when calculating net win on a hit.
+- Buffalo settlement now credits the winning unit stake + payout to bankroll, while table chips clear all component units.
+- Hop settlement now uses the same accounting model: bankroll receives winning unit stake + payout; chips clear all units that were at risk.
+
+Why this matters:
+
+- Net wealth change (`bankDelta + chipsOnTableDelta`) now matches the displayed profit message for these complex proposition bets.
+- This prevents subtle bankroll drift bugs and makes engine behavior safer to reuse in iOS UI layers.
+- Deterministic tests can now assert both payout display and accounting invariants.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

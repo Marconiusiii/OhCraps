@@ -1179,6 +1179,7 @@ def propPay(roll):
 		"Hop Hard 8",
 		"Hop Hard 10",
 		"Hop 4",
+		"Hop 4 Easy",
 		"Hop 5",
 		"Hop 6",
 		"Hop 6 Easy",
@@ -1187,29 +1188,14 @@ def propPay(roll):
 		"Hop 8 Easy",
 		"Hop 9",
 		"Hop 10",
+		"Hop 10 Easy",
 		"Hop EZ",
 		"Hop Hard"
 	]
 	for key in propBets:
 		if key in extractedPropKeys:
 			continue
-		if propBets[key] > 0:
-			multiplier = sub = 0
-
-			if multiplier > 0:
-				if key == "Horn":
-					print(f"You won ${(propBets[key]//4 * multiplier - propBets[key]):,} on the {key} bet!")
-					bank += (propBets[key]//4) * multiplier - propBets[key]
-					print("If it pays it stays! Horn bets are still up.")
-				else:
-					print(f"You won ${(propBets[key]*multiplier)-sub:,} on the {key} bet!")
-					bank += propBets[key] + (propBets[key] * multiplier) - sub
-					chipsOnTable -= propBets[key] + sub
-					propBets[key] = 0
-			elif multiplier == 0:
-				print(f"You lost ${propBets[key]:,} from the {key}.")
-				chipsOnTable -= propBets[key]
-				propBets[key] = 0
+		continue
 
 
 #All Tall Small setup

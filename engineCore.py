@@ -785,7 +785,8 @@ def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
 
 		if multiplier > 0:
 			if key == "Horn":
-				winAmount = (bet//4) * multiplier - bet
+				losingUnits = bet - (bet//4)
+				winAmount = (bet//4) * multiplier - losingUnits
 				messages.append(f"You won ${winAmount:,} on the {key} bet!")
 				messages.append("If it pays it stays! Horn bets are still up.")
 				bankDelta += winAmount
@@ -836,7 +837,7 @@ def settleBuffaloBet(propBets: dict, roll: int, die1: int, die2: int) -> PropSub
 		winningUnit = bet//4
 		winAmount = (winningUnit * 30) - sub
 		messages.append(f"You won ${winAmount:,} on the Buffalo bet!")
-		bankDelta += winningUnit + (winningUnit * 30) - sub
+		bankDelta += winningUnit + (winningUnit * 30)
 		chipsOnTableDelta -= winningUnit + sub
 		updatedPropBets["Buffalo"] = 0
 	else:
@@ -864,6 +865,7 @@ def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubset
 		"Hop Hard 8",
 		"Hop Hard 10",
 		"Hop 4",
+		"Hop 4 Easy",
 		"Hop 5",
 		"Hop 6",
 		"Hop 6 Easy",
@@ -872,6 +874,7 @@ def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubset
 		"Hop 8 Easy",
 		"Hop 9",
 		"Hop 10",
+		"Hop 10 Easy",
 		"Hop EZ",
 		"Hop Hard"
 	]
@@ -905,6 +908,16 @@ def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubset
 				multiplier = 30
 			sub = currentBet//2
 			winningBet = currentBet//2
+		elif key == "Hop 4 Easy" and roll == 4:
+			if die1 == 3:
+				multiplier = 15
+				sub = currentBet//2
+				winningBet = currentBet//2
+		elif key == "Hop 10 Easy" and roll == 10:
+			if die1 == 6:
+				multiplier = 15
+				sub = currentBet//2
+				winningBet = currentBet//2
 		elif key == "Hop 5" and roll == 5:
 			multiplier = 15
 			sub = currentBet//2
@@ -954,7 +967,7 @@ def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubset
 		if multiplier > 0:
 			winAmount = (winningBet * multiplier) - sub
 			messages.append(f"You won ${winAmount:,} on the {key} bet!")
-			bankDelta += winningBet + (winningBet * multiplier) - sub
+			bankDelta += winningBet + (winningBet * multiplier)
 			chipsOnTableDelta -= winningBet + sub
 			updatedPropBets[key] = 0
 		else:

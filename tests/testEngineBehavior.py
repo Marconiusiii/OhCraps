@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -169,6 +169,36 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.fieldBet, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, -10)
 		self.assertEqual(settlement.bankDelta, 0)
+
+	def testSettleHardWaysWinOnHardFour(self):
+		hardWays = {4: 5, 6: 0, 8: 0, 10: 0}
+		settlement = settleHardWays(hardWays=hardWays, roll=4, rollHard=True)
+		self.assertEqual(settlement.hitNumber, 4)
+		self.assertEqual(settlement.winAmount, 35)
+		self.assertEqual(settlement.bankDelta, 35)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
+	def testSettleHardWaysWinOnHardSix(self):
+		hardWays = {4: 0, 6: 5, 8: 0, 10: 0}
+		settlement = settleHardWays(hardWays=hardWays, roll=6, rollHard=True)
+		self.assertEqual(settlement.hitNumber, 6)
+		self.assertEqual(settlement.winAmount, 45)
+		self.assertEqual(settlement.bankDelta, 45)
+
+	def testSettleHardWaysLoseOnEasyRoll(self):
+		hardWays = {4: 0, 6: 5, 8: 0, 10: 0}
+		settlement = settleHardWays(hardWays=hardWays, roll=6, rollHard=False)
+		self.assertEqual(settlement.lostNumber, 6)
+		self.assertEqual(settlement.lossAmount, 5)
+		self.assertEqual(settlement.chipsOnTableDelta, -5)
+		self.assertEqual(settlement.hardWays[6], 0)
+
+	def testSettleHardWaysSevenOutClearsAll(self):
+		hardWays = {4: 5, 6: 10, 8: 15, 10: 20}
+		settlement = settleHardWays(hardWays=hardWays, roll=7, rollHard=False)
+		self.assertEqual(settlement.lossAmount, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -50)
+		self.assertEqual(settlement.hardWays, {4: 0, 6: 0, 8: 0, 10: 0})
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -284,40 +284,29 @@ bet//5 = low bets
 
 def hardCheck(roll):
 	global bank, chipsOnTable, hardWays, rollHard
-	if roll == 7:
-		loss = 0
-		for key in hardWays:
-			if hardWays[key] > 0:
-				loss += hardWays[key]
-				hardWays[key] = 0
-		if loss > 0:
-			print(f"You lost ${loss:,} from the Hard Ways.")
-			chipsOnTable -= loss
-	elif roll in [4, 6, 8, 10]:
-		if hardWays[roll] > 0 and rollHard == True:
-			if roll in [4, 10]:
-				win = hardWays[roll] * 7
-			elif roll in [6, 8]:
-				win = hardWays[roll] * 9
-			print(f"You won ${win:,} on the Hard {roll}!")
-			bank += win
-			if str(input("Press your bet? > ")).lower() in ['y', 'yes']:
-				print(f"How much on the Hard {roll}?")
-				chipsOnTable -= hardWays[roll]
-				hardWays[roll] = betPrompt()
-				if hardWays[roll] == 0:
-					print(f"Ok, taking down your Hard {roll} bet.")
-				else:
-					print(f"Ok, bumping up your Hard {roll} bet to ${hardWays[roll]:,}.")
-		elif hardWays[roll] > 0 and rollHard == False:
-			print(f"You lost ${hardWays[roll]:,} from the Hard {roll}.")
-			chipsOnTable -= hardWays[roll]
-			if str(input(f"Go back up on your Hard {roll} bet? > ")).lower() in ['y', 'yes']:
-				print(f"How much on the Hard {roll}?")
-				hardWays[roll] = betPrompt()
-				print(f"Ok, going back up on the Hard {roll} for ${hardWays[roll]:,}.")
+	settlement = settleHardWays(hardWays=hardWays, roll=roll, rollHard=rollHard)
+	hardWays = settlement.hardWays
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
+
+	if settlement.hitNumber is not None:
+		if str(input("Press your bet? > ")).lower() in ['y', 'yes']:
+			print(f"How much on the Hard {settlement.hitNumber}?")
+			chipsOnTable -= hardWays[settlement.hitNumber]
+			hardWays[settlement.hitNumber] = betPrompt()
+			if hardWays[settlement.hitNumber] == 0:
+				print(f"Ok, taking down your Hard {settlement.hitNumber} bet.")
 			else:
-				hardWays[roll] = 0
+				print(f"Ok, bumping up your Hard {settlement.hitNumber} bet to ${hardWays[settlement.hitNumber]:,}.")
+	elif settlement.lostNumber is not None:
+		if str(input(f"Go back up on your Hard {settlement.lostNumber} bet? > ")).lower() in ['y', 'yes']:
+			print(f"How much on the Hard {settlement.lostNumber}?")
+			hardWays[settlement.lostNumber] = betPrompt()
+			print(f"Ok, going back up on the Hard {settlement.lostNumber} for ${hardWays[settlement.lostNumber]:,}.")
+		else:
+			hardWays[settlement.lostNumber] = 0
 
 
 def hardShow():

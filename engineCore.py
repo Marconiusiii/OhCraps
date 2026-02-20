@@ -73,6 +73,18 @@ class FieldSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class HardWaysSettlement:
+	hardWays: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	hitNumber: int | None
+	lostNumber: int | None
+	winAmount: int
+	lossAmount: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -365,6 +377,66 @@ def settleFieldBet(fieldBet: int, roll: int) -> FieldSettlement:
 		winAmount=winAmount,
 		lossAmount=lossAmount,
 		didWin=didWin,
+		messages=messages
+	)
+
+
+def normalizeHardWays(hardWays: dict) -> dict:
+	normalized = {
+		4: 0,
+		6: 0,
+		8: 0,
+		10: 0
+	}
+	for key in normalized:
+		if key in hardWays:
+			normalized[key] = int(hardWays[key])
+	return normalized
+
+
+def settleHardWays(hardWays: dict, roll: int, rollHard: bool) -> HardWaysSettlement:
+	updatedHardWays = normalizeHardWays(hardWays)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	hitNumber = None
+	lostNumber = None
+	winAmount = 0
+	lossAmount = 0
+	messages = []
+
+	if roll == 7:
+		for key in updatedHardWays:
+			if updatedHardWays[key] > 0:
+				lossAmount += updatedHardWays[key]
+				updatedHardWays[key] = 0
+		if lossAmount > 0:
+			messages.append(f"You lost ${lossAmount:,} from the Hard Ways.")
+			chipsOnTableDelta -= lossAmount
+
+	elif roll in [4, 6, 8, 10] and updatedHardWays[roll] > 0:
+		if rollHard:
+			hitNumber = roll
+			if roll in [4, 10]:
+				winAmount = updatedHardWays[roll] * 7
+			elif roll in [6, 8]:
+				winAmount = updatedHardWays[roll] * 9
+			messages.append(f"You won ${winAmount:,} on the Hard {roll}!")
+			bankDelta += winAmount
+		else:
+			lostNumber = roll
+			lossAmount = updatedHardWays[roll]
+			messages.append(f"You lost ${lossAmount:,} from the Hard {roll}.")
+			chipsOnTableDelta -= lossAmount
+			updatedHardWays[roll] = 0
+
+	return HardWaysSettlement(
+		hardWays=updatedHardWays,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		hitNumber=hitNumber,
+		lostNumber=lostNumber,
+		winAmount=winAmount,
+		lossAmount=lossAmount,
 		messages=messages
 	)
 

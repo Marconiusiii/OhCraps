@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -256,6 +256,57 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -36)
 		self.assertEqual(settlement.dComeBets[4], 0)
 		self.assertEqual(settlement.dComeOdds[4], 0)
+
+	def testSettleComeBarBetWinsOnNatural(self):
+		settlement = settleComeBarBet(comeBet=20, roll=11)
+		self.assertEqual(settlement.comeBet, 0)
+		self.assertEqual(settlement.bankDelta, 40)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.movedNumber, None)
+
+	def testSettleComeBarBetLosesOnCraps(self):
+		settlement = settleComeBarBet(comeBet=20, roll=2)
+		self.assertEqual(settlement.comeBet, 0)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.movedNumber, None)
+
+	def testSettleComeBarBetMovesToNumber(self):
+		settlement = settleComeBarBet(comeBet=25, roll=5)
+		self.assertEqual(settlement.comeBet, 0)
+		self.assertEqual(settlement.movedNumber, 5)
+		self.assertEqual(settlement.movedAmount, 25)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
+	def testSettleDComeBarBetLosesOnNatural(self):
+		settlement = settleDComeBarBet(dComeBet=20, roll=7)
+		self.assertEqual(settlement.dComeBet, 0)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.movedNumber, None)
+
+	def testSettleDComeBarBetWinsOnTwoOrThree(self):
+		settlement = settleDComeBarBet(dComeBet=20, roll=3)
+		self.assertEqual(settlement.dComeBet, 0)
+		self.assertEqual(settlement.bankDelta, 40)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.movedNumber, None)
+
+	def testSettleDComeBarBetPushOnTwelve(self):
+		settlement = settleDComeBarBet(dComeBet=20, roll=12)
+		self.assertEqual(settlement.dComeBet, 0)
+		self.assertEqual(settlement.bankDelta, 20)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.movedNumber, None)
+
+	def testSettleDComeBarBetMovesToNumber(self):
+		settlement = settleDComeBarBet(dComeBet=30, roll=9)
+		self.assertEqual(settlement.dComeBet, 0)
+		self.assertEqual(settlement.movedNumber, 9)
+		self.assertEqual(settlement.movedAmount, 30)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
 
 
 if __name__ == "__main__":

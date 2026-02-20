@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -630,70 +630,56 @@ def comeCheck(roll):
 	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds, pointIsOn
 	comePay(roll)
 	if comeBet > 0:
-		if roll in [7, 11]:
-			print(f"You won ${comeBet:,} on the Come!")
-			bank += comeBet * 2
-			chipsOnTable -= comeBet
-			comeBet = 0
-		elif roll in [2, 3, 12]:
-			print(f"You lost ${comeBet:,} from the Come Bet.")
-			chipsOnTable -= comeBet
-			comeBet = 0
-		else:
-			print(f"Moving your Come Bet to the {roll}.")
-			comeBets[roll] = comeBet
-			comeBet = 0
+		settlement = settleComeBarBet(comeBet=comeBet, roll=roll)
+		comeBet = settlement.comeBet
+		bank += settlement.bankDelta
+		chipsOnTable += settlement.chipsOnTableDelta
+		for message in settlement.messages:
+			print(message)
+		if settlement.movedNumber is not None:
+			comeBets[settlement.movedNumber] = settlement.movedAmount
 			if str(input("Odds on your Come Bet? > ")).strip().lower() in ['y', 'yes']:
 				max = 0
-				if roll in [4, 10]:
-					max = comeBets[roll] * 3
-				elif roll in [5, 9]:
-					max = comeBets[roll] * 4
-				elif roll in [6, 8]:
-					max = comeBets[roll] * 5
-				print(f"How much on the Come {roll}? Max Odds is ${max:,}.")
+				if settlement.movedNumber in [4, 10]:
+					max = comeBets[settlement.movedNumber] * 3
+				elif settlement.movedNumber in [5, 9]:
+					max = comeBets[settlement.movedNumber] * 4
+				elif settlement.movedNumber in [6, 8]:
+					max = comeBets[settlement.movedNumber] * 5
+				print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 				while True:
-					comeOdds[roll] = betPrompt()
-					if comeOdds[roll] > max:
+					comeOdds[settlement.movedNumber] = betPrompt()
+					if comeOdds[settlement.movedNumber] > max:
 						print("Way too high on your Odds, there. Try again.")
-						chipsOnTable -= comeOdds[roll]
-						bank += comeOdds[roll]
-						comeOdds[roll] = 0
+						chipsOnTable -= comeOdds[settlement.movedNumber]
+						bank += comeOdds[settlement.movedNumber]
+						comeOdds[settlement.movedNumber] = 0
 						continue
 					else:
-						print(f"Ok, ${comeOdds[roll]:,} on your Come {roll} odds.")
+						print(f"Ok, ${comeOdds[settlement.movedNumber]:,} on your Come {settlement.movedNumber} odds.")
 						break
 	elif dComeBet > 0:
-		if roll in [7, 11]:
-			print(f"You lost ${dComeBet:,} from the Don't Come.")
-			chipsOnTable -= dComeBet
-			dComeBet = 0
-		elif roll in [2, 3, 12]:
-			if roll in [2, 3]:
-				print(f"You won ${dComeBet:,} on the Don't Come!")
-				bank += dComeBet * 2 
-			elif roll == 12:
-				print("12 is a Push!")
-				bank += dComeBet
-			chipsOnTable -= dComeBet
-			dComeBet = 0
-		else:
-			print(f"Moving your Don't Come bet to the {roll}.")
-			dComeBets[roll] = dComeBet
-			dComeBet = 0
-			if str(input(f"Lay odds on your Don't Come {roll}? > ")).strip().lower() in ['y', 'yes']:
-				dMax = dComeBets[roll] * 10
+		settlement = settleDComeBarBet(dComeBet=dComeBet, roll=roll)
+		dComeBet = settlement.dComeBet
+		bank += settlement.bankDelta
+		chipsOnTable += settlement.chipsOnTableDelta
+		for message in settlement.messages:
+			print(message)
+		if settlement.movedNumber is not None:
+			dComeBets[settlement.movedNumber] = settlement.movedAmount
+			if str(input(f"Lay odds on your Don't Come {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
+				dMax = dComeBets[settlement.movedNumber] * 10
 				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax:,}.")
 				while True:
-					dComeOdds[roll] = betPrompt()
-					if dComeOdds[roll] > dMax:
+					dComeOdds[settlement.movedNumber] = betPrompt()
+					if dComeOdds[settlement.movedNumber] > dMax:
 						print("Way too much for your Lay Odds! Try again.")
-						chipsOnTable -= dComeOdds[roll]
-						bank += dComeOdds[roll]
-						dComeOdds[roll] = 0
+						chipsOnTable -= dComeOdds[settlement.movedNumber]
+						bank += dComeOdds[settlement.movedNumber]
+						dComeOdds[settlement.movedNumber] = 0
 						continue
 					else:
-						print(f"Ok, ${dComeOdds[roll]:,} laid on the Don't Come {roll}.")
+						print(f"Ok, ${dComeOdds[settlement.movedNumber]:,} laid on the Don't Come {settlement.movedNumber}.")
 						break
 
 def comePay(roll):

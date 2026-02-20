@@ -96,6 +96,26 @@ class ComeTableSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class ComeBarSettlement:
+	comeBet: int
+	bankDelta: int
+	chipsOnTableDelta: int
+	movedNumber: int | None
+	movedAmount: int
+	messages: list[str]
+
+
+@dataclass(frozen=True)
+class DComeBarSettlement:
+	dComeBet: int
+	bankDelta: int
+	chipsOnTableDelta: int
+	movedNumber: int | None
+	movedAmount: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -574,6 +594,78 @@ def settleComeTableBets(comeBets: dict, dComeBets: dict, comeOdds: dict, dComeOd
 		dComeOdds=updatedDComeOdds,
 		bankDelta=bankDelta,
 		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)
+
+
+def settleComeBarBet(comeBet: int, roll: int) -> ComeBarSettlement:
+	currentComeBet = int(comeBet)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	movedNumber = None
+	movedAmount = 0
+	messages = []
+
+	if currentComeBet > 0:
+		if roll in [7, 11]:
+			messages.append(f"You won ${currentComeBet:,} on the Come!")
+			bankDelta += currentComeBet * 2
+			chipsOnTableDelta -= currentComeBet
+			currentComeBet = 0
+		elif roll in [2, 3, 12]:
+			messages.append(f"You lost ${currentComeBet:,} from the Come Bet.")
+			chipsOnTableDelta -= currentComeBet
+			currentComeBet = 0
+		else:
+			movedNumber = roll
+			movedAmount = currentComeBet
+			messages.append(f"Moving your Come Bet to the {roll}.")
+			currentComeBet = 0
+
+	return ComeBarSettlement(
+		comeBet=currentComeBet,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		movedNumber=movedNumber,
+		movedAmount=movedAmount,
+		messages=messages
+	)
+
+
+def settleDComeBarBet(dComeBet: int, roll: int) -> DComeBarSettlement:
+	currentDComeBet = int(dComeBet)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	movedNumber = None
+	movedAmount = 0
+	messages = []
+
+	if currentDComeBet > 0:
+		if roll in [7, 11]:
+			messages.append(f"You lost ${currentDComeBet:,} from the Don't Come.")
+			chipsOnTableDelta -= currentDComeBet
+			currentDComeBet = 0
+		elif roll in [2, 3, 12]:
+			if roll in [2, 3]:
+				messages.append(f"You won ${currentDComeBet:,} on the Don't Come!")
+				bankDelta += currentDComeBet * 2
+			elif roll == 12:
+				messages.append("12 is a Push!")
+				bankDelta += currentDComeBet
+			chipsOnTableDelta -= currentDComeBet
+			currentDComeBet = 0
+		else:
+			movedNumber = roll
+			movedAmount = currentDComeBet
+			messages.append(f"Moving your Don't Come bet to the {roll}.")
+			currentDComeBet = 0
+
+	return DComeBarSettlement(
+		dComeBet=currentDComeBet,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		movedNumber=movedNumber,
+		movedAmount=movedAmount,
 		messages=messages
 	)
 

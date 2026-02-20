@@ -753,7 +753,7 @@ def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
 	chipsOnTableDelta = 0
 	messages = []
 
-	subsetKeys = ["Any Seven", "Any Craps", "Eleven", "C and E"]
+	subsetKeys = ["Any Seven", "Any Craps", "Eleven", "C and E", "Snake Eyes", "Acey Deucey", "Boxcars", "Horn"]
 	for key in subsetKeys:
 		if key not in updatedPropBets:
 			continue
@@ -772,13 +772,29 @@ def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
 			multiplier = 3
 		elif key == "C and E" and roll == 11:
 			multiplier = 7
+		elif key == "Snake Eyes" and roll == 2:
+			multiplier = 30
+		elif key == "Acey Deucey" and roll == 3:
+			multiplier = 15
+		elif key == "Boxcars" and roll == 12:
+			multiplier = 30
+		elif key == "Horn" and roll in [2, 12]:
+			multiplier = 30
+		elif key == "Horn" and roll in [3, 11]:
+			multiplier = 15
 
 		if multiplier > 0:
-			winAmount = bet * multiplier
-			messages.append(f"You won ${winAmount:,} on the {key} bet!")
-			bankDelta += bet + winAmount
-			chipsOnTableDelta -= bet
-			updatedPropBets[key] = 0
+			if key == "Horn":
+				winAmount = (bet//4) * multiplier - bet
+				messages.append(f"You won ${winAmount:,} on the {key} bet!")
+				messages.append("If it pays it stays! Horn bets are still up.")
+				bankDelta += winAmount
+			else:
+				winAmount = bet * multiplier
+				messages.append(f"You won ${winAmount:,} on the {key} bet!")
+				bankDelta += bet + winAmount
+				chipsOnTableDelta -= bet
+				updatedPropBets[key] = 0
 		else:
 			messages.append(f"You lost ${bet:,} from the {key}.")
 			chipsOnTableDelta -= bet

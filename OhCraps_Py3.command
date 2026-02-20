@@ -1152,29 +1152,13 @@ def propPay(roll):
 	for message in subsetSettlement.messages:
 		print(message)
 #	multiplier = 0
+	extractedPropKeys = ["Any Seven", "Any Craps", "Eleven", "C and E", "Snake Eyes", "Acey Deucey", "Boxcars", "Horn"]
 	for key in propBets:
+		if key in extractedPropKeys:
+			continue
 		if propBets[key] > 0:
 			multiplier = sub = 0
-			if (key == "Snake Eyes" and roll == 2) or (key == "Boxcars" and roll == 12):
-				multiplier = 30
-			elif (key == "Acey Deucey" and roll == 3) or (key == "Eleven" and roll == 11):
-				multiplier = 15
-			elif key == "Any Seven" and roll == 7:
-				multiplier = 4
-			elif key == "Any Craps" and roll in [2, 3, 12]:
-				multiplier = 7
-			elif key == "C and E" and roll in [2, 3, 12]:
-				multiplier = 3
-			elif key == "C and E" and roll == 11:
-				multiplier = 7
-			elif key == "Horn" and roll in [2, 12]:
-				multiplier = 30
-
-#				sub = propBets[key]//4 * 3
-			elif key == "Horn" and roll in [3, 11]:
-				multiplier = 15
-#				sub = propBets[key]//4*3
-			elif key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
+			if key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
 				multiplier = 30
 				sub = propBets[key]//4*3
 				propBets[key] = propBets[key]//4
@@ -1188,16 +1172,16 @@ def propPay(roll):
 
 			elif key == "Hop 4" and roll == 4:
 				if die1 == 3:
-					multipler = 15
+					multiplier = 15
 				else:
-					multipler = 30
+					multiplier = 30
 				sub = propBets[key]//2
 				propBets[key] = propBets[key]//2
 			elif key == "Hop 10" and roll == 10:
 				if die1 == 6:
-					multipler = 15
+					multiplier = 15
 				else:
-					multipler = 30
+					multiplier = 30
 				sub = propBets[key]//2
 				propBets[key] = propBets[key]//2
 			elif key == "Hop 5" and roll == 5:

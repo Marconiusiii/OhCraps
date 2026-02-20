@@ -358,6 +358,28 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -10)
 		self.assertEqual(settlement.propBets["C and E"], 0)
 
+	def testSettlePropSubsetSnakeEyesWin(self):
+		propBets = {"Snake Eyes": 5}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=2)
+		self.assertEqual(settlement.bankDelta, 155)
+		self.assertEqual(settlement.chipsOnTableDelta, -5)
+		self.assertEqual(settlement.propBets["Snake Eyes"], 0)
+
+	def testSettlePropSubsetHornWinStaysUp(self):
+		propBets = {"Horn": 40}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=2)
+		self.assertEqual(settlement.bankDelta, 260)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertEqual(settlement.propBets["Horn"], 40)
+		self.assertIn("If it pays it stays! Horn bets are still up.", settlement.messages)
+
+	def testSettlePropSubsetHornLosesAndClears(self):
+		propBets = {"Horn": 40}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=7)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -40)
+		self.assertEqual(settlement.propBets["Horn"], 0)
+
 
 if __name__ == "__main__":
 	unittest.main()

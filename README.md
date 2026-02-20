@@ -74,6 +74,88 @@ You've established your bankroll and are now ready to start betting. You have a 
 </tbody>
 </table>
 
+## Engineering Walkthrough
+
+### Milestone 12: Proposition subset extraction and consistency fix
+
+This milestone moved more proposition logic out of the terminal script and into `engineCore.py`. The extracted subset now includes:
+
+- `Snake Eyes`
+- `Acey Deucey`
+- `Boxcars`
+- `Horn`
+
+The core architectural reason for this extraction is separation of concerns:
+
+- `engineCore.py` should own game rules and outcome calculation.
+- `OhCraps_Py3.command` should own terminal interaction, prompts, and display flow.
+
+When the rules live in engine functions, they can be tested in isolation without interactive input. This is the key step for an iOS port, where UI events should call deterministic engine methods and render returned state/messages.
+
+### What changed and why it matters
+
+1. `settlePropSubsetBets(...)` in `engineCore.py` now resolves the four additional proposition bets.
+2. `propPay(...)` in `OhCraps_Py3.command` now skips bets that are already settled by the engine subset, preventing duplicate settlement paths.
+3. A payout bug was fixed in hop resolution:
+	- `multipler` typo was corrected to `multiplier` for `Hop 4` and `Hop 10`.
+	- This matters because the misspelled variable prevented intended payout logic from being applied.
+
+This is both a refactor and a correctness improvement. A good refactor should preserve behavior where intended and make bugs easier to detect where behavior was unintended.
+
+### Deterministic code and why it is required
+
+In this project, deterministic code means:
+
+- The same input state and roll outcome produce the same output every time.
+- No hidden dependency on terminal input timing, global prompts, or random generator state inside settlement functions.
+
+Why this matters:
+
+- Unit tests become reliable and repeatable.
+- Rule correctness can be proven with specific scenarios.
+- Platform ports (iOS, web, desktop) can all reuse the same engine behavior and only swap UI layers.
+
+Example in this codebase:
+
+- `settlePropSubsetBets(propBets, roll)` is deterministic because it takes plain inputs and returns plain outputs (`bankDelta`, `chipsOnTableDelta`, updated bet map, messages).
+- The terminal layer only applies and prints those results.
+
+### Testing added in this milestone
+
+`tests/testEngineBehavior.py` now includes explicit tests for the new proposition subset behavior:
+
+- `Snake Eyes` win path
+- `Horn` win path with "pays, stays" behavior
+- `Horn` losing path and clear behavior
+
+These tests assert:
+
+- bankroll deltas
+- chips-on-table deltas
+- updated bet persistence/clearing
+- key user-facing message for horn staying up
+
+### How to run validation
+
+Use these commands from the repo root:
+
+```bash
+python3 -m py_compile OhCraps_Py3.command engineCore.py tests/testEngineBehavior.py tests/testDeterministicRolls.py
+python3 -m unittest discover -s tests -p 'test*.py'
+```
+
+If both commands pass, the engine extraction and bug fix are validated at syntax and behavior levels while keeping terminal gameplay intact.
+
+### Craps consistency notes found in this milestone
+
+Fixed:
+
+- `Hop 4` and `Hop 10` typo (`multipler`) causing inconsistent payout behavior.
+
+Still worth reviewing in future milestones:
+
+- House-rule variance for some proposition payouts can differ by casino. Current code should be treated as this project’s ruleset unless you decide to add configurable payout tables.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

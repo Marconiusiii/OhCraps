@@ -227,6 +227,24 @@ Consistency notes:
 - This milestone preserves that model intentionally as a refactor-only step.
 - Any payout normalization should be handled as a dedicated rules-change milestone so behavior differences are explicit and reviewable.
 
+### Milestone 15: Unreachable hop branch removal
+
+After hop settlement moved to `engineCore.py`, the hop-specific `elif` tree still present in the legacy fallback inside `propPay(...)` became unreachable because hop keys were explicitly skipped.
+
+This milestone removed that unreachable branch block.
+
+Why this change is valuable:
+
+- Less dead code means fewer places for regressions to hide.
+- The terminal wrapper becomes easier to read: apply engine settlement, print messages, then handle only truly unextracted fallback keys.
+- This aligns with iOS-port architecture goals where UI controllers should orchestrate engine calls rather than duplicate game rules.
+
+Behavioral impact:
+
+- No intended gameplay change.
+- Hop outcomes are still fully handled by `settleHopBets(...)`.
+- Existing tests remain the guardrail to confirm no regressions after cleanup.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

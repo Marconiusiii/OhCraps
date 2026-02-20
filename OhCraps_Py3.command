@@ -121,11 +121,11 @@ hardWays = {
 
 def hardWaysBetting():
 	global hardWays, bank, chipsOnTable
-	madeBet = True
 	for key in hardWays:
 		if hardWays[key] > 0:
 			print(f"You have ${hardWays[key]:,} on the hard {key}.")
 		print(f"How much on the Hard {key}?")
+		madeBet = True
 		while True:
 			bet = 0
 			try:
@@ -142,18 +142,18 @@ def hardWaysBetting():
 				madeBet = False
 				break
 
-			if bet > 0:
-				chipsOnTable -= hardWays[key]
-				if madeBet and bet != hardWays[key]:
-					bank -= bet - hardWays[key] 
-				hardWays[key] = bet
-				chipsOnTable += bet
-				print(f"${bet:,} on the Hard {key}.")
-			elif hardWays[key] > 0 and bet == 0:
-				print(f"Ok, taking down your Hard {key} bet.")
-				chipsOnTable -= hardWays[key]
-				bank += hardWays[key]
-				hardWays[key] = 0
+		if bet > 0:
+			chipsOnTable -= hardWays[key]
+			if madeBet and bet != hardWays[key]:
+				bank -= bet - hardWays[key]
+			hardWays[key] = bet
+			chipsOnTable += bet
+			print(f"${bet:,} on the Hard {key}.")
+		elif hardWays[key] > 0 and bet == 0:
+			print(f"Ok, taking down your Hard {key} bet.")
+			chipsOnTable -= hardWays[key]
+			bank += hardWays[key]
+			hardWays[key] = 0
 
 def hardTakeDown():
 	global hardWays, bank, chipsOnTable

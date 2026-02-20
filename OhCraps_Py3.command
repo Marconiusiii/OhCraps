@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1145,6 +1145,12 @@ def propBetting():
 
 def propPay(roll):
 	global propBets, bank, chipsOnTable, die1, die2
+	subsetSettlement = settlePropSubsetBets(propBets=propBets, roll=roll)
+	propBets = subsetSettlement.propBets
+	bank += subsetSettlement.bankDelta
+	chipsOnTable += subsetSettlement.chipsOnTableDelta
+	for message in subsetSettlement.messages:
+		print(message)
 #	multiplier = 0
 	for key in propBets:
 		if propBets[key] > 0:

@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -322,6 +322,41 @@ class EvaluateRollTests(unittest.TestCase):
 	def testMaxLayOdds(self):
 		self.assertEqual(maxLayOdds(0), 0)
 		self.assertEqual(maxLayOdds(12), 120)
+
+	def testSettlePropSubsetAnySevenWin(self):
+		propBets = {"Any Seven": 10, "Any Craps": 0, "Eleven": 0, "C and E": 0}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=7)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.propBets["Any Seven"], 0)
+
+	def testSettlePropSubsetAnyCrapsWin(self):
+		propBets = {"Any Seven": 0, "Any Craps": 10, "Eleven": 0, "C and E": 0}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=3)
+		self.assertEqual(settlement.bankDelta, 80)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.propBets["Any Craps"], 0)
+
+	def testSettlePropSubsetElevenWin(self):
+		propBets = {"Any Seven": 0, "Any Craps": 0, "Eleven": 5, "C and E": 0}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=11)
+		self.assertEqual(settlement.bankDelta, 80)
+		self.assertEqual(settlement.chipsOnTableDelta, -5)
+		self.assertEqual(settlement.propBets["Eleven"], 0)
+
+	def testSettlePropSubsetCandEWinsOnEleven(self):
+		propBets = {"Any Seven": 0, "Any Craps": 0, "Eleven": 0, "C and E": 10}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=11)
+		self.assertEqual(settlement.bankDelta, 80)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.propBets["C and E"], 0)
+
+	def testSettlePropSubsetCandELoses(self):
+		propBets = {"Any Seven": 0, "Any Craps": 0, "Eleven": 0, "C and E": 10}
+		settlement = settlePropSubsetBets(propBets=propBets, roll=4)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.propBets["C and E"], 0)
 
 
 if __name__ == "__main__":

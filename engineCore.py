@@ -116,6 +116,14 @@ class DComeBarSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class PropSubsetSettlement:
+	propBets: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -733,6 +741,51 @@ def settleOddsBets(lineBets: dict, roll: int, comeOut: int) -> LineSettlement:
 
 	return LineSettlement(
 		lineBets=updatedLineBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)
+
+
+def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
+	updatedPropBets = dict(propBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	subsetKeys = ["Any Seven", "Any Craps", "Eleven", "C and E"]
+	for key in subsetKeys:
+		if key not in updatedPropBets:
+			continue
+		bet = int(updatedPropBets[key])
+		if bet <= 0:
+			continue
+
+		multiplier = 0
+		if key == "Any Seven" and roll == 7:
+			multiplier = 4
+		elif key == "Any Craps" and roll in [2, 3, 12]:
+			multiplier = 7
+		elif key == "Eleven" and roll == 11:
+			multiplier = 15
+		elif key == "C and E" and roll in [2, 3, 12]:
+			multiplier = 3
+		elif key == "C and E" and roll == 11:
+			multiplier = 7
+
+		if multiplier > 0:
+			winAmount = bet * multiplier
+			messages.append(f"You won ${winAmount:,} on the {key} bet!")
+			bankDelta += bet + winAmount
+			chipsOnTableDelta -= bet
+			updatedPropBets[key] = 0
+		else:
+			messages.append(f"You lost ${bet:,} from the {key}.")
+			chipsOnTableDelta -= bet
+			updatedPropBets[key] = 0
+
+	return PropSubsetSettlement(
+		propBets=updatedPropBets,
 		bankDelta=bankDelta,
 		chipsOnTableDelta=chipsOnTableDelta,
 		messages=messages

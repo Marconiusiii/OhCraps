@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1157,8 +1157,39 @@ def propPay(roll):
 	chipsOnTable += buffaloSettlement.chipsOnTableDelta
 	for message in buffaloSettlement.messages:
 		print(message)
+	hopSettlement = settleHopBets(propBets=propBets, roll=roll, die1=die1, die2=die2)
+	propBets = hopSettlement.propBets
+	bank += hopSettlement.bankDelta
+	chipsOnTable += hopSettlement.chipsOnTableDelta
+	for message in hopSettlement.messages:
+		print(message)
 #	multiplier = 0
-	extractedPropKeys = ["Any Seven", "Any Craps", "Eleven", "C and E", "Snake Eyes", "Acey Deucey", "Boxcars", "Horn", "Buffalo"]
+	extractedPropKeys = [
+		"Any Seven",
+		"Any Craps",
+		"Eleven",
+		"C and E",
+		"Snake Eyes",
+		"Acey Deucey",
+		"Boxcars",
+		"Horn",
+		"Buffalo",
+		"Hop Hard 4",
+		"Hop Hard 6",
+		"Hop Hard 8",
+		"Hop Hard 10",
+		"Hop 4",
+		"Hop 5",
+		"Hop 6",
+		"Hop 6 Easy",
+		"Hop 7",
+		"Hop 8",
+		"Hop 8 Easy",
+		"Hop 9",
+		"Hop 10",
+		"Hop EZ",
+		"Hop Hard"
+	]
 	for key in propBets:
 		if key in extractedPropKeys:
 			continue

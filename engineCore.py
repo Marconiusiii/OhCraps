@@ -850,3 +850,121 @@ def settleBuffaloBet(propBets: dict, roll: int, die1: int, die2: int) -> PropSub
 		chipsOnTableDelta=chipsOnTableDelta,
 		messages=messages
 	)
+
+
+def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubsetSettlement:
+	updatedPropBets = dict(propBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	hopKeys = [
+		"Hop Hard 4",
+		"Hop Hard 6",
+		"Hop Hard 8",
+		"Hop Hard 10",
+		"Hop 4",
+		"Hop 5",
+		"Hop 6",
+		"Hop 6 Easy",
+		"Hop 7",
+		"Hop 8",
+		"Hop 8 Easy",
+		"Hop 9",
+		"Hop 10",
+		"Hop EZ",
+		"Hop Hard"
+	]
+
+	for key in hopKeys:
+		if key not in updatedPropBets:
+			continue
+		currentBet = int(updatedPropBets[key])
+		if currentBet <= 0:
+			continue
+
+		multiplier = 0
+		sub = 0
+		winningBet = currentBet
+
+		if key in ["Hop Hard 4", "Hop Hard 6", "Hop Hard 8", "Hop Hard 10"] and roll in [4, 6, 8, 10]:
+			val = "Hop Hard " + str(roll)
+			if die1 == die2 and val == key:
+				multiplier = 30
+		elif key == "Hop 4" and roll == 4:
+			if die1 == 3:
+				multiplier = 15
+			else:
+				multiplier = 30
+			sub = currentBet//2
+			winningBet = currentBet//2
+		elif key == "Hop 10" and roll == 10:
+			if die1 == 6:
+				multiplier = 15
+			else:
+				multiplier = 30
+			sub = currentBet//2
+			winningBet = currentBet//2
+		elif key == "Hop 5" and roll == 5:
+			multiplier = 15
+			sub = currentBet//2
+			winningBet = currentBet//2
+		elif key == "Hop 9" and roll == 9:
+			multiplier = 15
+			sub = currentBet//2
+			winningBet = currentBet//2
+		elif key == "Hop 6" and roll == 6:
+			if (die1, die2) in [(5, 1), (4, 2)]:
+				multiplier = 15
+			else:
+				multiplier = 30
+			sub = currentBet//3*2
+			winningBet = currentBet//3
+		elif key == "Hop 6 Easy" and roll == 6:
+			if (die1, die2) in [(5, 1), (4, 2)]:
+				multiplier = 15
+				sub = currentBet//2
+				winningBet = currentBet//2
+		elif key == "Hop 8" and roll == 8:
+			if (die1, die2) in [(5, 3), (6, 2)]:
+				multiplier = 15
+			else:
+				multiplier = 30
+			sub = currentBet//3*2
+			winningBet = currentBet//3
+		elif key == "Hop 8 Easy" and roll == 8:
+			if (die1, die2) in [(5, 3), (6, 2)]:
+				multiplier = 15
+				sub = currentBet//2
+				winningBet = currentBet//2
+		elif key == "Hop 7" and roll == 7:
+			multiplier = 15
+			sub = currentBet//3*2
+			winningBet = currentBet//3
+		elif key == "Hop EZ" and roll in range(3, 12):
+			multiplier = 15
+			sub = currentBet//15*14
+			winningBet = currentBet//15
+		elif key == "Hop Hard" and roll in [2, 4, 6, 8, 10, 12]:
+			if die1 == die2:
+				multiplier = 30
+				sub = currentBet//6*5
+				winningBet = currentBet//6
+
+		if multiplier > 0:
+			winAmount = (winningBet * multiplier) - sub
+			messages.append(f"You won ${winAmount:,} on the {key} bet!")
+			bankDelta += winningBet + (winningBet * multiplier) - sub
+			chipsOnTableDelta -= winningBet + sub
+			updatedPropBets[key] = 0
+		else:
+			messages.append(f"You lost ${currentBet:,} from the {key}.")
+			chipsOnTableDelta -= currentBet
+			updatedPropBets[key] = 0
+
+	return PropSubsetSettlement(
+		propBets=updatedPropBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)

@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -395,6 +395,46 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.propBets["Buffalo"], 0)
 		self.assertIn("You lost $40 from the Buffalo.", settlement.messages)
+
+	def testSettleHopBetsHop4EasyWin(self):
+		propBets = {"Hop 4": 20}
+		settlement = settleHopBets(propBets=propBets, roll=4, die1=3, die2=1)
+		self.assertEqual(settlement.bankDelta, 150)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.propBets["Hop 4"], 0)
+		self.assertIn("You won $140 on the Hop 4 bet!", settlement.messages)
+
+	def testSettleHopBetsHop4HardWin(self):
+		propBets = {"Hop 4": 20}
+		settlement = settleHopBets(propBets=propBets, roll=4, die1=2, die2=2)
+		self.assertEqual(settlement.bankDelta, 300)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.propBets["Hop 4"], 0)
+		self.assertIn("You won $290 on the Hop 4 bet!", settlement.messages)
+
+	def testSettleHopBetsHop6EasyLosesOnHardSix(self):
+		propBets = {"Hop 6 Easy": 20}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.propBets["Hop 6 Easy"], 0)
+		self.assertIn("You lost $20 from the Hop 6 Easy.", settlement.messages)
+
+	def testSettleHopBetsHopHardWinsOnDouble(self):
+		propBets = {"Hop Hard": 60}
+		settlement = settleHopBets(propBets=propBets, roll=10, die1=5, die2=5)
+		self.assertEqual(settlement.bankDelta, 260)
+		self.assertEqual(settlement.chipsOnTableDelta, -60)
+		self.assertEqual(settlement.propBets["Hop Hard"], 0)
+		self.assertIn("You won $250 on the Hop Hard bet!", settlement.messages)
+
+	def testSettleHopBetsHopHardSpecificLosesOnDifferentHardNumber(self):
+		propBets = {"Hop Hard 8": 10}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.propBets["Hop Hard 8"], 0)
+		self.assertIn("You lost $10 from the Hop Hard 8.", settlement.messages)
 
 
 if __name__ == "__main__":

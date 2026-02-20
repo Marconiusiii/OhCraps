@@ -188,6 +188,45 @@ Consistency note surfaced:
 
 - Existing buffalo accounting model prints a larger "won" amount than the net wealth delta implied by `bank` plus `chipsOnTable` movement. This behavior was preserved intentionally in this extraction milestone to avoid stealth payout-rule changes during refactor.
 
+### Milestone 14: Hop bet settlement extraction
+
+This milestone moved hop-family settlement rules into `engineCore.py` using:
+
+- `settleHopBets(propBets, roll, die1, die2)`
+
+What this now covers:
+
+- `Hop 4`, `Hop 5`, `Hop 6`, `Hop 7`, `Hop 8`, `Hop 9`, `Hop 10`
+- `Hop 6 Easy`, `Hop 8 Easy`
+- `Hop EZ`
+- `Hop Hard`
+- `Hop Hard 4`, `Hop Hard 6`, `Hop Hard 8`, `Hop Hard 10`
+
+Integration change:
+
+- `propPay(...)` now applies `settleHopBets(...)` before the legacy fallback loop.
+- Hop keys were added to the extracted-key skip list to prevent duplicate settlement.
+
+Why this is important:
+
+- Hop bets have the densest conditional tree in proposition settlement.
+- Extracting them isolates rule logic from terminal I/O.
+- Deterministic tests can now validate hard/easy dice-face combinations directly without interactive play.
+
+Testing added:
+
+- Hop 4 easy win
+- Hop 4 hard win
+- Hop 6 Easy loss on hard-6 roll
+- Hop Hard win on a double
+- Hop Hard specific loss when the wrong hard number hits
+
+Consistency notes:
+
+- Existing hop accounting model uses split-unit math (`sub` and reduced winning unit) that can produce payout displays that are not the same as intuitive "full-bet x odds" expectations.
+- This milestone preserves that model intentionally as a refactor-only step.
+- Any payout normalization should be handled as a dedicated rules-change milestone so behavior differences are explicit and reviewable.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

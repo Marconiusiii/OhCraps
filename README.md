@@ -353,6 +353,30 @@ Phase 1 scope note:
 - This does not yet remove all globals from terminal code.
 - It standardizes high-frequency core state synchronization while preserving existing gameplay behavior.
 
+### Milestone 21: Canonical runtime model de-duplication
+
+This milestone removes duplicated runtime model definitions from the terminal script and uses engine canonical types/functions directly.
+
+What was removed from terminal code:
+
+- Local `GameState` definition
+- Local `RollOutcome` definition
+- Local `evaluateRoll(...)`
+- Local `rollDice(...)`
+
+What terminal now uses:
+
+- `GameState` from `engineCore.py`
+- `RollOutcome` from `engineCore.py`
+- `evaluateRoll(...)` from `engineCore.py`
+- `rollDice(...)` from `engineCore.py`
+
+Why this matters:
+
+- Eliminates drift between terminal and engine rule models.
+- Ensures one source of truth for roll classification and dice model behavior.
+- Further reduces friction for iOS adapter work, where engine must be the canonical gameplay authority.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

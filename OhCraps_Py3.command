@@ -791,7 +791,7 @@ def propBetting():
 			print(f"Ok, ${propBets['C and E']:,} on C and E.")
 			continue
 		elif bet in ['h', 'horn']:
-			print("How much on the Horn Bet?")
+			print("How much on the Horn Bet? Must be a multiple of 4.")
 			bank += propBets["Horn"]
 			chipsOnTable -= propBets["Horn"]
 			propBets["Horn"] = betPrompt()
@@ -815,7 +815,7 @@ def propBetting():
 			print(f"Ok, ${hornHigh2:,} on the Horn High Deuce.")
 			continue
 		elif bet == 'hh3':
-			print("How much on the Horn High Ace-Deuce?")
+			print("How much on the Horn High Ace-Deuce? Must be a multiple of 5.")
 			bank += propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			chipsOnTable -= propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			while True:
@@ -832,7 +832,7 @@ def propBetting():
 			print(f"Ok, ${hornHigh3:,} on the Horn High Ace-Deuce.")
 			continue
 		elif bet in ['hhy', 'hh11']:
-			print("How much on the Horn High Yo?")
+			print("How much on the Horn High Yo? Must be a multiple of 5.")
 			bank += propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			chipsOnTable -= propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			while True:
@@ -849,7 +849,7 @@ def propBetting():
 			print(f"Ok, ${hornHigh11:,} on the Horn High Yo!")
 			continue
 		elif bet in ['hh12', 'hhm', 'hhb']:
-			print("How much on the Horn High 12?")
+			print("How much on the Horn High 12? Must be a multiple of 5.")
 			bank += propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			chipsOnTable -= propBets["Snake Eyes"] + propBets["Acey Deucey"] + propBets["Eleven"] + propBets["Boxcars"]
 			while True:

@@ -342,7 +342,7 @@ Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Additionally, at the "Change your bet?" prompt, you can type "p" to perform a full press, "hp" for a half-press, or "u" to press up one unit. A Full Press doubles the bet you currently have on the box number, a half-press presses up exactly half of what you have currently bet, and going up a unit will press your bet up $5 on the 4, 5, 9, and 10, and up $6 on the 6 or 8.
+Additionally, at the "Change your bet?" prompt, you can type "p" to perform a full press, "hp" for a half-press, or "u" to press up one unit. A Full Press doubles the bet you currently have on the box number. A half-press is based on your current wager; for the 6 and 8 it is normalized to valid $6 units with a minimum $6 press amount. Going up a unit will press your bet up $5 on the 4, 5, 9, and 10, and up $6 on the 6 or 8.
 
 Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
 

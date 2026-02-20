@@ -213,6 +213,7 @@ def hardCheck(roll):
 		if str(input("Press your bet? > ")).lower() in ['y', 'yes']:
 			print(f"How much on the Hard {settlement.hitNumber}?")
 			chipsOnTable -= hardWays[settlement.hitNumber]
+			bank += hardWays[settlement.hitNumber]
 			hardWays[settlement.hitNumber] = betPrompt()
 			if hardWays[settlement.hitNumber] == 0:
 				print(f"Ok, taking down your Hard {settlement.hitNumber} bet.")
@@ -338,6 +339,7 @@ def odds():
 			elif pOddsChange > maxOdds:
 				print("Nope, that bet is over the Max Odds. Try again!")
 				chipsOnTable -= pOddsChange
+				bank += pOddsChange
 				continue
 			elif lineBets["Pass Odds"] > 0 and pOddsChange == 0:
 				print("Ok, taking down your Pass Line Odds.")
@@ -361,7 +363,7 @@ def odds():
 			elif dpOddsChange > maxDP:
 				print("Nope, you laid too much! Try again.")
 				chipsOnTable -= dpOddsChange
-				bank -= lineBets["Don't Pass Odds"]
+				bank += dpOddsChange
 				continue
 			elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
 				print("Ok, taking down your Don't Pass Odds.")

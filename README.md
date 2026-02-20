@@ -377,6 +377,33 @@ Why this matters:
 - Ensures one source of truth for roll classification and dice model behavior.
 - Further reduces friction for iOS adapter work, where engine must be the canonical gameplay authority.
 
+### Milestone 22: Terminal flow regression tests and bankroll accounting hardening
+
+This milestone adds deterministic coverage for interactive terminal betting flows, not just engine settlement functions.
+
+What was added in tests:
+
+- A terminal-script loader in `tests/testEngineBehavior.py` that executes only the function-definition section of `OhCraps_Py3.command` (everything before `# Game Start`).
+- Mocked `input()` sequences for repeatable terminal-flow tests.
+- New regression tests for:
+	- Hard Ways wager persistence in `hardWaysBetting()`.
+	- Hard Ways takedown fund return path.
+	- Pass odds over-max rejection and retry in `odds()`.
+	- Don't Pass lay-odds over-max rejection and retry in `odds()`.
+	- Proposition Hi-Low validation retry accounting in `propBetting()`.
+
+Accounting fixes applied:
+
+- `hardCheck(...)`: pressing a hard-way bet now returns the current wager to bank before collecting replacement amount.
+- `odds(...)` Pass odds path: over-max retry now refunds `bank` as well as `chipsOnTable`.
+- `odds(...)` Don't Pass lay-odds path: over-max retry now refunds the attempted amount to `bank`.
+
+Why this matters:
+
+- The last severe bug came from an interactive path, not core engine settlement.
+- These tests close that gap by validating real input-driven branches deterministically.
+- The bankroll/chips accounting model is now protected on retry/re-entry flows where silent drift is most likely.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

@@ -1,6 +1,21 @@
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState
+
+
+def loadTerminalNamespace():
+	scriptPath = Path(__file__).resolve().parents[1] / "OhCraps_Py3.command"
+	sourceText = scriptPath.read_text()
+	cutMarker = "# Game Start"
+	markerIndex = sourceText.find(cutMarker)
+	if markerIndex == -1:
+		raise AssertionError("Could not locate game start marker in terminal script.")
+	prefixSource = sourceText[:markerIndex]
+	terminalNamespace = {}
+	exec(prefixSource, terminalNamespace)
+	return terminalNamespace
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -513,6 +528,80 @@ class EvaluateRollTests(unittest.TestCase):
 
 	def testCalculateHalfPressIncrementFiveUsesHalf(self):
 		self.assertEqual(calculateHalfPressIncrement(number=5, currentWager=25), 12)
+
+
+class TerminalFlowRegressionTests(unittest.TestCase):
+	def testHardWaysBettingSavesWager(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["hardWays"] = {4: 0, 6: 0, 8: 0, 10: 0}
+		with patch("builtins.input", side_effect=["5", "", "", ""]):
+			terminal["hardWaysBetting"]()
+		self.assertEqual(terminal["hardWays"][4], 5)
+		self.assertEqual(terminal["hardWays"][6], 0)
+		self.assertEqual(terminal["hardWays"][8], 0)
+		self.assertEqual(terminal["hardWays"][10], 0)
+		self.assertEqual(terminal["bank"], 95)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+
+	def testHardWaysBettingTakeDownReturnsFunds(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 90
+		terminal["chipsOnTable"] = 10
+		terminal["hardWays"] = {4: 0, 6: 10, 8: 0, 10: 0}
+		with patch("builtins.input", side_effect=["", "0", "", ""]):
+			terminal["hardWaysBetting"]()
+		self.assertEqual(terminal["hardWays"][6], 0)
+		self.assertEqual(terminal["bank"], 100)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testOddsPassRejectOverMaxRefundsBeforeRetry(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 6
+		terminal["lineBets"] = {
+			"Pass": 10,
+			"Pass Odds": 0,
+			"Don't Pass": 0,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.input", side_effect=["60", "30"]):
+			terminal["odds"]()
+		self.assertEqual(terminal["lineBets"]["Pass Odds"], 30)
+		self.assertEqual(terminal["bank"], 70)
+		self.assertEqual(terminal["chipsOnTable"], 40)
+
+	def testOddsDontPassRejectOverMaxRefundsBeforeRetry(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 400
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 6
+		terminal["lineBets"] = {
+			"Pass": 0,
+			"Pass Odds": 0,
+			"Don't Pass": 10,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.input", side_effect=["150", "90"]):
+			terminal["odds"]()
+		self.assertEqual(terminal["lineBets"]["Don't Pass Odds"], 90)
+		self.assertEqual(terminal["bank"], 310)
+		self.assertEqual(terminal["chipsOnTable"], 100)
+
+	def testPropBettingHiLowRetryPreservesAccounting(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		with patch("builtins.input", side_effect=["hl", "3", "4", "x"]):
+			terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Snake Eyes"], 2)
+		self.assertEqual(terminal["propBets"]["Boxcars"], 2)
+		self.assertEqual(terminal["propBets"]["Hi Low"], 0)
+		self.assertEqual(terminal["bank"], 96)
+		self.assertEqual(terminal["chipsOnTable"], 4)
 
 
 if __name__ == "__main__":

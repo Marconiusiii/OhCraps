@@ -156,6 +156,38 @@ Still worth reviewing in future milestones:
 
 - House-rule variance for some proposition payouts can differ by casino. Current code should be treated as this project’s ruleset unless you decide to add configurable payout tables.
 
+### Milestone 13: Composite proposition extraction
+
+This milestone targeted the next proposition cluster discussed in planning: `Yo`, `World`, `Hi Low`, and `Buffalo`.
+
+The important implementation detail is that settlement does not directly process all four labels as top-level bets:
+
+- `Yo` is represented by the `Eleven` key and is already covered by engine settlement.
+- `World` is decomposed during bet entry into `Any Seven` + `Horn`.
+- `Hi Low` is decomposed during bet entry into `Snake Eyes` + `Boxcars`.
+- `Buffalo` remains a distinct settlement path and was the remaining engine extraction target in this group.
+
+What was extracted:
+
+- New helper in `engineCore.py`: `settleBuffaloBet(propBets, roll, die1, die2)`
+- Wrapper integration in `propPay(...)` to run buffalo settlement before legacy proposition branches.
+- Skip list update so `Buffalo` is not reprocessed by legacy code.
+
+Why this structure is correct:
+
+- It keeps settlement deterministic and engine-owned for every proposition key that still has unique settlement logic at roll time.
+- It avoids duplicate logic for bets that are already normalized into component keys earlier in the flow.
+- It preserves terminal UX and existing payout semantics while reducing monolithic branching in the terminal script.
+
+Testing added:
+
+- Hard buffalo win path (hard 4/6/8/10 hit).
+- Buffalo losing path.
+
+Consistency note surfaced:
+
+- Existing buffalo accounting model prints a larger "won" amount than the net wealth delta implied by `bank` plus `chipsOnTable` movement. This behavior was preserved intentionally in this extraction milestone to avoid stealth payout-rule changes during refactor.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

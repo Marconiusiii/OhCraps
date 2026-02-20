@@ -806,3 +806,47 @@ def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
 		chipsOnTableDelta=chipsOnTableDelta,
 		messages=messages
 	)
+
+
+def settleBuffaloBet(propBets: dict, roll: int, die1: int, die2: int) -> PropSubsetSettlement:
+	updatedPropBets = dict(propBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	if "Buffalo" not in updatedPropBets:
+		return PropSubsetSettlement(
+			propBets=updatedPropBets,
+			bankDelta=bankDelta,
+			chipsOnTableDelta=chipsOnTableDelta,
+			messages=messages
+		)
+
+	bet = int(updatedPropBets["Buffalo"])
+	if bet <= 0:
+		return PropSubsetSettlement(
+			propBets=updatedPropBets,
+			bankDelta=bankDelta,
+			chipsOnTableDelta=chipsOnTableDelta,
+			messages=messages
+		)
+
+	if roll in [4, 6, 8, 10] and die1 == die2:
+		sub = bet//4 * 3
+		winningUnit = bet//4
+		winAmount = (winningUnit * 30) - sub
+		messages.append(f"You won ${winAmount:,} on the Buffalo bet!")
+		bankDelta += winningUnit + (winningUnit * 30) - sub
+		chipsOnTableDelta -= winningUnit + sub
+		updatedPropBets["Buffalo"] = 0
+	else:
+		messages.append(f"You lost ${bet:,} from the Buffalo.")
+		chipsOnTableDelta -= bet
+		updatedPropBets["Buffalo"] = 0
+
+	return PropSubsetSettlement(
+		propBets=updatedPropBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)

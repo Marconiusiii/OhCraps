@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -379,6 +379,22 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.bankDelta, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.propBets["Horn"], 0)
+
+	def testSettleBuffaloBetWinsOnHardNumber(self):
+		propBets = {"Buffalo": 40}
+		settlement = settleBuffaloBet(propBets=propBets, roll=8, die1=4, die2=4)
+		self.assertEqual(settlement.bankDelta, 280)
+		self.assertEqual(settlement.chipsOnTableDelta, -40)
+		self.assertEqual(settlement.propBets["Buffalo"], 0)
+		self.assertIn("You won $270 on the Buffalo bet!", settlement.messages)
+
+	def testSettleBuffaloBetLosesOnNonHardRoll(self):
+		propBets = {"Buffalo": 40}
+		settlement = settleBuffaloBet(propBets=propBets, roll=8, die1=5, die2=3)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -40)
+		self.assertEqual(settlement.propBets["Buffalo"], 0)
+		self.assertIn("You lost $40 from the Buffalo.", settlement.messages)
 
 
 if __name__ == "__main__":

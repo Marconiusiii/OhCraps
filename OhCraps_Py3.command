@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1151,19 +1151,20 @@ def propPay(roll):
 	chipsOnTable += subsetSettlement.chipsOnTableDelta
 	for message in subsetSettlement.messages:
 		print(message)
+	buffaloSettlement = settleBuffaloBet(propBets=propBets, roll=roll, die1=die1, die2=die2)
+	propBets = buffaloSettlement.propBets
+	bank += buffaloSettlement.bankDelta
+	chipsOnTable += buffaloSettlement.chipsOnTableDelta
+	for message in buffaloSettlement.messages:
+		print(message)
 #	multiplier = 0
-	extractedPropKeys = ["Any Seven", "Any Craps", "Eleven", "C and E", "Snake Eyes", "Acey Deucey", "Boxcars", "Horn"]
+	extractedPropKeys = ["Any Seven", "Any Craps", "Eleven", "C and E", "Snake Eyes", "Acey Deucey", "Boxcars", "Horn", "Buffalo"]
 	for key in propBets:
 		if key in extractedPropKeys:
 			continue
 		if propBets[key] > 0:
 			multiplier = sub = 0
-			if key == "Buffalo" and roll in [4, 6, 8, 10] and die1 == die2:
-				multiplier = 30
-				sub = propBets[key]//4*3
-				propBets[key] = propBets[key]//4
-
-			elif key in ['Hop Hard 4', 'Hop Hard 6', 'Hop Hard 8', 'Hop Hard 10'] and roll in [4, 6, 8, 10]:
+			if key in ['Hop Hard 4', 'Hop Hard 6', 'Hop Hard 8', 'Hop Hard 10'] and roll in [4, 6, 8, 10]:
 				val = "Hop Hard " + str(roll)
 				if die1 == die2 and val == key:
 					multiplier = 30

@@ -440,6 +440,23 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.propBets["Hop Hard 8"], 0)
 		self.assertIn("You lost $10 from the Hop Hard 8.", settlement.messages)
 
+	def testSettleHopBetsHopEZLosesOnHardRoll(self):
+		propBets = {"Hop EZ": 15}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -15)
+		self.assertEqual(settlement.propBets["Hop EZ"], 0)
+		self.assertIn("You lost $15 from the Hop EZ.", settlement.messages)
+
+	def testSettleHopBetsHopEZWinsOnEasyRoll(self):
+		propBets = {"Hop EZ": 15}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=4, die2=2)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -15)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 1)
+		self.assertEqual(settlement.propBets["Hop EZ"], 0)
+		self.assertIn("You won $1 on the Hop EZ bet!", settlement.messages)
+
 	def testPropKeyMatrixAccountsForEveryConfiguredPropKey(self):
 		propKeyMatrix = getPropKeyMatrix()
 		self.assertEqual(set(propKeyMatrix.keys()), set(PROP_BET_KEYS))

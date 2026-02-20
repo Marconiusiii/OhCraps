@@ -85,6 +85,17 @@ class HardWaysSettlement:
 	messages: list[str]
 
 
+@dataclass(frozen=True)
+class ComeTableSettlement:
+	comeBets: dict
+	dComeBets: dict
+	comeOdds: dict
+	dComeOdds: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -437,6 +448,132 @@ def settleHardWays(hardWays: dict, roll: int, rollHard: bool) -> HardWaysSettlem
 		lostNumber=lostNumber,
 		winAmount=winAmount,
 		lossAmount=lossAmount,
+		messages=messages
+	)
+
+
+def normalizeComeBets(comeBets: dict) -> dict:
+	normalized = dict(comeBets)
+	for key in [4, 5, 6, 8, 9, 10]:
+		if key not in normalized:
+			normalized[key] = 0
+		else:
+			normalized[key] = int(normalized[key])
+	return normalized
+
+
+def normalizeNumberBetDict(numberDict: dict) -> dict:
+	normalized = {
+		4: 0,
+		5: 0,
+		6: 0,
+		8: 0,
+		9: 0,
+		10: 0
+	}
+	for key in normalized:
+		if key in numberDict:
+			normalized[key] = int(numberDict[key])
+	return normalized
+
+
+def settleComeTableBets(comeBets: dict, dComeBets: dict, comeOdds: dict, dComeOdds: dict, roll: int, pointIsOn: bool, working: bool) -> ComeTableSettlement:
+	updatedComeBets = normalizeComeBets(comeBets)
+	updatedDComeBets = normalizeNumberBetDict(dComeBets)
+	updatedComeOdds = normalizeNumberBetDict(comeOdds)
+	updatedDComeOdds = normalizeNumberBetDict(dComeOdds)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	if roll == 7:
+		loss = 0
+		lossOdds = 0
+		for key in [4, 5, 6, 8, 9, 10]:
+			loss += updatedComeBets[key]
+			lossOdds += updatedComeOdds[key]
+		if loss > 0:
+			messages.append(f"You lost ${loss:,} from your Come Bets.")
+			if lossOdds > 0 and (pointIsOn or working):
+				messages.append(f"You lost ${lossOdds:,} from your Come Bet Odds.")
+			elif lossOdds > 0 and not pointIsOn:
+				messages.append(f"${lossOdds:,} returned to you from Come Odds.")
+				bankDelta += lossOdds
+			chipsOnTableDelta -= loss + lossOdds
+			for key in [4, 5, 6, 8, 9, 10]:
+				updatedComeBets[key] = 0
+				updatedComeOdds[key] = 0
+
+		win = 0
+		winOdds = 0
+		for key in [4, 5, 6, 8, 9, 10]:
+			win += updatedDComeBets[key] * 2
+			chipsOnTableDelta -= updatedDComeBets[key]
+		for key in [4, 5, 6, 8, 9, 10]:
+			if updatedDComeOdds[key] > 0 and (pointIsOn or working):
+				chipsOnTableDelta -= updatedDComeOdds[key]
+				bankDelta += updatedDComeOdds[key]
+				if key in [4, 10]:
+					winOdds += updatedDComeOdds[key]//2
+				elif key in [5, 9]:
+					winOdds += (updatedDComeOdds[key]//3) * 2
+				elif key in [6, 8]:
+					winOdds += (updatedDComeOdds[key]//6) * 5
+			else:
+				chipsOnTableDelta -= updatedDComeOdds[key]
+				winOdds += updatedDComeOdds[key]
+				updatedDComeOdds[key] = 0
+		if win > 0:
+			messages.append(f"You won ${win//2:,} from your Don't Come Bets!")
+			if winOdds > 0 and (pointIsOn or working):
+				messages.append(f"You won ${winOdds:,} from your Don't Come Bet Odds!")
+			elif winOdds > 0 and not pointIsOn:
+				messages.append(f"Returning ${winOdds:,} to you from your Don't Come odds.")
+			bankDelta += win + winOdds
+		for key in [4, 5, 6, 8, 9, 10]:
+			updatedDComeBets[key] = 0
+			updatedDComeOdds[key] = 0
+
+	if roll in [4, 5, 6, 8, 9, 10]:
+		if updatedComeBets[roll] > 0:
+			messages.append(f"You won ${updatedComeBets[roll]:,} on the Come {roll}!")
+			bankDelta += updatedComeBets[roll] * 2
+			chipsOnTableDelta -= updatedComeBets[roll]
+			updatedComeBets[roll] = 0
+			if updatedComeOdds[roll] > 0 and (pointIsOn or working):
+				cOddsWin = 0
+				if roll in [4, 10]:
+					cOddsWin = updatedComeOdds[roll] * 2
+				elif roll in [5, 9]:
+					cOddsWin += (updatedComeOdds[roll]//2) * 3
+				elif roll in [6, 8]:
+					cOddsWin += (updatedComeOdds[roll]//5) * 6
+				messages.append(f"You won ${cOddsWin:,} on the Come {roll} Odds!")
+				bankDelta += cOddsWin + updatedComeOdds[roll]
+				chipsOnTableDelta -= updatedComeOdds[roll]
+				updatedComeOdds[roll] = 0
+			elif updatedComeOdds[roll] > 0 and not pointIsOn:
+				messages.append(f"Returning ${updatedComeOdds[roll]:,} to you from your Come {roll} odds.")
+				chipsOnTableDelta -= updatedComeOdds[roll]
+				bankDelta += updatedComeOdds[roll]
+				updatedComeOdds[roll] = 0
+
+		if updatedDComeBets[roll] > 0:
+			messages.append(f"You lost ${updatedDComeBets[roll]:,} from the Don't Come {roll}.")
+			chipsOnTableDelta -= updatedDComeBets[roll]
+			updatedDComeBets[roll] = 0
+			if updatedDComeOdds[roll] > 0:
+				messages.append(f"You lost ${updatedDComeOdds[roll]:,} from the Don't Come {roll} Odds.")
+				chipsOnTableDelta -= updatedDComeOdds[roll]
+				updatedDComeOdds[roll] = 0
+
+	return ComeTableSettlement(
+		comeBets=updatedComeBets,
+		dComeBets=updatedDComeBets,
+		comeOdds=updatedComeOdds,
+		dComeOdds=updatedDComeOdds,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
 		messages=messages
 	)
 

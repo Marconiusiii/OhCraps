@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -199,6 +199,63 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.lossAmount, 50)
 		self.assertEqual(settlement.chipsOnTableDelta, -50)
 		self.assertEqual(settlement.hardWays, {4: 0, 6: 0, 8: 0, 10: 0})
+
+	def testSettleComeTableBetsSevenOut(self):
+		comeBets = {4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, "Come": 0}
+		dComeBets = {4: 0, 5: 15, 6: 0, 8: 0, 9: 0, 10: 0}
+		comeOdds = {4: 20, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		dComeOdds = {4: 0, 5: 30, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settleComeTableBets(
+			comeBets=comeBets,
+			dComeBets=dComeBets,
+			comeOdds=comeOdds,
+			dComeOdds=dComeOdds,
+			roll=7,
+			pointIsOn=True,
+			working=False
+		)
+		self.assertEqual(settlement.bankDelta, 80)
+		self.assertEqual(settlement.chipsOnTableDelta, -75)
+		self.assertEqual(settlement.comeBets[4], 0)
+		self.assertEqual(settlement.dComeBets[5], 0)
+
+	def testSettleComeTableBetsComeNumberHit(self):
+		comeBets = {4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, "Come": 0}
+		dComeBets = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		comeOdds = {4: 15, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		dComeOdds = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settleComeTableBets(
+			comeBets=comeBets,
+			dComeBets=dComeBets,
+			comeOdds=comeOdds,
+			dComeOdds=dComeOdds,
+			roll=4,
+			pointIsOn=True,
+			working=False
+		)
+		self.assertEqual(settlement.bankDelta, 65)
+		self.assertEqual(settlement.chipsOnTableDelta, -25)
+		self.assertEqual(settlement.comeBets[4], 0)
+		self.assertEqual(settlement.comeOdds[4], 0)
+
+	def testSettleComeTableBetsDontComeLosesOnNumber(self):
+		comeBets = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, "Come": 0}
+		dComeBets = {4: 12, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		comeOdds = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		dComeOdds = {4: 24, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settleComeTableBets(
+			comeBets=comeBets,
+			dComeBets=dComeBets,
+			comeOdds=comeOdds,
+			dComeOdds=dComeOdds,
+			roll=4,
+			pointIsOn=True,
+			working=False
+		)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -36)
+		self.assertEqual(settlement.dComeBets[4], 0)
+		self.assertEqual(settlement.dComeOdds[4], 0)
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -698,85 +698,23 @@ def comeCheck(roll):
 
 def comePay(roll):
 	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn, working
-	if roll == 7:
-		loss = lossOdds = 0
-		for key in comeBets:
-			loss += comeBets[key]
-		for key in comeOdds:
-			lossOdds += comeOdds[key]
-		if loss > 0:
-			print(f"You lost ${loss:,} from your Come Bets.")
-			if lossOdds > 0 and pointIsOn or lossOdds > 0 and working:
-				print(f"You lost ${lossOdds:,} from your Come Bet Odds.")
-			elif lossOdds > 0 and pointIsOn == False:
-				print(f"${lossOdds:,} returned to you from Come Odds.")
-				bank += lossOdds
-			chipsOnTable -= loss + lossOdds
-			for key in comeBets:
-				comeBets[key] = 0
-			for key in comeOdds:
-				comeOdds[key] = 0
-		win = winOdds = 0
-		for key in dComeBets:
-			win += dComeBets[key] * 2
-			chipsOnTable -= dComeBets[key]
-		for key in dComeOdds:
-			if dComeOdds[key] > 0 and pointIsOn or dComeOdds[key] > 0 and working:
-				chipsOnTable -= dComeOdds[key]
-				bank += dComeOdds[key]
-				if key in [4, 10]:
-					winOdds += dComeOdds[key]//2
-				elif key in [5, 9]:
-					winOdds += dComeOdds[key]//3*2
-				elif key in [6, 8]:
-					winOdds += dComeOdds[key]//6*5
-			else:
-				chipsOnTable -= dComeOdds[key]
-				winOdds += dComeOdds[key]
-				dComeOdds[key] = 0
-		if win > 0:
-			print(f"You won ${win//2:,} from your Don't Come Bets!")
-			if winOdds > 0 and pointIsOn or winOdds > 0 and working:
-				print(f"You won ${winOdds:,} from your Don't Come Bet Odds!")
-			elif winOdds > 0 and pointIsOn == False:
-				print(f"Returning ${winOdds:,} to you from your Don't Come odds.")
-			bank += win + winOdds + dComeOdds[key]
-		for key in dComeBets:
-			dComeBets[key] = 0
-		for key in dComeOdds:
-			dComeOdds[key] = 0
-	if roll in [4, 5, 6, 8, 9, 10]:
-		if comeBets[roll] > 0:
-			print(f"You won ${comeBets[roll]:,} on the Come {roll}!")
-			bank += comeBets[roll] * 2
-			chipsOnTable -= comeBets[roll]
-			comeBets[roll] = 0
-			if comeOdds[roll] > 0 and pointIsOn or comeOdds[roll] > 0 and working:
-				cOddsWin = 0
-				if roll in [4, 10]:
-					cOddsWin = comeOdds[roll] * 2
-				elif roll in [5, 9]:
-					cOddsWin += comeOdds[roll]//2*3
-				elif roll in [6, 8]:
-					cOddsWin += comeOdds[roll]//5*6
-				print(f"You won ${cOddsWin:,} on the Come {roll} Odds!")
-				bank += cOddsWin + comeOdds[roll]
-				chipsOnTable -= comeOdds[roll]
-				comeOdds[roll] = 0
-			elif comeOdds[roll] > 0 and pointIsOn == False:
-				print(f"Returning ${comeOdds[roll]:,} to you from your Come {roll} odds.")
-				chipsOnTable -= comeOdds[roll]
-				bank += comeOdds[roll]
-				comeOdds[roll] = 0
-
-		if dComeBets[roll] > 0:
-			print(f"You lost ${dComeBets[roll]:,} from the Don't Come {roll}.")
-			chipsOnTable -= dComeBets[roll]
-			dComeBets[roll] = 0
-			if dComeOdds[roll] > 0:
-				print(f"You lost ${dComeOdds[roll]:,} from the Don't Come {roll} Odds.")
-				chipsOnTable -= dComeOdds[roll]
-				dComeOdds[roll] = 0
+	settlement = settleComeTableBets(
+		comeBets=comeBets,
+		dComeBets=dComeBets,
+		comeOdds=comeOdds,
+		dComeOdds=dComeOdds,
+		roll=roll,
+		pointIsOn=pointIsOn,
+		working=working
+	)
+	comeBets = settlement.comeBets
+	dComeBets = settlement.dComeBets
+	comeOdds = settlement.comeOdds
+	dComeOdds = settlement.dComeOdds
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
 
 #Field Betting
 

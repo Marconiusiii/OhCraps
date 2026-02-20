@@ -130,3 +130,58 @@ It does lock the highest-risk interactive accounting paths with deterministic te
 
 ## Next logical follow-up
 Build a small adapter layer that converts each user betting action into pure function calls with explicit state in/state out, then reuse these same test patterns on the adapter. That is the cleanest bridge from terminal loop to iOS UI events.
+
+## Milestone 23 addendum: Place and Lay branch coverage
+Milestone 23 applied the same deterministic strategy to Place/Lay interactive branches.
+
+### Why this was the right next step
+The prior terminal-flow tests locked hard ways and odds retry accounting, but Place/Lay flows still had:
+
+- Large branch count (`a`, `i`, `c`, mover, press variants, takedown).
+- Multiple remove-old/add-new transitions.
+- Point inclusion/exclusion branches that can silently alter outlay.
+
+These are exactly the kinds of paths that pass casual play testing but fail in edge sequences.
+
+### Additional tests added
+In `tests/testEngineBehavior.py`, `TerminalFlowRegressionTests` now also includes:
+
+- `testPlacePresetAcrossExcludePoint`
+- `testPlacePresetInsideExcludePoint`
+- `testPlacePresetCenterSetsOnlySixAndEight`
+- `testPlaceMoverConvertsSixToFiveUnitNumber`
+- `testPlaceMoverConvertsFiveUnitNumberToSix`
+- `testPlaceCheckFullPressMaintainsAccounting`
+- `testPlaceCheckHalfPressUsesNormalizedSixIncrement`
+- `testLayAllAcrossSetsEachNumber`
+- `testLayBettingTakeDownReturnsFunds`
+
+### Why the assertions are structured this way
+Each test checks two things at once:
+
+1. Behavioral correctness:
+	- Correct numbers are set/cleared.
+	- Correct branch executes based on input sequence.
+
+2. Accounting correctness:
+	- `bank` and `chipsOnTable` end at exact expected values.
+	- No duplicate debits/credits during replacement flows.
+
+### Important test-fixture lesson
+One new test initially failed due to invalid setup:
+
+- It had existing place bets but did not preload `chipsOnTable` to match those live bets.
+
+That was a fixture bug, not game logic. The setup was corrected to realistic state:
+
+- live bets are represented in `chipsOnTable`
+- available rack value remains in `bank`
+
+This is a useful rule for future test writing:
+
+- Any test that starts with active bets must initialize `bank` and `chipsOnTable` consistently with those bets before asserting flow behavior.
+
+### Milestone 23 outcome
+- No additional game-rule patch was needed in terminal code.
+- Coverage increased from 71 to 80 passing tests.
+- Place/Lay branch risk is now materially lower, and adapter extraction can proceed with stronger regression protection.

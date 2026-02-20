@@ -603,6 +603,110 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 96)
 		self.assertEqual(terminal["chipsOnTable"], 4)
 
+	def testPlacePresetAcrossExcludePoint(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 6
+		terminal["place"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["2", "n"]):
+			terminal["placePreset"]("a")
+		self.assertEqual(terminal["place"], {4: 10, 5: 10, 6: 0, 8: 12, 9: 10, 10: 10})
+		self.assertEqual(terminal["bank"], 148)
+		self.assertEqual(terminal["chipsOnTable"], 52)
+
+	def testPlacePresetInsideExcludePoint(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 5
+		terminal["place"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["2", "n"]):
+			terminal["placePreset"]("i")
+		self.assertEqual(terminal["place"], {4: 0, 5: 0, 6: 12, 8: 12, 9: 10, 10: 0})
+		self.assertEqual(terminal["bank"], 166)
+		self.assertEqual(terminal["chipsOnTable"], 34)
+
+	def testPlacePresetCenterSetsOnlySixAndEight(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 168
+		terminal["chipsOnTable"] = 32
+		terminal["place"] = {4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5}
+		terminal["pointIsOn"] = False
+		with patch("builtins.input", side_effect=["2"]):
+			terminal["placePreset"]("c")
+		self.assertEqual(terminal["place"], {4: 0, 5: 0, 6: 12, 8: 12, 9: 0, 10: 0})
+		self.assertEqual(terminal["bank"], 176)
+		self.assertEqual(terminal["chipsOnTable"], 24)
+
+	def testPlaceMoverConvertsSixToFiveUnitNumber(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 24
+		terminal["comeOut"] = 6
+		terminal["place"] = {4: 0, 5: 0, 6: 24, 8: 0, 9: 0, 10: 0}
+		terminal["placeMover"]()
+		self.assertEqual(terminal["place"], {4: 20, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+		self.assertEqual(terminal["bank"], 104)
+		self.assertEqual(terminal["chipsOnTable"], 20)
+
+	def testPlaceMoverConvertsFiveUnitNumberToSix(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 30
+		terminal["comeOut"] = 5
+		terminal["place"] = {4: 10, 5: 25, 6: 0, 8: 0, 9: 0, 10: 0}
+		terminal["placeMover"]()
+		self.assertEqual(terminal["place"], {4: 10, 5: 0, 6: 30, 8: 0, 9: 0, 10: 0})
+		self.assertEqual(terminal["bank"], 95)
+		self.assertEqual(terminal["chipsOnTable"], 35)
+
+	def testPlaceCheckFullPressMaintainsAccounting(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {4: 0, 5: 0, 6: 18, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["p"]):
+			terminal["placeCheck"](6)
+		self.assertEqual(terminal["place"][6], 36)
+		self.assertEqual(terminal["bank"], 103)
+		self.assertEqual(terminal["chipsOnTable"], 36)
+
+	def testPlaceCheckHalfPressUsesNormalizedSixIncrement(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {4: 0, 5: 0, 6: 18, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["hp"]):
+			terminal["placeCheck"](6)
+		self.assertEqual(terminal["place"][6], 24)
+		self.assertEqual(terminal["bank"], 115)
+		self.assertEqual(terminal["chipsOnTable"], 24)
+
+	def testLayAllAcrossSetsEachNumber(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["2"]):
+			terminal["layAll"]()
+		self.assertEqual(terminal["layBets"], {4: 10, 5: 10, 6: 10, 8: 10, 9: 10, 10: 10})
+		self.assertEqual(terminal["bank"], 40)
+		self.assertEqual(terminal["chipsOnTable"], 60)
+
+	def testLayBettingTakeDownReturnsFunds(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 90
+		terminal["chipsOnTable"] = 10
+		terminal["layBets"] = {4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["0", "", "", "", "", ""]):
+			terminal["layBetting"]()
+		self.assertEqual(terminal["layBets"], {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+		self.assertEqual(terminal["bank"], 100)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
 
 if __name__ == "__main__":
 	unittest.main()

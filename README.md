@@ -404,6 +404,35 @@ Why this matters:
 - These tests close that gap by validating real input-driven branches deterministically.
 - The bankroll/chips accounting model is now protected on retry/re-entry flows where silent drift is most likely.
 
+### Milestone 23: Place/Lay terminal flow coverage expansion
+
+This milestone extends deterministic terminal-flow tests to Place and Lay interactive branches that were still mostly manual-test only.
+
+What was added in tests:
+
+- `placePreset('a')` with point exclusion accounting assertions.
+- `placePreset('i')` with point exclusion accounting assertions.
+- `placePreset('c')` conversion behavior and accounting assertions.
+- `placeMover()` conversion checks:
+	- 6/8 -> 5-unit number normalization
+	- 5-unit number -> 6/8 normalization
+- `placeCheck()` press-path checks:
+	- Full press accounting
+	- Half press accounting with normalized 6/8 increment
+- `layAll()` across setup accounting.
+- `layBetting()` takedown return accounting.
+
+Why this matters:
+
+- These flows have branch-heavy user input and replacement logic where regressions are easy to introduce.
+- Adding deterministic coverage here narrows remaining untested terminal-state paths before adapter extraction.
+- This directly improves confidence for iOS migration because these tests validate state transitions, not just settlement math.
+
+Milestone result:
+
+- No new gameplay-rule changes were required.
+- Added regression coverage increased suite from 71 to 80 tests, all passing.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

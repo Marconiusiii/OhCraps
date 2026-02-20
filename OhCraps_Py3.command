@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1834,67 +1834,52 @@ def vig(bet):
 
 def placeCheck(roll):
 	global place, bank, chipsOnTable
-	if roll in [4, 5, 6, 8, 9, 10]:
-		if place[roll] > 0:
-			win = 0
-			if roll in [4, 10] and place[roll] >= 10:
-				win = place[roll] * 2 - vig(place[roll])
-			elif roll in [4, 10]:
-				win = (place[roll]//5) * 9
-			elif roll in [5, 9]:
-				win = (place[roll]//5) * 7
-			elif roll in [6, 8]:
-				win = (place[roll]//6) * 7 + place[roll]%6
+	settlement = settlePlaceBets(placeBets=place, roll=roll)
+	place = settlement.placeBets
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
 
-# Modulo accounts for improper bets, such as $@5 on the 6 or 8. Dealers would pay odds on the first $24 and then the remainder would get paid out as $1.
-
-			bank += win
-			print(f"You won ${win:,} on the Place {roll}!")
-			press = str(input("Change your bet? 'y' to change, 'p' to full-press, 'hp' to half-press, or 'u' to press 1 unit, or Enter to do nothing.\n > ")).strip().lower()
-			if press == 'y':
-				print(f"How much on the Place {roll}?")
-				bank += place[roll]
-				bet = betPrompt()
-				if bet == 0:
-					chipsOnTable -= place[roll]
-					place[roll] = bet
-					print(f"Ok, taking down your Place {roll} bet.")
-				else:
-					chipsOnTable -= place[roll]
-					place[roll] = bet
-					print(f"Ok, ${place[roll]:,} on the Place {roll}.")
-			elif press == 'p':
-				bank += place[roll]
-				chipsOnTable -= place[roll]
-				place[roll] *= 2
-				bank -= place[roll]
-				chipsOnTable += place[roll]
-				print(f"Full Press! You now have ${place[roll]} on the Place {roll}")
-			elif press == 'hp':
-				bank += place[roll]
-				chipsOnTable -= place[roll]
-				place[roll] += place[roll]//2
-				bank -= place[roll]
-				chipsOnTable += place[roll]
-				print(f"Half Press! You now have ${place[roll]} on the Place {roll}")
-			elif press == 'u':
-				bank += place[roll]
-				chipsOnTable -= place[roll]
-				if roll in [4, 5, 9, 10]:
-					place[roll] += 5
-				else:
-					place[roll] += 6
-				bank -= place[roll]
-				chipsOnTable += place[roll]
-				print(f"Pressing up one unit. You now have ${place[roll]} on the Place {roll}")
-	elif roll == 7:
-		loss = 0
-		for key in place:
-			loss += place[key]
-			place[key] = 0
-		chipsOnTable -= loss
-		if loss > 0:
-			print(f"You lost ${loss:,} from the Place bets.")
+	hitNumber = settlement.hitNumber
+	if hitNumber is not None:
+		press = str(input("Change your bet? 'y' to change, 'p' to full-press, 'hp' to half-press, or 'u' to press 1 unit, or Enter to do nothing.\n > ")).strip().lower()
+		if press == 'y':
+			print(f"How much on the Place {hitNumber}?")
+			bank += place[hitNumber]
+			bet = betPrompt()
+			if bet == 0:
+				chipsOnTable -= place[hitNumber]
+				place[hitNumber] = bet
+				print(f"Ok, taking down your Place {hitNumber} bet.")
+			else:
+				chipsOnTable -= place[hitNumber]
+				place[hitNumber] = bet
+				print(f"Ok, ${place[hitNumber]:,} on the Place {hitNumber}.")
+		elif press == 'p':
+			bank += place[hitNumber]
+			chipsOnTable -= place[hitNumber]
+			place[hitNumber] *= 2
+			bank -= place[hitNumber]
+			chipsOnTable += place[hitNumber]
+			print(f"Full Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
+		elif press == 'hp':
+			bank += place[hitNumber]
+			chipsOnTable -= place[hitNumber]
+			place[hitNumber] += place[hitNumber]//2
+			bank -= place[hitNumber]
+			chipsOnTable += place[hitNumber]
+			print(f"Half Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
+		elif press == 'u':
+			bank += place[hitNumber]
+			chipsOnTable -= place[hitNumber]
+			if hitNumber in [4, 5, 9, 10]:
+				place[hitNumber] += 5
+			else:
+				place[hitNumber] += 6
+			bank -= place[hitNumber]
+			chipsOnTable += place[hitNumber]
+			print(f"Pressing up one unit. You now have ${place[hitNumber]} on the Place {hitNumber}")
 
 def showAllBets():
 	global comeBet, dComeBet, fireBet, lineBets, propBets, atsAll, atsTall, atsSmall

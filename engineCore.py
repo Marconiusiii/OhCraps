@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import random
+import math
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional
@@ -34,6 +35,18 @@ class LineSettlement:
 	lineBets: dict
 	bankDelta: int
 	chipsOnTableDelta: int
+	messages: list[str]
+
+
+@dataclass(frozen=True)
+class PlaceSettlement:
+	placeBets: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	hitNumber: int | None
+	winAmount: int
+	commissionPaid: int
+	lossAmount: int
 	messages: list[str]
 
 
@@ -134,10 +147,10 @@ def settleLineBets(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int) -> L
 				messages.append(f"You lost ${updatedLineBets['Pass']:,} from the Pass Line.")
 				chipsOnTableDelta -= updatedLineBets["Pass"]
 				updatedLineBets["Pass"] = 0
-				if updatedLineBets["Don't Pass"] > 0:
-					dontPassValue = updatedLineBets["Don't Pass"]
-					messages.append(f"You won ${dontPassValue:,} on the Don't Pass Line!")
-					bankDelta += updatedLineBets["Don't Pass"] * 2
+			if updatedLineBets["Don't Pass"] > 0:
+				dontPassValue = updatedLineBets["Don't Pass"]
+				messages.append(f"You won ${dontPassValue:,} on the Don't Pass Line!")
+				bankDelta += updatedLineBets["Don't Pass"] * 2
 				chipsOnTableDelta -= updatedLineBets["Don't Pass"]
 				updatedLineBets["Don't Pass"] = 0
 
@@ -145,6 +158,74 @@ def settleLineBets(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int) -> L
 		lineBets=updatedLineBets,
 		bankDelta=bankDelta,
 		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)
+
+
+def normalizePlaceBets(placeBets: dict) -> dict:
+	normalized = {
+		4: 0,
+		5: 0,
+		6: 0,
+		8: 0,
+		9: 0,
+		10: 0
+	}
+	for key in normalized:
+		if key in placeBets:
+			normalized[key] = int(placeBets[key])
+	return normalized
+
+
+def calculateVig(bet: int) -> int:
+	total = bet * 0.05
+	if bet < 25:
+		return math.ceil(total)
+	return math.floor(total)
+
+
+def settlePlaceBets(placeBets: dict, roll: int) -> PlaceSettlement:
+	updatedPlaceBets = normalizePlaceBets(placeBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	hitNumber = None
+	winAmount = 0
+	commissionPaid = 0
+	lossAmount = 0
+	messages = []
+
+	if roll in [4, 5, 6, 8, 9, 10] and updatedPlaceBets[roll] > 0:
+		hitNumber = roll
+		if roll in [4, 10] and updatedPlaceBets[roll] >= 10:
+			commissionPaid = calculateVig(updatedPlaceBets[roll])
+			winAmount = updatedPlaceBets[roll] * 2 - commissionPaid
+		elif roll in [4, 10]:
+			winAmount = (updatedPlaceBets[roll]//5) * 9
+		elif roll in [5, 9]:
+			winAmount = (updatedPlaceBets[roll]//5) * 7
+		elif roll in [6, 8]:
+			winAmount = (updatedPlaceBets[roll]//6) * 7 + updatedPlaceBets[roll]%6
+		bankDelta += winAmount
+		if commissionPaid > 0:
+			messages.append(f"${commissionPaid:,} paid to the House for the vig.")
+		messages.append(f"You won ${winAmount:,} on the Place {roll}!")
+
+	elif roll == 7:
+		for key in updatedPlaceBets:
+			lossAmount += updatedPlaceBets[key]
+			updatedPlaceBets[key] = 0
+		chipsOnTableDelta -= lossAmount
+		if lossAmount > 0:
+			messages.append(f"You lost ${lossAmount:,} from the Place bets.")
+
+	return PlaceSettlement(
+		placeBets=updatedPlaceBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		hitNumber=hitNumber,
+		winAmount=winAmount,
+		commissionPaid=commissionPaid,
+		lossAmount=lossAmount,
 		messages=messages
 	)
 

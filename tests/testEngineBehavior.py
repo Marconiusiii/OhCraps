@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -65,6 +65,13 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.lineBets["Pass"], 0)
 		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
 
+	def testSettleLineBetsSevenOutDontPassOnly(self):
+		lineBets = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 25, "Don't Pass Odds": 0}
+		settlement = settleLineBets(lineBets=lineBets, pointIsOn=True, roll=6, p2roll=7)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -25)
+		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
+
 	def testSettleOddsBetsPassOddsWin(self):
 		lineBets = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
 		settlement = settleOddsBets(lineBets=lineBets, roll=5, comeOut=5)
@@ -85,6 +92,28 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.bankDelta, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.lineBets["Don't Pass Odds"], 0)
+
+	def testSettlePlaceBetsBuy4IncludesVig(self):
+		placeBets = {4: 25, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		settlement = settlePlaceBets(placeBets=placeBets, roll=4)
+		self.assertEqual(settlement.commissionPaid, 1)
+		self.assertEqual(settlement.winAmount, 49)
+		self.assertEqual(settlement.bankDelta, 49)
+		self.assertEqual(settlement.hitNumber, 4)
+
+	def testSettlePlaceBetsSixHandlesImproperBet(self):
+		placeBets = {4: 0, 5: 0, 6: 5, 8: 0, 9: 0, 10: 0}
+		settlement = settlePlaceBets(placeBets=placeBets, roll=6)
+		self.assertEqual(settlement.winAmount, 5)
+		self.assertEqual(settlement.bankDelta, 5)
+		self.assertEqual(settlement.hitNumber, 6)
+
+	def testSettlePlaceBetsSevenOutClearsAll(self):
+		placeBets = {4: 10, 5: 15, 6: 18, 8: 12, 9: 10, 10: 25}
+		settlement = settlePlaceBets(placeBets=placeBets, roll=7)
+		self.assertEqual(settlement.lossAmount, 90)
+		self.assertEqual(settlement.chipsOnTableDelta, -90)
+		self.assertEqual(settlement.placeBets, {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
 
 
 if __name__ == "__main__":

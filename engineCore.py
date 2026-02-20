@@ -155,6 +155,25 @@ def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
 	return DiceRoll(die1=die1, die2=die2, total=total, isHard=isHard)
 
 
+def maxPassOdds(pointNumber: int, baseBet: int) -> int:
+	bet = int(baseBet)
+	if pointNumber in [4, 10]:
+		return bet * 3
+	if pointNumber in [5, 9]:
+		return bet * 4
+	if pointNumber in [6, 8]:
+		return bet * 5
+	return 0
+
+
+def maxComeOdds(number: int, baseBet: int) -> int:
+	return maxPassOdds(number, baseBet)
+
+
+def maxLayOdds(baseBet: int) -> int:
+	return int(baseBet) * 10
+
+
 def normalizeLineBets(lineBets: dict) -> dict:
 	normalized = {
 		"Pass": 0,

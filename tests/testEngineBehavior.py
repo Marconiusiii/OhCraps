@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -307,6 +307,21 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.movedAmount, 30)
 		self.assertEqual(settlement.bankDelta, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
+	def testMaxPassOddsByPoint(self):
+		self.assertEqual(maxPassOdds(4, 10), 30)
+		self.assertEqual(maxPassOdds(5, 10), 40)
+		self.assertEqual(maxPassOdds(6, 10), 50)
+		self.assertEqual(maxPassOdds(12, 10), 0)
+
+	def testMaxComeOddsUsesSameRule(self):
+		self.assertEqual(maxComeOdds(10, 15), 45)
+		self.assertEqual(maxComeOdds(9, 15), 60)
+		self.assertEqual(maxComeOdds(8, 15), 75)
+
+	def testMaxLayOdds(self):
+		self.assertEqual(maxLayOdds(0), 0)
+		self.assertEqual(maxLayOdds(12), 120)
 
 
 if __name__ == "__main__":

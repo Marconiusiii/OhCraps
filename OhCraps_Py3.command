@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -404,13 +404,8 @@ def dpPhase2():
 def odds():
 	global lineBets, bank, chipsOnTable, comeOut
 	pOddsChange = dpOddsChange = 0
-	if comeOut in [4, 10]:
-		maxOdds = lineBets["Pass"] * 3
-	elif comeOut in [5, 9]:
-		maxOdds = lineBets["Pass"] * 4
-	elif comeOut in [6, 8]:
-		maxOdds = lineBets["Pass"] * 5
-	maxDP = lineBets["Don't Pass"] * 10
+	maxOdds = maxPassOdds(comeOut, lineBets["Pass"])
+	maxDP = maxLayOdds(lineBets["Don't Pass"])
 	if lineBets["Pass"] > 0:
 		print(f"You have ${lineBets['Pass Odds']:,} for your odds.")
 		while True:
@@ -586,20 +581,14 @@ def comeOddsChange():
 
 def cdcOddsChange(dict, dict2):
 	global chipsOnTable, bank
-	maxDC = 10
-	maxC = 0
 	for key in dict:
 		if dict[key] > 0:
-			if key in [4, 10]:
-				maxC = 3
-			elif key in [5, 9]:
-				maxC = 4
-			elif key in [6, 8]:
-				maxC = 5
 			if 'Come' in dict:
-				print(f"How much for Odds on the {key}? Max Odds is ${maxC * dict[key]:,}; you have ${dict2[key]:,} in Odds.")
+				maxOdds = maxComeOdds(key, dict[key])
+				print(f"How much for Odds on the {key}? Max Odds is ${maxOdds:,}; you have ${dict2[key]:,} in Odds.")
 			else:
-				print(f"How much to Lay against the {key}? Max Lay is ${maxDC*dict[key]:,}; you have ${dict2[key]:,} in Lay Odds.")
+				maxOdds = maxLayOdds(dict[key])
+				print(f"How much to Lay against the {key}? Max Lay is ${maxOdds:,}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
 					bet = int(input("$>"))
@@ -639,13 +628,7 @@ def comeCheck(roll):
 		if settlement.movedNumber is not None:
 			comeBets[settlement.movedNumber] = settlement.movedAmount
 			if str(input("Odds on your Come Bet? > ")).strip().lower() in ['y', 'yes']:
-				max = 0
-				if settlement.movedNumber in [4, 10]:
-					max = comeBets[settlement.movedNumber] * 3
-				elif settlement.movedNumber in [5, 9]:
-					max = comeBets[settlement.movedNumber] * 4
-				elif settlement.movedNumber in [6, 8]:
-					max = comeBets[settlement.movedNumber] * 5
+				max = maxComeOdds(settlement.movedNumber, comeBets[settlement.movedNumber])
 				print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 				while True:
 					comeOdds[settlement.movedNumber] = betPrompt()
@@ -668,7 +651,7 @@ def comeCheck(roll):
 		if settlement.movedNumber is not None:
 			dComeBets[settlement.movedNumber] = settlement.movedAmount
 			if str(input(f"Lay odds on your Don't Come {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
-				dMax = dComeBets[settlement.movedNumber] * 10
+				dMax = maxLayOdds(dComeBets[settlement.movedNumber])
 				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax:,}.")
 				while True:
 					dComeOdds[settlement.movedNumber] = betPrompt()

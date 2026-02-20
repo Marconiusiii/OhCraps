@@ -359,6 +359,18 @@ def calculateVig(bet: int) -> int:
 	return math.floor(total)
 
 
+def calculateHalfPressIncrement(number: int, currentWager: int) -> int:
+	wager = int(currentWager)
+	if wager <= 0:
+		return 0
+	if number in [6, 8]:
+		normalizedHalf = (wager//2//6) * 6
+		if normalizedHalf < 6:
+			return 6
+		return normalizedHalf
+	return wager//2
+
+
 def settlePlaceBets(placeBets: dict, roll: int) -> PlaceSettlement:
 	updatedPlaceBets = normalizePlaceBets(placeBets)
 	bankDelta = 0

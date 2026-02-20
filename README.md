@@ -300,6 +300,34 @@ Why this matters:
 - Allows tests to assert full proposition coverage.
 - Makes wrapper behavior explicit: unclassified keys are a model error, not silent game behavior.
 
+### Milestone 18: Place half-press normalization for 6 and 8
+
+This milestone fixes half-press behavior for Place 6 and Place 8 to match table-valid bet sizing.
+
+Rule implemented:
+
+- Full press still doubles current wager.
+- Half-press for 6/8 is normalized to valid $6 units.
+- Half-press increment for 6/8 has a minimum of $6.
+- Half-press amount is based on current wager, not on the payout result.
+
+Examples:
+
+- $18 on 8 half-presses by $6 (to $24), not by $9.
+- $24 on 6 half-presses by $12 (to $36).
+- $6 on 6 half-presses by $6 (to $12).
+
+Implementation:
+
+- New engine helper: `calculateHalfPressIncrement(number, currentWager)`
+- Terminal place flow now calls this helper for the `hp` path.
+
+Why this matters:
+
+- Keeps 6/8 wagers table-valid after every press action.
+- Removes invalid intermediate bets (like $27 on 6/8).
+- Locks behavior with deterministic tests for regression protection.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

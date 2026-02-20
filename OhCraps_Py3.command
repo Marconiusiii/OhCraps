@@ -5,7 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -1624,7 +1624,7 @@ def placeCheck(roll):
 		elif press == 'hp':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
-			place[hitNumber] += place[hitNumber]//2
+			place[hitNumber] += calculateHalfPressIncrement(number=hitNumber, currentWager=place[hitNumber])
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
 			print(f"Half Press! You now have ${place[hitNumber]} on the Place {hitNumber}")

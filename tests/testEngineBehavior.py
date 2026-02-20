@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -482,6 +482,18 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Horn"], 20)
 		self.assertEqual(resolution.propBets["Snake Eyes"], 10)
 		self.assertEqual(resolution.propBets["Boxcars"], 10)
+
+	def testCalculateHalfPressIncrementSixFromEighteen(self):
+		self.assertEqual(calculateHalfPressIncrement(number=6, currentWager=18), 6)
+
+	def testCalculateHalfPressIncrementEightFromTwentyFour(self):
+		self.assertEqual(calculateHalfPressIncrement(number=8, currentWager=24), 12)
+
+	def testCalculateHalfPressIncrementSixMinimumIsSix(self):
+		self.assertEqual(calculateHalfPressIncrement(number=6, currentWager=6), 6)
+
+	def testCalculateHalfPressIncrementFiveUsesHalf(self):
+		self.assertEqual(calculateHalfPressIncrement(number=5, currentWager=25), 12)
 
 
 if __name__ == "__main__":

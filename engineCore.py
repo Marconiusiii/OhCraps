@@ -29,6 +29,14 @@ class GameState:
 		return None
 
 
+@dataclass(frozen=True)
+class LineSettlement:
+	lineBets: dict
+	bankDelta: int
+	chipsOnTableDelta: int
+	messages: list[str]
+
+
 class RollOutcome(Enum):
 	natural = auto()
 	craps = auto()
@@ -66,3 +74,126 @@ def rollDice(rng: Optional[random.Random] = None) -> DiceRoll:
 	total = die1 + die2
 	isHard = die1 == die2
 	return DiceRoll(die1=die1, die2=die2, total=total, isHard=isHard)
+
+
+def normalizeLineBets(lineBets: dict) -> dict:
+	normalized = {
+		"Pass": 0,
+		"Pass Odds": 0,
+		"Don't Pass": 0,
+		"Don't Pass Odds": 0
+	}
+	for key in normalized:
+		if key in lineBets:
+			normalized[key] = int(lineBets[key])
+	return normalized
+
+
+def settleLineBets(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int) -> LineSettlement:
+	updatedLineBets = normalizeLineBets(lineBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	if not pointIsOn:
+		if roll in [7, 11]:
+			if updatedLineBets["Pass"] > 0:
+				messages.append(f"You won ${updatedLineBets['Pass']:,} on the Pass Line!")
+				bankDelta += updatedLineBets["Pass"]
+			if updatedLineBets["Don't Pass"] > 0:
+				dontPassValue = updatedLineBets["Don't Pass"]
+				messages.append(f"You lost ${dontPassValue:,} from the Don't Pass Line.")
+				chipsOnTableDelta -= updatedLineBets["Don't Pass"]
+				updatedLineBets["Don't Pass"] = 0
+		elif roll in [2, 3, 12]:
+			if updatedLineBets["Pass"] > 0:
+				messages.append(f"You lost ${updatedLineBets['Pass']:,} from the Pass Line.")
+				chipsOnTableDelta -= updatedLineBets["Pass"]
+				updatedLineBets["Pass"] = 0
+			if updatedLineBets["Don't Pass"] > 0:
+				if roll in [2, 3]:
+					dontPassValue = updatedLineBets["Don't Pass"]
+					messages.append(f"You won ${dontPassValue:,} on the Don't Pass Line!")
+					bankDelta += updatedLineBets["Don't Pass"]
+				elif roll == 12:
+					messages.append("12 is a Push!")
+	elif pointIsOn:
+		if p2roll == roll:
+			if updatedLineBets["Pass"] > 0:
+				messages.append(f"You won ${updatedLineBets['Pass']:,} on the Pass Line!")
+				bankDelta += updatedLineBets["Pass"] * 2
+				chipsOnTableDelta -= updatedLineBets["Pass"]
+				updatedLineBets["Pass"] = 0
+			if updatedLineBets["Don't Pass"] > 0:
+				dontPassValue = updatedLineBets["Don't Pass"]
+				messages.append(f"You lost ${dontPassValue:,} from the Don't Pass Line.")
+				chipsOnTableDelta -= updatedLineBets["Don't Pass"]
+				updatedLineBets["Don't Pass"] = 0
+		elif p2roll == 7:
+			if updatedLineBets["Pass"] > 0:
+				messages.append(f"You lost ${updatedLineBets['Pass']:,} from the Pass Line.")
+				chipsOnTableDelta -= updatedLineBets["Pass"]
+				updatedLineBets["Pass"] = 0
+				if updatedLineBets["Don't Pass"] > 0:
+					dontPassValue = updatedLineBets["Don't Pass"]
+					messages.append(f"You won ${dontPassValue:,} on the Don't Pass Line!")
+					bankDelta += updatedLineBets["Don't Pass"] * 2
+				chipsOnTableDelta -= updatedLineBets["Don't Pass"]
+				updatedLineBets["Don't Pass"] = 0
+
+	return LineSettlement(
+		lineBets=updatedLineBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)
+
+
+def settleOddsBets(lineBets: dict, roll: int, comeOut: int) -> LineSettlement:
+	updatedLineBets = normalizeLineBets(lineBets)
+	bankDelta = 0
+	chipsOnTableDelta = 0
+	messages = []
+
+	passOdds = updatedLineBets["Pass Odds"]
+	if passOdds > 0 and roll != 7:
+		payout = 0
+		if roll in [4, 10]:
+			payout = passOdds * 2
+		elif roll in [5, 9]:
+			payout += (passOdds//2) * 3
+		elif roll in [6, 8]:
+			payout += (passOdds//5) * 6
+		messages.append(f"You won ${payout:,} from your Pass Line Odds!")
+		bankDelta += payout + passOdds
+		chipsOnTableDelta -= passOdds
+		updatedLineBets["Pass Odds"] = 0
+	elif passOdds > 0 and roll == 7:
+		messages.append(f"You lost ${passOdds:,} from your Pass Line Odds.")
+		chipsOnTableDelta -= passOdds
+		updatedLineBets["Pass Odds"] = 0
+
+	dontPassOdds = updatedLineBets["Don't Pass Odds"]
+	if dontPassOdds > 0 and roll == 7:
+		payout = 0
+		if comeOut in [4, 10]:
+			payout += dontPassOdds//2
+		elif comeOut in [5, 9]:
+			payout += (dontPassOdds//3) * 2
+		elif comeOut in [6, 8]:
+			payout += (dontPassOdds//6) * 5
+		messages.append(f"You won ${payout:,} on your Don't Pass Odds!")
+		bankDelta += payout + dontPassOdds
+		chipsOnTableDelta -= dontPassOdds
+		updatedLineBets["Don't Pass Odds"] = 0
+	elif dontPassOdds > 0 and roll == comeOut:
+		messages.append(f"You lost ${dontPassOdds:,} from your Don't Pass Odds.")
+		chipsOnTableDelta -= dontPassOdds
+		updatedLineBets["Don't Pass Odds"] = 0
+
+	return LineSettlement(
+		lineBets=updatedLineBets,
+		bankDelta=bankDelta,
+		chipsOnTableDelta=chipsOnTableDelta,
+		messages=messages
+	)

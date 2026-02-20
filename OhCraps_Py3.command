@@ -5,6 +5,7 @@ import math
 import os
 from dataclasses import dataclass
 from typing import Optional
+from engineCore import settleLineBets, settleOddsBets
 
 @dataclass(frozen=True)
 class DiceRoll:
@@ -374,49 +375,20 @@ def lineBetting():
 
 def lineCheck(roll, p2roll):
 	global lineBets, bank, chipsOnTable, pointIsOn
-	if pointIsOn == False:
-		if roll in [7, 11]:
-			if lineBets["Pass"] > 0:
-				print(f"You won ${lineBets['Pass']:,} on the Pass Line!")
-				bank += lineBets["Pass"]
-			if lineBets["Don't Pass"] > 0:
-				print(f"You lost ${lineBets["Don't Pass"]:,} from the Don't Pass Line.")
-				chipsOnTable -= lineBets["Don't Pass"]
-				lineBets["Don't Pass"] = 0
-		elif roll in [2, 3, 12]:
-			if lineBets["Pass"] > 0:
-				print(f"You lost ${lineBets['Pass']:,} from the Pass Line.")
-				chipsOnTable -= lineBets["Pass"]
-				lineBets["Pass"] = 0
-			if lineBets["Don't Pass"] > 0:
-				if roll in [2, 3]:
-					print(f"You won ${lineBets["Don't Pass"]:,} on the Don't Pass Line!")
-					bank += lineBets["Don't Pass"]
-				elif roll == 12:
-					print("12 is a Push!")
-	elif pointIsOn == True:
-		if p2roll == roll:
-			if lineBets["Pass"] > 0:
-				print(f"You won ${lineBets['Pass']:,} on the Pass Line!")
-				bank += lineBets["Pass"] * 2
-				chipsOnTable -= lineBets["Pass"]
-				lineBets["Pass"] = 0
-			if lineBets["Don't Pass"] > 0:
-				print(f"You lost ${lineBets["Don't Pass"]:,} from the Don't Pass Line.")
-				chipsOnTable -= lineBets["Don't Pass"]
-				lineBets["Don't Pass"] = 0
-			oddsCheck(p2roll)
-		elif p2roll == 7:
-			if lineBets["Pass"] > 0:
-				print(f"You lost ${lineBets['Pass']:,} from the Pass Line.")
-				chipsOnTable -= lineBets["Pass"]
-				lineBets["Pass"] = 0
-			if lineBets["Don't Pass"] > 0:
-				print(f"You won ${lineBets["Don't Pass"]:,} on the Don't Pass Line!")
-				bank += lineBets["Don't Pass"] * 2
-				chipsOnTable -= lineBets["Don't Pass"]
-				lineBets["Don't Pass"] = 0
-			oddsCheck(p2roll)
+	settlement = settleLineBets(
+		lineBets=lineBets,
+		pointIsOn=pointIsOn,
+		roll=roll,
+		p2roll=p2roll
+	)
+	lineBets = settlement.lineBets
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
+
+	if pointIsOn and (p2roll == roll or p2roll == 7):
+		oddsCheck(p2roll)
 
 def dpPhase2():
 	global lineBets, bank, chipsOnTable
@@ -501,37 +473,16 @@ def odds():
 
 def oddsCheck(roll):
 	global bank, chipsOnTable, lineBets, comeOut
-	payout = 0
-	if lineBets["Pass Odds"] > 0 and roll != 7:
-		if roll in [4, 10]:
-			payout = lineBets["Pass Odds"] * 2
-		elif roll in [5, 9]:
-			payout += (lineBets["Pass Odds"]//2) * 3
-		elif roll in [6, 8]:
-			payout += (lineBets["Pass Odds"]//5) * 6
-		print(f"You won ${payout:,} from your Pass Line Odds!")
-		bank += payout + lineBets["Pass Odds"]
-		chipsOnTable -= lineBets["Pass Odds"]
-		lineBets["Pass Odds"] = 0
-	elif lineBets["Pass Odds"] > 0 and roll == 7:
-		print(f"You lost ${lineBets['Pass Odds']:,} from your Pass Line Odds.")
-		chipsOnTable -= lineBets["Pass Odds"]
-		lineBets["Pass Odds"] = 0
-	if lineBets["Don't Pass Odds"] > 0 and roll == 7:
-		if comeOut in [4, 10]:
-			payout += lineBets["Don't Pass Odds"]//2
-		elif comeOut in [5, 9]:
-			payout += (lineBets["Don't Pass Odds"]//3) * 2
-		elif comeOut in [6, 8]:
-			payout += (lineBets["Don't Pass Odds"]//6) * 5
-		print(f"You won ${payout:,} on your Don't Pass Odds!")
-		bank += payout + lineBets["Don't Pass Odds"]
-		chipsOnTable -= lineBets["Don't Pass Odds"]
-		lineBets["Don't Pass Odds"] = 0
-	elif lineBets["Don't Pass Odds"] > 0 and roll == comeOut:
-		print(f"You lost ${lineBets["Don't Pass Odds"]:,} from your Don't Pass Odds.")
-		chipsOnTable -= lineBets["Don't Pass Odds"]
-		lineBets["Don't Pass Odds"] = 0
+	settlement = settleOddsBets(
+		lineBets=lineBets,
+		roll=roll,
+		comeOut=comeOut
+	)
+	lineBets = settlement.lineBets
+	bank += settlement.bankDelta
+	chipsOnTable += settlement.chipsOnTableDelta
+	for message in settlement.messages:
+		print(message)
 
 # Come Betting
 

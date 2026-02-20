@@ -1,6 +1,6 @@
 import unittest
 
-from engineCore import GameState, RollOutcome, evaluateRoll
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets
 
 
 class EvaluateRollTests(unittest.TestCase):
@@ -41,6 +41,50 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(evaluateRoll(state, 7), RollOutcome.sevenOut)
 		self.assertEqual(evaluateRoll(state, 6), RollOutcome.pointHit)
 		self.assertEqual(evaluateRoll(state, 8), RollOutcome.neutral)
+
+	def testSettleLineBetsComeOutNatural(self):
+		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 0}
+		settlement = settleLineBets(lineBets=lineBets, pointIsOn=False, roll=7, p2roll=0)
+		self.assertEqual(settlement.bankDelta, 10)
+		self.assertEqual(settlement.chipsOnTableDelta, -15)
+		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
+
+	def testSettleLineBetsPointHit(self):
+		lineBets = {"Pass": 20, "Pass Odds": 0, "Don't Pass": 25, "Don't Pass Odds": 0}
+		settlement = settleLineBets(lineBets=lineBets, pointIsOn=True, roll=6, p2roll=6)
+		self.assertEqual(settlement.bankDelta, 40)
+		self.assertEqual(settlement.chipsOnTableDelta, -45)
+		self.assertEqual(settlement.lineBets["Pass"], 0)
+		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
+
+	def testSettleLineBetsSevenOut(self):
+		lineBets = {"Pass": 20, "Pass Odds": 0, "Don't Pass": 25, "Don't Pass Odds": 0}
+		settlement = settleLineBets(lineBets=lineBets, pointIsOn=True, roll=6, p2roll=7)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -45)
+		self.assertEqual(settlement.lineBets["Pass"], 0)
+		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
+
+	def testSettleOddsBetsPassOddsWin(self):
+		lineBets = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
+		settlement = settleOddsBets(lineBets=lineBets, roll=5, comeOut=5)
+		self.assertEqual(settlement.bankDelta, 25)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.lineBets["Pass Odds"], 0)
+
+	def testSettleOddsBetsDontPassOddsWinOnSeven(self):
+		lineBets = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 30}
+		settlement = settleOddsBets(lineBets=lineBets, roll=7, comeOut=5)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -30)
+		self.assertEqual(settlement.lineBets["Don't Pass Odds"], 0)
+
+	def testSettleOddsBetsDontPassOddsLosesOnPointHit(self):
+		lineBets = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 40}
+		settlement = settleOddsBets(lineBets=lineBets, roll=4, comeOut=4)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, -40)
+		self.assertEqual(settlement.lineBets["Don't Pass Odds"], 0)
 
 
 if __name__ == "__main__":

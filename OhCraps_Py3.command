@@ -2160,6 +2160,76 @@ def handleBettingCommand(command, pointPhase=False):
 	print("That's not an option, silly!")
 	return {"shouldRoll": False}
 
+def resolveComeOutRoll():
+	global comeOut, throws, working, pointIsOn
+	comeOut = roll()
+	outcome = evaluateRoll(gameState, comeOut)
+	throws += 1
+	comeCheck(comeOut)
+	layCheck(comeOut)
+	fieldCheck(comeOut)
+	if working:
+		placeCheck(comeOut)
+		hardCheck(comeOut)
+	propPay(comeOut)
+	if atsOn == True:
+		ats(comeOut)
+	if outcome == RollOutcome.natural:
+		if comeOut == 7:
+			throws = 0
+		lineCheck(comeOut, p2)
+		working = False
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		return {"enteredPointPhase": False, "outcome": outcome}
+	if outcome == RollOutcome.craps:
+		lineCheck(comeOut, p2)
+		working = False
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		return {"enteredPointPhase": False, "outcome": outcome}
+	pointIsOn = True
+	working = False
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	return {"enteredPointPhase": True, "outcome": outcome}
+
+def resolvePointRoll():
+	global p2, throws, placeOff, layOff, hardOff, pointIsOn
+	p2 = roll()
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	outcome = evaluateRoll(gameState, p2)
+	throws += 1
+	comeCheck(p2)
+	if placeOff:
+		placeOff = False
+	else:
+		placeCheck(p2)
+	if layOff:
+		layOff = False
+	else:
+		layCheck(p2)
+	fieldCheck(p2)
+	if hardOff:
+		hardOff = False
+	else:
+		hardCheck(p2)
+	lineCheck(comeOut, p2)
+	propPay(p2)
+	if fireBet > 0:
+		fireCheck()
+	if atsOn == True:
+		ats(p2)
+	if outcome == RollOutcome.sevenOut:
+		throws = 0
+		pointIsOn = False
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		return {"pointRoundEnded": True, "outcome": outcome}
+	if outcome == RollOutcome.pointHit:
+		print("Point Hit! Front line winner!")
+		pointIsOn = False
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		return {"pointRoundEnded": True, "outcome": outcome}
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	return {"pointRoundEnded": False, "outcome": outcome}
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2219,100 +2289,32 @@ while True:
 		if commandResult["shouldRoll"]:
 			break
 
-
-	comeOut = roll()
-	outcome = evaluateRoll(gameState, comeOut)
-
-	throws += 1
-
-	comeCheck(comeOut)
-	layCheck(comeOut)
-	fieldCheck(comeOut)
-	if working:
-		placeCheck(comeOut)
-		hardCheck(comeOut)
-
-	propPay(comeOut)
-	if atsOn == True:
-		ats(comeOut)
-
-	if outcome == RollOutcome.natural:
-		if comeOut == 7:
-			throws = 0
-		lineCheck(comeOut, p2)
-		working = False
-		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	comeOutResult = resolveComeOutRoll()
+	if not comeOutResult["enteredPointPhase"]:
 		continue
-	elif outcome == RollOutcome.craps:
-		lineCheck(comeOut, p2)
-		working = False
-		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		continue
-	else:
-		pointIsOn = True
-		working = False
-		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		while True:
-			if chipsOnTable > 0:
-				print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
-			else:
-				print(f"You have ${bank:,} in the bank.")
+	while True:
+		if chipsOnTable > 0:
+			print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+		else:
+			print(f"You have ${bank:,} in the bank.")
 
-			if bank <= 0 and chipsOnTable <= 0:
-				outOfMoney()
+		if bank <= 0 and chipsOnTable <= 0:
+			outOfMoney()
 
-			print(f"\n{comeOut} is the Point!\n")
-			print(f"Throws: {throws}")
+		print(f"\n{comeOut} is the Point!\n")
+		print(f"Throws: {throws}")
 
 #Phase 2 Betting
 
-			while True:
-				print("Place your bets!\n")
-				round2 = str(input(">  ")).strip().lower()
-				commandResult = handleBettingCommand(round2, pointPhase=True)
-				if commandResult["shouldRoll"]:
-					break
-			p2 = roll()
-
-			syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-			outcome = evaluateRoll(gameState, p2)
-
-			throws += 1
-
-			comeCheck(p2)
-			if placeOff:
-				placeOff = False
-			else:
-				placeCheck(p2)
-			if layOff:
-				layOff = False
-			else:
-				layCheck(p2)
-			fieldCheck(p2)
-			if hardOff:
-				hardOff = False
-			else:
-				hardCheck(p2)
-			lineCheck(comeOut, p2)
-			propPay(p2)
-			if fireBet > 0:
-				fireCheck()
-			if atsOn == True:
-				ats(p2)
-
-			if outcome == RollOutcome.sevenOut:
-				throws = 0
-				pointIsOn = False
-#				os.system("clear")
-				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		while True:
+			print("Place your bets!\n")
+			round2 = str(input(">  ")).strip().lower()
+			commandResult = handleBettingCommand(round2, pointPhase=True)
+			if commandResult["shouldRoll"]:
 				break
-			elif outcome == RollOutcome.pointHit:
-				print("Point Hit! Front line winner!")
-				pointIsOn = False
-				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-				break
-			else:
-				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-				continue
+		pointRollResult = resolvePointRoll()
+		if pointRollResult["pointRoundEnded"]:
+			break
+		continue
 
 	continue

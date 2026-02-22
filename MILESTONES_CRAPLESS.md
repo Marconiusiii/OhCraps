@@ -660,3 +660,31 @@ New milestone updates should be appended here rather than creating new milestone
 	- Place menu routing in Point phase.
 	- Point-phase roll command returns roll intent.
 	- Point-phase odds command with no line bet keeps proper guard message.
+
+## Milestone 50: Come Out And Point Roll Orchestrators
+
+### What changed
+- Extracted Come Out roll resolution into `resolveComeOutRoll()`.
+- Extracted Point-phase roll resolution into `resolvePointRoll()`.
+- Rewired the main game loop to call these orchestrators instead of inline roll-resolution blocks.
+- Preserved existing command prompts and payout paths while reducing nested loop complexity.
+
+### Why
+- Roll-resolution logic was embedded directly in the main loop with large duplicated state-sync/settlement sequences.
+- Extracting deterministic orchestrators reduces control-flow risk and makes a future iOS controller layer easier to map.
+
+### Behavior
+- No payout-rule changes.
+- No table-rule changes.
+- Point transitions and round resets still follow existing logic:
+	- Come Out naturals/craps continue to next Come Out.
+	- Point established enters point phase.
+	- Seven out and point hit both end point phase.
+
+### Test coverage
+- Added terminal orchestration tests in `tests/testEngineBehavior.py` for:
+	- `resolveComeOutRoll()` natural path (including throw reset on 7).
+	- `resolveComeOutRoll()` point-established path.
+	- `resolvePointRoll()` seven-out point-end path.
+	- `resolvePointRoll()` neutral roll continuation path, including one-roll Off flag reset behavior.
+- Full suite and compile checks remain green.

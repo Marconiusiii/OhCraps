@@ -1100,6 +1100,105 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
 		self.assertIn("You don't have a Line bet, silly!", printed)
 
+	def testResolveComeOutRollNaturalResetsThrowCount(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["working"] = True
+		terminal["throws"] = 8
+		terminal["pointIsOn"] = False
+		terminal["comeOut"] = 0
+		terminal["p2"] = 0
+		terminal["roll"] = lambda: 7
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].natural
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		lineCalls = []
+		terminal["lineCheck"] = lambda comeRoll, p2Roll: lineCalls.append((comeRoll, p2Roll))
+		result = terminal["resolveComeOutRoll"]()
+		self.assertEqual(result["enteredPointPhase"], False)
+		self.assertEqual(terminal["throws"], 0)
+		self.assertEqual(terminal["working"], False)
+		self.assertEqual(lineCalls, [(7, 0)])
+
+	def testResolveComeOutRollPointEstablished(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["working"] = True
+		terminal["throws"] = 2
+		terminal["pointIsOn"] = False
+		terminal["comeOut"] = 0
+		terminal["roll"] = lambda: 6
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].pointEstablished
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		terminal["lineCheck"] = lambda comeRoll, p2Roll: None
+		result = terminal["resolveComeOutRoll"]()
+		self.assertEqual(result["enteredPointPhase"], True)
+		self.assertEqual(terminal["pointIsOn"], True)
+		self.assertEqual(terminal["working"], False)
+		self.assertEqual(terminal["comeOut"], 6)
+
+	def testResolvePointRollSevenOutEndsPoint(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["fireBet"] = 0
+		terminal["throws"] = 3
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 8
+		terminal["p2"] = 0
+		terminal["placeOff"] = False
+		terminal["layOff"] = False
+		terminal["hardOff"] = False
+		terminal["roll"] = lambda: 7
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].sevenOut
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["lineCheck"] = lambda pointNumber, rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		result = terminal["resolvePointRoll"]()
+		self.assertEqual(result["pointRoundEnded"], True)
+		self.assertEqual(terminal["pointIsOn"], False)
+		self.assertEqual(terminal["throws"], 0)
+
+	def testResolvePointRollNeutralContinuesPoint(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["fireBet"] = 0
+		terminal["throws"] = 3
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 8
+		terminal["p2"] = 0
+		terminal["placeOff"] = True
+		terminal["layOff"] = True
+		terminal["hardOff"] = True
+		terminal["roll"] = lambda: 5
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].neutral
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["lineCheck"] = lambda pointNumber, rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		result = terminal["resolvePointRoll"]()
+		self.assertEqual(result["pointRoundEnded"], False)
+		self.assertEqual(terminal["pointIsOn"], True)
+		self.assertEqual(terminal["throws"], 4)
+		self.assertEqual(terminal["placeOff"], False)
+		self.assertEqual(terminal["layOff"], False)
+		self.assertEqual(terminal["hardOff"], False)
+
 	def testBetSnapshotCaptureApplyRoundTrip(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 321

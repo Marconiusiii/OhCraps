@@ -470,3 +470,27 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated handler tests to assert new action-result fields instead of legacy `handled` key.
 - Existing no-mutation and exit-path tests remain passing under the new contract.
 - Full suite remains green.
+
+## Regression Fix: Come Odds Prompt Order And Number Context
+
+### Issue
+- Come odds prompt appeared before movement messaging in Come flow.
+- Come odds prompt text no longer identified rolled number context.
+
+### Fix
+- In `processComePostRollAction(roll)`:
+	- movement + max-odds reminder now prints immediately before odds decision prompt,
+	- odds prompt now includes rolled number (`Odds on your Come N? >`).
+- Prevented duplicate delayed movement messaging in aggregated action-result output.
+- Left Don't Come flow unchanged.
+
+### Locked behavior order
+1. roll outcome reaches Come bar handling,
+2. movement message with max-odds reminder is shown,
+3. odds prompt on rolled number is shown.
+
+### Test coverage
+- Added regression test:
+	- `testComeCheckPrintsMoveReminderBeforeOddsPromptWithNumber`
+- Updated prior action-result test to align with immediate movement message emission path.
+- Full suite remains green.

@@ -25,7 +25,9 @@ def roll():
 		rollHard = True
 		print(f"\n{total} the Hard Way!\n")
 		print("\n" + stickman(total))
-	elif total in [7, 11] and pointIsOn == False:
+	elif total == 7 and pointIsOn == False:
+		print(f"\n{total} winner! Pay the line, take the don't!\n")
+	elif total == 11 and pointIsOn == False and gameMode == GameMode.craps:
 		print(f"\n{total} winner! Pay the line, take the don't!\n")
 	else:
 		call = random.randrange(1, 21)
@@ -586,19 +588,24 @@ def processComePostRollAction(roll):
 		comeBet = settlement.comeBet
 		bank += settlement.bankDelta
 		chipsOnTable += settlement.chipsOnTableDelta
+		settlementMessages = list(settlement.messages)
+		if settlement.movedNumber is not None:
+			moveMessage = f"Moving your Come Bet to the {settlement.movedNumber}."
+			settlementMessages = [msg for msg in settlementMessages if msg != moveMessage]
 		mergeActionResult(
 			actionResult,
 			createActionResult(
 				success=True,
-				messages=settlement.messages,
+				messages=settlementMessages,
 				stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
 			)
 		)
 		if settlement.movedNumber is not None:
 			comeBets[settlement.movedNumber] = settlement.movedAmount
 			actionResult["stateChanged"] = True
-			if str(input("Odds on your Come Bet? > ")).strip().lower() in ['y', 'yes']:
-				max = maxComeOddsForMode(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode)
+			max = maxComeOddsForMode(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode)
+			print(f"Moving your Come Bet to the {settlement.movedNumber}.")
+			if str(input(f"Come Odds for the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
 				print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 				while True:
 					comeOdds[settlement.movedNumber] = betPrompt()
@@ -623,18 +630,23 @@ def processComePostRollAction(roll):
 		dComeBet = settlement.dComeBet
 		bank += settlement.bankDelta
 		chipsOnTable += settlement.chipsOnTableDelta
+		settlementMessages = list(settlement.messages)
+		if settlement.movedNumber is not None:
+			moveMessage = f"Moving your Don't Come bet to the {settlement.movedNumber}."
+			settlementMessages = [msg for msg in settlementMessages if msg != moveMessage]
 		mergeActionResult(
 			actionResult,
 			createActionResult(
 				success=True,
-				messages=settlement.messages,
+				messages=settlementMessages,
 				stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
 			)
 		)
 		if settlement.movedNumber is not None:
 			dComeBets[settlement.movedNumber] = settlement.movedAmount
 			actionResult["stateChanged"] = True
-			if str(input(f"Lay odds on your Don't Come {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
+			print(f"Moving your Don't Come bet to the {settlement.movedNumber}.")
+			if str(input(f"Don't Come Odds for the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
 				dMax = maxLayOdds(dComeBets[settlement.movedNumber])
 				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax:,}.")
 				while True:

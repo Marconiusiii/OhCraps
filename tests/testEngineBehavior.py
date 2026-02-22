@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
@@ -1086,8 +1087,64 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with patch("builtins.input", side_effect=["n"]), patch("builtins.print"):
 			result = terminal["comeCheck"](5)
 		self.assertEqual(result["stateChanged"], True)
-		self.assertTrue(any("Moving your Come Bet to the 5." in msg for msg in result["messages"]))
+		self.assertEqual(any("Moving your Come Bet to the 5." in msg for msg in result["messages"]), False)
 		self.assertEqual(terminal["comeBets"][5], 10)
+
+	def testComeCheckPrintsMoveReminderBeforeOddsPromptWithNumber(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["comeBet"] = 10
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		seenMoveReminder = {"value": False}
+
+		def fakePrint(*args, **kwargs):
+			text = " ".join(str(part) for part in args)
+			if "Moving your Come Bet to the 5." in text:
+				seenMoveReminder["value"] = True
+
+		def fakeInput(prompt=""):
+			self.assertEqual(prompt, "Come Odds for the 5? > ")
+			self.assertEqual(seenMoveReminder["value"], True)
+			return "n"
+
+		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
+			terminal["comeCheck"](5)
+
+	def testDontComeCheckPrintsMoveReminderBeforeOddsPromptWithNumber(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["dComeBet"] = 10
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		seenMoveReminder = {"value": False}
+
+		def fakePrint(*args, **kwargs):
+			text = " ".join(str(part) for part in args)
+			if "Moving your Don't Come bet to the 5." in text:
+				seenMoveReminder["value"] = True
+
+		def fakeInput(prompt=""):
+			self.assertEqual(prompt, "Don't Come Odds for the 5? > ")
+			self.assertEqual(seenMoveReminder["value"], True)
+			return "n"
+
+		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
+			terminal["comeCheck"](5)
+
+	def testRollCraplessComeOutElevenDoesNotPrintWinnerLine(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["pointIsOn"] = False
+		with patch.dict(terminal, {"rollDice": lambda: SimpleNamespace(die1=6, die2=5, total=11, isHard=False), "stickman": lambda roll: "yo"}), patch("builtins.print") as mockPrint:
+			total = terminal["roll"]()
+		self.assertEqual(total, 11)
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertNotIn("winner! Pay the line, take the don't!", printed)
 
 	def testComeCheckReturnsNoChangeActionResultWhenNoBarBets(self):
 		terminal = loadTerminalNamespace()

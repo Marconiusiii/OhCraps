@@ -15,7 +15,19 @@ After downloading the OhCraps_Py3.command file, double-click or Open the file an
 
 $ python3 OhCraps_Py3.command
 
-The game starts off asking you to set up a bankroll. Enter a numeric amount to start.
+
+### Game Modes
+
+When the game starts, you'll choose one of two modes:
+
+- `1. Craps`
+- `2. Crapless Craps`
+
+Standard Craps follows traditional come-out winners and losers.
+
+Crapless Craps removes the standard come-out craps numbers as automatic losers for the Pass Line, so those rolls become point numbers instead. In Crapless, Place betting also includes 2, 3, 11, and 12 with the same table-style limits and buy behavior described below.
+
+After choosing a Game Mode, a bankroll prompt will appear. Enter a numeric value to start.
 
 ### Coming Out Roll
 
@@ -74,22 +86,13 @@ You've established your bankroll and are now ready to start betting. You have a 
 </tbody>
 </table>
 
-### Game Modes
-
-When the game starts, you'll choose one of two modes:
-
-- `1. Craps`
-- `2. Crapless Craps`
-
-Standard Craps follows traditional come-out winners and losers.
-
-Crapless Craps removes the standard come-out craps numbers as automatic losers for the Pass Line, so those rolls become point numbers instead. In Crapless, Place betting also includes 2, 3, 11, and 12 with the same table-style limits and buy behavior described below.
-
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.
 
 Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet. This bet wins if a 2 or 3 rolls on the Come Out roll. Rolling a 12 will push, so you will not lose nor win and the bet will be returned to you. This bet loses when rolling a 7 or 11 on the Come Out roll, and if any other number rolls that will become the point for the point phase of the game. If the shooter rolls a 7 in the Point phase of the game, the Don't Pass bet will win.
+
+Note: Don't Pass does not exist in Crapless Craps.
 
 Once you've set your Line Bets, type 'x' and hit Enter to continue on with the game. Should your Line bets win in the come out phase, the bets will stay out on the table for you.
 
@@ -137,6 +140,8 @@ Typing 'p' and hitting Enter on the Place Prompt after the point has been establ
 #### Lay Bets
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
+
+Note: Lay Bets do not exist in Crapless Craps.
 
 Lay bets are always working on the Come Out roll.
 
@@ -339,10 +344,14 @@ The Come and Don't Come Fields act like additional Pass Line Bets after a Point 
 ##### Come Bet
 A Come Bet will win if a 7 or 11 is rolled, and lose with a 2, 3, or 12. If any other number is rolled, the Come Bet moves to that number, and you will be prompted for Come Bet Odds.  If that Come Bet number is rolled before a 7, you will win. If a 7 is rolled before any of the Come Bet numbers are hit, all Come bets are cleared and you lose.
 
+In Crapless Craps, Come Bets can move to 2, 3, 11, and 12.
+
 If you still have Come Bets up with odds in the Come Out phase, such as if you made Come Bets and then the Point was hit, rolling a 7 at this stage will result in all Come Bets losing but all Odds returned to you. If you happen to roll a Come Bet number as the Point in the come out phase, you will win the flat bet, but the odds once again will be returned to you since they are off during the come out phase unless you've turned Working on.
 
 ##### Don't Come Bet
 The Don't Come is the opposite of the Come. A bet here wins on a 2, 3 or 12 and loses with a 7 or 11. If any other number is rolled, the Don't Come moves to that number and you are prompted to add Odds, which are always optional. Should a 7 roll before the Don't Come number is rolled, you win on all Don't Come bets. If the Don't Come number is rolled before a 7, you lose that bet.
+
+Don't Come bets do not exist in Crapless Craps.
 
 If Come or Don't Come bets are up during the Coming Out roll, all Come and Don't Come Odds bets are Off, or are not counted on the Coming Out Roll unless Working has been turned on. If a 7 is rolled for the Coming Out roll, Come bets will lose, but the Odds will be ignored, while a Don't Come bet will win but will also have the Odds ignored until a Point is established. If Working is Off, the Odds will be returned to your bankroll.
 

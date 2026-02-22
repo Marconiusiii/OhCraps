@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -158,19 +158,28 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
 
 	def testSettleLineBetsForModeCrapsMatchesCanonical(self):
-		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 5, "Don't Pass Odds": 0}
-		base = settleLineBets(lineBets=lineBets, pointIsOn=False, roll=7, p2roll=0)
-		mode = settleLineBetsForMode(lineBets=lineBets, pointIsOn=False, roll=7, p2roll=0, gameMode=GameMode.craps)
-		self.assertEqual(mode.bankDelta, base.bankDelta)
-		self.assertEqual(mode.chipsOnTableDelta, base.chipsOnTableDelta)
-		self.assertEqual(mode.lineBets, base.lineBets)
+		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 0}
+		baseSettlement = settleLineBets(lineBets=lineBets, pointIsOn=False, roll=7, p2roll=0)
+		modeSettlement = settleLineBetsForMode(lineBets=lineBets, pointIsOn=False, roll=7, p2roll=0, gameMode=GameMode.craps)
+		self.assertEqual(modeSettlement.lineBets, baseSettlement.lineBets)
+		self.assertEqual(modeSettlement.bankDelta, baseSettlement.bankDelta)
+		self.assertEqual(modeSettlement.chipsOnTableDelta, baseSettlement.chipsOnTableDelta)
 
-	def testSettleLineBetsForModeCraplessUsesResolvablePath(self):
-		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 5, "Don't Pass Odds": 0}
+	def testSettleLineBetsForModeCraplessReturnsDontPass(self):
+		lineBets = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 20, "Don't Pass Odds": 30}
 		settlement = settleLineBetsForMode(lineBets=lineBets, pointIsOn=False, roll=11, p2roll=0, gameMode=GameMode.craplessCraps)
-		self.assertIsNotNone(settlement)
-		self.assertIn("Pass", settlement.lineBets)
-		self.assertIn("Don't Pass", settlement.lineBets)
+		self.assertEqual(settlement.lineBets["Don't Pass"], 0)
+		self.assertEqual(settlement.lineBets["Don't Pass Odds"], 0)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -50)
+		self.assertIn("Don't bets are not available in Crapless Craps. Returning $50.", settlement.messages)
+
+	def testSettleLineBetsForModeCraplessComeOutElevenLeavesPassUp(self):
+		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		settlement = settleLineBetsForMode(lineBets=lineBets, pointIsOn=False, roll=11, p2roll=0, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.lineBets["Pass"], 10)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
 
 	def testSettleOddsBetsPassOddsWin(self):
 		lineBets = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
@@ -215,6 +224,35 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -90)
 		self.assertEqual(settlement.placeBets, {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
 
+	def testSettlePlaceBetsForModeCrapsMatchesCanonical(self):
+		placeBets = {4: 10, 5: 15, 6: 18, 8: 12, 9: 10, 10: 25}
+		baseSettlement = settlePlaceBets(placeBets=placeBets, roll=5)
+		modeSettlement = settlePlaceBetsForMode(placeBets=placeBets, roll=5, gameMode=GameMode.craps)
+		self.assertEqual(modeSettlement.winAmount, baseSettlement.winAmount)
+		self.assertEqual(modeSettlement.bankDelta, baseSettlement.bankDelta)
+		self.assertEqual(modeSettlement.chipsOnTableDelta, baseSettlement.chipsOnTableDelta)
+
+	def testSettlePlaceBetsForModeCraplessPlaceTwoUnderBuyThreshold(self):
+		placeBets = {2: 10, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=2, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.winAmount, 55)
+		self.assertEqual(settlement.bankDelta, 55)
+
+	def testSettlePlaceBetsForModeCraplessPlaceThreeBuyIncludesVig(self):
+		placeBets = {2: 0, 3: 20, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=3, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.commissionPaid, 1)
+		self.assertEqual(settlement.winAmount, 59)
+		self.assertEqual(settlement.bankDelta, 59)
+
+	def testSettlePlaceBetsForModeCraplessSevenOutClearsAll(self):
+		placeBets = {2: 10, 3: 12, 4: 10, 5: 10, 6: 12, 8: 12, 9: 10, 10: 10, 11: 12, 12: 10}
+		settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=7, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.lossAmount, 108)
+		self.assertEqual(settlement.chipsOnTableDelta, -108)
+		self.assertEqual(settlement.placeBets[2], 0)
+		self.assertEqual(settlement.placeBets[12], 0)
+
 	def testSettleLayBetsLosesOnLayNumber(self):
 		layBets = {4: 30, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
 		settlement = settleLayBets(layBets=layBets, roll=4)
@@ -239,6 +277,15 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, 0)
 		self.assertEqual(settlement.lostNumber, None)
 		self.assertEqual(settlement.layBets, layBets)
+
+	def testSettleLayBetsForModeCraplessReturnsAnyLay(self):
+		layBets = {4: 20, 5: 0, 6: 30, 8: 0, 9: 0, 10: 0}
+		settlement = settleLayBetsForMode(layBets=layBets, roll=7, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.bankDelta, 50)
+		self.assertEqual(settlement.chipsOnTableDelta, -50)
+		self.assertEqual(settlement.layBets[4], 0)
+		self.assertEqual(settlement.layBets[6], 0)
+		self.assertIn("Lay bets are not available in Crapless Craps. Returning $50.", settlement.messages)
 
 	def testSettleFieldBetStandardWin(self):
 		settlement = settleFieldBet(fieldBet=10, roll=9)
@@ -612,29 +659,6 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		outcome = terminal["evaluateRoll"](state, 11)
 		self.assertEqual(outcome, terminal["RollOutcome"].pointEstablished)
 
-	def testCraplessFirstRollPathDoesNotRaiseNameError(self):
-		terminal = loadTerminalNamespace()
-		terminal["gameMode"] = terminal["GameMode"].craplessCraps
-		terminal["throws"] = 0
-		terminal["p2"] = 0
-		terminal["pointIsOn"] = False
-		terminal["comeOut"] = 0
-		terminal["bank"] = 100
-		terminal["chipsOnTable"] = 0
-		terminal["gameState"] = terminal["createGameState"](
-			bank=terminal["bank"],
-			chipsOnTable=terminal["chipsOnTable"],
-			throws=terminal["throws"],
-			pointIsOn=terminal["pointIsOn"],
-			comeOut=terminal["comeOut"],
-			p2=terminal["p2"],
-			gameMode=terminal["gameMode"]
-		)
-		with patch.dict(terminal, {"roll": lambda: 11}), patch("builtins.print"):
-			terminal["comeOut"] = terminal["roll"]()
-			outcome = terminal["evaluateRoll"](terminal["gameState"], terminal["comeOut"])
-		self.assertEqual(outcome, terminal["RollOutcome"].pointEstablished)
-
 	def testSelectGameModeAcceptsCraps(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
@@ -655,6 +679,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with patch("builtins.input", side_effect=["x", "2"]):
 			terminal["selectGameMode"]()
 		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+
+	def testLineBettingRejectsDontPassInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		with patch("builtins.input", side_effect=["d", "x"]), patch("builtins.print"):
+			terminal["lineBetting"]()
+		self.assertEqual(terminal["lineBets"]["Don't Pass"], 0)
+
+	def testValidPlaceNumbersInCraplessIncludesEdgeNumbers(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		self.assertEqual(terminal["validPlaceNumbers"](), [2, 3, 4, 5, 6, 8, 9, 10, 11, 12])
 
 	def testHardWaysBettingSavesWager(self):
 		terminal = loadTerminalNamespace()

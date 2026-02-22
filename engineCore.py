@@ -406,9 +406,40 @@ def settleLineBets(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int) -> L
 
 def settleLineBetsForMode(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int, gameMode: GameMode) -> LineSettlement:
 	if gameMode == GameMode.craplessCraps:
-		# Phase-in scaffold: dedicated Crapless entry point currently delegates to canonical logic.
-		# Upcoming milestone(s) will apply Stratosphere-specific Crapless line behavior here.
-		return settleLineBets(lineBets=lineBets, pointIsOn=pointIsOn, roll=roll, p2roll=p2roll)
+		updatedLineBets = normalizeLineBets(lineBets)
+		bankDelta = 0
+		chipsOnTableDelta = 0
+		messages = []
+
+		dontTotal = updatedLineBets["Don't Pass"] + updatedLineBets["Don't Pass Odds"]
+		if dontTotal > 0:
+			messages.append(f"Don't bets are not available in Crapless Craps. Returning ${dontTotal:,}.")
+			bankDelta += dontTotal
+			chipsOnTableDelta -= dontTotal
+			updatedLineBets["Don't Pass"] = 0
+			updatedLineBets["Don't Pass Odds"] = 0
+
+		if not pointIsOn:
+			if roll == 7 and updatedLineBets["Pass"] > 0:
+				messages.append(f"You won ${updatedLineBets['Pass']:,} on the Pass Line!")
+				bankDelta += updatedLineBets["Pass"]
+		else:
+			if p2roll == roll and updatedLineBets["Pass"] > 0:
+				messages.append(f"You won ${updatedLineBets['Pass']:,} on the Pass Line!")
+				bankDelta += updatedLineBets["Pass"] * 2
+				chipsOnTableDelta -= updatedLineBets["Pass"]
+				updatedLineBets["Pass"] = 0
+			elif p2roll == 7 and updatedLineBets["Pass"] > 0:
+				messages.append(f"You lost ${updatedLineBets['Pass']:,} from the Pass Line.")
+				chipsOnTableDelta -= updatedLineBets["Pass"]
+				updatedLineBets["Pass"] = 0
+
+		return LineSettlement(
+			lineBets=updatedLineBets,
+			bankDelta=bankDelta,
+			chipsOnTableDelta=chipsOnTableDelta,
+			messages=messages
+		)
 	return settleLineBets(lineBets=lineBets, pointIsOn=pointIsOn, roll=roll, p2roll=p2roll)
 
 
@@ -492,6 +523,71 @@ def settlePlaceBets(placeBets: dict, roll: int) -> PlaceSettlement:
 	)
 
 
+def settlePlaceBetsForMode(placeBets: dict, roll: int, gameMode: GameMode) -> PlaceSettlement:
+	if gameMode == GameMode.craplessCraps:
+		allowedNumbers = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+		updatedPlaceBets = {}
+		for number in allowedNumbers:
+			updatedPlaceBets[number] = int(placeBets.get(number, 0))
+
+		bankDelta = 0
+		chipsOnTableDelta = 0
+		hitNumber = None
+		winAmount = 0
+		commissionPaid = 0
+		lossAmount = 0
+		messages = []
+
+		if roll in allowedNumbers and updatedPlaceBets[roll] > 0:
+			hitNumber = roll
+			if roll in [2, 12]:
+				if updatedPlaceBets[roll] >= 20:
+					commissionPaid = calculateVig(updatedPlaceBets[roll])
+					winAmount = updatedPlaceBets[roll] * 6 - commissionPaid
+				else:
+					winAmount = (updatedPlaceBets[roll]//2) * 11
+			elif roll in [3, 11]:
+				if updatedPlaceBets[roll] >= 20:
+					commissionPaid = calculateVig(updatedPlaceBets[roll])
+					winAmount = updatedPlaceBets[roll] * 3 - commissionPaid
+				else:
+					winAmount = (updatedPlaceBets[roll]//4) * 11
+			elif roll in [4, 10] and updatedPlaceBets[roll] >= 10:
+				commissionPaid = calculateVig(updatedPlaceBets[roll])
+				winAmount = updatedPlaceBets[roll] * 2 - commissionPaid
+			elif roll in [4, 10]:
+				winAmount = (updatedPlaceBets[roll]//5) * 9
+			elif roll in [5, 9]:
+				winAmount = (updatedPlaceBets[roll]//5) * 7
+			elif roll in [6, 8]:
+				winAmount = (updatedPlaceBets[roll]//6) * 7 + updatedPlaceBets[roll]%6
+
+			bankDelta += winAmount
+			if commissionPaid > 0:
+				messages.append(f"${commissionPaid:,} paid to the House for the vig.")
+			messages.append(f"You won ${winAmount:,} on the Place {roll}!")
+
+		if roll == 7:
+			for key in updatedPlaceBets:
+				lossAmount += updatedPlaceBets[key]
+				updatedPlaceBets[key] = 0
+			chipsOnTableDelta -= lossAmount
+			if lossAmount > 0:
+				messages.append(f"You lost ${lossAmount:,} from the Place bets.")
+
+		return PlaceSettlement(
+			placeBets=updatedPlaceBets,
+			bankDelta=bankDelta,
+			chipsOnTableDelta=chipsOnTableDelta,
+			hitNumber=hitNumber,
+			winAmount=winAmount,
+			commissionPaid=commissionPaid,
+			lossAmount=lossAmount,
+			messages=messages
+		)
+	return settlePlaceBets(placeBets=placeBets, roll=roll)
+
+
 def normalizeLayBets(layBets: dict) -> dict:
 	normalized = {
 		4: 0,
@@ -567,6 +663,31 @@ def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
 		totalVigAmount=totalVigAmount,
 		messages=messages
 	)
+
+
+def settleLayBetsForMode(layBets: dict, roll: int, gameMode: GameMode) -> LaySettlement:
+	if gameMode == GameMode.craplessCraps:
+		updatedLayBets = {}
+		returnAmount = 0
+		for key in layBets:
+			updatedLayBets[key] = int(layBets[key])
+			returnAmount += updatedLayBets[key]
+			updatedLayBets[key] = 0
+
+		messages = []
+		if returnAmount > 0:
+			messages.append(f"Lay bets are not available in Crapless Craps. Returning ${returnAmount:,}.")
+		return LaySettlement(
+			layBets=updatedLayBets,
+			bankDelta=returnAmount,
+			chipsOnTableDelta=-returnAmount,
+			lostNumber=None,
+			lostAmount=0,
+			totalWinAmount=0,
+			totalVigAmount=0,
+			messages=messages
+		)
+	return settleLayBets(layBets=layBets, roll=roll)
 
 
 def settleFieldBet(fieldBet: int, roll: int) -> FieldSettlement:

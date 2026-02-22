@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -268,6 +268,9 @@ def lineBetting():
 			print(f'Ok, ${lineBets["Pass"]:,} on the Pass Line.')
 			continue
 		elif lBet.lower() in ["d", "dp", "don't pass", "don't"]:
+			if gameMode == GameMode.craplessCraps:
+				print("Don't Pass is not available in Crapless Craps.")
+				continue
 			chipsOnTable -= lineBets["Don't Pass"]
 			bank += lineBets["Don't Pass"]
 			print("How much on the Don't Pass line?")
@@ -1225,7 +1228,7 @@ def layShow():
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
-	settlement = settleLayBets(layBets=layBets, roll=roll)
+	settlement = settleLayBetsForMode(layBets=layBets, roll=roll, gameMode=gameMode)
 	layBets = settlement.layBets
 	bank += settlement.bankDelta
 	chipsOnTable += settlement.chipsOnTableDelta
@@ -1313,18 +1316,50 @@ def outOfMoney():
 #Place Betting
 
 place = {
+2: 0,
+3: 0,
 4: 0,
 5: 0,
 6: 0,
 8: 0,
 9: 0,
-10: 0
+10: 0,
+11: 0,
+12: 0
 }
 
 placeOff = False
 
+def validPlaceNumbers():
+	if gameMode == GameMode.craplessCraps:
+		return [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+	return [4, 5, 6, 8, 9, 10]
+
+def placeUnitSize(number):
+	if number in [2, 12]:
+		return 2
+	if number in [3, 11]:
+		return 4
+	if number in [6, 8]:
+		return 6
+	return 5
+
+def normalizedHalfPressIncrement(number, currentWager):
+	if number in [6, 8]:
+		return calculateHalfPressIncrement(number=number, currentWager=currentWager)
+	unit = placeUnitSize(number)
+	inc = currentWager//2
+	if number in [2, 3, 11, 12]:
+		inc = (inc//unit) * unit
+		if inc < unit:
+			inc = unit
+	return inc
+
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
+	if gameMode == GameMode.craplessCraps:
+		print("Across/Inside/Center presets are currently disabled in Crapless Craps. Use individual Place betting.")
+		return
 	total = 0
 	outlay = 0
 	for number in place:
@@ -1434,6 +1469,9 @@ def placePreset(pre):
 
 def placeMover():
 	global place, chipsOnTable, bank, comeOut
+	if gameMode == GameMode.craplessCraps:
+		print("Place mover is currently disabled in Crapless Craps.")
+		return
 	for key in place:
 		if place[key] == 0 and place[comeOut] > 0:
 			if key in [6, 8] and comeOut in [4, 5, 9, 10]:
@@ -1454,7 +1492,7 @@ def placeMover():
 def placeBets():
 	global place, chipsOnTable, bank
 	madeBet = True
-	for key in place:
+	for key in validPlaceNumbers():
 		print(f"You have ${place[key]:,} on the Place {key}.")
 		print(f"How much on the Place {key}?")
 		while True:
@@ -1465,6 +1503,12 @@ def placeBets():
 					print("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
 					print(f"How much on the Place {key}?")
+					continue
+				if gameMode == GameMode.craplessCraps and key in [2, 12] and bet%2 != 0:
+					print("Place 2 and 12 bets must be a multiple of 2 in Crapless Craps.")
+					continue
+				if gameMode == GameMode.craplessCraps and key in [3, 11] and bet%4 != 0:
+					print("Place 3 and 11 bets must be a multiple of 4 in Crapless Craps.")
 					continue
 				madeBet = True
 				break
@@ -1491,7 +1535,7 @@ def placeBets():
 
 def placeShow():
 	global place
-	for key in place:
+	for key in validPlaceNumbers():
 		if place[key] > 0:
 			print(f"You have ${place[key]:,} on the Place {key}.")
 
@@ -1513,8 +1557,11 @@ def vig(bet):
 
 def placeCheck(roll):
 	global place, bank, chipsOnTable
-	settlement = settlePlaceBets(placeBets=place, roll=roll)
+	settlement = settlePlaceBetsForMode(placeBets=place, roll=roll, gameMode=gameMode)
 	place = settlement.placeBets
+	for key in [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]:
+		if key not in place:
+			place[key] = 0
 	bank += settlement.bankDelta
 	chipsOnTable += settlement.chipsOnTableDelta
 	for message in settlement.messages:
@@ -1545,17 +1592,14 @@ def placeCheck(roll):
 		elif press == 'hp':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
-			place[hitNumber] += calculateHalfPressIncrement(number=hitNumber, currentWager=place[hitNumber])
+			place[hitNumber] += normalizedHalfPressIncrement(number=hitNumber, currentWager=place[hitNumber])
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
 			print(f"Half Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
 		elif press == 'u':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
-			if hitNumber in [4, 5, 9, 10]:
-				place[hitNumber] += 5
-			else:
-				place[hitNumber] += 6
+			place[hitNumber] += placeUnitSize(hitNumber)
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
 			print(f"Pressing up one unit. You now have ${place[hitNumber]} on the Place {hitNumber}")
@@ -1665,6 +1709,9 @@ while True:
 					break
 
 		elif round1 in ["ly", "lay"]:
+			if gameMode == GameMode.craplessCraps:
+				print("Lay bets are not available in Crapless Craps.")
+				continue
 			while True:
 				layShow()
 				lyBet = str(input("Lay Bets? > ")).strip().lower()
@@ -1785,6 +1832,7 @@ while True:
 		else:
 			print("That's not an option, silly!")
 			continue
+
 
 	comeOut = roll()
 	outcome = evaluateRoll(gameState, comeOut)
@@ -1912,6 +1960,9 @@ while True:
 						continue
 					continue
 				elif round2  in ["ly", "lay"]:
+					if gameMode == GameMode.craplessCraps:
+						print("Lay bets are not available in Crapless Craps.")
+						continue
 					while True:
 						layShow()
 						ly2Bet = str(input("Lay Bets? > ")).strip().lower()

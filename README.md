@@ -498,36 +498,100 @@ Testing outcome:
 - Added terminal-facing mode-outcome assertion coverage.
 - Suite increased from 87 to 90 tests, all passing.
 
-### Milestone 26: Crapless resolving-path stabilization
+### Milestone 27: Stratosphere-aligned Crapless line rules
 
-This milestone closes the first-roll crash and formalizes a mode-aware line-settlement entry path for Crapless progression.
+This milestone applies the first explicit table-rule restriction for Crapless line betting: no Don't Pass / Don't Pass Odds action in Crapless mode.
 
-What was fixed:
+What changed:
 
-- Terminal first-roll traceback (`NameError: outcome is not defined`) was resolved by restoring the roll/evaluate sequence to the correct post-betting control-flow location.
-- This ensures both Craps and Crapless can complete the first roll without runtime failure.
+- Added mode-aware line settlement engine entry:
+	- `settleLineBetsForMode(...)` in `engineCore.py`
+- Crapless mode line behavior now:
+	- returns any existing Don't Pass and Don't Pass Odds chips to bank
+	- clears those bets from the table
+	- settles Pass Line outcomes on the mode-aware roll/point flow
+- Standard Craps mode still uses canonical `settleLineBets(...)` behavior.
 
-What was added:
+Terminal behavior update:
 
-- New engine wrapper:
-	- `settleLineBetsForMode(...)`
-- Terminal line settlement now routes through this mode-aware entry point.
-- Current Crapless line wrapper behavior intentionally delegates to canonical line logic as a phase-in scaffold.
+- In line betting prompt, selecting Don't Pass while in Crapless now shows a rejection message and does not place the bet.
+- Line resolution path now routes through `settleLineBetsForMode(...)`.
 
 Why this matters:
 
-- You now have a stable resolving path for Crapless gameplay progression (no immediate first-roll crash).
-- Mode-specific line behavior can be introduced safely in one centralized function without terminal-branch duplication.
+- This is the first enforced Stratosphere-style constraint in live gameplay logic.
+- It prevents illegal Don't line state from persisting in Crapless sessions.
+- It keeps mode-specific behavior centralized in the engine, not spread across terminal branches.
 
 Scope note:
 
-- This milestone still does not apply full Stratosphere Crapless line/payout policy changes.
-- It is a runtime stabilization and architecture milestone.
+- This milestone still does not include full Stratosphere payout matrix updates for non-line bet families.
+- It intentionally isolates line-rule enforcement before expanding to other bet domains.
 
 Testing outcome:
 
-- Added deterministic tests for mode-aware line wrapper and first-roll Crapless path stability.
-- Suite increased from 90 to 93 tests, all passing.
+- Added deterministic tests for:
+	- canonical parity in standard mode
+	- Crapless Don't-bet return/clear behavior
+	- Crapless line prompt rejection for Don't Pass
+- Suite increased from 93 to 94 tests, all passing.
+
+### Milestone 28: Crapless Place/Lay domain and settlement path
+
+This milestone adds mode-aware Place and Lay handling for Crapless sessions with engine-owned settlement wrappers.
+
+What changed:
+
+- Added `settlePlaceBetsForMode(...)` in `engineCore.py`.
+- Added `settleLayBetsForMode(...)` in `engineCore.py`.
+- Terminal now routes:
+	- `placeCheck(...)` -> `settlePlaceBetsForMode(...)`
+	- `layCheck(...)` -> `settleLayBetsForMode(...)`
+
+Crapless Place domain:
+
+- Place numbers now include:
+	- `2, 3, 4, 5, 6, 8, 9, 10, 11, 12`
+- Crapless Place input validation added:
+	- Place 2/12 must be multiples of 2
+	- Place 3/11 must be multiples of 4
+
+Crapless Place settlement assumptions used in this milestone:
+
+- 2/12:
+	- under 20: 11:2
+	- 20 and above: buy-style 6:1 minus vig on base
+- 3/11:
+	- under 20: 11:4
+	- 20 and above: buy-style 3:1 minus vig on base
+- Existing 4/5/6/8/9/10 behavior remains consistent with current project rules.
+
+Crapless Lay handling in this milestone:
+
+- Lay betting menu access is blocked in Crapless mode.
+- If any lay exposure exists, settlement wrapper returns chips and clears lay bets with explicit message.
+
+Additional terminal behavior:
+
+- Added `validPlaceNumbers()` and mode-aware place unit helpers.
+- `u` press and `hp` half-press now normalize for new Crapless edge numbers through unit rules.
+- Across/Inside/Center presets and place-mover are currently disabled in Crapless mode to avoid invalid auto-math on the expanded number set.
+
+Why this matters:
+
+- Place/Lay mode differences now resolve through deterministic engine paths.
+- Crapless gameplay can progress with legal place-number state and explicit lay restrictions.
+- This creates a stable foundation for future Stratosphere payout refinements if needed.
+
+Testing outcome:
+
+- Added deterministic tests for:
+	- mode-wrapper parity in standard mode
+	- Crapless Place 2/3 payout paths
+	- Crapless Place seven-out clearing on expanded domain
+	- Crapless Lay return-and-clear behavior
+	- terminal helper/domain checks in Crapless mode
+- Suite increased from 94 to 100 tests, all passing.
 
 #### Line Bets
 

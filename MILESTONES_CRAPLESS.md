@@ -527,3 +527,26 @@ New milestone updates should be appended here rather than creating new milestone
 	- Don't Pass effective-max rejection/retry,
 	- updated Come/Don't Come prompt text expectations.
 - Full suite remains green.
+
+## Milestone 44: Crapless Place Edge Matrix Hardening
+
+### What changed
+- Expanded deterministic engine tests for Crapless Place edge numbers (`2, 3, 11, 12`) to cover additional vig-rounding boundaries.
+- Added mixed seven-out matrix coverage for Crapless place books with both edge and core numbers at varied wager sizes.
+- Added terminal-flow checks that confirm Buy confirmation messaging appears for high-edge wagers on `11` and `12`.
+
+### Why
+- Edge-number place rules have been a repeated regression hotspot.
+- This closes remaining gaps where previous tests covered only part of the edge buy/rounding space.
+- Strengthens confidence before iOS-port-focused refactors.
+
+### Behavior
+- No gameplay rule changes in this milestone.
+- This milestone is test and verification hardening only.
+
+### Test coverage
+- Added/expanded tests in `tests/testEngineBehavior.py` for:
+	- `2/12` and `3/11` vig rounding symmetry on buy payouts.
+	- mixed large Crapless seven-out clearing and accounting.
+	- terminal Buy messaging on `11` and `12` at `$20+`.
+- Full suite remains green.

@@ -313,7 +313,11 @@ class EvaluateRollTests(unittest.TestCase):
 		cases = [
 			{"number": 2, "bet": 38, "expectedCommission": 1, "expectedWin": 227},
 			{"number": 2, "bet": 40, "expectedCommission": 2, "expectedWin": 238},
+			{"number": 12, "bet": 38, "expectedCommission": 1, "expectedWin": 227},
+			{"number": 12, "bet": 40, "expectedCommission": 2, "expectedWin": 238},
 			{"number": 3, "bet": 36, "expectedCommission": 1, "expectedWin": 107},
+			{"number": 3, "bet": 44, "expectedCommission": 2, "expectedWin": 130},
+			{"number": 11, "bet": 36, "expectedCommission": 1, "expectedWin": 107},
 			{"number": 11, "bet": 44, "expectedCommission": 2, "expectedWin": 130}
 		]
 		for case in cases:
@@ -332,6 +336,14 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -108)
 		self.assertEqual(settlement.placeBets[2], 0)
 		self.assertEqual(settlement.placeBets[12], 0)
+
+	def testSettlePlaceBetsForModeCraplessSevenOutMixedLargeEdgeBets(self):
+		placeBets = {2: 25, 3: 30, 4: 15, 5: 10, 6: 18, 8: 24, 9: 10, 10: 20, 11: 35, 12: 40}
+		expectedLoss = sum(placeBets.values())
+		settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=7, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.lossAmount, expectedLoss)
+		self.assertEqual(settlement.chipsOnTableDelta, -expectedLoss)
+		self.assertTrue(all(value == 0 for value in settlement.placeBets.values()))
 
 	def testSettleLayBetsLosesOnLayNumber(self):
 		layBets = {4: 30, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
@@ -1656,6 +1668,22 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["place"][2], 21)
 		self.assertEqual(terminal["place"][3], 22)
 		self.assertEqual(terminal["bank"], 57)
+		self.assertEqual(terminal["chipsOnTable"], 43)
+
+	def testPlaceBetsCraplessEdgeOverTwentyShowsBuyForElevenAndTwelve(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 120
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["", "", "", "", "", "", "", "", "21", "22"]), patch("builtins.print") as mockPrint:
+			terminal["placeBets"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("Buying the 11 for $21.", printed)
+		self.assertIn("Buying the 12 for $22.", printed)
+		self.assertEqual(terminal["place"][11], 21)
+		self.assertEqual(terminal["place"][12], 22)
+		self.assertEqual(terminal["bank"], 77)
 		self.assertEqual(terminal["chipsOnTable"], 43)
 
 	def testLayAllAcrossSetsEachNumber(self):

@@ -799,6 +799,44 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("Extreme Across", craplessHelp)
 		self.assertIn("edge numbers", craplessHelp)
 
+	def testHandlePlaceMenuCommandExit(self):
+		terminal = loadTerminalNamespace()
+		with patch("builtins.print"):
+			result = terminal["handlePlaceMenuCommand"]("x", pointPhase=False)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], True)
+
+	def testHandlePlaceMenuCommandPointTogglePlaceOff(self):
+		terminal = loadTerminalNamespace()
+		terminal["placeOff"] = False
+		with patch("builtins.print"):
+			result = terminal["handlePlaceMenuCommand"]("o", pointPhase=True)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["placeOff"], True)
+
+	def testHandlePlaceMenuCommandPointOnlyIgnoredOnComeOut(self):
+		terminal = loadTerminalNamespace()
+		terminal["placeOff"] = False
+		with patch("builtins.print"):
+			result = terminal["handlePlaceMenuCommand"]("o", pointPhase=False)
+		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["placeOff"], False)
+
+	def testHandlePlaceMenuCommandInvalidNoMutation(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			result = terminal["handlePlaceMenuCommand"]("zz", pointPhase=True)
+		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0})
+
 	def testPlacePresetAcrossWorksInCrapless(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps

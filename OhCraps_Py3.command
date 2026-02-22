@@ -1380,6 +1380,48 @@ def placeHelpText(pointPhase=False):
 	helpLines.append("\tx: Exit Place Betting.")
 	return "\n".join(helpLines) + "\n"
 
+def handlePlaceMenuCommand(command, pointPhase=False):
+	global placeOff, chipsOnTable, bank, place, comeOut
+	cmd = str(command).strip().lower()
+	if cmd == "y":
+		placeBets()
+		return {"handled": True, "shouldExitMenu": False}
+	if pointPhase and cmd == "o":
+		if placeOff:
+			placeOff = False
+			print("Ok, your Place Bets are back on.")
+		else:
+			placeOff = True
+			print("All your Place Bets are Off.")
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "d":
+		if pointPhase:
+			print("Taking down all of your Place Bets.")
+		else:
+			print("Taking down your Place Bets.")
+		placeTakeDown()
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in validPlacePresetCodesForMode():
+		placePreset(cmd)
+		return {"handled": True, "shouldExitMenu": False}
+	if pointPhase and cmd == "m":
+		placeMover()
+		return {"handled": True, "shouldExitMenu": False}
+	if pointPhase and cmd == "p":
+		chipsOnTable -= place[comeOut]
+		bank += place[comeOut]
+		place[comeOut] = 0
+		print(f"Taking down the Place {comeOut} bet.")
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "h":
+		print(placeHelpText(pointPhase=pointPhase))
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "x":
+		print("Done Place Betting!")
+		return {"handled": True, "shouldExitMenu": True}
+	print("That's not a valid option!")
+	return {"handled": False, "shouldExitMenu": False}
+
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
 	preset = pre.strip().lower()
@@ -1776,24 +1818,9 @@ while True:
 				while True:
 					placeShow()
 					plBet = str(input("Place Bets? > ")).strip().lower()
-					if plBet == "y":
-						placeBets()
-						continue
-					elif plBet == "d":
-						print("Taking down your Place Bets.")
-						placeTakeDown()
-						continue
-					elif plBet in validPlacePresetCodesForMode():
-						placePreset(plBet)
-						continue
-					elif plBet == "h":
-						print(placeHelpText(pointPhase=False))
-					elif plBet == "x":
-						print("Done Place Betting!")
+					commandResult = handlePlaceMenuCommand(plBet, pointPhase=False)
+					if commandResult["shouldExitMenu"]:
 						break
-					else:
-						print("That's not a valid option!")
-						continue
 
 		elif round1 in ["ly", "lay"]:
 			if gameMode == GameMode.craplessCraps:
@@ -2006,46 +2033,13 @@ while True:
 					quitGame()
 
 				elif round2 == "p":
-					while True:
-						placeShow()
-						pl2 = str(input("Place Bets? > ")).strip().lower()
-						if pl2 == "y":
-							placeBets()
-							continue
-						elif pl2 == "o":
-							if placeOff:
-								placeOff = False
-								print("Ok, your Place Bets are back on.")
-							else:
-								placeOff = True
-								print("All your Place Bets are Off.")
-							continue
-						elif pl2 == "d":
-							print("Taking down all of your Place Bets.")
-							placeTakeDown()
-							continue
-						elif pl2 in validPlacePresetCodesForMode():
-							placePreset(pl2)
-							continue
-						elif pl2 == "m":
-							placeMover()
-							continue
-						elif pl2 == "p":
-							chipsOnTable -= place[comeOut]
-							bank += place[comeOut]
-							place[comeOut] = 0
-							print(f"Taking down the Place {comeOut} bet.")
-							continue
-						elif pl2 == "h":
-							print(placeHelpText(pointPhase=True))
-							continue
-						elif pl2 == "x":
-							print("Done Place Betting!")
-							break
-						else:
-							print("That's not a valid option!")
+						while True:
+							placeShow()
+							pl2 = str(input("Place Bets? > ")).strip().lower()
+							commandResult = handlePlaceMenuCommand(pl2, pointPhase=True)
+							if commandResult["shouldExitMenu"]:
+								break
 						continue
-					continue
 				elif round2  in ["ly", "lay"]:
 					if gameMode == GameMode.craplessCraps:
 						print("Lay bets are not available in Crapless Craps.")

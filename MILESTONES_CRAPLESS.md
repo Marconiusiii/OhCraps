@@ -225,3 +225,32 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testPlacePresetExtremeAcrossRejectedInCrapsNoMutation`
 	- `testPlaceHelpTextIsModeAware`
 - Full suite remains green.
+
+## Milestone 35: Extract Place Command Dispatcher
+
+### What changed
+- Added a dedicated Place command dispatcher:
+	- `handlePlaceMenuCommand(command, pointPhase=False)`
+- Moved Place command branching logic out of both terminal loops into that shared handler.
+- Updated both Place menus (come-out and point phase) to call dispatcher and act on returned command result.
+
+### Dispatcher contract
+- Returns a dict with:
+	- `handled`: whether command was recognized/executed.
+	- `shouldExitMenu`: whether caller should break Place menu loop.
+- Keeps existing behavior for all commands:
+	- Common: `y`, `d`, helper presets, `h`, `x`
+	- Point-only: `o`, `m`, `p`
+- Invalid commands still fail safely without mutating table state.
+
+### Why
+- This reduces duplicate control flow and makes Place command handling deterministic and testable.
+- It is a direct step toward iOS portability by isolating command intent from loop/UI structure.
+
+### Test coverage
+- Added deterministic dispatcher tests in `tests/testEngineBehavior.py`:
+	- `testHandlePlaceMenuCommandExit`
+	- `testHandlePlaceMenuCommandPointTogglePlaceOff`
+	- `testHandlePlaceMenuCommandPointOnlyIgnoredOnComeOut`
+	- `testHandlePlaceMenuCommandInvalidNoMutation`
+- Full suite remains green.

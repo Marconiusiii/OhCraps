@@ -92,3 +92,32 @@ New milestone updates should be appended here rather than creating new milestone
 
 - Engine line settlement confirms point 11 hit wins in Crapless point phase.
 - This behavior is now explicitly locked by tests in the suite.
+
+## Milestone 30: Edge Helper (`e`)
+
+### What changed
+- Added new Place helper `e` for edge-only setup in Crapless sessions.
+- `e` places wagers only on:
+	- `2, 3, 11, 12`
+- Unit sizing for `e` uses existing edge unit rules:
+	- 2/12: 2-unit base
+	- 3/11: 4-unit base
+
+### Preserved behavior
+- Existing helpers were not repurposed:
+	- `a` unchanged
+	- `i` unchanged
+	- `c` unchanged
+	- `ea` unchanged
+
+### Accounting model
+- `e` follows preset-style replacement behavior:
+	- clears non-edge place numbers,
+	- applies edge wagers from selected unit size,
+	- updates bank/chips with deterministic outlay math.
+
+### Test coverage
+- Added deterministic tests for:
+	- edge-only placement map from `e`,
+	- bank/chips invariants,
+	- no regression of existing helper behaviors.

@@ -754,6 +754,18 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 44)
 		self.assertEqual(terminal["bank"], 156)
 
+	def testPlacePresetEdgeOnlyInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 168
+		terminal["chipsOnTable"] = 32
+		terminal["place"] = {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["placePreset"]("e")
+		self.assertEqual(terminal["place"], {2: 2, 3: 4, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 4, 12: 2})
+		self.assertEqual(terminal["chipsOnTable"], 12)
+		self.assertEqual(terminal["bank"], 188)
+
 	def testHardWaysBettingSavesWager(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

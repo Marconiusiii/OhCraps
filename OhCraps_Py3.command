@@ -1357,7 +1357,7 @@ def normalizedHalfPressIncrement(number, currentWager):
 
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
-	if gameMode == GameMode.craplessCraps and pre.strip().lower() != "ea":
+	if gameMode == GameMode.craplessCraps and pre.strip().lower() not in ["ea", "e"]:
 		print("Across/Inside/Center presets remain standard-only in Crapless. Use 'ea' for Extreme Across or individual Place betting.")
 		return
 	total = 0
@@ -1494,6 +1494,35 @@ def placePreset(pre):
 			bank -= place[key]
 			total += place[key]
 		print(f"Ok, placing ${total:,} Extreme Across.")
+	elif pre.strip().lower() == "e":
+		while True:
+			print("How many Edge units on 2, 3, 11, and 12?")
+			try:
+				unit = int(input("> "))
+			except ValueError:
+				print("That wasn't even a unit! Try again.")
+				continue
+			targetNumbers = [2, 3, 11, 12]
+			totalNeed = 0
+			for number in targetNumbers:
+				totalNeed += placeUnitSize(number) * unit
+			if totalNeed > bank + outlay:
+				print("You don't have enough money for that! Egads!")
+				outOfMoney()
+				continue
+			break
+
+		for key in place:
+			chipsOnTable -= place[key]
+			bank += place[key]
+			if key in [2, 3, 11, 12]:
+				place[key] = placeUnitSize(key) * unit
+			else:
+				place[key] = 0
+			chipsOnTable += place[key]
+			bank -= place[key]
+			total += place[key]
+		print(f"Ok, placing ${total:,} on the edges.")
 
 
 def placeMover():
@@ -1728,7 +1757,7 @@ while True:
 					print("Taking down your Place Bets.")
 					placeTakeDown()
 					continue
-				elif plBet in ['a', 'i', 'c', 'ea']:
+				elif plBet in ['a', 'i', 'c', 'ea', 'e']:
 					placePreset(plBet)
 					continue
 				elif plBet == "h":
@@ -1966,7 +1995,7 @@ while True:
 							print("Taking down all of your Place Bets.")
 							placeTakeDown()
 							continue
-						elif pl2 in ['a', 'i', 'c', 'ea']:
+						elif pl2 in ['a', 'i', 'c', 'ea', 'e']:
 							placePreset(pl2)
 							continue
 						elif pl2 == "m":

@@ -636,6 +636,7 @@ Testing outcome:
 - Detailed milestone-by-milestone Crapless documentation is now consolidated in:
 	- `MILESTONES_CRAPLESS.md`
 - New Crapless updates should be appended to that single file going forward.
+- Added Crapless `e` helper for edge-only Place setup on `2,3,11,12` with mode unit sizing.
 
 #### Line Bets
 

@@ -210,6 +210,27 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.lineBets["Don't Pass Odds"], 0)
 
+	def testSettleOddsBetsCraplessPassOddsWinOnTwo(self):
+		lineBets = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
+		settlement = settleOddsBets(lineBets=lineBets, roll=2, comeOut=2, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.bankDelta, 70)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.lineBets["Pass Odds"], 0)
+
+	def testSettleOddsBetsCraplessPassOddsWinOnThreeElevenTwelve(self):
+		cases = [
+			{"roll": 3, "odds": 12, "expectedDelta": 48},
+			{"roll": 11, "odds": 12, "expectedDelta": 48},
+			{"roll": 12, "odds": 10, "expectedDelta": 70},
+		]
+		for case in cases:
+			with self.subTest(roll=case["roll"]):
+				lineBets = {"Pass": 0, "Pass Odds": case["odds"], "Don't Pass": 0, "Don't Pass Odds": 0}
+				settlement = settleOddsBets(lineBets=lineBets, roll=case["roll"], comeOut=case["roll"], gameMode=GameMode.craplessCraps)
+				self.assertEqual(settlement.bankDelta, case["expectedDelta"])
+				self.assertEqual(settlement.chipsOnTableDelta, -case["odds"])
+				self.assertEqual(settlement.lineBets["Pass Odds"], 0)
+
 	def testSettlePlaceBetsBuy4IncludesVig(self):
 		placeBets = {4: 25, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
 		settlement = settlePlaceBets(placeBets=placeBets, roll=4)
@@ -1420,6 +1441,24 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["lineBets"]["Pass Odds"], 60)
 		self.assertEqual(terminal["bank"], 40)
 		self.assertEqual(terminal["chipsOnTable"], 70)
+
+	def testOddsCheckPaysCraplessPassOddsOnPointTwo(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 2
+		terminal["lineBets"] = {
+			"Pass": 0,
+			"Pass Odds": 10,
+			"Don't Pass": 0,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.print"):
+			terminal["oddsCheck"](2)
+		self.assertEqual(terminal["lineBets"]["Pass Odds"], 0)
+		self.assertEqual(terminal["bank"], 170)
+		self.assertEqual(terminal["chipsOnTable"], 0)
 
 	def testOddsPassRejectsInvalidUnitThenAccepts(self):
 		terminal = loadTerminalNamespace()

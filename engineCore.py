@@ -1086,7 +1086,7 @@ def settleDComeBarBet(dComeBet: int, roll: int) -> DComeBarSettlement:
 	)
 
 
-def settleOddsBets(lineBets: dict, roll: int, comeOut: int) -> LineSettlement:
+def settleOddsBets(lineBets: dict, roll: int, comeOut: int, gameMode: GameMode = GameMode.craps) -> LineSettlement:
 	updatedLineBets = normalizeLineBets(lineBets)
 	bankDelta = 0
 	chipsOnTableDelta = 0
@@ -1094,13 +1094,7 @@ def settleOddsBets(lineBets: dict, roll: int, comeOut: int) -> LineSettlement:
 
 	passOdds = updatedLineBets["Pass Odds"]
 	if passOdds > 0 and roll != 7:
-		payout = 0
-		if roll in [4, 10]:
-			payout = passOdds * 2
-		elif roll in [5, 9]:
-			payout += (passOdds//2) * 3
-		elif roll in [6, 8]:
-			payout += (passOdds//5) * 6
+		payout = comeOddsWinForMode(number=roll, oddsBet=passOdds, gameMode=gameMode)
 		messages.append(f"You won ${payout:,} from your Pass Line Odds!")
 		bankDelta += payout + passOdds
 		chipsOnTableDelta -= passOdds
@@ -1112,13 +1106,7 @@ def settleOddsBets(lineBets: dict, roll: int, comeOut: int) -> LineSettlement:
 
 	dontPassOdds = updatedLineBets["Don't Pass Odds"]
 	if dontPassOdds > 0 and roll == 7:
-		payout = 0
-		if comeOut in [4, 10]:
-			payout += dontPassOdds//2
-		elif comeOut in [5, 9]:
-			payout += (dontPassOdds//3) * 2
-		elif comeOut in [6, 8]:
-			payout += (dontPassOdds//6) * 5
+		payout = dComeOddsWinForMode(number=comeOut, oddsBet=dontPassOdds, gameMode=gameMode)
 		messages.append(f"You won ${payout:,} on your Don't Pass Odds!")
 		bankDelta += payout + dontPassOdds
 		chipsOnTableDelta -= dontPassOdds

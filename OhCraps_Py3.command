@@ -398,7 +398,8 @@ def oddsCheck(roll):
 	settlement = settleOddsBets(
 		lineBets=lineBets,
 		roll=roll,
-		comeOut=comeOut
+		comeOut=comeOut,
+		gameMode=gameMode
 	)
 	lineBets = settlement.lineBets
 	bank += settlement.bankDelta

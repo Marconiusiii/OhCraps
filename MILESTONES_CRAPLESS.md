@@ -141,3 +141,25 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Replaced the prior Crapless "disabled" tests for `a/i/c` with active behavior tests.
 - New assertions verify resulting place map plus `bank` and `chipsOnTable` totals for each helper.
+
+## Milestone 32: Crapless Helper Integration Coverage
+
+### What changed
+- Added integration-style terminal regression tests for Crapless helper flows.
+- New coverage verifies original helpers in Crapless through real preset calls:
+	- `a` with point exclusion path (`pointIsOn` + "Include the Point?" = no).
+	- `i` with point exclusion path.
+- Added sequential helper replacement coverage in one session:
+	- `a` then `e` then `ea` with final map/accounting assertions.
+- Added guard coverage for current place mover behavior in Crapless:
+	- confirms mover remains disabled and does not mutate bankroll/table/place state.
+- Added press-path integration check after helper setup:
+	- `c` helper setup followed by `hp` on a winning 8, with normalized increment and accounting assertions.
+
+### Why
+- Unit checks were already present, but helper/menu interactions still carried risk in point-phase and sequential replacement flows.
+- This milestone locks the high-risk user paths most likely to regress while expanding Crapless behavior.
+
+### Test impact
+- Test suite now includes these additional deterministic cases under `tests/testEngineBehavior.py`.
+- Full suite remains green after additions.

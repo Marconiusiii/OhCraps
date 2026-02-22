@@ -763,6 +763,64 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 12)
 		self.assertEqual(terminal["bank"], 188)
 
+	def testPlacePresetAcrossExcludePointInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 6
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["1", "n"]):
+			terminal["placePreset"]("a")
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 5, 5: 5, 6: 0, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0})
+		self.assertEqual(terminal["chipsOnTable"], 26)
+		self.assertEqual(terminal["bank"], 174)
+
+	def testPlacePresetInsideExcludePointInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 9
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["1", "n"]):
+			terminal["placePreset"]("i")
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 0, 5: 5, 6: 6, 8: 6, 9: 0, 10: 0, 11: 0, 12: 0})
+		self.assertEqual(terminal["chipsOnTable"], 17)
+		self.assertEqual(terminal["bank"], 183)
+
+	def testPlacePresetSequenceAcrossEdgeExtremeInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["pointIsOn"] = False
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["placePreset"]("a")
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["placePreset"]("e")
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["placePreset"]("ea")
+		self.assertEqual(terminal["place"], {2: 2, 3: 4, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 4, 12: 2})
+		self.assertEqual(terminal["chipsOnTable"], 44)
+		self.assertEqual(terminal["bank"], 156)
+
+	def testPlaceMoverStaysDisabledInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 168
+		terminal["chipsOnTable"] = 32
+		terminal["comeOut"] = 6
+		terminal["place"] = {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placeMover"]()
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0})
+		self.assertEqual(terminal["chipsOnTable"], 32)
+		self.assertEqual(terminal["bank"], 168)
+
 	def testHardWaysBettingSavesWager(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100
@@ -916,6 +974,20 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["place"][6], 24)
 		self.assertEqual(terminal["bank"], 115)
 		self.assertEqual(terminal["chipsOnTable"], 24)
+
+	def testPlaceCheckHalfPressNormalizedAfterCraplessHelperFlow(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["3"]):
+			terminal["placePreset"]("c")
+		with patch("builtins.input", side_effect=["hp"]):
+			terminal["placeCheck"](8)
+		self.assertEqual(terminal["place"][8], 24)
+		self.assertEqual(terminal["bank"], 179)
+		self.assertEqual(terminal["chipsOnTable"], 42)
 
 	def testLayAllAcrossSetsEachNumber(self):
 		terminal = loadTerminalNamespace()

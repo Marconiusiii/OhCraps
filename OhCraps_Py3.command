@@ -1992,6 +1992,174 @@ def showAllBets():
 	if fireBet > 0:
 		print(f"You have ${fireBet:,} on the Fire Bet.")
 
+def runPlaceMenu(pointPhase=False):
+	while True:
+		placeShow()
+		placeCommand = str(input("Place Bets? > ")).strip().lower()
+		commandResult = handlePlaceMenuCommand(placeCommand, pointPhase=pointPhase)
+		emitActionResult(commandResult)
+		if commandResult["shouldExitMenu"]:
+			break
+
+def runLayMenu(pointPhase=False):
+	while True:
+		layShow()
+		layCommand = str(input("Lay Bets? > ")).strip().lower()
+		commandResult = handleLayMenuCommand(layCommand, pointPhase=pointPhase)
+		emitActionResult(commandResult)
+		if commandResult["shouldExitMenu"]:
+			break
+
+def runHardWaysMenu(pointPhase=False):
+	while True:
+		hardShow()
+		hardCommand = str(input("Hard Ways Bets? > ")).strip().lower()
+		commandResult = handleHardWaysMenuCommand(hardCommand, pointPhase=pointPhase)
+		emitActionResult(commandResult)
+		if commandResult["shouldExitMenu"]:
+			break
+
+def handleBettingCommand(command, pointPhase=False):
+	global working
+	cmd = str(command).strip().lower()
+	if cmd == "q":
+		quitGame()
+		return {"shouldRoll": False}
+	if cmd == "b":
+		if pointPhase:
+			print(f"You have ${bank:,} in your rack with ${chipsOnTable:,} on the table. The Point is {comeOut}.")
+		else:
+			print(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
+		return {"shouldRoll": False}
+	if cmd == "a":
+		showAllBets()
+		return {"shouldRoll": False}
+	if pointPhase:
+		if cmd in ["o", "po", "dpo"]:
+			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
+				odds()
+			else:
+				print("You don't have a Line bet, silly!")
+			return {"shouldRoll": False}
+		if cmd == "dp":
+			if lineBets["Don't Pass"] > 0:
+				dpPhase2()
+			else:
+				print("You don't have a Don't Pass bet!")
+			return {"shouldRoll": False}
+		if cmd == "c":
+			comeShow()
+			print("Come Bet:\n")
+			come()
+			return {"shouldRoll": False}
+		if cmd == "co":
+			comeOddsChange()
+			return {"shouldRoll": False}
+		if cmd == "dcd":
+			dComeDown()
+			return {"shouldRoll": False}
+		if cmd == "p":
+			runPlaceMenu(pointPhase=True)
+			return {"shouldRoll": False}
+		if cmd in ["ly", "lay"]:
+			runLayMenu(pointPhase=True)
+			return {"shouldRoll": False}
+		if cmd == "f":
+			fieldShow()
+			fb2 = str(input("Field Bet? > ")).strip().lower()
+			if fb2 in ['y', 'yes']:
+				field()
+			elif fb2 in ['d', 'td', 'takedown']:
+				fieldTakeDown()
+			return {"shouldRoll": False}
+		if cmd == "hd":
+			runHardWaysMenu(pointPhase=True)
+			return {"shouldRoll": False}
+		if cmd in ["pr", "prop"]:
+			propBetting()
+			return {"shouldRoll": False}
+		if cmd == "h":
+			print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+			return {"shouldRoll": False}
+		if cmd in ["r", "x"]:
+			print("Dice are rolling!")
+			return {"shouldRoll": True}
+		print("That's not a betting option, silly!")
+		return {"shouldRoll": False}
+	if cmd in ["l", "line", "line bets"]:
+		print("Line Bets:\n")
+		lineBetting()
+		return {"shouldRoll": False}
+	if cmd == "p":
+		runPlaceMenu(pointPhase=False)
+		return {"shouldRoll": False}
+	if cmd in ["ly", "lay"]:
+		runLayMenu(pointPhase=False)
+		return {"shouldRoll": False}
+	if cmd in ["f", "field"]:
+		fieldShow()
+		fBet = str(input("Field Bet? > ")).strip().lower()
+		if fBet in ['y', 'yes']:
+			field()
+		elif fBet in ['d', 'td', 'takedown']:
+			fieldTakeDown()
+		return {"shouldRoll": False}
+	if cmd in ["hd", "hard", "hw"]:
+		runHardWaysMenu(pointPhase=False)
+		return {"shouldRoll": False}
+	if cmd in ["w", "work", "working"]:
+		plCheck = hCheck = lCheck = cCheck = 0
+		for value in place.values():
+			plCheck += value
+		for value in hardWays.values():
+			hCheck += value
+		for value in layBets.values():
+			lCheck += value
+		for value in comeBets.values():
+			cCheck += value
+		for value in dComeBets.values():
+			cCheck += value
+		if plCheck > 0 or hCheck > 0 or lCheck > 0 or cCheck > 0:
+			if working:
+				working = False
+				print("Ok, all bets are Off.")
+			else:
+				working = True
+				print("Ok, all bets are Working!")
+		else:
+			print("Make some bets first so they can Work!")
+		return {"shouldRoll": False}
+	if cmd in ["pr", "prop"]:
+		propBetting()
+		return {"shouldRoll": False}
+	if cmd == "dcd":
+		dComeDown()
+		return {"shouldRoll": False}
+	if cmd == "ats":
+		if atsOn == True:
+			print(f"All Tall Small: {allNums}")
+		elif throws == 0:
+			print("All Tall Small:\n")
+			atsBetting()
+		else:
+			print("All Tall Small will be available after the next 7 rolls.")
+		return {"shouldRoll": False}
+	if cmd == "fire":
+		if fireBet == 0:
+			print("Fire Bet:\n")
+			fireBetting()
+		else:
+			print(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
+		return {"shouldRoll": False}
+	if cmd == "h":
+		print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+		return {"shouldRoll": False}
+	if cmd in ["x", "r"]:
+		print("Rolling the dice!")
+		return {"shouldRoll": True}
+	print("That's not an option, silly!")
+	return {"shouldRoll": False}
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2047,118 +2215,9 @@ while True:
 	while True:
 		print("Place your Bets!\n")
 		round1 = str(input(">  ")).strip().lower()
-		if round1 in ["l", "line", "line bets"]:
-			print("Line Bets:\n")
-			lineBetting()
-			continue
-
-		elif round1 == "q":
-			quitGame()
-		elif round1 == "p":
-					while True:
-						placeShow()
-						plBet = str(input("Place Bets? > ")).strip().lower()
-						commandResult = handlePlaceMenuCommand(plBet, pointPhase=False)
-						emitActionResult(commandResult)
-						if commandResult["shouldExitMenu"]:
-							break
-
-		elif round1 in ["ly", "lay"]:
-				while True:
-					layShow()
-					lyBet = str(input("Lay Bets? > ")).strip().lower()
-					commandResult = handleLayMenuCommand(lyBet, pointPhase=False)
-					emitActionResult(commandResult)
-					if commandResult["shouldExitMenu"]:
-						break
-
-		elif round1 in ["f", "field"]:
-			fieldShow()
-			fBet = str(input("Field Bet? > ")).strip().lower()
-			if fBet in ['y', 'yes']:
-				field()
-			elif fBet in ['d', 'td', 'takedown']:
-				fieldTakeDown()
-			continue
-
-		elif round1 in ["hd", "hard", "hw"]:
-				while True:
-					hardShow()
-					print
-					hWays = str(input("Hard Ways Bets? > ")).strip().lower()
-					commandResult = handleHardWaysMenuCommand(hWays, pointPhase=False)
-					emitActionResult(commandResult)
-					if commandResult["shouldExitMenu"]:
-						break
-
-# Working Bets Setup
-		elif round1 in ["w", "work", "working"]:
-			plCheck = hCheck = lCheck = cCheck = 0
-			for value in place.values():
-				plCheck += value
-			for value in hardWays.values():
-				hCheck += value
-			for value in layBets.values():
-				lCheck += value
-			for value in comeBets.values():
-				cCheck += value
-			for value in dComeBets.values():
-				cCheck += value
-
-			if plCheck > 0 or hCheck > 0 or lCheck > 0 or cCheck > 0:
-				if working:
-					working = False
-					print("Ok, all bets are Off.")
-				else:
-					working = True
-					print("Ok, all bets are Working!")
-			else:
-				print("Make some bets first so they can Work!")
-			continue
-
-		elif round1 in ["pr", "prop"]:
-			propBetting()
-			continue
-
-		elif round1 == "dcd":
-			dComeDown()
-			continue
-
-		elif round1 == "ats":
-			if atsOn == True:
-				print(f"All Tall Small: {allNums}")
-			elif throws == 0:
-				print("All Tall Small:\n")
-				atsBetting()
-			else:
-				print("All Tall Small will be available after the next 7 rolls.")
-			continue
-
-# Fire Bet
-		elif round1 == "fire":
-			if fireBet == 0:
-				print("Fire Bet:\n")
-				fireBetting()
-			else:
-				print(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
-			continue
-#Coming Out Roll
-		elif round1 in ["x", "r"]:
-			print("Rolling the dice!")
+		commandResult = handleBettingCommand(round1, pointPhase=False)
+		if commandResult["shouldRoll"]:
 			break
-
-		elif round1 == "h":
-			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
-			continue
-		elif round1 == "b":
-			print(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
-			continue
-		elif round1 == "a":
-			showAllBets()
-			continue
-		else:
-			print("That's not an option, silly!")
-			continue
 
 
 	comeOut = roll()
@@ -2210,98 +2269,9 @@ while True:
 			while True:
 				print("Place your bets!\n")
 				round2 = str(input(">  ")).strip().lower()
-
-				if round2 in ["o", "po", "dpo"]:
-					if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
-						odds()
-					else:
-						print("You don't have a Line bet, silly!")
-					continue
-
-				if round2 == "b":
-					print(f"You have ${bank:,} in your rack with ${chipsOnTable:,} on the table. The Point is {comeOut}.")
-					continue
-
-				if round2 == "dp":
-					if lineBets["Don't Pass"] > 0:
-						dpPhase2()
-					else:
-						print("You don't have a Don't Pass bet!")
-					continue
-
-				if round2 == "c":
-					comeShow()
-					print("Come Bet:\n")
-					come()
-					continue
-
-				if round2 == "co":
-					comeOddsChange()
-					continue
-
-				if round2 == "dcd":
-					dComeDown()
-					continue
-
-				elif round2 == "q":
-					quitGame()
-
-				elif round2 == "p":
-						while True:
-							placeShow()
-							pl2 = str(input("Place Bets? > ")).strip().lower()
-							commandResult = handlePlaceMenuCommand(pl2, pointPhase=True)
-							emitActionResult(commandResult)
-							if commandResult["shouldExitMenu"]:
-								break
-						continue
-				elif round2  in ["ly", "lay"]:
-						while True:
-							layShow()
-							ly2Bet = str(input("Lay Bets? > ")).strip().lower()
-							commandResult = handleLayMenuCommand(ly2Bet, pointPhase=True)
-							emitActionResult(commandResult)
-							if commandResult["shouldExitMenu"]:
-								break
-						continue
-
-				elif round2 == "f":
-					fieldShow()
-					fb2 = str(input("Field Bet? > ")).strip().lower()
-					if fb2 in ['y', 'yes']:
-						field()
-					elif fb2 in ['d', 'td', 'takedown']:
-						fieldTakeDown()
-					continue
-
-				elif round2 == "hd":
-						while True:
-							hardShow()
-							hard2 = str(input("Hard Ways bets? > ")).strip().lower()
-							commandResult = handleHardWaysMenuCommand(hard2, pointPhase=True)
-							emitActionResult(commandResult)
-							if commandResult["shouldExitMenu"]:
-								break
-						continue
-
-				elif round2 in ["pr", "prop"]:
-					propBetting()
-					continue
-
-				elif round2 == "a":
-					showAllBets()
-					continue
-# phase 2 roll
-				elif round2 in ["r", "x"]:
-					print("Dice are rolling!")
+				commandResult = handleBettingCommand(round2, pointPhase=True)
+				if commandResult["shouldRoll"]:
 					break
-				elif round2 == "h":
-					print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
-					continue
-
-				else:
-					print("That's not a betting option, silly!")
-					continue
 			p2 = roll()
 
 			syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)

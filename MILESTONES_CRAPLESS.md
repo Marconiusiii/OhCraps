@@ -629,3 +629,34 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - No rules or payout logic changed in this milestone.
 - Existing automated suite remains green after documentation updates.
+
+## Milestone 49: Shared Betting Command Router
+
+### What changed
+- Added shared betting router helpers in terminal flow:
+	- `runPlaceMenu(pointPhase=...)`
+	- `runLayMenu(pointPhase=...)`
+	- `runHardWaysMenu(pointPhase=...)`
+	- `handleBettingCommand(command, pointPhase=...)`
+- Replaced duplicated Come Out and Point phase command branches with the shared router.
+- Preserved existing command vocabulary and player-facing prompt text.
+
+### Why
+- Come Out and Point phase menus had duplicated command-routing code.
+- Duplication increases regression risk when one branch is updated and the other is not.
+- A shared router is a direct portability step for future iOS controller extraction.
+
+### Behavior
+- No payout-rule changes.
+- No bet math changes.
+- No command removals.
+- Roll triggers remain:
+	- Come Out: `x` or `r`
+	- Point phase: `x` or `r`
+
+### Test coverage
+- Added terminal routing regression tests in `tests/testEngineBehavior.py` for:
+	- Place menu routing in Come Out.
+	- Place menu routing in Point phase.
+	- Point-phase roll command returns roll intent.
+	- Point-phase odds command with no line bet keeps proper guard message.

@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+import py_compile
 from unittest.mock import patch
 
 from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
@@ -19,6 +20,10 @@ def loadTerminalNamespace():
 
 
 class EvaluateRollTests(unittest.TestCase):
+	def testTerminalScriptCompiles(self):
+		scriptPath = Path(__file__).resolve().parents[1] / "OhCraps_Py3.command"
+		py_compile.compile(str(scriptPath), doraise=True)
+
 	def testComeOutNatural(self):
 		state = GameState(
 			bank=1000,
@@ -1057,6 +1062,43 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 200)
 		self.assertEqual(terminal["chipsOnTable"], 0)
 		self.assertEqual(terminal["hardWays"], {4: 5, 6: 0, 8: 0, 10: 0})
+
+	def testHandleBettingCommandRoutesPlaceMenuInComeOut(self):
+		terminal = loadTerminalNamespace()
+		calls = []
+		def fakeRunPlaceMenu(pointPhase=False):
+			calls.append(pointPhase)
+		terminal["runPlaceMenu"] = fakeRunPlaceMenu
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("p", pointPhase=False)
+		self.assertEqual(result["shouldRoll"], False)
+		self.assertEqual(calls, [False])
+
+	def testHandleBettingCommandRoutesPlaceMenuInPointPhase(self):
+		terminal = loadTerminalNamespace()
+		calls = []
+		def fakeRunPlaceMenu(pointPhase=False):
+			calls.append(pointPhase)
+		terminal["runPlaceMenu"] = fakeRunPlaceMenu
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("p", pointPhase=True)
+		self.assertEqual(result["shouldRoll"], False)
+		self.assertEqual(calls, [True])
+
+	def testHandleBettingCommandPointRollReturnsTrue(self):
+		terminal = loadTerminalNamespace()
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("x", pointPhase=True)
+		self.assertEqual(result["shouldRoll"], True)
+
+	def testHandleBettingCommandPointOddsWithoutLineBet(self):
+		terminal = loadTerminalNamespace()
+		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		with patch("builtins.print") as mockPrint:
+			result = terminal["handleBettingCommand"]("o", pointPhase=True)
+		self.assertEqual(result["shouldRoll"], False)
+		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
+		self.assertIn("You don't have a Line bet, silly!", printed)
 
 	def testBetSnapshotCaptureApplyRoundTrip(self):
 		terminal = loadTerminalNamespace()

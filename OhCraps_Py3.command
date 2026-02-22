@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -283,11 +283,12 @@ def lineBetting():
 
 def lineCheck(roll, p2roll):
 	global lineBets, bank, chipsOnTable, pointIsOn
-	settlement = settleLineBets(
+	settlement = settleLineBetsForMode(
 		lineBets=lineBets,
 		pointIsOn=pointIsOn,
 		roll=roll,
-		p2roll=p2roll
+		p2roll=p2roll,
+		gameMode=gameMode
 	)
 	lineBets = settlement.lineBets
 	bank += settlement.bankDelta
@@ -1785,7 +1786,6 @@ while True:
 			print("That's not an option, silly!")
 			continue
 
-
 	comeOut = roll()
 	outcome = evaluateRoll(gameState, comeOut)
 
@@ -1802,14 +1802,14 @@ while True:
 	if atsOn == True:
 		ats(comeOut)
 
-	if comeOut in [7, 11]:
+	if outcome == RollOutcome.natural:
 		if comeOut == 7:
 			throws = 0
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		continue
-	elif comeOut in [2, 3, 12]:
+	elif outcome == RollOutcome.craps:
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
@@ -2033,13 +2033,13 @@ while True:
 			if atsOn == True:
 				ats(p2)
 
-			if p2 == 7:
+			if outcome == RollOutcome.sevenOut:
 				throws = 0
 				pointIsOn = False
 #				os.system("clear")
 				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 				break
-			elif p2 == comeOut:
+			elif outcome == RollOutcome.pointHit:
 				print("Point Hit! Front line winner!")
 				pointIsOn = False
 				syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)

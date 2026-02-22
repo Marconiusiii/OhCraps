@@ -463,6 +463,72 @@ Testing outcome:
 - Added deterministic tests for mode parsing, profile lookup, state mode sync, and terminal selection retry behavior.
 - Suite increased from 80 to 87 tests, all passing.
 
+### Milestone 25: Mode-aware roll and point behavior
+
+This milestone introduces the first gameplay difference between Craps and Crapless Craps by making roll outcome classification mode-aware.
+
+What changed:
+
+- `evaluateRoll(...)` in `engineCore.py` now branches on `gameMode`:
+	- Standard Craps (unchanged):
+		- Come-out 7/11 => natural
+		- Come-out 2/3/12 => craps
+		- Other numbers => point established
+	- Crapless Craps:
+		- Come-out 7 => natural
+		- All non-7 come-out rolls => point established
+- Terminal round transitions in `OhCraps_Py3.command` now use `RollOutcome` rather than hardcoded number lists for:
+	- Come-out phase branch selection
+	- Point-phase seven-out and point-hit resolution
+
+Why this matters:
+
+- It is the minimal safe behavior-level change that makes mode selection meaningful.
+- It centralizes core phase logic in engine outcome rules, reducing duplicated table-specific branching in terminal code.
+- It keeps this milestone focused and testable before broader payout/domain updates.
+
+Scope note:
+
+- This milestone intentionally does not yet apply full Stratosphere Crapless table behavior for payout structures or full bet availability constraints.
+- It only applies mode-aware roll classification and point lifecycle flow.
+
+Testing outcome:
+
+- Added deterministic tests for Crapless come-out and point-phase roll outcomes.
+- Added terminal-facing mode-outcome assertion coverage.
+- Suite increased from 87 to 90 tests, all passing.
+
+### Milestone 26: Crapless resolving-path stabilization
+
+This milestone closes the first-roll crash and formalizes a mode-aware line-settlement entry path for Crapless progression.
+
+What was fixed:
+
+- Terminal first-roll traceback (`NameError: outcome is not defined`) was resolved by restoring the roll/evaluate sequence to the correct post-betting control-flow location.
+- This ensures both Craps and Crapless can complete the first roll without runtime failure.
+
+What was added:
+
+- New engine wrapper:
+	- `settleLineBetsForMode(...)`
+- Terminal line settlement now routes through this mode-aware entry point.
+- Current Crapless line wrapper behavior intentionally delegates to canonical line logic as a phase-in scaffold.
+
+Why this matters:
+
+- You now have a stable resolving path for Crapless gameplay progression (no immediate first-roll crash).
+- Mode-specific line behavior can be introduced safely in one centralized function without terminal-branch duplication.
+
+Scope note:
+
+- This milestone still does not apply full Stratosphere Crapless line/payout policy changes.
+- It is a runtime stabilization and architecture milestone.
+
+Testing outcome:
+
+- Added deterministic tests for mode-aware line wrapper and first-roll Crapless path stability.
+- Suite increased from 90 to 93 tests, all passing.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

@@ -255,11 +255,16 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 
 def evaluateRoll(gameState: GameState, rollValue: int) -> RollOutcome:
 	if not gameState.pointIsOn:
-		if rollValue in (7, 11):
-			return RollOutcome.natural
-		if rollValue in (2, 3, 12):
-			return RollOutcome.craps
-		return RollOutcome.pointEstablished
+		if gameState.gameMode == GameMode.craplessCraps:
+			if rollValue == 7:
+				return RollOutcome.natural
+			return RollOutcome.pointEstablished
+		else:
+			if rollValue in (7, 11):
+				return RollOutcome.natural
+			if rollValue in (2, 3, 12):
+				return RollOutcome.craps
+			return RollOutcome.pointEstablished
 
 	if rollValue == 7:
 		return RollOutcome.sevenOut
@@ -397,6 +402,14 @@ def settleLineBets(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int) -> L
 		chipsOnTableDelta=chipsOnTableDelta,
 		messages=messages
 	)
+
+
+def settleLineBetsForMode(lineBets: dict, pointIsOn: bool, roll: int, p2roll: int, gameMode: GameMode) -> LineSettlement:
+	if gameMode == GameMode.craplessCraps:
+		# Phase-in scaffold: dedicated Crapless entry point currently delegates to canonical logic.
+		# Upcoming milestone(s) will apply Stratosphere-specific Crapless line behavior here.
+		return settleLineBets(lineBets=lineBets, pointIsOn=pointIsOn, roll=roll, p2roll=p2roll)
+	return settleLineBets(lineBets=lineBets, pointIsOn=pointIsOn, roll=roll, p2roll=p2roll)
 
 
 def normalizePlaceBets(placeBets: dict) -> dict:

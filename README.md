@@ -648,13 +648,17 @@ Once you've set your Line Bets, type 'x' and hit Enter to continue on with the g
 
 #### Place Bets
 
-Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through the Place Bet flow, asking you for a bet on each of the place numbers (4, 5, 6, 8, 9, 10). Enter a 0 if you want to keep the bet clear, otherwise enter your bet to Place the number. Typing Enter will bypass the current Place Number and leave the bet alone and move you to the next number. Once you enter a bet or pass the Place 10, you'll be brought back to the Place Bets prompt.
+Typing 'p' and hitting Enter in the Place Your Bets prompt will take you through the Place Bet flow and ask you for each Place number. In standard Craps this is 4, 5, 6, 8, 9, and 10. In Crapless, this also includes 2, 3, 11, and 12. Enter 0 to clear a bet, otherwise enter the amount you want to Place. Hitting Enter skips that number and keeps your current bet as-is.
 
 If the Place Bet number is rolled, you'll be prompted to Press your Bet. Hit Enter to decline, or enter 'y' to edit the Place Bet. Enter 0 to remove it.
 
-Additionally, at the "Change your bet?" prompt, you can type "p" to perform a full press, "hp" for a half-press, or "u" to press up one unit. A Full Press doubles the bet you currently have on the box number. A half-press is based on your current wager; for the 6 and 8 it is normalized to valid $6 units with a minimum $6 press amount. Going up a unit will press your bet up $5 on the 4, 5, 9, and 10, and up $6 on the 6 or 8.
+Additionally, at the "Change your bet?" prompt, you can type "p" to full press, "hp" to half-press, or "u" to press one unit. Full Press doubles what you already have on that number. Half-press is based on your current wager. Going up one unit adds the table unit for that number.
 
-Emulating how Craps works in Las Vegas, Placing the 4 or 10 for $10 or more will automatically buy those bets, and the 5% commission is factored into what you win if they hit. For example, Buying the Place 4 for $25 will win 2 for 1, so you pay a $1 vig to win $50, and will end up collecting $49. The vig will round up to the nearest dollar for bets under $20, and will round down to the nearest dollar for everything else.
+In standard Craps, placing the 4 or 10 for $10 or more automatically buys the bet. In Crapless, the 2, 3, 11, and 12 are also treated this way once they are $20 or higher. Buy bets pay the correct odds and a 5% vig is taken from the win. For edge numbers in Crapless under $20, the game uses table-valid minimum sizing:
+- 2 and 12 must be in $2 steps
+- 3 and 11 must be in $4 steps
+
+Once those edge bets are $20 or higher, they are auto-buy and can be entered naturally without those under-$20 step limits.
 
 In the Place Bet prompt, if you type 'd' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
 
@@ -861,9 +865,19 @@ New betting modes appear in the Point phase, and are accessed through the follow
 
 #### Line Odds
 
-When a point is established, you'll have the ability to add Pass Line Odds or a Lay Bet to your initial Line Bet. If you bet on the Pass Line before the Coming Out roll, typing 'o' and hitting Enter in the Place Your Bets prompt will open the Odds Betting mode. You'll be able to set Pass Line Odds and Lay Odds for Don't Pass bets.
+When a point is established, you'll have the ability to add Pass Line Odds or Lay Odds on a Don't Pass bet (standard Craps only). If you bet the Pass Line before the come out roll, typing 'o' from the Place Your Bets prompt opens the Odds flow.
 
-This game uses a standard 3x4x5x Odds limit. Odds on the 4 and 10 are limited to 3x your initial Line bet, odds on the 5 and 9 are limited to 4x your bet, and odds on the 6 and 8 are limited to 5x your bet. All Don't Pass lay odds are limited to 10x your Don't Pass bet.
+Standard Craps uses 3x4x5x limits:
+- 4/10 up to 3x
+- 5/9 up to 4x
+- 6/8 up to 5x
+- Don't Pass lay odds up to 10x
+
+In Crapless, Pass Odds also follow the edge points:
+- 2 and 12 up to 6x
+- 3 and 11 up to 3x
+
+All prompts show the max you can actually enter for that spot.
 
 When at the Line Bet Odds prompt, typing 'p' and hitting Enter will take down your Pass Line Odds bet. Typing 'd' and hitting Enter will take down your Don't Pass Lay Odds. Typing 'a' and hitting Enter will take down both Pass and Don't Pass Odds if you have them set.
 

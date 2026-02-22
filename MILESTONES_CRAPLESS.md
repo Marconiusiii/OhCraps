@@ -593,3 +593,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- under-`$20` invalid-then-valid manual change flow,
 	- `$20+` non-multiple manual change acceptance.
 - Full suite remains green.
+
+## Milestone 47: Buy Messaging Consistency Coverage
+
+### What changed
+- Added deterministic terminal tests for place buy messaging at threshold boundaries.
+- Covered standard Craps auto-buy messaging for `4` and `10` at `$10+`.
+- Covered non-buy messaging for standard `4` below threshold.
+- Preserved existing Crapless edge buy messaging coverage at `$20+`.
+
+### Why
+- Messaging consistency is a frequent regression vector even when payout math is correct.
+- Deterministic text checks improve confidence for future UI-layer ports where messages may be mapped directly to UX surfaces.
+
+### Test coverage
+- Added tests in `tests/testEngineBehavior.py` for:
+	- standard `4/10` buy text at threshold,
+	- standard `4` non-buy text below threshold.
+- Full suite remains green.
+
+## Milestone 48: Player-Facing Rules Text Alignment
+
+### What changed
+- Updated README game-instructions wording for Place and Odds so it matches live table behavior in both Craps and Crapless.
+- Clarified Crapless edge-number Place flow from a player perspective:
+	- under `$20` table-step sizing on `2/3/11/12`,
+	- auto-buy handling at `$20+` with vig.
+- Clarified Pass Odds limits in Crapless for edge points (`2/12` and `3/11`).
+- Kept all wording player-facing and table-oriented.
+
+### Why
+- Gameplay behavior had moved ahead of user instructions in a few key spots.
+- Aligning instructions to table behavior reduces confusion during live play and testing.
+
+### Test coverage
+- No rules or payout logic changed in this milestone.
+- Existing automated suite remains green after documentation updates.

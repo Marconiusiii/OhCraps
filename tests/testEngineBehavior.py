@@ -1686,6 +1686,37 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 77)
 		self.assertEqual(terminal["chipsOnTable"], 43)
 
+	def testPlaceBetsStandardFourAndTenShowBuyAtThreshold(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["10", "", "", "", "", "10"]), patch("builtins.print") as mockPrint:
+			terminal["placeBets"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("Buying the 4 for $10.", printed)
+		self.assertIn("Buying the 10 for $10.", printed)
+		self.assertEqual(terminal["place"][4], 10)
+		self.assertEqual(terminal["place"][10], 10)
+		self.assertEqual(terminal["bank"], 80)
+		self.assertEqual(terminal["chipsOnTable"], 20)
+
+	def testPlaceBetsStandardFourUnderThresholdShowsNonBuyMessage(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.input", side_effect=["5", "", "", "", "", ""]), patch("builtins.print") as mockPrint:
+			terminal["placeBets"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("$5 on the Place 4.", printed)
+		self.assertNotIn("Buying the 4 for $5.", printed)
+		self.assertEqual(terminal["place"][4], 5)
+		self.assertEqual(terminal["bank"], 95)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+
 	def testPlaceCheckCraplessEdgeTwoHalfPressNormalizesAndAccounts(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps

@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice
+from engineCore import settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -1587,6 +1587,24 @@ pointIsOn = False
 working = plWork = hdWork = lyWork = coWork = False
 throws = 0
 comeOut = 0
+gameMode = GameMode.craps
+
+
+def selectGameMode():
+	global gameMode
+	print("Choose game mode:")
+	print("1. Craps")
+	print("2. Crapless Craps")
+	while True:
+		choice = str(input("> ")).strip()
+		selectedMode = parseGameModeChoice(choice)
+		if selectedMode is None:
+			print("Invalid choice. Enter 1 or 2.")
+			continue
+		gameMode = selectedMode
+		selectedProfile = getRulesProfile(gameMode)
+		print(f"{selectedProfile.displayName} selected.")
+		break
 
 gameState = createGameState(
 	bank=bank,
@@ -1594,12 +1612,15 @@ gameState = createGameState(
 	throws=throws,
 	pointIsOn=pointIsOn,
 	comeOut=comeOut,
-	p2=p2
+	p2=p2,
+	gameMode=gameMode
 )
 
 
 # Game Start
 print(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
+selectGameMode()
+syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 cashIn()
 while True:
 	if chipsOnTable <= 0:

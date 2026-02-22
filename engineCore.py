@@ -7,6 +7,43 @@ from enum import Enum, auto
 from typing import Optional
 
 
+class GameMode(Enum):
+	craps = "craps"
+	craplessCraps = "craplessCraps"
+
+
+@dataclass(frozen=True)
+class GameRulesProfile:
+	gameMode: GameMode
+	displayName: str
+
+
+standardRulesProfile = GameRulesProfile(
+	gameMode=GameMode.craps,
+	displayName="Craps"
+)
+
+craplessRulesProfile = GameRulesProfile(
+	gameMode=GameMode.craplessCraps,
+	displayName="Crapless Craps"
+)
+
+
+def parseGameModeChoice(choice: str) -> Optional[GameMode]:
+	normalizedChoice = str(choice).strip()
+	if normalizedChoice == "1":
+		return GameMode.craps
+	if normalizedChoice == "2":
+		return GameMode.craplessCraps
+	return None
+
+
+def getRulesProfile(gameMode: GameMode) -> GameRulesProfile:
+	if gameMode == GameMode.craplessCraps:
+		return craplessRulesProfile
+	return standardRulesProfile
+
+
 @dataclass(frozen=True)
 class DiceRoll:
 	die1: int
@@ -23,6 +60,7 @@ class GameState:
 	pointIsOn: bool
 	comeOut: int
 	p2: int
+	gameMode: GameMode = GameMode.craps
 
 	def getPoint(self):
 		if self.pointIsOn:
@@ -230,24 +268,27 @@ def evaluateRoll(gameState: GameState, rollValue: int) -> RollOutcome:
 	return RollOutcome.neutral
 
 
-def createGameState(bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int) -> GameState:
+def createGameState(bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int, gameMode: GameMode = GameMode.craps) -> GameState:
 	return GameState(
 		bank=int(bank),
 		chipsOnTable=int(chipsOnTable),
 		throws=int(throws),
 		pointIsOn=bool(pointIsOn),
 		comeOut=int(comeOut),
-		p2=int(p2)
+		p2=int(p2),
+		gameMode=gameMode
 	)
 
 
-def syncGameState(gameState: GameState, bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int) -> GameState:
+def syncGameState(gameState: GameState, bank: int, chipsOnTable: int, throws: int, pointIsOn: bool, comeOut: int, p2: int, gameMode: Optional[GameMode] = None) -> GameState:
 	gameState.bank = int(bank)
 	gameState.chipsOnTable = int(chipsOnTable)
 	gameState.throws = int(throws)
 	gameState.pointIsOn = bool(pointIsOn)
 	gameState.comeOut = int(comeOut)
 	gameState.p2 = int(p2)
+	if gameMode is not None:
+		gameState.gameMode = gameMode
 	return gameState
 
 

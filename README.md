@@ -433,6 +433,36 @@ Milestone result:
 - No new gameplay-rule changes were required.
 - Added regression coverage increased suite from 71 to 80 tests, all passing.
 
+### Milestone 24: Game mode scaffold and startup mode selection
+
+This milestone adds the foundation for dual game modes without changing table behavior yet.
+
+What was added:
+
+- Engine mode scaffold in `engineCore.py`:
+	- `GameMode` enum with:
+		- `craps`
+		- `craplessCraps`
+	- `GameRulesProfile` container
+	- `parseGameModeChoice(choice)` for deterministic `1`/`2` parsing
+	- `getRulesProfile(gameMode)` for centralized mode metadata
+- `GameState` now includes `gameMode` (defaults to `craps`).
+- `createGameState(...)` and `syncGameState(...)` now support `gameMode`.
+- Startup flow in terminal now asks:
+	- `1. Craps`
+	- `2. Crapless Craps`
+	Then proceeds to bankroll prompt.
+
+Safety outcome:
+
+- This milestone does not change payouts, point behavior, place/lay number domains, or come-out rules.
+- It only creates a safe selector + state scaffold so later rule changes can be introduced behind a mode profile.
+
+Testing outcome:
+
+- Added deterministic tests for mode parsing, profile lookup, state mode sync, and terminal selection retry behavior.
+- Suite increased from 80 to 87 tests, all passing.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

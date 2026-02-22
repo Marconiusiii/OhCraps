@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleOddsBets, settlePlaceBets, settleLayBets, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -65,6 +65,11 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(state.pointIsOn, True)
 		self.assertEqual(state.comeOut, 8)
 		self.assertEqual(state.p2, 6)
+		self.assertEqual(state.gameMode, GameMode.craps)
+
+	def testCreateGameStateWithCraplessMode(self):
+		state = createGameState(bank=1500, chipsOnTable=120, throws=9, pointIsOn=True, comeOut=8, p2=6, gameMode=GameMode.craplessCraps)
+		self.assertEqual(state.gameMode, GameMode.craplessCraps)
 
 	def testSyncGameState(self):
 		state = createGameState(bank=100, chipsOnTable=10, throws=1, pointIsOn=False, comeOut=0, p2=0)
@@ -75,6 +80,22 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(state.pointIsOn, True)
 		self.assertEqual(state.comeOut, 5)
 		self.assertEqual(state.p2, 9)
+		self.assertEqual(state.gameMode, GameMode.craps)
+
+	def testSyncGameStateCanUpdateGameMode(self):
+		state = createGameState(bank=100, chipsOnTable=10, throws=1, pointIsOn=False, comeOut=0, p2=0, gameMode=GameMode.craps)
+		syncGameState(gameState=state, bank=100, chipsOnTable=10, throws=1, pointIsOn=False, comeOut=0, p2=0, gameMode=GameMode.craplessCraps)
+		self.assertEqual(state.gameMode, GameMode.craplessCraps)
+
+	def testParseGameModeChoice(self):
+		self.assertEqual(parseGameModeChoice("1"), GameMode.craps)
+		self.assertEqual(parseGameModeChoice("2"), GameMode.craplessCraps)
+		self.assertEqual(parseGameModeChoice(" 2 "), GameMode.craplessCraps)
+		self.assertEqual(parseGameModeChoice("x"), None)
+
+	def testGetRulesProfile(self):
+		self.assertEqual(getRulesProfile(GameMode.craps).displayName, "Craps")
+		self.assertEqual(getRulesProfile(GameMode.craplessCraps).displayName, "Crapless Craps")
 
 	def testSettleLineBetsComeOutNatural(self):
 		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 0}
@@ -531,6 +552,27 @@ class EvaluateRollTests(unittest.TestCase):
 
 
 class TerminalFlowRegressionTests(unittest.TestCase):
+	def testSelectGameModeAcceptsCraps(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["selectGameMode"]()
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craps)
+
+	def testSelectGameModeAcceptsCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		with patch("builtins.input", side_effect=["2"]):
+			terminal["selectGameMode"]()
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+
+	def testSelectGameModeRejectsInvalidThenAccepts(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		with patch("builtins.input", side_effect=["x", "2"]):
+			terminal["selectGameMode"]()
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+
 	def testHardWaysBettingSavesWager(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

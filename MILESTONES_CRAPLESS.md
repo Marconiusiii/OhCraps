@@ -494,3 +494,36 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testComeCheckPrintsMoveReminderBeforeOddsPromptWithNumber`
 - Updated prior action-result test to align with immediate movement message emission path.
 - Full suite remains green.
+
+## Milestone 43: Unify Odds Limits And Prompt Semantics
+
+### What changed
+- Added engine helper:
+	- `oddsBetLimits(number, baseBet, gameMode, isDont=False)`
+	- Returns: `rawMax`, `effectiveMax`, `unit`.
+- Switched terminal odds entry paths to consume this helper:
+	- `odds()` (Pass and Don't Pass)
+	- `cdcOddsChange(...)` (Come/Don't Come odds edits)
+	- `processComePostRollAction(...)` (post-move Come/Don't Come odds)
+- Standardized odds prompts to always show:
+	- target number,
+	- effective max (enterable under unit rules),
+	- required multiple increment.
+
+### Why
+- Removes split logic where one path computed max and another enforced unit multiples.
+- Prevents user-facing contradictions such as displaying a max that cannot be entered.
+- Consolidates odds constraints into deterministic engine logic, improving iOS portability.
+
+### Behavior changes
+- Pass and Don't Pass odds now enforce increment units in `odds()` the same way Come/Don't Come already did.
+- Displayed max values now align to the highest valid amount for the required unit.
+- Come and Don't Come prompts now follow the same effective-max + multiples format.
+
+### Test coverage
+- Added engine-level tests for `oddsBetLimits(...)`.
+- Added terminal regression tests for:
+	- Pass odds unit rejection/retry,
+	- Don't Pass effective-max rejection/retry,
+	- updated Come/Don't Come prompt text expectations.
+- Full suite remains green.

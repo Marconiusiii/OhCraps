@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -620,6 +620,18 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(maxLayOdds(0), 0)
 		self.assertEqual(maxLayOdds(12), 120)
 
+	def testOddsBetLimitsAlignsEffectiveMaxToUnit(self):
+		limits = oddsBetLimits(number=5, baseBet=10, gameMode=GameMode.craps, isDont=True)
+		self.assertEqual(limits["rawMax"], 100)
+		self.assertEqual(limits["effectiveMax"], 99)
+		self.assertEqual(limits["unit"], 3)
+
+	def testOddsBetLimitsForComeInCraplessEdgeNumber(self):
+		limits = oddsBetLimits(number=2, baseBet=10, gameMode=GameMode.craplessCraps, isDont=False)
+		self.assertEqual(limits["rawMax"], 60)
+		self.assertEqual(limits["effectiveMax"], 60)
+		self.assertEqual(limits["unit"], 1)
+
 	def testSettlePropSubsetAnySevenWin(self):
 		propBets = {"Any Seven": 10, "Any Craps": 0, "Eleven": 0, "C and E": 0}
 		settlement = settlePropSubsetBets(propBets=propBets, roll=7)
@@ -1130,7 +1142,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 
 		self.assertEqual(result["messages"].count("Way too high on your Odds, there. Try again."), 0)
 		self.assertEqual(result["messages"].count("Ok, $20 on your Come 5 odds."), 1)
-		self.assertEqual(sum(1 for text in printedTexts if "How much on the Come 5? Max Odds is $40." in text), 2)
+		self.assertEqual(sum(1 for text in printedTexts if "How much for your Come 5 Odds? Max is $40, multiples of 2" in text), 2)
 		self.assertEqual(sum(1 for text in printedTexts if "Way too high on your Odds, there. Try again." in text), 1)
 		self.assertEqual(terminal["comeOdds"][5], 20)
 
@@ -1408,6 +1420,48 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["lineBets"]["Pass Odds"], 60)
 		self.assertEqual(terminal["bank"], 40)
 		self.assertEqual(terminal["chipsOnTable"], 70)
+
+	def testOddsPassRejectsInvalidUnitThenAccepts(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 5
+		terminal["lineBets"] = {
+			"Pass": 10,
+			"Pass Odds": 0,
+			"Don't Pass": 0,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.input", side_effect=["3", "4"]), patch("builtins.print") as mockPrint:
+			terminal["odds"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("How much for your Pass 5 Odds? Max is $40, multiples of 2", printed)
+		self.assertIn("Invalid odds amount. Must be in increments of $2.", printed)
+		self.assertEqual(terminal["lineBets"]["Pass Odds"], 4)
+		self.assertEqual(terminal["bank"], 96)
+		self.assertEqual(terminal["chipsOnTable"], 14)
+
+	def testOddsDontPassUsesEffectiveMaxAndUnit(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 5
+		terminal["lineBets"] = {
+			"Pass": 0,
+			"Pass Odds": 0,
+			"Don't Pass": 10,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.input", side_effect=["100", "99"]), patch("builtins.print") as mockPrint:
+			terminal["odds"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("How much for your Don't Pass 5 Lay Odds? Max is $99, multiples of 3", printed)
+		self.assertIn("Nope, you laid too much! Try again.", printed)
+		self.assertEqual(terminal["lineBets"]["Don't Pass Odds"], 99)
+		self.assertEqual(terminal["bank"], 101)
+		self.assertEqual(terminal["chipsOnTable"], 109)
 
 	def testOddsDontPassRejectOverMaxRefundsBeforeRetry(self):
 		terminal = loadTerminalNamespace()

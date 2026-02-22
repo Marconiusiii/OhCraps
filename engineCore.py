@@ -412,6 +412,20 @@ def maxLayOdds(baseBet: int) -> int:
 	return int(baseBet) * 10
 
 
+def oddsBetLimits(number: int, baseBet: int, gameMode: GameMode, isDont: bool = False) -> dict:
+	rawMax = maxLayOdds(baseBet) if isDont else maxComeOddsForMode(number=number, baseBet=baseBet, gameMode=gameMode)
+	unit = dComeOddsUnitForMode(number=number, gameMode=gameMode) if isDont else comeOddsUnitForMode(number=number, gameMode=gameMode)
+	if unit <= 1:
+		effectiveMax = rawMax
+	else:
+		effectiveMax = rawMax - (rawMax % unit)
+	return {
+		"rawMax": int(rawMax),
+		"effectiveMax": int(effectiveMax),
+		"unit": int(unit),
+	}
+
+
 def normalizeLineBets(lineBets: dict) -> dict:
 	normalized = {
 		"Pass": 0,

@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -331,21 +331,26 @@ def dpPhase2():
 def odds():
 	global lineBets, bank, chipsOnTable, comeOut
 	pOddsChange = dpOddsChange = 0
-	maxOdds = maxComeOddsForMode(number=comeOut, baseBet=lineBets["Pass"], gameMode=gameMode)
-	maxDP = maxLayOdds(lineBets["Don't Pass"])
+	passLimits = oddsBetLimits(number=comeOut, baseBet=lineBets["Pass"], gameMode=gameMode, isDont=False)
+	dontPassLimits = oddsBetLimits(number=comeOut, baseBet=lineBets["Don't Pass"], gameMode=gameMode, isDont=True)
 	if lineBets["Pass"] > 0:
 		print(f"You have ${lineBets['Pass Odds']:,} for your odds.")
 		while True:
 			chipsOnTable -= lineBets["Pass Odds"]
 			bank += lineBets["Pass Odds"]
-			print(f"How Much for your Pass Line Odds? Max Odds for the {comeOut} is ${maxOdds:,}.")
+			print(f"How much for your Pass {comeOut} Odds? Max is ${passLimits['effectiveMax']:,}, multiples of {passLimits['unit']}")
 			pOddsChange = betPrompt()
-			if pOddsChange > 0 and pOddsChange <= maxOdds:
+			if pOddsChange > 0 and pOddsChange <= passLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=pOddsChange, gameMode=gameMode):
 				lineBets["Pass Odds"] = pOddsChange
 				print(f"Ok, ${lineBets['Pass Odds']:,} on your Pass Line Odds.")
 				break
-			elif pOddsChange > maxOdds:
+			elif pOddsChange > passLimits["effectiveMax"]:
 				print("Nope, that bet is over the Max Odds. Try again!")
+				chipsOnTable -= pOddsChange
+				bank += pOddsChange
+				continue
+			elif not isOddsBetUnitValid(number=comeOut, oddsBet=pOddsChange, gameMode=gameMode):
+				print(f"Invalid odds amount. Must be in increments of ${passLimits['unit']:,}.")
 				chipsOnTable -= pOddsChange
 				bank += pOddsChange
 				continue
@@ -362,14 +367,19 @@ def odds():
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
-			print(f"How much to Lay for your Odds? Max Odds for the {comeOut} is ${maxDP:,}.")
+			print(f"How much for your Don't Pass {comeOut} Lay Odds? Max is ${dontPassLimits['effectiveMax']:,}, multiples of {dontPassLimits['unit']}")
 			dpOddsChange = betPrompt()
-			if dpOddsChange > 0 and dpOddsChange <= maxDP:
+			if dpOddsChange > 0 and dpOddsChange <= dontPassLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=dpOddsChange, gameMode=gameMode, isDont=True):
 				lineBets["Don't Pass Odds"] = dpOddsChange
 				print(f"Ok, ${lineBets["Don't Pass Odds"]:,} laid against the Point.")
 				break
-			elif dpOddsChange > maxDP:
+			elif dpOddsChange > dontPassLimits["effectiveMax"]:
 				print("Nope, you laid too much! Try again.")
+				chipsOnTable -= dpOddsChange
+				bank += dpOddsChange
+				continue
+			elif not isOddsBetUnitValid(number=comeOut, oddsBet=dpOddsChange, gameMode=gameMode, isDont=True):
+				print(f"Invalid odds amount. Must be in increments of ${dontPassLimits['unit']:,}.")
 				chipsOnTable -= dpOddsChange
 				bank += dpOddsChange
 				continue
@@ -528,13 +538,11 @@ def cdcOddsChange(dict, dict2):
 	for key in dict:
 		if dict[key] > 0:
 			if 'Come' in dict:
-				maxOdds = maxComeOddsForMode(number=key, baseBet=dict[key], gameMode=gameMode)
-				unit = comeOddsUnitForMode(number=key, gameMode=gameMode)
-				print(f"How much for Odds on the {key}? Max Odds is ${maxOdds:,}; you have ${dict2[key]:,} in Odds.")
+				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=False)
+				print(f"How much for your Come {key} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}; you have ${dict2[key]:,} in Odds.")
 			else:
-				maxOdds = maxLayOdds(dict[key])
-				unit = dComeOddsUnitForMode(number=key, gameMode=gameMode)
-				print(f"How much to Lay against the {key}? Max Lay is ${maxOdds:,}; you have ${dict2[key]:,} in Lay Odds.")
+				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=True)
+				print(f"How much for your Lay {key} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
 					bet = int(input("$>"))
@@ -543,8 +551,11 @@ def cdcOddsChange(dict, dict2):
 						outOfMoney()
 						print("Change your Odds?")
 						continue
+					if bet > limits["effectiveMax"]:
+						print("Nope, that is over the max odds. Try again.")
+						continue
 					if not isOddsBetUnitValid(number=key, oddsBet=bet, gameMode=gameMode, isDont=('Come' not in dict)):
-						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
+						print(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
 						continue
 					break
 				except ValueError:
@@ -603,21 +614,20 @@ def processComePostRollAction(roll):
 		if settlement.movedNumber is not None:
 			comeBets[settlement.movedNumber] = settlement.movedAmount
 			actionResult["stateChanged"] = True
-			max = maxComeOddsForMode(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode)
+			limits = oddsBetLimits(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode, isDont=False)
 			print(f"Moving your Come Bet to the {settlement.movedNumber}.")
 			if str(input(f"Come Odds for the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
 				while True:
-					print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
+					print(f"How much for your Come {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}")
 					comeOdds[settlement.movedNumber] = betPrompt()
-					if comeOdds[settlement.movedNumber] > max:
+					if comeOdds[settlement.movedNumber] > limits["effectiveMax"]:
 						print("Way too high on your Odds, there. Try again.")
 						chipsOnTable -= comeOdds[settlement.movedNumber]
 						bank += comeOdds[settlement.movedNumber]
 						comeOdds[settlement.movedNumber] = 0
 						continue
 					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=comeOdds[settlement.movedNumber], gameMode=gameMode):
-						unit = comeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
-						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
+						print(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
 						chipsOnTable -= comeOdds[settlement.movedNumber]
 						bank += comeOdds[settlement.movedNumber]
 						comeOdds[settlement.movedNumber] = 0
@@ -647,20 +657,18 @@ def processComePostRollAction(roll):
 			actionResult["stateChanged"] = True
 			print(f"Moving your Don't Come bet to the {settlement.movedNumber}.")
 			if str(input(f"Lay Odds on the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
-				dMax = maxLayOdds(dComeBets[settlement.movedNumber])
-				unit = dComeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
-				effectiveMax = dMax if unit <= 1 else dMax - (dMax % unit)
+				limits = oddsBetLimits(number=settlement.movedNumber, baseBet=dComeBets[settlement.movedNumber], gameMode=gameMode, isDont=True)
 				while True:
-					print(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${effectiveMax:,}, multiples of {unit}")
+					print(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}")
 					dComeOdds[settlement.movedNumber] = betPrompt()
-					if dComeOdds[settlement.movedNumber] > effectiveMax:
+					if dComeOdds[settlement.movedNumber] > limits["effectiveMax"]:
 						print("Way too much for your Lay Odds! Try again.")
 						chipsOnTable -= dComeOdds[settlement.movedNumber]
 						bank += dComeOdds[settlement.movedNumber]
 						dComeOdds[settlement.movedNumber] = 0
 						continue
 					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=dComeOdds[settlement.movedNumber], gameMode=gameMode, isDont=True):
-						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
+						print(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
 						chipsOnTable -= dComeOdds[settlement.movedNumber]
 						bank += dComeOdds[settlement.movedNumber]
 						dComeOdds[settlement.movedNumber] = 0
@@ -2171,6 +2179,7 @@ while True:
 	else:
 		pointIsOn = True
 		working = False
+		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		while True:
 			if chipsOnTable > 0:
 				print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
@@ -2282,6 +2291,7 @@ while True:
 					continue
 			p2 = roll()
 
+			syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 			outcome = evaluateRoll(gameState, p2)
 
 			throws += 1

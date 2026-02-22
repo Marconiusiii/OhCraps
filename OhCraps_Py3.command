@@ -331,7 +331,7 @@ def dpPhase2():
 def odds():
 	global lineBets, bank, chipsOnTable, comeOut
 	pOddsChange = dpOddsChange = 0
-	maxOdds = maxPassOdds(comeOut, lineBets["Pass"])
+	maxOdds = maxComeOddsForMode(number=comeOut, baseBet=lineBets["Pass"], gameMode=gameMode)
 	maxDP = maxLayOdds(lineBets["Don't Pass"])
 	if lineBets["Pass"] > 0:
 		print(f"You have ${lineBets['Pass Odds']:,} for your odds.")

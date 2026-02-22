@@ -688,3 +688,25 @@ New milestone updates should be appended here rather than creating new milestone
 	- `resolvePointRoll()` seven-out point-end path.
 	- `resolvePointRoll()` neutral roll continuation path, including one-roll Off flag reset behavior.
 - Full suite and compile checks remain green.
+
+## Milestone 51: Point-Phase Menu Extraction
+
+### What changed
+- Extracted point-phase betting prompt loop into `runPointPhaseBettingMenu()`.
+- Replaced inline point-phase betting prompt loop in main game flow with a call to the new function.
+- Kept point-phase command routing through `handleBettingCommand(..., pointPhase=True)`.
+
+### Why
+- The point-phase prompt loop still lived inline in the top-level game coordinator.
+- Extracting this loop reduces top-level nesting and isolates one more UI-loop responsibility for eventual iOS controller mapping.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- Point-phase betting menu still loops until a roll command is entered.
+
+### Test coverage
+- Added terminal tests in `tests/testEngineBehavior.py` for:
+	- loop-until-roll behavior in `runPointPhaseBettingMenu()`.
+	- explicit `pointPhase=True` routing to `handleBettingCommand(...)`.
+- Compile and full suite remain green.

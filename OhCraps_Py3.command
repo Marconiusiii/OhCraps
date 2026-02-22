@@ -2230,6 +2230,14 @@ def resolvePointRoll():
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 	return {"pointRoundEnded": False, "outcome": outcome}
 
+def runPointPhaseBettingMenu():
+	while True:
+		print("Place your bets!\n")
+		round2 = str(input(">  ")).strip().lower()
+		commandResult = handleBettingCommand(round2, pointPhase=True)
+		if commandResult["shouldRoll"]:
+			return {"shouldRoll": True}
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2306,12 +2314,7 @@ while True:
 
 #Phase 2 Betting
 
-		while True:
-			print("Place your bets!\n")
-			round2 = str(input(">  ")).strip().lower()
-			commandResult = handleBettingCommand(round2, pointPhase=True)
-			if commandResult["shouldRoll"]:
-				break
+		runPointPhaseBettingMenu()
 		pointRollResult = resolvePointRoll()
 		if pointRollResult["pointRoundEnded"]:
 			break

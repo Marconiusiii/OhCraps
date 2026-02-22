@@ -1199,6 +1199,30 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["layOff"], False)
 		self.assertEqual(terminal["hardOff"], False)
 
+	def testRunPointPhaseBettingMenuLoopsUntilRollCommand(self):
+		terminal = loadTerminalNamespace()
+		calls = []
+		def fakeHandleBettingCommand(command, pointPhase=False):
+			calls.append((command, pointPhase))
+			return {"shouldRoll": command == "x"}
+		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+		with patch("builtins.input", side_effect=["h", "x"]), patch("builtins.print"):
+			result = terminal["runPointPhaseBettingMenu"]()
+		self.assertEqual(result["shouldRoll"], True)
+		self.assertEqual(calls, [("h", True), ("x", True)])
+
+	def testRunPointPhaseBettingMenuUsesPointPhaseTrue(self):
+		terminal = loadTerminalNamespace()
+		pointPhaseFlags = []
+		def fakeHandleBettingCommand(command, pointPhase=False):
+			pointPhaseFlags.append(pointPhase)
+			return {"shouldRoll": True}
+		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+		with patch("builtins.input", side_effect=["x"]), patch("builtins.print"):
+			result = terminal["runPointPhaseBettingMenu"]()
+		self.assertEqual(result["shouldRoll"], True)
+		self.assertEqual(pointPhaseFlags, [True])
+
 	def testBetSnapshotCaptureApplyRoundTrip(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 321

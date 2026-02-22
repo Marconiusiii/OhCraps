@@ -732,3 +732,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- loop-until-roll behavior in `runComeOutBettingMenu()`.
 	- explicit `pointPhase=False` routing to `handleBettingCommand(...)`.
 - Compile and full suite remain green.
+
+## Milestone 53: Point-Phase Status Presenter Extraction
+
+### What changed
+- Extracted point-phase status rendering into `showPointPhaseStatus()`.
+- Replaced inline point-phase status block in main game flow with the new helper call.
+- Preserved existing output order:
+	- bankroll/chips line,
+	- out-of-money guard,
+	- point banner,
+	- throws line.
+
+### Why
+- The top-level point-phase loop still contained repeated status-display and guard logic.
+- Pulling that into one function reduces coordinator complexity and isolates terminal-presenter behavior for future UI mapping.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No text wording changes intended for point-phase status output.
+
+### Test coverage
+- Added terminal tests in `tests/testEngineBehavior.py` for:
+	- status output with chips on table.
+	- zero-bank/zero-table path calling `outOfMoney()` and still rendering point/throws lines.
+- Compile and full suite remain green.

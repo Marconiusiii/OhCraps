@@ -2246,6 +2246,16 @@ def runComeOutBettingMenu():
 		if commandResult["shouldRoll"]:
 			return {"shouldRoll": True}
 
+def showPointPhaseStatus():
+	if chipsOnTable > 0:
+		print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+	else:
+		print(f"You have ${bank:,} in the bank.")
+	if bank <= 0 and chipsOnTable <= 0:
+		outOfMoney()
+	print(f"\n{comeOut} is the Point!\n")
+	print(f"Throws: {throws}")
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2304,16 +2314,7 @@ while True:
 	if not comeOutResult["enteredPointPhase"]:
 		continue
 	while True:
-		if chipsOnTable > 0:
-			print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
-		else:
-			print(f"You have ${bank:,} in the bank.")
-
-		if bank <= 0 and chipsOnTable <= 0:
-			outOfMoney()
-
-		print(f"\n{comeOut} is the Point!\n")
-		print(f"Throws: {throws}")
+		showPointPhaseStatus()
 
 #Phase 2 Betting
 

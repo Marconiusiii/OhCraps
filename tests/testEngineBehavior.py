@@ -1247,6 +1247,38 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(pointPhaseFlags, [False])
 
+	def testShowPointPhaseStatusWithChipsShowsTableAmount(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 250
+		terminal["chipsOnTable"] = 75
+		terminal["comeOut"] = 9
+		terminal["throws"] = 14
+		outCalls = []
+		terminal["outOfMoney"] = lambda: outCalls.append(True)
+		with patch("builtins.print") as mockPrint:
+			terminal["showPointPhaseStatus"]()
+		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
+		self.assertIn("You have $250 in the bank with $75 out on the table.", printed)
+		self.assertIn("9 is the Point!", printed)
+		self.assertIn("Throws: 14", printed)
+		self.assertEqual(outCalls, [])
+
+	def testShowPointPhaseStatusNoChipsCallsOutOfMoney(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 0
+		terminal["chipsOnTable"] = 0
+		terminal["comeOut"] = 4
+		terminal["throws"] = 3
+		outCalls = []
+		terminal["outOfMoney"] = lambda: outCalls.append(True)
+		with patch("builtins.print") as mockPrint:
+			terminal["showPointPhaseStatus"]()
+		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
+		self.assertIn("You have $0 in the bank.", printed)
+		self.assertIn("4 is the Point!", printed)
+		self.assertIn("Throws: 3", printed)
+		self.assertEqual(outCalls, [True])
+
 	def testBetSnapshotCaptureApplyRoundTrip(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 321

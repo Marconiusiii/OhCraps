@@ -88,7 +88,7 @@ You've established your bankroll and are now ready to start betting. You have a 
 
 #### Line Bets
 
-Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.
+Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount. In standard Craps, this bet wins on a 7 or 11 on the Come Out roll, loses on 2, 3, or 12, and any other number becomes the Point. In Crapless Craps, only a 7 wins on the Come Out roll and every other number (2, 3, 4, 5, 6, 8, 9, 10, 11, 12) becomes the Point. If the shooter rolls the Point again in the Point phase, this bet wins. Rolling a 7 in the Point phase makes this bet lose and resets the game.
 
 Bet on the Don't Pass Line by typing 'd' and hitting Enter, then follow the prompts to place your bet. This bet wins if a 2 or 3 rolls on the Come Out roll. Rolling a 12 will push, so you will not lose nor win and the bet will be returned to you. This bet loses when rolling a 7 or 11 on the Come Out roll, and if any other number rolls that will become the point for the point phase of the game. If the shooter rolls a 7 in the Point phase of the game, the Don't Pass bet will win.
 
@@ -110,6 +110,7 @@ In standard Craps, placing the 4 or 10 for $10 or more automatically buys the be
 
 Once those edge bets are $20 or higher, they are auto-buy and can be entered naturally without those under-$20 step limits.
 
+##### Place Bet Helpers
 In the Place Bet prompt, if you type 'd' instead of 'y' and hit Enter, this will take down all your bets. A quick and simple way to 0 them all out. This works both in the Come Out phase and also after a Point has been established.
 
 After a Point has been established, when you are prompted with the Place Bet option, typing 'o' and hitting Enter will toggle your Place Bets Off for the next roll. This means that hitting any of the numbers or a 7 Out will not affect your bets and you will not get paid. The bets stay Off for only this one roll, so you'll need to turn them off after each roll if you want them to stay off for an extended period of rolls. When still in the prompt, entering 'o' again and hitting Enter will toggle the bets back On.
@@ -119,6 +120,10 @@ You can automatically place bets across all the numbers or bet inside using keyw
 On the Place Bet prompt, typing 'i' and hitting Enter will activate Inside mode, where the Place 4 and 10 will be taken down and you'll be prompted for how many units you'd like to place on the 5, 6, 8, and 9.
 
 Typing 'c' and hitting Enter will activate the center betting mode, where you'll be asked how many units you'd like to place on the 6 and 8 together. So typing '2' will place the 6 and 8 for 2 units, or $12, each.
+
+In Crapless Craps, pressing "ea" will prompt you for Extreme Across, meaning that the set amount of units will be placed across all numbers from 2 through 12.
+
+Typing "e" will activate the Extreme mode, where units will only be placed on the 2, 3, 11, and 12.
 
 These options provide a quick way to make common Place bets without having to jump through each individual number. 1 Unit is equal to $5, with the 6 and 8 automatically adjusting for the $6 bets required for them.
 
@@ -271,7 +276,7 @@ Once a shooter wins 4 Points, the Fire Bet will pay out on the next 7 Out. If th
 
 ### Point Phase
 
-If a 4, 5, 6, 8, 9, or 10 is rolled on the Coming Out roll, that number becomes the Point. Roll the dice until the Point is hit to win on the Pass Line and reset the game, or until a 7 is rolled, clearing all the bets in a loss and returning to the Come Out roll.
+In standard Craps, a 4, 5, 6, 8, 9, or 10 on the Come Out roll becomes the Point. In Crapless Craps, any non-7 Come Out number (2, 3, 4, 5, 6, 8, 9, 10, 11, 12) becomes the Point. Roll the dice until the Point is hit to win on the Pass Line and reset the game, or until a 7 is rolled, clearing all the bets in a loss and returning to the Come Out roll.
 
 New betting modes appear in the Point phase, and are accessed through the following codes.
 
@@ -331,7 +336,7 @@ In Crapless, Pass Odds also follow the edge points:
 
 All prompts show the max you can actually enter for that spot.
 
-When at the Line Bet Odds prompt, typing 'p' and hitting Enter will take down your Pass Line Odds bet. Typing 'd' and hitting Enter will take down your Don't Pass Lay Odds. Typing 'a' and hitting Enter will take down both Pass and Don't Pass Odds if you have them set.
+At the Line Odds prompt, enter the amount you want for Odds or Lay Odds. Enter 0 to take down the current Odds on that side, or press Enter to leave the current amount unchanged.
 
 #### Take Down Don't Pass Bet and Odds
 

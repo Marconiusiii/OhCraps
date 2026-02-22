@@ -163,3 +163,34 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test impact
 - Test suite now includes these additional deterministic cases under `tests/testEngineBehavior.py`.
 - Full suite remains green after additions.
+
+## Milestone 33: Crapless Edge Place Payout Matrix Lock
+
+### What changed
+- Added deterministic payout matrix tests for Crapless edge Place numbers (`2, 3, 11, 12`).
+- Added explicit coverage for three payout bands:
+	- under buy-threshold behavior,
+	- threshold behavior where buy/vig starts,
+	- above-threshold behavior with vig rounding.
+- Added assertions that on winning Place hits:
+	- only winnings are added to bank,
+	- chips-on-table delta stays unchanged,
+	- original Place wager remains up.
+
+### Why
+- Edge-number Place bets are the highest-risk payout area in Crapless and needed exact regression locks.
+- Matrix tests reduce risk of silent payout drift while refactoring toward iOS-ready architecture.
+
+### Rule mapping notes
+- Current implementation profile (as coded) is now explicitly locked by tests:
+	- Place 2/12 under threshold uses 11-for-2 style payout.
+	- Place 3/11 under threshold uses 11-for-4 style payout.
+	- Buy-style payout activates at `>= 20` for edge numbers.
+	- Vig uses existing commission rounding in engine (`calculateVig`).
+
+### Test coverage summary
+- Added three new test methods in `tests/testEngineBehavior.py`:
+	- `testSettlePlaceBetsForModeCraplessEdgeNumbersUnderBuyThresholdMatrix`
+	- `testSettlePlaceBetsForModeCraplessEdgeNumbersBuyThresholdMatrix`
+	- `testSettlePlaceBetsForModeCraplessEdgeNumbersBuyVigRoundingMatrix`
+- Full suite remains green.

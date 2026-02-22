@@ -253,6 +253,57 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.winAmount, 59)
 		self.assertEqual(settlement.bankDelta, 59)
 
+	def testSettlePlaceBetsForModeCraplessEdgeNumbersUnderBuyThresholdMatrix(self):
+		cases = [
+			{"number": 2, "bet": 18, "expectedWin": 99},
+			{"number": 12, "bet": 18, "expectedWin": 99},
+			{"number": 3, "bet": 16, "expectedWin": 44},
+			{"number": 11, "bet": 16, "expectedWin": 44}
+		]
+		for case in cases:
+			with self.subTest(number=case["number"], bet=case["bet"]):
+				placeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+				placeBets[case["number"]] = case["bet"]
+				settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=case["number"], gameMode=GameMode.craplessCraps)
+				self.assertEqual(settlement.commissionPaid, 0)
+				self.assertEqual(settlement.winAmount, case["expectedWin"])
+				self.assertEqual(settlement.bankDelta, case["expectedWin"])
+				self.assertEqual(settlement.chipsOnTableDelta, 0)
+				self.assertEqual(settlement.placeBets[case["number"]], case["bet"])
+
+	def testSettlePlaceBetsForModeCraplessEdgeNumbersBuyThresholdMatrix(self):
+		cases = [
+			{"number": 2, "bet": 20, "expectedCommission": 1, "expectedWin": 119},
+			{"number": 12, "bet": 20, "expectedCommission": 1, "expectedWin": 119},
+			{"number": 3, "bet": 20, "expectedCommission": 1, "expectedWin": 59},
+			{"number": 11, "bet": 20, "expectedCommission": 1, "expectedWin": 59}
+		]
+		for case in cases:
+			with self.subTest(number=case["number"], bet=case["bet"]):
+				placeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+				placeBets[case["number"]] = case["bet"]
+				settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=case["number"], gameMode=GameMode.craplessCraps)
+				self.assertEqual(settlement.commissionPaid, case["expectedCommission"])
+				self.assertEqual(settlement.winAmount, case["expectedWin"])
+				self.assertEqual(settlement.bankDelta, case["expectedWin"])
+				self.assertIn(f"${case['expectedCommission']:,} paid to the House for the vig.", settlement.messages)
+
+	def testSettlePlaceBetsForModeCraplessEdgeNumbersBuyVigRoundingMatrix(self):
+		cases = [
+			{"number": 2, "bet": 38, "expectedCommission": 1, "expectedWin": 227},
+			{"number": 2, "bet": 40, "expectedCommission": 2, "expectedWin": 238},
+			{"number": 3, "bet": 36, "expectedCommission": 1, "expectedWin": 107},
+			{"number": 11, "bet": 44, "expectedCommission": 2, "expectedWin": 130}
+		]
+		for case in cases:
+			with self.subTest(number=case["number"], bet=case["bet"]):
+				placeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+				placeBets[case["number"]] = case["bet"]
+				settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=case["number"], gameMode=GameMode.craplessCraps)
+				self.assertEqual(settlement.commissionPaid, case["expectedCommission"])
+				self.assertEqual(settlement.winAmount, case["expectedWin"])
+				self.assertEqual(settlement.bankDelta, case["expectedWin"])
+
 	def testSettlePlaceBetsForModeCraplessSevenOutClearsAll(self):
 		placeBets = {2: 10, 3: 12, 4: 10, 5: 10, 6: 12, 8: 12, 9: 10, 10: 10, 11: 12, 12: 10}
 		settlement = settlePlaceBetsForMode(placeBets=placeBets, roll=7, gameMode=GameMode.craplessCraps)

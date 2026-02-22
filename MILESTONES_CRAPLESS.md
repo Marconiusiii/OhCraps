@@ -412,3 +412,33 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testBetSnapshotCaptureApplyRoundTrip`
 	- `testSnapshotApplyWithPlaceSettlementPreservesOtherBets`
 - Full suite remains green.
+
+## Milestone 41: Come Subsystem Action-Result Pattern
+
+### What changed
+- Added lightweight action-result helpers in terminal code:
+	- `createActionResult(success=True, messages=None, stateChanged=False)`
+	- `mergeActionResult(baseResult, newResult)`
+	- `emitActionResult(actionResult)`
+- Extracted Come post-roll command processing into:
+	- `processComePostRollAction(roll)`
+- Refactored `comeCheck(roll)` to:
+	- execute `comePay(roll)`,
+	- process post-roll Come/Don't Come bar actions via structured result,
+	- emit aggregated messages,
+	- return action-result object.
+
+### Why
+- Moves Come command handling toward structured, testable command outcomes instead of implicit print/mutate flow.
+- Improves portability for future non-terminal UI layers (including iOS) where action results can be rendered by view logic.
+
+### Behavior
+- Gameplay/accounting behavior remains unchanged.
+- Existing prompts and user decisions are preserved.
+
+### Test coverage
+- Added deterministic tests:
+	- `testCreateActionResultShape`
+	- `testComeCheckReturnsActionResultForMovedComeBet`
+	- `testComeCheckReturnsNoChangeActionResultWhenNoBarBets`
+- Full suite remains green.

@@ -1357,8 +1357,8 @@ def normalizedHalfPressIncrement(number, currentWager):
 
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
-	if gameMode == GameMode.craplessCraps:
-		print("Across/Inside/Center presets are currently disabled in Crapless Craps. Use individual Place betting.")
+	if gameMode == GameMode.craplessCraps and pre.strip().lower() != "ea":
+		print("Across/Inside/Center presets remain standard-only in Crapless. Use 'ea' for Extreme Across or individual Place betting.")
 		return
 	total = 0
 	outlay = 0
@@ -1464,7 +1464,36 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Ok, placing ${total:,} on the 6 and 8.")
+			print(f"Ok, placing ${total:,} on the 6 and 8.")
+	elif pre.strip().lower() == "ea":
+		while True:
+			print("How many Extreme Across units from 2 through 12?")
+			try:
+				unit = int(input("> "))
+			except ValueError:
+				print("That wasn't even a unit! Try again.")
+				continue
+			targetNumbers = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+			totalNeed = 0
+			for number in targetNumbers:
+				totalNeed += placeUnitSize(number) * unit
+			if totalNeed > bank + outlay:
+				print("You don't have enough money for that! Egads!")
+				outOfMoney()
+				continue
+			break
+
+		for key in place:
+			chipsOnTable -= place[key]
+			bank += place[key]
+			if key in [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]:
+				place[key] = placeUnitSize(key) * unit
+			else:
+				place[key] = 0
+			chipsOnTable += place[key]
+			bank -= place[key]
+			total += place[key]
+		print(f"Ok, placing ${total:,} Extreme Across.")
 
 
 def placeMover():
@@ -1699,7 +1728,7 @@ while True:
 					print("Taking down your Place Bets.")
 					placeTakeDown()
 					continue
-				elif plBet in ['a', 'i', 'c']:
+				elif plBet in ['a', 'i', 'c', 'ea']:
 					placePreset(plBet)
 					continue
 				elif plBet == "h":
@@ -1937,7 +1966,7 @@ while True:
 							print("Taking down all of your Place Bets.")
 							placeTakeDown()
 							continue
-						elif pl2 in ['a', 'i', 'c']:
+						elif pl2 in ['a', 'i', 'c', 'ea']:
 							placePreset(pl2)
 							continue
 						elif pl2 == "m":

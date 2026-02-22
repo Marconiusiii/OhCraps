@@ -593,6 +593,44 @@ Testing outcome:
 	- terminal helper/domain checks in Crapless mode
 - Suite increased from 94 to 100 tests, all passing.
 
+### Milestone 29: Extreme Across helper for Crapless
+
+This milestone keeps standard helpers unchanged and adds a new Crapless-specific place helper:
+
+- `ea` = Extreme Across
+
+Requested helper scope retained exactly:
+
+- `a` remains standard across helper (4 through 10 only)
+- `i` remains standard inside helper (5 through 9 only)
+- `c` remains standard center helper (6 and 8 only)
+- `ea` is new and places across `2,3,4,5,6,8,9,10,11,12`
+
+Implementation details:
+
+- In Crapless mode:
+	- `a/i/c` are intentionally not repurposed to expanded domain.
+	- `ea` performs expanded-domain placement with mode unit sizing:
+		- 2/12: 2-unit base
+		- 3/11: 4-unit base
+		- 4/5/9/10: 5-unit base
+		- 6/8: 6-unit base
+- Existing place helpers in standard mode were preserved.
+
+Why this matters:
+
+- It preserves user muscle memory for existing helper commands.
+- It introduces expanded Crapless automation without changing existing helper semantics.
+- It gives a deterministic path for full-table Crapless place setup.
+
+Testing outcome:
+
+- Added deterministic tests that verify:
+	- `a/i/c` remain restricted as requested
+	- `ea` builds correct wagers across all Crapless place numbers
+	- bank/chips accounting remains correct
+- Suite increased from 100 to 104 tests, all passing.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

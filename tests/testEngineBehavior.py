@@ -695,6 +695,57 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
 		self.assertEqual(terminal["validPlaceNumbers"](), [2, 3, 4, 5, 6, 8, 9, 10, 11, 12])
 
+	def testPlacePresetAcrossDisabledInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 10, 5: 10, 6: 12, 8: 12, 9: 10, 10: 10, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placePreset"]("a")
+		self.assertEqual(terminal["place"][4], 10)
+		self.assertEqual(terminal["place"][10], 10)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testPlacePresetInsideDisabledInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 10, 6: 12, 8: 12, 9: 10, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placePreset"]("i")
+		self.assertEqual(terminal["place"][5], 10)
+		self.assertEqual(terminal["place"][9], 10)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testPlacePresetCenterDisabledInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 12, 8: 12, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placePreset"]("c")
+		self.assertEqual(terminal["place"][6], 12)
+		self.assertEqual(terminal["place"][8], 12)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testPlacePresetExtremeAcrossInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["1"]):
+			terminal["placePreset"]("ea")
+		self.assertEqual(terminal["place"], {2: 2, 3: 4, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 4, 12: 2})
+		self.assertEqual(terminal["chipsOnTable"], 44)
+		self.assertEqual(terminal["bank"], 156)
+
 	def testHardWaysBettingSavesWager(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

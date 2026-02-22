@@ -710,3 +710,25 @@ New milestone updates should be appended here rather than creating new milestone
 	- loop-until-roll behavior in `runPointPhaseBettingMenu()`.
 	- explicit `pointPhase=True` routing to `handleBettingCommand(...)`.
 - Compile and full suite remain green.
+
+## Milestone 52: Come Out Menu Extraction
+
+### What changed
+- Extracted Come Out betting prompt loop into `runComeOutBettingMenu()`.
+- Replaced inline Come Out betting prompt loop in main game flow with a call to the new function.
+- Kept Come Out command routing through `handleBettingCommand(..., pointPhase=False)`.
+
+### Why
+- Come Out betting prompt logic remained inline while point-phase prompt logic had already been extracted.
+- This keeps phase menu structure symmetric and further simplifies the top-level coordinator for iOS-port readiness.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- Come Out betting menu still loops until a roll command is entered.
+
+### Test coverage
+- Added terminal tests in `tests/testEngineBehavior.py` for:
+	- loop-until-roll behavior in `runComeOutBettingMenu()`.
+	- explicit `pointPhase=False` routing to `handleBettingCommand(...)`.
+- Compile and full suite remain green.

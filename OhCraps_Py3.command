@@ -2238,6 +2238,14 @@ def runPointPhaseBettingMenu():
 		if commandResult["shouldRoll"]:
 			return {"shouldRoll": True}
 
+def runComeOutBettingMenu():
+	while True:
+		print("Place your Bets!\n")
+		round1 = str(input(">  ")).strip().lower()
+		commandResult = handleBettingCommand(round1, pointPhase=False)
+		if commandResult["shouldRoll"]:
+			return {"shouldRoll": True}
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2290,12 +2298,7 @@ while True:
 
 # Initial bets
 
-	while True:
-		print("Place your Bets!\n")
-		round1 = str(input(">  ")).strip().lower()
-		commandResult = handleBettingCommand(round1, pointPhase=False)
-		if commandResult["shouldRoll"]:
-			break
+	runComeOutBettingMenu()
 
 	comeOutResult = resolveComeOutRoll()
 	if not comeOutResult["enteredPointPhase"]:

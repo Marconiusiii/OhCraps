@@ -2256,6 +2256,18 @@ def showPointPhaseStatus():
 	print(f"\n{comeOut} is the Point!\n")
 	print(f"Throws: {throws}")
 
+def runPointPhaseRound():
+	while True:
+		showPointPhaseStatus()
+
+#Phase 2 Betting
+
+		runPointPhaseBettingMenu()
+		pointRollResult = resolvePointRoll()
+		if pointRollResult["pointRoundEnded"]:
+			return {"roundEnded": True, "outcome": pointRollResult["outcome"]}
+		continue
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2313,15 +2325,6 @@ while True:
 	comeOutResult = resolveComeOutRoll()
 	if not comeOutResult["enteredPointPhase"]:
 		continue
-	while True:
-		showPointPhaseStatus()
-
-#Phase 2 Betting
-
-		runPointPhaseBettingMenu()
-		pointRollResult = resolvePointRoll()
-		if pointRollResult["pointRoundEnded"]:
-			break
-		continue
+	runPointPhaseRound()
 
 	continue

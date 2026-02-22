@@ -758,3 +758,28 @@ New milestone updates should be appended here rather than creating new milestone
 	- status output with chips on table.
 	- zero-bank/zero-table path calling `outOfMoney()` and still rendering point/throws lines.
 - Compile and full suite remain green.
+
+## Milestone 54: Point-Phase Round Coordinator Extraction
+
+### What changed
+- Extracted full point-phase round loop into `runPointPhaseRound()`.
+- Replaced inline point-phase round loop in main flow with a call to the coordinator.
+- Kept coordinator internals delegated to existing helpers:
+	- `showPointPhaseStatus()`
+	- `runPointPhaseBettingMenu()`
+	- `resolvePointRoll()`
+
+### Why
+- Even after menu/status extraction, the top-level loop still directly owned point-phase round control flow.
+- This extraction further isolates gameplay orchestration from top-level script flow and improves portability to an iOS controller structure.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- Point-phase round still repeats until a point-ending roll result occurs.
+
+### Test coverage
+- Added terminal tests in `tests/testEngineBehavior.py` for:
+	- immediate round end path in `runPointPhaseRound()`.
+	- multi-iteration neutral-then-end path in `runPointPhaseRound()`.
+- Compile and full suite remain green.

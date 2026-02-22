@@ -1279,6 +1279,43 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("Throws: 3", printed)
 		self.assertEqual(outCalls, [True])
 
+	def testRunPointPhaseRoundEndsWhenPointRoundEnds(self):
+		terminal = loadTerminalNamespace()
+		statusCalls = []
+		menuCalls = []
+		resolveCalls = []
+		terminal["showPointPhaseStatus"] = lambda: statusCalls.append(True)
+		terminal["runPointPhaseBettingMenu"] = lambda: menuCalls.append(True)
+		terminal["resolvePointRoll"] = lambda: (resolveCalls.append(True) or {"pointRoundEnded": True, "outcome": terminal["RollOutcome"].pointHit})
+		result = terminal["runPointPhaseRound"]()
+		self.assertEqual(result["roundEnded"], True)
+		self.assertEqual(result["outcome"], terminal["RollOutcome"].pointHit)
+		self.assertEqual(len(statusCalls), 1)
+		self.assertEqual(len(menuCalls), 1)
+		self.assertEqual(len(resolveCalls), 1)
+
+	def testRunPointPhaseRoundContinuesUntilPointRoundEnds(self):
+		terminal = loadTerminalNamespace()
+		statusCalls = []
+		menuCalls = []
+		resolveCalls = []
+		outcomes = [
+			{"pointRoundEnded": False, "outcome": terminal["RollOutcome"].neutral},
+			{"pointRoundEnded": True, "outcome": terminal["RollOutcome"].sevenOut}
+		]
+		terminal["showPointPhaseStatus"] = lambda: statusCalls.append(True)
+		terminal["runPointPhaseBettingMenu"] = lambda: menuCalls.append(True)
+		def fakeResolvePointRoll():
+			resolveCalls.append(True)
+			return outcomes[len(resolveCalls) - 1]
+		terminal["resolvePointRoll"] = fakeResolvePointRoll
+		result = terminal["runPointPhaseRound"]()
+		self.assertEqual(result["roundEnded"], True)
+		self.assertEqual(result["outcome"], terminal["RollOutcome"].sevenOut)
+		self.assertEqual(len(statusCalls), 2)
+		self.assertEqual(len(menuCalls), 2)
+		self.assertEqual(len(resolveCalls), 2)
+
 	def testBetSnapshotCaptureApplyRoundTrip(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 321

@@ -894,7 +894,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		with patch("builtins.print"):
 			result = terminal["handlePlaceMenuCommand"]("x", pointPhase=False)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], True)
 
 	def testHandlePlaceMenuCommandPointTogglePlaceOff(self):
@@ -902,7 +903,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["placeOff"] = False
 		with patch("builtins.print"):
 			result = terminal["handlePlaceMenuCommand"]("o", pointPhase=True)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], True)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["placeOff"], True)
 
@@ -911,7 +913,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["placeOff"] = False
 		with patch("builtins.print"):
 			result = terminal["handlePlaceMenuCommand"]("o", pointPhase=False)
-		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["success"], False)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["placeOff"], False)
 
@@ -922,18 +925,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["place"] = {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0}
 		with patch("builtins.print"):
 			result = terminal["handlePlaceMenuCommand"]("zz", pointPhase=True)
-		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["success"], False)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["bank"], 200)
 		self.assertEqual(terminal["chipsOnTable"], 0)
 		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0})
+		self.assertTrue(any("valid option" in msg for msg in result["messages"]))
 
 	def testHandleLayMenuCommandExit(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("x", pointPhase=False)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], True)
 
 	def testHandleLayMenuCommandPointToggle(self):
@@ -942,7 +948,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["layOff"] = False
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("o", pointPhase=True)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], True)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["layOff"], True)
 
@@ -951,7 +958,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("y", pointPhase=True)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], False)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], True)
 
 	def testHandleLayMenuCommandInvalidNoMutation(self):
@@ -963,7 +971,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("zz", pointPhase=True)
-		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["success"], False)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["layOff"], False)
 		self.assertEqual(terminal["bank"], 200)
@@ -974,7 +983,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		with patch("builtins.print"):
 			result = terminal["handleHardWaysMenuCommand"]("x", pointPhase=False)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], True)
 
 	def testHandleHardWaysMenuCommandPointToggle(self):
@@ -982,7 +992,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["hardOff"] = False
 		with patch("builtins.print"):
 			result = terminal["handleHardWaysMenuCommand"]("o", pointPhase=True)
-		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], True)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["hardOff"], True)
 
@@ -994,7 +1005,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
 		with patch("builtins.print"):
 			result = terminal["handleHardWaysMenuCommand"]("zz", pointPhase=True)
-		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["success"], False)
+		self.assertEqual(result["stateChanged"], False)
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["hardOff"], False)
 		self.assertEqual(terminal["bank"], 200)

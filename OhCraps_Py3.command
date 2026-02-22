@@ -1498,42 +1498,38 @@ def handlePlaceMenuCommand(command, pointPhase=False):
 	cmd = str(command).strip().lower()
 	if cmd == "y":
 		placeBets()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if pointPhase and cmd == "o":
 		if placeOff:
 			placeOff = False
-			print("Ok, your Place Bets are back on.")
+			messages = ["Ok, your Place Bets are back on."]
 		else:
 			placeOff = True
-			print("All your Place Bets are Off.")
-		return {"handled": True, "shouldExitMenu": False}
+			messages = ["All your Place Bets are Off."]
+		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd == "d":
 		if pointPhase:
-			print("Taking down all of your Place Bets.")
+			messages = ["Taking down all of your Place Bets."]
 		else:
-			print("Taking down your Place Bets.")
+			messages = ["Taking down your Place Bets."]
 		placeTakeDown()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in validPlacePresetCodesForMode():
 		placePreset(cmd)
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if pointPhase and cmd == "m":
 		placeMover()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if pointPhase and cmd == "p":
 		chipsOnTable -= place[comeOut]
 		bank += place[comeOut]
 		place[comeOut] = 0
-		print(f"Taking down the Place {comeOut} bet.")
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[f"Taking down the Place {comeOut} bet."], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd == "h":
-		print(placeHelpText(pointPhase=pointPhase))
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[placeHelpText(pointPhase=pointPhase)], stateChanged=False) | {"shouldExitMenu": False}
 	if cmd == "x":
-		print("Done Place Betting!")
-		return {"handled": True, "shouldExitMenu": True}
-	print("That's not a valid option!")
-	return {"handled": False, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=["Done Place Betting!"], stateChanged=False) | {"shouldExitMenu": True}
+	return createActionResult(success=False, messages=["That's not a valid option!"], stateChanged=False) | {"shouldExitMenu": False}
 
 def layHelpText(pointPhase=False):
 	helpLines = [
@@ -1569,72 +1565,66 @@ def handleLayMenuCommand(command, pointPhase=False):
 	global layOff
 	cmd = str(command).strip().lower()
 	if gameMode == GameMode.craplessCraps:
-		print("Lay bets are not available in Crapless Craps.")
-		return {"handled": True, "shouldExitMenu": True}
+		return createActionResult(success=False, messages=["Lay bets are not available in Crapless Craps."], stateChanged=False) | {"shouldExitMenu": True}
 	if cmd in ["y", "yes"]:
 		layBetting()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if pointPhase and cmd in ["o", "off"]:
 		if layOff == False:
 			layOff = True
-			print("Your Lay Bets are Off.")
+			messages = ["Your Lay Bets are Off."]
 		else:
 			layOff = False
-			print("Your Lay Bets are On.")
-		return {"handled": True, "shouldExitMenu": False}
+			messages = ["Your Lay Bets are On."]
+		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["d", "td", "takedown"]:
 		if pointPhase:
-			print("Taking down all of your Lay Bets.")
+			messages = ["Taking down all of your Lay Bets."]
 		else:
-			print("Taking down your Lay Bets.")
+			messages = ["Taking down your Lay Bets."]
 		layTakeDown()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["a", "across", "all"]:
 		layAll()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd == "h":
-		print(layHelpText(pointPhase=pointPhase))
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[layHelpText(pointPhase=pointPhase)], stateChanged=False) | {"shouldExitMenu": False}
 	if cmd == "x":
-		print("Done Lay Betting!")
-		return {"handled": True, "shouldExitMenu": True}
-	print("That's not an option!")
-	return {"handled": False, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=["Done Lay Betting!"], stateChanged=False) | {"shouldExitMenu": True}
+	return createActionResult(success=False, messages=["That's not an option!"], stateChanged=False) | {"shouldExitMenu": False}
 
 def handleHardWaysMenuCommand(command, pointPhase=False):
 	global hardOff
 	cmd = str(command).strip().lower()
 	if cmd in ["y", "yes"]:
 		hardWaysBetting()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if pointPhase and cmd in ["o", "off"]:
 		if hardOff == False:
 			hardOff = True
-			print("Your Hard Ways are Off.")
+			messages = ["Your Hard Ways are Off."]
 		else:
 			hardOff = False
-			print("Hard Ways are On.")
-		return {"handled": True, "shouldExitMenu": False}
+			messages = ["Hard Ways are On."]
+		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["d", "td", "takedown"]:
 		hardTakeDown()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["a", "all", "across"]:
 		hardAuto()
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["h4", "h6", "h8", "h10"]:
 		hardHigh(cmd)
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd == "h":
-		print(hardWaysHelpText(pointPhase=pointPhase))
-		return {"handled": True, "shouldExitMenu": False}
+		return createActionResult(success=True, messages=[hardWaysHelpText(pointPhase=pointPhase)], stateChanged=False) | {"shouldExitMenu": False}
 	if cmd == "x":
 		if pointPhase:
-			print("Finished betting on the Hard Ways!")
+			messages = ["Finished betting on the Hard Ways!"]
 		else:
-			print("Done betting the Hard Ways!")
-		return {"handled": True, "shouldExitMenu": True}
-	print("That's not an option!")
-	return {"handled": False, "shouldExitMenu": False}
+			messages = ["Done betting the Hard Ways!"]
+		return createActionResult(success=True, messages=messages, stateChanged=False) | {"shouldExitMenu": True}
+	return createActionResult(success=False, messages=["That's not an option!"], stateChanged=False) | {"shouldExitMenu": False}
 
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
@@ -2031,20 +2021,22 @@ while True:
 		elif round1 == "q":
 			quitGame()
 		elif round1 == "p":
-				while True:
-					placeShow()
-					plBet = str(input("Place Bets? > ")).strip().lower()
-					commandResult = handlePlaceMenuCommand(plBet, pointPhase=False)
-					if commandResult["shouldExitMenu"]:
-						break
+					while True:
+						placeShow()
+						plBet = str(input("Place Bets? > ")).strip().lower()
+						commandResult = handlePlaceMenuCommand(plBet, pointPhase=False)
+						emitActionResult(commandResult)
+						if commandResult["shouldExitMenu"]:
+							break
 
 		elif round1 in ["ly", "lay"]:
-			while True:
-				layShow()
-				lyBet = str(input("Lay Bets? > ")).strip().lower()
-				commandResult = handleLayMenuCommand(lyBet, pointPhase=False)
-				if commandResult["shouldExitMenu"]:
-					break
+				while True:
+					layShow()
+					lyBet = str(input("Lay Bets? > ")).strip().lower()
+					commandResult = handleLayMenuCommand(lyBet, pointPhase=False)
+					emitActionResult(commandResult)
+					if commandResult["shouldExitMenu"]:
+						break
 
 		elif round1 in ["f", "field"]:
 			fieldShow()
@@ -2056,13 +2048,14 @@ while True:
 			continue
 
 		elif round1 in ["hd", "hard", "hw"]:
-			while True:
-				hardShow()
-				print
-				hWays = str(input("Hard Ways Bets? > ")).strip().lower()
-				commandResult = handleHardWaysMenuCommand(hWays, pointPhase=False)
-				if commandResult["shouldExitMenu"]:
-					break
+				while True:
+					hardShow()
+					print
+					hWays = str(input("Hard Ways Bets? > ")).strip().lower()
+					commandResult = handleHardWaysMenuCommand(hWays, pointPhase=False)
+					emitActionResult(commandResult)
+					if commandResult["shouldExitMenu"]:
+						break
 
 # Working Bets Setup
 		elif round1 in ["w", "work", "working"]:
@@ -2223,6 +2216,7 @@ while True:
 							placeShow()
 							pl2 = str(input("Place Bets? > ")).strip().lower()
 							commandResult = handlePlaceMenuCommand(pl2, pointPhase=True)
+							emitActionResult(commandResult)
 							if commandResult["shouldExitMenu"]:
 								break
 						continue
@@ -2231,6 +2225,7 @@ while True:
 							layShow()
 							ly2Bet = str(input("Lay Bets? > ")).strip().lower()
 							commandResult = handleLayMenuCommand(ly2Bet, pointPhase=True)
+							emitActionResult(commandResult)
 							if commandResult["shouldExitMenu"]:
 								break
 						continue
@@ -2249,6 +2244,7 @@ while True:
 							hardShow()
 							hard2 = str(input("Hard Ways bets? > ")).strip().lower()
 							commandResult = handleHardWaysMenuCommand(hard2, pointPhase=True)
+							emitActionResult(commandResult)
 							if commandResult["shouldExitMenu"]:
 								break
 						continue

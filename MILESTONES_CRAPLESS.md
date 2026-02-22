@@ -442,3 +442,31 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testComeCheckReturnsActionResultForMovedComeBet`
 	- `testComeCheckReturnsNoChangeActionResultWhenNoBarBets`
 - Full suite remains green.
+
+## Milestone 42: Normalize Menu Handlers To Action-Result Contract
+
+### What changed
+- Upgraded command handlers to return structured action-result payloads:
+	- `handlePlaceMenuCommand(...)`
+	- `handleLayMenuCommand(...)`
+	- `handleHardWaysMenuCommand(...)`
+- Each handler now returns:
+	- `success`
+	- `messages`
+	- `stateChanged`
+	- `shouldExitMenu`
+- Updated menu loop call sites to emit handler messages centrally via:
+	- `emitActionResult(commandResult)`
+
+### Why
+- Aligns subsystem command handlers under one result contract.
+- Reduces direct print side-effects inside handlers and improves portability to non-terminal UIs.
+
+### Behavior
+- Gameplay and menu semantics remain unchanged.
+- Exit and invalid-command behavior is preserved.
+
+### Test coverage
+- Updated handler tests to assert new action-result fields instead of legacy `handled` key.
+- Existing no-mutation and exit-path tests remain passing under the new contract.
+- Full suite remains green.

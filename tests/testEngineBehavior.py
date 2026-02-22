@@ -181,6 +181,14 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.bankDelta, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, 0)
 
+	def testSettleLineBetsForModeCraplessPointElevenHitWins(self):
+		lineBets = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		settlement = settleLineBetsForMode(lineBets=lineBets, pointIsOn=True, roll=11, p2roll=11, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.lineBets["Pass"], 0)
+		self.assertEqual(settlement.bankDelta, 20)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertIn("You won $10 on the Pass Line!", settlement.messages)
+
 	def testSettleOddsBetsPassOddsWin(self):
 		lineBets = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
 		settlement = settleOddsBets(lineBets=lineBets, roll=5, comeOut=5)

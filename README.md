@@ -631,6 +631,12 @@ Testing outcome:
 	- bank/chips accounting remains correct
 - Suite increased from 100 to 104 tests, all passing.
 
+### Crapless Milestone Notes
+
+- Detailed milestone-by-milestone Crapless documentation is now consolidated in:
+	- `MILESTONES_CRAPLESS.md`
+- New Crapless updates should be appended to that single file going forward.
+
 #### Line Bets
 
 Bet on the Pass Line by typing 'p' and hitting Enter, then follow the prompt to put in a bet amount.  This bet will win if a 7 or 11 rolls on the Come out roll, loses if a 2, 3, or 12 rolls, and continues on to the point phase of the game if any other number rolls. If the shooter rolls that number again in the point phase, this bet will win. Rolling a 7 in the point phase will make this bet lose and the game resets.

@@ -783,3 +783,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- immediate round end path in `runPointPhaseRound()`.
 	- multi-iteration neutral-then-end path in `runPointPhaseRound()`.
 - Compile and full suite remain green.
+
+## Milestone 55: Come Out Round Coordinator Extraction
+
+### What changed
+- Extracted full Come Out round flow into `runComeOutRound()`.
+- Replaced inline main-loop Come Out round sequence with a single coordinator call.
+- Kept coordinator internals delegated to existing helpers:
+	- `runComeOutBettingMenu()`
+	- `resolveComeOutRoll()`
+
+### Why
+- Come Out round control still lived inline while point-phase round had already been extracted.
+- This makes phase orchestration symmetric and keeps the top-level loop focused on phase transitions only.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- Come Out round still follows the same branch outcomes:
+	- continue Come Out if no point is entered,
+	- transition into point phase when point is established.
+
+### Test coverage
+- Added terminal tests in `tests/testEngineBehavior.py` for:
+	- continue-path result from `runComeOutRound()`.
+	- enter-point result from `runComeOutRound()`.
+- Compile and full suite remain green.

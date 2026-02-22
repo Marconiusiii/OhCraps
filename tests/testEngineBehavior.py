@@ -1247,6 +1247,30 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(pointPhaseFlags, [False])
 
+	def testRunComeOutRoundReturnsContinuePath(self):
+		terminal = loadTerminalNamespace()
+		menuCalls = []
+		resolveCalls = []
+		terminal["runComeOutBettingMenu"] = lambda: menuCalls.append(True)
+		terminal["resolveComeOutRoll"] = lambda: (resolveCalls.append(True) or {"enteredPointPhase": False, "outcome": terminal["RollOutcome"].natural})
+		result = terminal["runComeOutRound"]()
+		self.assertEqual(result["enteredPointPhase"], False)
+		self.assertEqual(result["outcome"], terminal["RollOutcome"].natural)
+		self.assertEqual(len(menuCalls), 1)
+		self.assertEqual(len(resolveCalls), 1)
+
+	def testRunComeOutRoundReturnsEnterPointPath(self):
+		terminal = loadTerminalNamespace()
+		menuCalls = []
+		resolveCalls = []
+		terminal["runComeOutBettingMenu"] = lambda: menuCalls.append(True)
+		terminal["resolveComeOutRoll"] = lambda: (resolveCalls.append(True) or {"enteredPointPhase": True, "outcome": terminal["RollOutcome"].pointEstablished})
+		result = terminal["runComeOutRound"]()
+		self.assertEqual(result["enteredPointPhase"], True)
+		self.assertEqual(result["outcome"], terminal["RollOutcome"].pointEstablished)
+		self.assertEqual(len(menuCalls), 1)
+		self.assertEqual(len(resolveCalls), 1)
+
 	def testShowPointPhaseStatusWithChipsShowsTableAmount(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 250

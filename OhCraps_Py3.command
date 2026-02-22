@@ -2246,6 +2246,11 @@ def runComeOutBettingMenu():
 		if commandResult["shouldRoll"]:
 			return {"shouldRoll": True}
 
+def runComeOutRound():
+	runComeOutBettingMenu()
+	comeOutResult = resolveComeOutRoll()
+	return {"enteredPointPhase": bool(comeOutResult["enteredPointPhase"]), "outcome": comeOutResult["outcome"]}
+
 def showPointPhaseStatus():
 	if chipsOnTable > 0:
 		print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
@@ -2320,9 +2325,7 @@ while True:
 
 # Initial bets
 
-	runComeOutBettingMenu()
-
-	comeOutResult = resolveComeOutRoll()
+	comeOutResult = runComeOutRound()
 	if not comeOutResult["enteredPointPhase"]:
 		continue
 	runPointPhaseRound()

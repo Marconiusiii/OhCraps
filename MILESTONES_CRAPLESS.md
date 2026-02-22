@@ -121,3 +121,23 @@ New milestone updates should be appended here rather than creating new milestone
 	- edge-only placement map from `e`,
 	- bank/chips invariants,
 	- no regression of existing helper behaviors.
+
+## Milestone 31: Restore `a`, `i`, `c` Helpers In Crapless
+
+### What changed
+- Removed the Crapless helper gate in `placePreset(pre)` that blocked standard presets.
+- Removed the related warning message stating presets were unavailable in Crapless.
+- Restored active behavior for original helpers in Crapless mode:
+	- `a` runs normal Across sizing on `4,5,6,8,9,10`.
+	- `i` runs normal Inside sizing on `5,6,8,9`.
+	- `c` runs normal Center sizing on `6,8`.
+- Kept Crapless-only helpers intact:
+	- `ea` for Extreme Across `2,3,4,5,6,8,9,10,11,12`.
+	- `e` for edges `2,3,11,12`.
+
+### Why
+- You requested parity with original helper workflows in Crapless and removal of the blocking gate text.
+
+### Test coverage
+- Replaced the prior Crapless "disabled" tests for `a/i/c` with active behavior tests.
+- New assertions verify resulting place map plus `bank` and `chipsOnTable` totals for each helper.

@@ -1357,9 +1357,6 @@ def normalizedHalfPressIncrement(number, currentWager):
 
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
-	if gameMode == GameMode.craplessCraps and pre.strip().lower() not in ["ea", "e"]:
-		print("Across/Inside/Center presets remain standard-only in Crapless. Use 'ea' for Extreme Across or individual Place betting.")
-		return
 	total = 0
 	outlay = 0
 	for number in place:

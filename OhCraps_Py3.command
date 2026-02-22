@@ -1856,11 +1856,11 @@ def placeBets():
 					outOfMoney()
 					print(f"How much on the Place {key}?")
 					continue
-				if gameMode == GameMode.craplessCraps and key in [2, 12] and bet%2 != 0:
-					print("Place 2 and 12 bets must be a multiple of 2 in Crapless Craps.")
+				if gameMode == GameMode.craplessCraps and key in [2, 12] and bet < 20 and bet%2 != 0:
+					print("Invalid amount for that Place bet. Try again.")
 					continue
-				if gameMode == GameMode.craplessCraps and key in [3, 11] and bet%4 != 0:
-					print("Place 3 and 11 bets must be a multiple of 4 in Crapless Craps.")
+				if gameMode == GameMode.craplessCraps and key in [3, 11] and bet < 20 and bet%4 != 0:
+					print("Invalid amount for that Place bet. Try again.")
 					continue
 				madeBet = True
 				break
@@ -1875,7 +1875,7 @@ def placeBets():
 				bank -= bet - place[key] 
 			place[key] = bet
 			chipsOnTable += bet
-			if key in [4, 10] and bet >= 10:
+			if (key in [4, 10] and bet >= 10) or (gameMode == GameMode.craplessCraps and key in [2, 3, 11, 12] and bet >= 20):
 				print(f"Buying the {key} for ${bet:,}.")
 			else:
 				print(f"${bet:,} on the Place {key}.")

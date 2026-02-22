@@ -1001,6 +1001,61 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 0)
 		self.assertEqual(terminal["hardWays"], {4: 5, 6: 0, 8: 0, 10: 0})
 
+	def testBetSnapshotCaptureApplyRoundTrip(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 321
+		terminal["chipsOnTable"] = 45
+		terminal["comeBet"] = 10
+		terminal["dComeBet"] = 15
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 5, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 5, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 12, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["place"] = {2: 2, 3: 4, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 4, 12: 2}
+		terminal["layBets"] = {4: 0, 5: 5, 6: 0, 8: 0, 9: 0, 10: 0}
+		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
+		terminal["fieldBet"] = 20
+		snapshot = terminal["captureBetSnapshot"]()
+		terminal["bank"] = 0
+		terminal["chipsOnTable"] = 0
+		terminal["comeBet"] = 0
+		terminal["dComeBet"] = 0
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		terminal["hardWays"] = {4: 0, 6: 0, 8: 0, 10: 0}
+		terminal["fieldBet"] = 0
+		terminal["applyBetSnapshot"](snapshot)
+		self.assertEqual(terminal["bank"], 321)
+		self.assertEqual(terminal["chipsOnTable"], 45)
+		self.assertEqual(terminal["comeBet"], 10)
+		self.assertEqual(terminal["dComeBet"], 15)
+		self.assertEqual(terminal["comeBets"][4], 5)
+		self.assertEqual(terminal["dComeBets"][5], 5)
+		self.assertEqual(terminal["comeOdds"][4], 10)
+		self.assertEqual(terminal["dComeOdds"][5], 12)
+		self.assertEqual(terminal["place"][11], 4)
+		self.assertEqual(terminal["layBets"][5], 5)
+		self.assertEqual(terminal["hardWays"][4], 5)
+		self.assertEqual(terminal["fieldBet"], 20)
+
+	def testSnapshotApplyWithPlaceSettlementPreservesOtherBets(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 10, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["layBets"] = {4: 0, 5: 5, 6: 0, 8: 0, 9: 0, 10: 0}
+		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
+		with patch("builtins.input", side_effect=[""]):
+			terminal["placeCheck"](2)
+		self.assertEqual(terminal["place"][2], 10)
+		self.assertEqual(terminal["layBets"][5], 5)
+		self.assertEqual(terminal["hardWays"][4], 5)
+
 	def testCdcOddsChangeRejectsInvalidComeOddsUnitInCraps(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps

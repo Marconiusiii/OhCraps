@@ -202,10 +202,12 @@ bet//5 = low bets
 
 def hardCheck(roll):
 	global bank, chipsOnTable, hardWays, rollHard
+	snapshot = captureBetSnapshot()
 	settlement = settleHardWays(hardWays=hardWays, roll=roll, rollHard=rollHard)
-	hardWays = settlement.hardWays
-	bank += settlement.bankDelta
-	chipsOnTable += settlement.chipsOnTableDelta
+	snapshot["hardWays"] = settlement.hardWays
+	snapshot["bank"] += settlement.bankDelta
+	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
+	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
 		print(message)
 
@@ -626,6 +628,7 @@ def comeCheck(roll):
 
 def comePay(roll):
 	global bank, chipsOnTable, comeBets, dComeBets, comeOdds, dComeOdds, pointIsOn, working
+	snapshot = captureBetSnapshot()
 	settlement = settleComeTableBets(
 		comeBets=comeBets,
 		dComeBets=dComeBets,
@@ -636,12 +639,13 @@ def comePay(roll):
 		working=working,
 		gameMode=gameMode
 	)
-	comeBets = settlement.comeBets
-	dComeBets = settlement.dComeBets
-	comeOdds = settlement.comeOdds
-	dComeOdds = settlement.dComeOdds
-	bank += settlement.bankDelta
-	chipsOnTable += settlement.chipsOnTableDelta
+	snapshot["comeBets"] = settlement.comeBets
+	snapshot["dComeBets"] = settlement.dComeBets
+	snapshot["comeOdds"] = settlement.comeOdds
+	snapshot["dComeOdds"] = settlement.dComeOdds
+	snapshot["bank"] += settlement.bankDelta
+	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
+	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
 		print(message)
 
@@ -676,10 +680,12 @@ def fieldTakeDown():
 
 def fieldCheck(roll):
 	global fieldBet, bank, chipsOnTable
+	snapshot = captureBetSnapshot()
 	settlement = settleFieldBet(fieldBet=fieldBet, roll=roll)
-	fieldBet = settlement.fieldBet
-	bank += settlement.bankDelta
-	chipsOnTable += settlement.chipsOnTableDelta
+	snapshot["fieldBet"] = settlement.fieldBet
+	snapshot["bank"] += settlement.bankDelta
+	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
+	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
 		print(message)
 
@@ -1264,10 +1270,12 @@ def layShow():
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
+	snapshot = captureBetSnapshot()
 	settlement = settleLayBetsForMode(layBets=layBets, roll=roll, gameMode=gameMode)
-	layBets = settlement.layBets
-	bank += settlement.bankDelta
-	chipsOnTable += settlement.chipsOnTableDelta
+	snapshot["layBets"] = settlement.layBets
+	snapshot["bank"] += settlement.bankDelta
+	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
+	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
 		print(message)
 
@@ -1363,6 +1371,37 @@ place = {
 11: 0,
 12: 0
 }
+
+def captureBetSnapshot():
+	return {
+		"bank": int(bank),
+		"chipsOnTable": int(chipsOnTable),
+		"comeBet": int(comeBet),
+		"dComeBet": int(dComeBet),
+		"comeBets": dict(comeBets),
+		"dComeBets": dict(dComeBets),
+		"comeOdds": dict(comeOdds),
+		"dComeOdds": dict(dComeOdds),
+		"place": dict(place),
+		"layBets": dict(layBets),
+		"hardWays": dict(hardWays),
+		"fieldBet": int(fieldBet)
+	}
+
+def applyBetSnapshot(snapshot):
+	global bank, chipsOnTable, comeBet, dComeBet, comeBets, dComeBets, comeOdds, dComeOdds, place, layBets, hardWays, fieldBet
+	bank = int(snapshot["bank"])
+	chipsOnTable = int(snapshot["chipsOnTable"])
+	comeBet = int(snapshot["comeBet"])
+	dComeBet = int(snapshot["dComeBet"])
+	comeBets = dict(snapshot["comeBets"])
+	dComeBets = dict(snapshot["dComeBets"])
+	comeOdds = dict(snapshot["comeOdds"])
+	dComeOdds = dict(snapshot["dComeOdds"])
+	place = dict(snapshot["place"])
+	layBets = dict(snapshot["layBets"])
+	hardWays = dict(snapshot["hardWays"])
+	fieldBet = int(snapshot["fieldBet"])
 
 placeOff = False
 
@@ -1820,13 +1859,15 @@ def vig(bet):
 
 def placeCheck(roll):
 	global place, bank, chipsOnTable
+	snapshot = captureBetSnapshot()
 	settlement = settlePlaceBetsForMode(placeBets=place, roll=roll, gameMode=gameMode)
-	place = settlement.placeBets
+	snapshot["place"] = settlement.placeBets
 	for key in [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]:
-		if key not in place:
-			place[key] = 0
-	bank += settlement.bankDelta
-	chipsOnTable += settlement.chipsOnTableDelta
+		if key not in snapshot["place"]:
+			snapshot["place"][key] = 0
+	snapshot["bank"] += settlement.bankDelta
+	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
+	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
 		print(message)
 

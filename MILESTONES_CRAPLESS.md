@@ -380,3 +380,35 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testCdcOddsChangeRejectsInvalidComeOddsUnitInCraps`
 	- `testCdcOddsChangeRejectsInvalidDontComeOddsUnitInCrapless`
 - Full suite remains green.
+
+## Milestone 40: Terminal Bet-State Snapshot Adapter
+
+### What changed
+- Added terminal state snapshot helpers:
+	- `captureBetSnapshot()`
+	- `applyBetSnapshot(snapshot)`
+- Snapshot includes high-mutation bet/accounting state:
+	- `bank`, `chipsOnTable`
+	- `comeBet`, `dComeBet`
+	- `comeBets`, `dComeBets`, `comeOdds`, `dComeOdds`
+	- `place`, `layBets`, `hardWays`, `fieldBet`
+- Refactored settlement application paths to use snapshot read/write:
+	- `comePay(...)`
+	- `placeCheck(...)`
+	- `layCheck(...)`
+	- `hardCheck(...)`
+	- `fieldCheck(...)`
+
+### Why
+- This reduces direct global mutation spread and creates explicit synchronization points.
+- It is a practical intermediate step toward extracting a portable state/controller layer for iOS.
+
+### Behavior
+- No intended gameplay rule changes.
+- Settlement deltas and prompt flows remain functionally equivalent.
+
+### Test coverage
+- Added deterministic snapshot tests in `tests/testEngineBehavior.py`:
+	- `testBetSnapshotCaptureApplyRoundTrip`
+	- `testSnapshotApplyWithPlaceSettlementPreservesOtherBets`
+- Full suite remains green.

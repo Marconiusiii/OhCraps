@@ -1686,6 +1686,42 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 77)
 		self.assertEqual(terminal["chipsOnTable"], 43)
 
+	def testPlaceCheckCraplessEdgeTwoHalfPressNormalizesAndAccounts(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {2: 18, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["hp"]):
+			terminal["placeCheck"](2)
+		self.assertEqual(terminal["place"][2], 26)
+		self.assertEqual(terminal["bank"], 191)
+		self.assertEqual(terminal["chipsOnTable"], 26)
+
+	def testPlaceCheckCraplessEdgeThreeHalfPressNormalizesAndAccounts(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 16
+		terminal["place"] = {2: 0, 3: 16, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["hp"]):
+			terminal["placeCheck"](3)
+		self.assertEqual(terminal["place"][3], 24)
+		self.assertEqual(terminal["bank"], 136)
+		self.assertEqual(terminal["chipsOnTable"], 24)
+
+	def testPlaceCheckCraplessEdgeTwoFullPressAccountsFromBuyHit(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 21
+		terminal["place"] = {2: 21, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["p"]):
+			terminal["placeCheck"](2)
+		self.assertEqual(terminal["place"][2], 42)
+		self.assertEqual(terminal["bank"], 203)
+		self.assertEqual(terminal["chipsOnTable"], 42)
+
 	def testLayAllAcrossSetsEachNumber(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

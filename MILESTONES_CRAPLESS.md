@@ -550,3 +550,22 @@ New milestone updates should be appended here rather than creating new milestone
 	- mixed large Crapless seven-out clearing and accounting.
 	- terminal Buy messaging on `11` and `12` at `$20+`.
 - Full suite remains green.
+
+## Milestone 45: Crapless Edge Press/Half-Press Determinism
+
+### What changed
+- Added deterministic terminal tests for Crapless Place edge-number press behavior on `2` and `3`.
+- Covered both:
+	- half-press normalization (unit-aware increment behavior),
+	- full-press accounting after a buy-threshold hit.
+
+### Why
+- Press/half-press is a high-regression path due to combined payout, normalization, and bankroll/chips updates in one flow.
+- Edge numbers in Crapless have different unit behavior from standard center numbers, so explicit coverage is required.
+
+### Test coverage
+- Added tests in `tests/testEngineBehavior.py` for:
+	- `Place 2` half-press normalization and accounting,
+	- `Place 3` half-press normalization and accounting,
+	- `Place 2` full-press accounting after buy-style settlement.
+- Full suite remains green.

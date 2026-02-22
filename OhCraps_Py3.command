@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -395,40 +395,56 @@ def oddsCheck(roll):
 # Come Betting
 
 comeBets = {
+2: 0,
+3: 0,
 4: 0,
 5: 0,
 6: 0,
 8: 0,
 9: 0,
 10: 0,
+11: 0,
+12: 0,
 	"Come": 0
 }
 
 comeOdds = {
-4: 0,
-5: 0,
-6: 0,
-8: 0,
-9: 0,
-10: 0
-}
-
-dComeBets = {
+2: 0,
+3: 0,
 4: 0,
 5: 0,
 6: 0,
 8: 0,
 9: 0,
 10: 0,
+11: 0,
+12: 0
 }
 
-dComeOdds = {
+dComeBets = {
+2: 0,
+3: 0,
 4: 0,
 5: 0,
 6: 0,
 8: 0,
 9: 0,
-10: 0
+10: 0,
+11: 0,
+12: 0,
+	}
+
+dComeOdds = {
+2: 0,
+3: 0,
+4: 0,
+5: 0,
+6: 0,
+8: 0,
+9: 0,
+10: 0,
+11: 0,
+12: 0
 }
 
 comeBet = dComeBet = 0
@@ -508,7 +524,7 @@ def cdcOddsChange(dict, dict2):
 	for key in dict:
 		if dict[key] > 0:
 			if 'Come' in dict:
-				maxOdds = maxComeOdds(key, dict[key])
+				maxOdds = maxComeOddsForMode(number=key, baseBet=dict[key], gameMode=gameMode)
 				print(f"How much for Odds on the {key}? Max Odds is ${maxOdds:,}; you have ${dict2[key]:,} in Odds.")
 			else:
 				maxOdds = maxLayOdds(dict[key])
@@ -543,7 +559,7 @@ def comeCheck(roll):
 	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds, pointIsOn
 	comePay(roll)
 	if comeBet > 0:
-		settlement = settleComeBarBet(comeBet=comeBet, roll=roll)
+		settlement = settleComeBarBet(comeBet=comeBet, roll=roll, gameMode=gameMode)
 		comeBet = settlement.comeBet
 		bank += settlement.bankDelta
 		chipsOnTable += settlement.chipsOnTableDelta
@@ -552,7 +568,7 @@ def comeCheck(roll):
 		if settlement.movedNumber is not None:
 			comeBets[settlement.movedNumber] = settlement.movedAmount
 			if str(input("Odds on your Come Bet? > ")).strip().lower() in ['y', 'yes']:
-				max = maxComeOdds(settlement.movedNumber, comeBets[settlement.movedNumber])
+				max = maxComeOddsForMode(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode)
 				print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 				while True:
 					comeOdds[settlement.movedNumber] = betPrompt()
@@ -598,7 +614,8 @@ def comePay(roll):
 		dComeOdds=dComeOdds,
 		roll=roll,
 		pointIsOn=pointIsOn,
-		working=working
+		working=working,
+		gameMode=gameMode
 	)
 	comeBets = settlement.comeBets
 	dComeBets = settlement.dComeBets
@@ -1422,6 +1439,107 @@ def handlePlaceMenuCommand(command, pointPhase=False):
 	print("That's not a valid option!")
 	return {"handled": False, "shouldExitMenu": False}
 
+def layHelpText(pointPhase=False):
+	helpLines = [
+		"Lay Bet Codes:",
+		"\ty: Enter Lay Betting mode.",
+		"\ta: Lay Bets across all numbers.",
+		"\td: Take down all Lay Bets."
+	]
+	if pointPhase:
+		helpLines.append("\to: Toggle Lay Bets Off or On for next roll.")
+	helpLines.append("\th: Show this Help menu.")
+	helpLines.append("\tx: Finish Lay Betting.")
+	return "\n".join(helpLines) + "\n"
+
+def hardWaysHelpText(pointPhase=False):
+	helpLines = [
+		"Hard Ways Codes:",
+		"\ty: Enter Hard Ways betting mode.",
+		"\td: Take down Hard Ways bets.",
+		"\ta: Auto-bet Across all Hard Ways.",
+		"\th4: Bet all Hard Ways High 4.",
+		"\th6: Bet all Hard Ways High 6.",
+		"\th8: Bet all Hard Ways High 8.",
+		"\th10: Bet all Hard Ways High 10."
+	]
+	if pointPhase:
+		helpLines.append("\to: Toggle Hard Ways Bets On or Off for next roll.")
+	helpLines.append("\th: Show this Help menu.")
+	helpLines.append("\tx: Finish Hard Ways Betting.")
+	return "\n".join(helpLines) + "\n"
+
+def handleLayMenuCommand(command, pointPhase=False):
+	global layOff
+	cmd = str(command).strip().lower()
+	if gameMode == GameMode.craplessCraps:
+		print("Lay bets are not available in Crapless Craps.")
+		return {"handled": True, "shouldExitMenu": True}
+	if cmd in ["y", "yes"]:
+		layBetting()
+		return {"handled": True, "shouldExitMenu": False}
+	if pointPhase and cmd in ["o", "off"]:
+		if layOff == False:
+			layOff = True
+			print("Your Lay Bets are Off.")
+		else:
+			layOff = False
+			print("Your Lay Bets are On.")
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in ["d", "td", "takedown"]:
+		if pointPhase:
+			print("Taking down all of your Lay Bets.")
+		else:
+			print("Taking down your Lay Bets.")
+		layTakeDown()
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in ["a", "across", "all"]:
+		layAll()
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "h":
+		print(layHelpText(pointPhase=pointPhase))
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "x":
+		print("Done Lay Betting!")
+		return {"handled": True, "shouldExitMenu": True}
+	print("That's not an option!")
+	return {"handled": False, "shouldExitMenu": False}
+
+def handleHardWaysMenuCommand(command, pointPhase=False):
+	global hardOff
+	cmd = str(command).strip().lower()
+	if cmd in ["y", "yes"]:
+		hardWaysBetting()
+		return {"handled": True, "shouldExitMenu": False}
+	if pointPhase and cmd in ["o", "off"]:
+		if hardOff == False:
+			hardOff = True
+			print("Your Hard Ways are Off.")
+		else:
+			hardOff = False
+			print("Hard Ways are On.")
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in ["d", "td", "takedown"]:
+		hardTakeDown()
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in ["a", "all", "across"]:
+		hardAuto()
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd in ["h4", "h6", "h8", "h10"]:
+		hardHigh(cmd)
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "h":
+		print(hardWaysHelpText(pointPhase=pointPhase))
+		return {"handled": True, "shouldExitMenu": False}
+	if cmd == "x":
+		if pointPhase:
+			print("Finished betting on the Hard Ways!")
+		else:
+			print("Done betting the Hard Ways!")
+		return {"handled": True, "shouldExitMenu": True}
+	print("That's not an option!")
+	return {"handled": False, "shouldExitMenu": False}
+
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
 	preset = pre.strip().lower()
@@ -1823,26 +1941,11 @@ while True:
 						break
 
 		elif round1 in ["ly", "lay"]:
-			if gameMode == GameMode.craplessCraps:
-				print("Lay bets are not available in Crapless Craps.")
-				continue
 			while True:
 				layShow()
 				lyBet = str(input("Lay Bets? > ")).strip().lower()
-				if lyBet in ['y', 'yes']:
-					layBetting()
-					continue
-				elif lyBet == "d":
-					print("Taking down your Lay Bets.")
-					layTakeDown()
-					continue
-				elif lyBet == "a":
-					layAll()
-					continue
-				elif lyBet == "h":
-					print("Lay Bet Codes:\n\n\ty: Enter Individual Lay Betting mode.\n\ta: Lay Bets across all numbers.\n\td: Take down all Lay Bets.\n\th: Show this Help menu.\n\tx: Finish Lay Betting.\n")
-				elif lyBet == "x":
-					print("Done Lay Betting!")
+				commandResult = handleLayMenuCommand(lyBet, pointPhase=False)
+				if commandResult["shouldExitMenu"]:
 					break
 
 		elif round1 in ["f", "field"]:
@@ -1859,23 +1962,8 @@ while True:
 				hardShow()
 				print
 				hWays = str(input("Hard Ways Bets? > ")).strip().lower()
-				if hWays in ['y', 'yes']:
-					hardWaysBetting()
-					continue
-				elif hWays in ['d', 'td', 'takedown']:
-					hardTakeDown()
-					continue
-				elif hWays in ['a', 'across', 'all']:
-					hardAuto()
-					continue
-				elif hWays in ["h4", "h6", "h8", "h10"]:
-					hardHigh(hWays)
-					continue
-				elif hWays == "h":
-					print("Hard Ways Codes:\n\n\ty: Enter Individual Hard Ways Betting mode.\n\td: Take down all Hard Ways bets.\n\ta: Auto-bet across all Hard Ways numbers.\n\th4: Bet all numbers, Hard 4 high.\n\th6: Bet all numbers, Hard 6 high.\n\th8: Bet all numbers, Hard 8 high.\n\th10: Bet all numbers, Hard 10 high.\n\th: Show this Help Menu.\n\tx: Finish Hard Ways betting.\n")
-					continue
-				elif hWays == "x":
-					print("Done betting the Hard Ways!")
+				commandResult = handleHardWaysMenuCommand(hWays, pointPhase=False)
+				if commandResult["shouldExitMenu"]:
 					break
 
 # Working Bets Setup
@@ -2041,40 +2129,13 @@ while True:
 								break
 						continue
 				elif round2  in ["ly", "lay"]:
-					if gameMode == GameMode.craplessCraps:
-						print("Lay bets are not available in Crapless Craps.")
+						while True:
+							layShow()
+							ly2Bet = str(input("Lay Bets? > ")).strip().lower()
+							commandResult = handleLayMenuCommand(ly2Bet, pointPhase=True)
+							if commandResult["shouldExitMenu"]:
+								break
 						continue
-					while True:
-						layShow()
-						ly2Bet = str(input("Lay Bets? > ")).strip().lower()
-						if ly2Bet in ['y', 'yes']:
-							layBetting()
-							continue
-						elif ly2Bet == "o":
-							if layOff == False:
-								layOff = True
-								print("Your Lay Bets are Off.")
-							else:
-								layOff = False
-								print("Your Lay Bets are On.")
-							continue
-						elif ly2Bet == "a":
-							layAll()
-							continue
-						elif ly2Bet in "d":
-							print("Taking down all of your Lay Bets.")
-							layTakeDown()
-							continue
-						elif ly2Bet == "h":
-							print("Lay Bet Codes:\n\n\ty: Enter Lay Betting Mode\n\ta: Lay Bets across all numbers.\n\to: Toggle Lay Bets Off or On for next roll\n\td: Take all Lay Bets down.\n\th: Show this Help menu\n\tx: Finish Lay Betting")
-							continue
-						elif ly2Bet == "x":
-							print("Done Lay Betting!")
-							break
-						else:
-							print("That's not an option!")
-							continue
-					continue
 
 				elif round2 == "f":
 					fieldShow()
@@ -2086,39 +2147,13 @@ while True:
 					continue
 
 				elif round2 == "hd":
-					while True:
-						hardShow()
-						hard2 = str(input("Hard Ways bets? > ")).strip().lower()
-						if hard2 in ['y', 'yes']:
-							hardWaysBetting()
-							continue
-						elif hard2 in ['o', 'off']:
-							if hardOff == False:
-								hardOff = True
-								print("Your Hard Ways are Off.")
-							else:
-								hardOff = False
-								print("Hard Ways are On.")
-							continue
-						elif hard2 in ['d', 'td', 'takedown']:
-							hardTakeDown()
-							continue
-						elif hard2 in ['a', 'all', 'across']:
-							hardAuto()
-							continue
-						elif hard2 in ["h4", "h6", "h8", "h10"]:
-							hardHigh(hard2)
-							continue
-						elif hard2 == "h":
-							print("Hard Ways Codes:\n\n\ty: Enter Hard Ways betting mode\n\to: Toggle Hard Ways Bets On or Off for next roll\n\td: Take down Hard Ways bets\n\ta: Auto-bet Across all Hard Ways\n\t:h4: Bet all Hard Ways High 4\n\th6: Bet all Hard Ways High 6\n\th8: Bet all Hard Ways High 8\n\th10: Bet all Hard Ways High 10\n\th: Show this Help Menu\n\tx: Finish Hard Ways Betting")
-							continue
-						elif hard2 == "x":
-							print("Finished betting on the Hard Ways!")
-							break
-						else:
-							print("That's not an option!")
-							continue
-					continue
+						while True:
+							hardShow()
+							hard2 = str(input("Hard Ways bets? > ")).strip().lower()
+							commandResult = handleHardWaysMenuCommand(hard2, pointPhase=True)
+							if commandResult["shouldExitMenu"]:
+								break
+						continue
 
 				elif round2 in ["pr", "prop"]:
 					propBetting()

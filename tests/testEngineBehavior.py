@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -485,6 +485,22 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.bankDelta, 0)
 		self.assertEqual(settlement.chipsOnTableDelta, 0)
 
+	def testSettleComeBarBetCraplessMovesEleven(self):
+		settlement = settleComeBarBet(comeBet=25, roll=11, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.comeBet, 0)
+		self.assertEqual(settlement.movedNumber, 11)
+		self.assertEqual(settlement.movedAmount, 25)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
+	def testSettleComeBarBetCraplessMovesTwo(self):
+		settlement = settleComeBarBet(comeBet=25, roll=2, gameMode=GameMode.craplessCraps)
+		self.assertEqual(settlement.comeBet, 0)
+		self.assertEqual(settlement.movedNumber, 2)
+		self.assertEqual(settlement.movedAmount, 25)
+		self.assertEqual(settlement.bankDelta, 0)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+
 	def testSettleDComeBarBetLosesOnNatural(self):
 		settlement = settleDComeBarBet(dComeBet=20, roll=7)
 		self.assertEqual(settlement.dComeBet, 0)
@@ -524,6 +540,52 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(maxComeOdds(10, 15), 45)
 		self.assertEqual(maxComeOdds(9, 15), 60)
 		self.assertEqual(maxComeOdds(8, 15), 75)
+
+	def testMaxComeOddsForModeCraplessEdgeNumbers(self):
+		self.assertEqual(maxComeOddsForMode(number=2, baseBet=10, gameMode=GameMode.craplessCraps), 60)
+		self.assertEqual(maxComeOddsForMode(number=12, baseBet=10, gameMode=GameMode.craplessCraps), 60)
+		self.assertEqual(maxComeOddsForMode(number=3, baseBet=10, gameMode=GameMode.craplessCraps), 30)
+		self.assertEqual(maxComeOddsForMode(number=11, baseBet=10, gameMode=GameMode.craplessCraps), 30)
+
+	def testSettleComeTableBetsCraplessComeElevenHitWithOdds(self):
+		comeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 10, 12: 0, "Come": 0}
+		dComeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		comeOdds = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 15, 12: 0}
+		dComeOdds = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		settlement = settleComeTableBets(
+			comeBets=comeBets,
+			dComeBets=dComeBets,
+			comeOdds=comeOdds,
+			dComeOdds=dComeOdds,
+			roll=11,
+			pointIsOn=True,
+			working=False,
+			gameMode=GameMode.craplessCraps
+		)
+		self.assertEqual(settlement.bankDelta, 80)
+		self.assertEqual(settlement.chipsOnTableDelta, -25)
+		self.assertEqual(settlement.comeBets[11], 0)
+		self.assertEqual(settlement.comeOdds[11], 0)
+
+	def testSettleComeTableBetsCraplessComeTwoHitWithOdds(self):
+		comeBets = {2: 10, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		dComeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		comeOdds = {2: 12, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		dComeOdds = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		settlement = settleComeTableBets(
+			comeBets=comeBets,
+			dComeBets=dComeBets,
+			comeOdds=comeOdds,
+			dComeOdds=dComeOdds,
+			roll=2,
+			pointIsOn=True,
+			working=False,
+			gameMode=GameMode.craplessCraps
+		)
+		self.assertEqual(settlement.bankDelta, 104)
+		self.assertEqual(settlement.chipsOnTableDelta, -22)
+		self.assertEqual(settlement.comeBets[2], 0)
+		self.assertEqual(settlement.comeOdds[2], 0)
 
 	def testMaxLayOdds(self):
 		self.assertEqual(maxLayOdds(0), 0)
@@ -836,6 +898,79 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 200)
 		self.assertEqual(terminal["chipsOnTable"], 0)
 		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 5, 5: 5, 6: 6, 8: 6, 9: 5, 10: 5, 11: 0, 12: 0})
+
+	def testHandleLayMenuCommandExit(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		with patch("builtins.print"):
+			result = terminal["handleLayMenuCommand"]("x", pointPhase=False)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], True)
+
+	def testHandleLayMenuCommandPointToggle(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["layOff"] = False
+		with patch("builtins.print"):
+			result = terminal["handleLayMenuCommand"]("o", pointPhase=True)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["layOff"], True)
+
+	def testHandleLayMenuCommandCraplessGuardExits(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		with patch("builtins.print"):
+			result = terminal["handleLayMenuCommand"]("y", pointPhase=True)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], True)
+
+	def testHandleLayMenuCommandInvalidNoMutation(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["layOff"] = False
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		with patch("builtins.print"):
+			result = terminal["handleLayMenuCommand"]("zz", pointPhase=True)
+		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["layOff"], False)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertEqual(terminal["layBets"], {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+
+	def testHandleHardWaysMenuCommandExit(self):
+		terminal = loadTerminalNamespace()
+		with patch("builtins.print"):
+			result = terminal["handleHardWaysMenuCommand"]("x", pointPhase=False)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], True)
+
+	def testHandleHardWaysMenuCommandPointToggle(self):
+		terminal = loadTerminalNamespace()
+		terminal["hardOff"] = False
+		with patch("builtins.print"):
+			result = terminal["handleHardWaysMenuCommand"]("o", pointPhase=True)
+		self.assertEqual(result["handled"], True)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["hardOff"], True)
+
+	def testHandleHardWaysMenuCommandInvalidNoMutation(self):
+		terminal = loadTerminalNamespace()
+		terminal["hardOff"] = False
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
+		with patch("builtins.print"):
+			result = terminal["handleHardWaysMenuCommand"]("zz", pointPhase=True)
+		self.assertEqual(result["handled"], False)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(terminal["hardOff"], False)
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertEqual(terminal["hardWays"], {4: 5, 6: 0, 8: 0, 10: 0})
 
 	def testPlacePresetAcrossWorksInCrapless(self):
 		terminal = loadTerminalNamespace()

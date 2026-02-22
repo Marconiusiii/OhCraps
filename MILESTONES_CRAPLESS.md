@@ -254,3 +254,73 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testHandlePlaceMenuCommandPointOnlyIgnoredOnComeOut`
 	- `testHandlePlaceMenuCommandInvalidNoMutation`
 - Full suite remains green.
+
+## Milestone 36: Extract Lay And Hard Ways Command Dispatchers
+
+### What changed
+- Added shared Lay command dispatcher:
+	- `handleLayMenuCommand(command, pointPhase=False)`
+- Added shared Hard Ways command dispatcher:
+	- `handleHardWaysMenuCommand(command, pointPhase=False)`
+- Added centralized help text builders:
+	- `layHelpText(pointPhase=False)`
+	- `hardWaysHelpText(pointPhase=False)`
+- Replaced duplicated Lay/Hard command branches in both:
+	- initial betting phase menus,
+	- point-phase betting menus.
+
+### Behavior preserved
+- Lay command coverage: `y`, `a`, `d`, `h`, `x`, plus point-only `o`.
+- Hard Ways command coverage: `y`, `a`, `d`, `h4/h6/h8/h10`, `h`, `x`, plus point-only `o`.
+- Crapless Lay restriction is enforced in one dispatcher path.
+- Invalid command paths remain no-op on bankroll/table state.
+
+### Why
+- Removes duplicated command parsing logic and centralizes menu behavior.
+- Improves determinism and testability, which is needed for iOS view/controller extraction.
+
+### Test coverage
+- Added deterministic dispatcher tests in `tests/testEngineBehavior.py`:
+	- `testHandleLayMenuCommandExit`
+	- `testHandleLayMenuCommandPointToggle`
+	- `testHandleLayMenuCommandCraplessGuardExits`
+	- `testHandleLayMenuCommandInvalidNoMutation`
+	- `testHandleHardWaysMenuCommandExit`
+	- `testHandleHardWaysMenuCommandPointToggle`
+	- `testHandleHardWaysMenuCommandInvalidNoMutation`
+- Full suite remains green.
+
+## Milestone 37: Crapless Come Odds Structure Fix
+
+### What changed
+- Added mode-aware Come odds limit function in engine:
+	- `maxComeOddsForMode(number, baseBet, gameMode)`
+- Kept `maxComeOdds(...)` as standard wrapper for backward compatibility.
+- Extended Come table settlement to be mode-aware:
+	- `settleComeTableBets(..., gameMode=GameMode.craps)`
+- Added mode-aware Come number domain helper:
+	- `comeNumbersForMode(gameMode)`
+- Updated Come settlement loops to include Crapless edge points (`2, 3, 11, 12`) when in Crapless mode.
+- Added Come odds payout handling for Crapless edge numbers:
+	- Come 2/12 odds pay `6:1`
+	- Come 3/11 odds pay `3:1`
+- Added mode-aware Come bar handling:
+	- `settleComeBarBet(..., gameMode=GameMode.craps)`
+	- In Crapless: Come wins only on 7; all other totals move to numbers.
+
+### Terminal integration
+- Updated terminal to call mode-aware Come odds limit function in both odds entry paths.
+- Updated terminal Come bar settlement call to pass `gameMode`.
+- Updated terminal Come table settlement call to pass `gameMode`.
+- Expanded terminal Come/Don't Come dictionaries to include edge keys (`2, 3, 11, 12`) so Crapless odds and settlements are tracked safely.
+
+### Why
+- Come odds behavior in Crapless was still using standard Craps constraints and number sets.
+- This caused incorrect max-odds and settlement behavior for edge points.
+
+### Test coverage
+- Added deterministic tests for:
+	- Crapless Come bar movement on 11 and 2.
+	- Mode-aware max Come odds for edge numbers.
+	- Crapless Come odds payouts for 11 and 2 hits.
+- Full suite remains green.

@@ -194,3 +194,34 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testSettlePlaceBetsForModeCraplessEdgeNumbersBuyThresholdMatrix`
 	- `testSettlePlaceBetsForModeCraplessEdgeNumbersBuyVigRoundingMatrix`
 - Full suite remains green.
+
+## Milestone 34: Mode-Aware Place Helper Commands And Help Text
+
+### What changed
+- Added centralized mode-aware Place helper command list:
+	- `validPlacePresetCodesForMode()`
+- Added centralized Place help text generator:
+	- `placeHelpText(pointPhase=False)`
+- Updated both Place betting loops (come-out and point phase) to use mode-aware helper dispatch.
+- Added explicit invalid-option feedback in the come-out Place loop for safer command handling.
+- Added mode-safe validation at the start of `placePreset(pre)`:
+	- rejects presets not valid for the current game mode,
+	- prevents bet/accounting mutation on invalid helper commands.
+
+### Why
+- Place helper discoverability and command handling needed to be deterministic and mode-correct.
+- This removes ambiguity about which helper codes are valid in each game type.
+
+### Behavior now
+- Craps mode valid helper presets: `a`, `i`, `c`
+- Crapless mode valid helper presets: `a`, `i`, `c`, `e`, `ea`
+- Entering helper presets not valid for the current mode is ignored safely with a message.
+
+### Test coverage
+- Added deterministic tests in `tests/testEngineBehavior.py`:
+	- `testValidPlacePresetCodesForModeCraps`
+	- `testValidPlacePresetCodesForModeCrapless`
+	- `testPlacePresetEdgeRejectedInCrapsNoMutation`
+	- `testPlacePresetExtremeAcrossRejectedInCrapsNoMutation`
+	- `testPlaceHelpTextIsModeAware`
+- Full suite remains green.

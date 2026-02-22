@@ -754,6 +754,51 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
 		self.assertEqual(terminal["validPlaceNumbers"](), [2, 3, 4, 5, 6, 8, 9, 10, 11, 12])
 
+	def testValidPlacePresetCodesForModeCraps(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		self.assertEqual(terminal["validPlacePresetCodesForMode"](), ['a', 'i', 'c'])
+
+	def testValidPlacePresetCodesForModeCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		self.assertEqual(terminal["validPlacePresetCodesForMode"](), ['a', 'i', 'c', 'ea', 'e'])
+
+	def testPlacePresetEdgeRejectedInCrapsNoMutation(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placePreset"]("e")
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0})
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testPlacePresetExtremeAcrossRejectedInCrapsNoMutation(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["place"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.print"):
+			terminal["placePreset"]("ea")
+		self.assertEqual(terminal["place"], {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0})
+		self.assertEqual(terminal["bank"], 200)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+
+	def testPlaceHelpTextIsModeAware(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		crapsHelp = terminal["placeHelpText"](pointPhase=False)
+		self.assertNotIn("Extreme Across", crapsHelp)
+		self.assertNotIn("edge numbers", crapsHelp)
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		craplessHelp = terminal["placeHelpText"](pointPhase=False)
+		self.assertIn("Extreme Across", craplessHelp)
+		self.assertIn("edge numbers", craplessHelp)
+
 	def testPlacePresetAcrossWorksInCrapless(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps

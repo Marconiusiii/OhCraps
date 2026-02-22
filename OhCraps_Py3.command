@@ -1355,13 +1355,42 @@ def normalizedHalfPressIncrement(number, currentWager):
 			inc = unit
 	return inc
 
+def validPlacePresetCodesForMode():
+	if gameMode == GameMode.craplessCraps:
+		return ['a', 'i', 'c', 'ea', 'e']
+	return ['a', 'i', 'c']
+
+def placeHelpText(pointPhase=False):
+	helpLines = [
+		"Place Betting Codes:",
+		"\ty: Enter individual Place Betting mode.",
+		"\ta: Auto-bet Across all the numbers.",
+		"\ti: Auto-bet on the Inside numbers.",
+		"\tc: Auto-bet on the 6 and 8."
+	]
+	if gameMode == GameMode.craplessCraps:
+		helpLines.append("\te: Auto-bet edge numbers (2, 3, 11, 12).")
+		helpLines.append("\tea: Auto-bet Extreme Across (2 through 12).")
+	helpLines.append("\td: Take down all Place Bets.")
+	if pointPhase:
+		helpLines.append("\to: Turn Place Bets Off for next roll.")
+		helpLines.append("\tm: Move Point number to empty Place Bet.")
+		helpLines.append("\tp: Take down Point number place bet.")
+	helpLines.append("\th: Show this Help Menu.")
+	helpLines.append("\tx: Exit Place Betting.")
+	return "\n".join(helpLines) + "\n"
+
 def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
+	preset = pre.strip().lower()
+	if preset not in validPlacePresetCodesForMode():
+		print("That preset is not valid for this game mode.")
+		return
 	total = 0
 	outlay = 0
 	for number in place:
 		outlay += place[number]
-	if pre.strip().lower() == 'a':
+	if preset == 'a':
 		while True:
 			print("How many units across the Place Numbers?")
 			try:
@@ -1395,7 +1424,7 @@ def placePreset(pre):
 			bank -= place[key]
 			total += place[key]
 		print(f"Placing ${total:,} Across.")
-	elif pre.strip().lower() == 'i':
+	elif preset == 'i':
 		print("How many units Inside?")
 		while True:
 			try:
@@ -1436,7 +1465,7 @@ def placePreset(pre):
 				total += place[key]
 		print(f"Ok, placing ${total:,} inside.")
 
-	elif pre.strip().lower() == "c":
+	elif preset == "c":
 		print("How many units on the 6 and 8?")
 		while True:
 			try:
@@ -1462,7 +1491,7 @@ def placePreset(pre):
 			bank -= place[key]
 			total += place[key]
 			print(f"Ok, placing ${total:,} on the 6 and 8.")
-	elif pre.strip().lower() == "ea":
+	elif preset == "ea":
 		while True:
 			print("How many Extreme Across units from 2 through 12?")
 			try:
@@ -1491,7 +1520,7 @@ def placePreset(pre):
 			bank -= place[key]
 			total += place[key]
 		print(f"Ok, placing ${total:,} Extreme Across.")
-	elif pre.strip().lower() == "e":
+	elif preset == "e":
 		while True:
 			print("How many Edge units on 2, 3, 11, and 12?")
 			try:
@@ -1744,24 +1773,27 @@ while True:
 		elif round1 == "q":
 			quitGame()
 		elif round1 == "p":
-			while True:
-				placeShow()
-				plBet = str(input("Place Bets? > ")).strip().lower()
-				if plBet == "y":
-					placeBets()
-					continue
-				elif plBet == "d":
-					print("Taking down your Place Bets.")
-					placeTakeDown()
-					continue
-				elif plBet in ['a', 'i', 'c', 'ea', 'e']:
-					placePreset(plBet)
-					continue
-				elif plBet == "h":
-					print("Place Betting Codes:\n\ty: Enter individual Place Betting mode.\n\td: Take down all Place Bets.\n\ta: Auto-bet Across all the numbers.\n\ti: Auto-bet on the Inside numbers.\n\tc: Auto-bet on the 6 and 8\n\th: Show this Help Menu.\n\tx: Exit Place Betting.\n")
-				elif plBet == "x":
-					print("Done Place Betting!")
-					break
+				while True:
+					placeShow()
+					plBet = str(input("Place Bets? > ")).strip().lower()
+					if plBet == "y":
+						placeBets()
+						continue
+					elif plBet == "d":
+						print("Taking down your Place Bets.")
+						placeTakeDown()
+						continue
+					elif plBet in validPlacePresetCodesForMode():
+						placePreset(plBet)
+						continue
+					elif plBet == "h":
+						print(placeHelpText(pointPhase=False))
+					elif plBet == "x":
+						print("Done Place Betting!")
+						break
+					else:
+						print("That's not a valid option!")
+						continue
 
 		elif round1 in ["ly", "lay"]:
 			if gameMode == GameMode.craplessCraps:
@@ -1992,7 +2024,7 @@ while True:
 							print("Taking down all of your Place Bets.")
 							placeTakeDown()
 							continue
-						elif pl2 in ['a', 'i', 'c', 'ea', 'e']:
+						elif pl2 in validPlacePresetCodesForMode():
 							placePreset(pl2)
 							continue
 						elif pl2 == "m":
@@ -2005,7 +2037,7 @@ while True:
 							print(f"Taking down the Place {comeOut} bet.")
 							continue
 						elif pl2 == "h":
-							print("Place Bet Codes:\n\n\ty: Enter individual Place Betting mode.\n\ta: Auto-bet across all numbers.\n\ti: Auto-bet inside numbers.\n\tc: Auto-bet on the 6 and 8\n\to: Turn Place Bets Off for next roll.\n\td: Take down all Place Bets.\n\tm: Move Point number to empty Place Bet.\n\tp: Take down Point number place bet.\n\th: Show this Help menu.\n\tx: Finish Place Betting.")
+							print(placeHelpText(pointPhase=True))
 							continue
 						elif pl2 == "x":
 							print("Done Place Betting!")

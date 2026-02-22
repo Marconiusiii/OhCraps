@@ -8,6 +8,12 @@ from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsFor
 #Version Number
 version = "7.0.0"
 
+def writeOutput(message):
+	print(message)
+
+def readInput(promptText):
+	return str(input(promptText))
+
 class comeOutRollResult:
 	def __init__(self, enteredPointPhase, outcome):
 		self.enteredPointPhase = bool(enteredPointPhase)
@@ -2252,16 +2258,16 @@ def resolvePointRoll():
 
 def runPointPhaseBettingMenu():
 	while True:
-		print("Place your bets!\n")
-		round2 = str(input(">  ")).strip().lower()
+		writeOutput("Place your bets!\n")
+		round2 = readInput(">  ").strip().lower()
 		commandResult = handleBettingCommand(round2, pointPhase=True)
 		if commandResult["shouldRoll"]:
 			return {"shouldRoll": True}
 
 def runComeOutBettingMenu():
 	while True:
-		print("Place your Bets!\n")
-		round1 = str(input(">  ")).strip().lower()
+		writeOutput("Place your Bets!\n")
+		round1 = readInput(">  ").strip().lower()
 		commandResult = handleBettingCommand(round1, pointPhase=False)
 		if commandResult["shouldRoll"]:
 			return {"shouldRoll": True}
@@ -2273,13 +2279,13 @@ def runComeOutRound():
 
 def showPointPhaseStatus():
 	if chipsOnTable > 0:
-		print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+		writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
 	else:
-		print(f"You have ${bank:,} in the bank.")
+		writeOutput(f"You have ${bank:,} in the bank.")
 	if bank <= 0 and chipsOnTable <= 0:
 		outOfMoney()
-	print(f"\n{comeOut} is the Point!\n")
-	print(f"Throws: {throws}")
+	writeOutput(f"\n{comeOut} is the Point!\n")
+	writeOutput(f"Throws: {throws}")
 
 def runPointPhaseRound():
 	while True:

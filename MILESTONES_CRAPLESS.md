@@ -838,3 +838,29 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Updated existing round/roll orchestration tests in `tests/testEngineBehavior.py` to assert against typed result attributes.
 - Compile and full suite remain green.
+
+## Milestone 57: Orchestrator IO Adapter Boundary
+
+### What changed
+- Added terminal I/O wrapper helpers:
+	- `writeOutput(message)`
+	- `readInput(promptText)`
+- Migrated orchestrator-level prompt/display functions to use wrappers:
+	- `runComeOutBettingMenu()`
+	- `runPointPhaseBettingMenu()`
+	- `showPointPhaseStatus()`
+- Kept all player-facing prompt text unchanged.
+
+### Why
+- Direct `print/input` calls are a key portability blocker for non-terminal UIs.
+- A thin adapter boundary makes orchestration easier to retarget for iOS without touching rule logic.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No prompt wording changes.
+
+### Test coverage
+- Updated menu tests to patch `readInput`/`writeOutput` adapter functions directly.
+- Added explicit adapter usage test for `showPointPhaseStatus()` output flow.
+- Compile and full suite remain green.

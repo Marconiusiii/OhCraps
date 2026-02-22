@@ -1206,8 +1206,10 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			calls.append((command, pointPhase))
 			return {"shouldRoll": command == "x"}
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
-		with patch("builtins.input", side_effect=["h", "x"]), patch("builtins.print"):
-			result = terminal["runPointPhaseBettingMenu"]()
+		inputs = iter(["h", "x"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: None
+		result = terminal["runPointPhaseBettingMenu"]()
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(calls, [("h", True), ("x", True)])
 
@@ -1218,8 +1220,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			pointPhaseFlags.append(pointPhase)
 			return {"shouldRoll": True}
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
-		with patch("builtins.input", side_effect=["x"]), patch("builtins.print"):
-			result = terminal["runPointPhaseBettingMenu"]()
+		terminal["readInput"] = lambda promptText: "x"
+		terminal["writeOutput"] = lambda message: None
+		result = terminal["runPointPhaseBettingMenu"]()
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(pointPhaseFlags, [True])
 
@@ -1230,8 +1233,10 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			calls.append((command, pointPhase))
 			return {"shouldRoll": command == "r"}
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
-		with patch("builtins.input", side_effect=["h", "r"]), patch("builtins.print"):
-			result = terminal["runComeOutBettingMenu"]()
+		inputs = iter(["h", "r"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: None
+		result = terminal["runComeOutBettingMenu"]()
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(calls, [("h", False), ("r", False)])
 
@@ -1242,10 +1247,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			pointPhaseFlags.append(pointPhase)
 			return {"shouldRoll": True}
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
-		with patch("builtins.input", side_effect=["x"]), patch("builtins.print"):
-			result = terminal["runComeOutBettingMenu"]()
+		terminal["readInput"] = lambda promptText: "x"
+		terminal["writeOutput"] = lambda message: None
+		result = terminal["runComeOutBettingMenu"]()
 		self.assertEqual(result["shouldRoll"], True)
 		self.assertEqual(pointPhaseFlags, [False])
+
+	def testShowPointPhaseStatusUsesWriteOutputAdapter(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 25
+		terminal["comeOut"] = 6
+		terminal["throws"] = 9
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(message)
+		terminal["outOfMoney"] = lambda: None
+		terminal["showPointPhaseStatus"]()
+		self.assertEqual(writes[0], "You have $100 in the bank with $25 out on the table.")
+		self.assertEqual(writes[1], "\n6 is the Point!\n")
+		self.assertEqual(writes[2], "Throws: 9")
 
 	def testRunComeOutRoundReturnsContinuePath(self):
 		terminal = loadTerminalNamespace()

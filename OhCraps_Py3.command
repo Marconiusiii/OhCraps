@@ -8,6 +8,26 @@ from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsFor
 #Version Number
 version = "7.0.0"
 
+class comeOutRollResult:
+	def __init__(self, enteredPointPhase, outcome):
+		self.enteredPointPhase = bool(enteredPointPhase)
+		self.outcome = outcome
+
+class pointRollResult:
+	def __init__(self, pointRoundEnded, outcome):
+		self.pointRoundEnded = bool(pointRoundEnded)
+		self.outcome = outcome
+
+class comeOutRoundResult:
+	def __init__(self, enteredPointPhase, outcome):
+		self.enteredPointPhase = bool(enteredPointPhase)
+		self.outcome = outcome
+
+class pointPhaseRoundResult:
+	def __init__(self, roundEnded, outcome):
+		self.roundEnded = bool(roundEnded)
+		self.outcome = outcome
+
 #Roll and Dice Setup
 die1 = die2 = 0
 
@@ -2180,16 +2200,16 @@ def resolveComeOutRoll():
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		return {"enteredPointPhase": False, "outcome": outcome}
+		return comeOutRollResult(enteredPointPhase=False, outcome=outcome)
 	if outcome == RollOutcome.craps:
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		return {"enteredPointPhase": False, "outcome": outcome}
+		return comeOutRollResult(enteredPointPhase=False, outcome=outcome)
 	pointIsOn = True
 	working = False
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-	return {"enteredPointPhase": True, "outcome": outcome}
+	return comeOutRollResult(enteredPointPhase=True, outcome=outcome)
 
 def resolvePointRoll():
 	global p2, throws, placeOff, layOff, hardOff, pointIsOn
@@ -2221,14 +2241,14 @@ def resolvePointRoll():
 		throws = 0
 		pointIsOn = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		return {"pointRoundEnded": True, "outcome": outcome}
+		return pointRollResult(pointRoundEnded=True, outcome=outcome)
 	if outcome == RollOutcome.pointHit:
 		print("Point Hit! Front line winner!")
 		pointIsOn = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-		return {"pointRoundEnded": True, "outcome": outcome}
+		return pointRollResult(pointRoundEnded=True, outcome=outcome)
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
-	return {"pointRoundEnded": False, "outcome": outcome}
+	return pointRollResult(pointRoundEnded=False, outcome=outcome)
 
 def runPointPhaseBettingMenu():
 	while True:
@@ -2248,8 +2268,8 @@ def runComeOutBettingMenu():
 
 def runComeOutRound():
 	runComeOutBettingMenu()
-	comeOutResult = resolveComeOutRoll()
-	return {"enteredPointPhase": bool(comeOutResult["enteredPointPhase"]), "outcome": comeOutResult["outcome"]}
+	comeOutRoll = resolveComeOutRoll()
+	return comeOutRoundResult(enteredPointPhase=comeOutRoll.enteredPointPhase, outcome=comeOutRoll.outcome)
 
 def showPointPhaseStatus():
 	if chipsOnTable > 0:
@@ -2269,8 +2289,8 @@ def runPointPhaseRound():
 
 		runPointPhaseBettingMenu()
 		pointRollResult = resolvePointRoll()
-		if pointRollResult["pointRoundEnded"]:
-			return {"roundEnded": True, "outcome": pointRollResult["outcome"]}
+		if pointRollResult.pointRoundEnded:
+			return pointPhaseRoundResult(roundEnded=True, outcome=pointRollResult.outcome)
 		continue
 
 #Additional Global Variables
@@ -2326,7 +2346,7 @@ while True:
 # Initial bets
 
 	comeOutResult = runComeOutRound()
-	if not comeOutResult["enteredPointPhase"]:
+	if not comeOutResult.enteredPointPhase:
 		continue
 	runPointPhaseRound()
 

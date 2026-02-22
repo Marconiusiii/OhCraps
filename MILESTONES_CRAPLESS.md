@@ -809,3 +809,32 @@ New milestone updates should be appended here rather than creating new milestone
 	- continue-path result from `runComeOutRound()`.
 	- enter-point result from `runComeOutRound()`.
 - Compile and full suite remain green.
+
+## Milestone 56: Typed Round Transition Results
+
+### What changed
+- Added typed transition classes in terminal flow:
+	- `comeOutRollResult`
+	- `pointRollResult`
+	- `comeOutRoundResult`
+	- `pointPhaseRoundResult`
+- Replaced dict-based transition returns with typed objects for:
+	- `resolveComeOutRoll()`
+	- `resolvePointRoll()`
+	- `runComeOutRound()`
+	- `runPointPhaseRound()`
+- Updated top-level callers and tests to use attribute access instead of string-key indexing.
+
+### Why
+- String-key dict transitions are fragile and make orchestration logic harder to reason about.
+- Typed transition objects improve clarity, reduce typo risk, and better match iOS controller/state modeling patterns.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No prompt text changes.
+- Round/phase transition behavior is unchanged.
+
+### Test coverage
+- Updated existing round/roll orchestration tests in `tests/testEngineBehavior.py` to assert against typed result attributes.
+- Compile and full suite remain green.

@@ -350,3 +350,33 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testDComeOddsWinForModeStandardAndCrapless`
 - Existing Come odds settlement tests remain passing.
 - Full suite remains green.
+
+## Milestone 39: Odds Unit Validation Normalization
+
+### What changed
+- Added engine policy helpers for odds entry units:
+	- `comeOddsUnitForMode(number, gameMode)`
+	- `dComeOddsUnitForMode(number, gameMode)`
+	- `isOddsBetUnitValid(number, oddsBet, gameMode, isDont=False)`
+- Integrated unit validation into terminal odds entry paths:
+	- `cdcOddsChange(...)`
+	- immediate Come odds prompt after Come bet moves
+	- immediate Don't Come lay-odds prompt after Don't Come bet moves
+
+### Rule effect
+- Odds values that do not match allowed increments are now rejected at input time.
+- Existing payout math is unchanged; this milestone prevents invalid wager shapes before settlement.
+
+### Why
+- This removes truncation-style artifacts caused by off-unit odds amounts.
+- It improves consistency between what users can enter and what settlement logic expects.
+
+### Test coverage
+- Added engine-level unit tests:
+	- `testComeOddsUnitsByMode`
+	- `testDComeOddsUnitsByMode`
+	- `testIsOddsBetUnitValidByMode`
+- Added terminal validation tests:
+	- `testCdcOddsChangeRejectsInvalidComeOddsUnitInCraps`
+	- `testCdcOddsChangeRejectsInvalidDontComeOddsUnitInCrapless`
+- Full suite remains green.

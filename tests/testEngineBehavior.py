@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -557,6 +557,25 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(dComeOddsWinForMode(number=11, oddsBet=30, gameMode=GameMode.craplessCraps), 10)
 		self.assertEqual(dComeOddsWinForMode(number=2, oddsBet=30, gameMode=GameMode.craplessCraps), 5)
 
+	def testComeOddsUnitsByMode(self):
+		self.assertEqual(comeOddsUnitForMode(number=5, gameMode=GameMode.craps), 2)
+		self.assertEqual(comeOddsUnitForMode(number=6, gameMode=GameMode.craps), 5)
+		self.assertEqual(comeOddsUnitForMode(number=2, gameMode=GameMode.craplessCraps), 1)
+		self.assertEqual(comeOddsUnitForMode(number=11, gameMode=GameMode.craplessCraps), 1)
+
+	def testDComeOddsUnitsByMode(self):
+		self.assertEqual(dComeOddsUnitForMode(number=4, gameMode=GameMode.craps), 2)
+		self.assertEqual(dComeOddsUnitForMode(number=6, gameMode=GameMode.craps), 6)
+		self.assertEqual(dComeOddsUnitForMode(number=2, gameMode=GameMode.craplessCraps), 6)
+		self.assertEqual(dComeOddsUnitForMode(number=11, gameMode=GameMode.craplessCraps), 3)
+
+	def testIsOddsBetUnitValidByMode(self):
+		self.assertEqual(isOddsBetUnitValid(number=5, oddsBet=3, gameMode=GameMode.craps), False)
+		self.assertEqual(isOddsBetUnitValid(number=5, oddsBet=4, gameMode=GameMode.craps), True)
+		self.assertEqual(isOddsBetUnitValid(number=2, oddsBet=5, gameMode=GameMode.craplessCraps), True)
+		self.assertEqual(isOddsBetUnitValid(number=2, oddsBet=5, gameMode=GameMode.craplessCraps, isDont=True), False)
+		self.assertEqual(isOddsBetUnitValid(number=2, oddsBet=6, gameMode=GameMode.craplessCraps, isDont=True), True)
+
 	def testSettleComeTableBetsCraplessComeElevenHitWithOdds(self):
 		comeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 10, 12: 0, "Come": 0}
 		dComeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
@@ -981,6 +1000,32 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 200)
 		self.assertEqual(terminal["chipsOnTable"], 0)
 		self.assertEqual(terminal["hardWays"], {4: 5, 6: 0, 8: 0, 10: 0})
+
+	def testCdcOddsChangeRejectsInvalidComeOddsUnitInCraps(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 10, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["3", "4"]), patch("builtins.print"):
+			terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
+		self.assertEqual(terminal["comeOdds"][5], 4)
+		self.assertEqual(terminal["bank"], 96)
+		self.assertEqual(terminal["chipsOnTable"], 4)
+
+	def testCdcOddsChangeRejectsInvalidDontComeOddsUnitInCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["dComeBets"] = {2: 12, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["5", "6"]), patch("builtins.print"):
+			terminal["cdcOddsChange"](terminal["dComeBets"], terminal["dComeOdds"])
+		self.assertEqual(terminal["dComeOdds"][2], 6)
+		self.assertEqual(terminal["bank"], 94)
+		self.assertEqual(terminal["chipsOnTable"], 6)
 
 	def testPlacePresetAcrossWorksInCrapless(self):
 		terminal = loadTerminalNamespace()

@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -525,9 +525,11 @@ def cdcOddsChange(dict, dict2):
 		if dict[key] > 0:
 			if 'Come' in dict:
 				maxOdds = maxComeOddsForMode(number=key, baseBet=dict[key], gameMode=gameMode)
+				unit = comeOddsUnitForMode(number=key, gameMode=gameMode)
 				print(f"How much for Odds on the {key}? Max Odds is ${maxOdds:,}; you have ${dict2[key]:,} in Odds.")
 			else:
 				maxOdds = maxLayOdds(dict[key])
+				unit = dComeOddsUnitForMode(number=key, gameMode=gameMode)
 				print(f"How much to Lay against the {key}? Max Lay is ${maxOdds:,}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
@@ -536,6 +538,9 @@ def cdcOddsChange(dict, dict2):
 						print("You don't have enough money to make that bet! Try again.")
 						outOfMoney()
 						print("Change your Odds?")
+						continue
+					if not isOddsBetUnitValid(number=key, oddsBet=bet, gameMode=gameMode, isDont=('Come' not in dict)):
+						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
 						continue
 					break
 				except ValueError:
@@ -578,6 +583,13 @@ def comeCheck(roll):
 						bank += comeOdds[settlement.movedNumber]
 						comeOdds[settlement.movedNumber] = 0
 						continue
+					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=comeOdds[settlement.movedNumber], gameMode=gameMode):
+						unit = comeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
+						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
+						chipsOnTable -= comeOdds[settlement.movedNumber]
+						bank += comeOdds[settlement.movedNumber]
+						comeOdds[settlement.movedNumber] = 0
+						continue
 					else:
 						print(f"Ok, ${comeOdds[settlement.movedNumber]:,} on your Come {settlement.movedNumber} odds.")
 						break
@@ -597,6 +609,13 @@ def comeCheck(roll):
 					dComeOdds[settlement.movedNumber] = betPrompt()
 					if dComeOdds[settlement.movedNumber] > dMax:
 						print("Way too much for your Lay Odds! Try again.")
+						chipsOnTable -= dComeOdds[settlement.movedNumber]
+						bank += dComeOdds[settlement.movedNumber]
+						dComeOdds[settlement.movedNumber] = 0
+						continue
+					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=dComeOdds[settlement.movedNumber], gameMode=gameMode, isDont=True):
+						unit = dComeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
+						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
 						chipsOnTable -= dComeOdds[settlement.movedNumber]
 						bank += dComeOdds[settlement.movedNumber]
 						dComeOdds[settlement.movedNumber] = 0

@@ -337,6 +337,41 @@ def maxComeOddsForMode(number: int, baseBet: int, gameMode: GameMode) -> int:
 	return maxPassOdds(number, bet)
 
 
+def comeOddsUnitForMode(number: int, gameMode: GameMode) -> int:
+	if gameMode == GameMode.craplessCraps and number in [2, 3, 11, 12]:
+		return 1
+	if number in [5, 9]:
+		return 2
+	if number in [6, 8]:
+		return 5
+	return 1
+
+
+def dComeOddsUnitForMode(number: int, gameMode: GameMode) -> int:
+	if gameMode == GameMode.craplessCraps:
+		if number in [2, 12]:
+			return 6
+		if number in [3, 11]:
+			return 3
+	if number in [4, 10]:
+		return 2
+	if number in [5, 9]:
+		return 3
+	if number in [6, 8]:
+		return 6
+	return 1
+
+
+def isOddsBetUnitValid(number: int, oddsBet: int, gameMode: GameMode, isDont: bool = False) -> bool:
+	bet = int(oddsBet)
+	if bet == 0:
+		return True
+	unit = dComeOddsUnitForMode(number, gameMode) if isDont else comeOddsUnitForMode(number, gameMode)
+	if unit <= 1:
+		return True
+	return bet % unit == 0
+
+
 def comeOddsWinForMode(number: int, oddsBet: int, gameMode: GameMode) -> int:
 	bet = int(oddsBet)
 	if bet <= 0:

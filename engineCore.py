@@ -337,6 +337,42 @@ def maxComeOddsForMode(number: int, baseBet: int, gameMode: GameMode) -> int:
 	return maxPassOdds(number, bet)
 
 
+def comeOddsWinForMode(number: int, oddsBet: int, gameMode: GameMode) -> int:
+	bet = int(oddsBet)
+	if bet <= 0:
+		return 0
+	if gameMode == GameMode.craplessCraps:
+		if number in [2, 12]:
+			return bet * 6
+		if number in [3, 11]:
+			return bet * 3
+	if number in [4, 10]:
+		return bet * 2
+	if number in [5, 9]:
+		return (bet//2) * 3
+	if number in [6, 8]:
+		return (bet//5) * 6
+	return 0
+
+
+def dComeOddsWinForMode(number: int, oddsBet: int, gameMode: GameMode) -> int:
+	bet = int(oddsBet)
+	if bet <= 0:
+		return 0
+	if gameMode == GameMode.craplessCraps:
+		if number in [2, 12]:
+			return bet//6
+		if number in [3, 11]:
+			return bet//3
+	if number in [4, 10]:
+		return bet//2
+	if number in [5, 9]:
+		return (bet//3) * 2
+	if number in [6, 8]:
+		return (bet//6) * 5
+	return 0
+
+
 def maxLayOdds(baseBet: int) -> int:
 	return int(baseBet) * 10
 
@@ -799,13 +835,12 @@ def settleHardWays(hardWays: dict, roll: int, rollHard: bool) -> HardWaysSettlem
 	)
 
 
-def normalizeComeBets(comeBets: dict) -> dict:
-	normalized = dict(comeBets)
-	for key in [4, 5, 6, 8, 9, 10]:
-		if key not in normalized:
-			normalized[key] = 0
-		else:
-			normalized[key] = int(normalized[key])
+def normalizeComeBets(comeBets: dict, numbers: list | None = None) -> dict:
+	if numbers is None:
+		numbers = [4, 5, 6, 8, 9, 10]
+	normalized = {"Come": int(comeBets.get("Come", 0))}
+	for key in numbers:
+		normalized[key] = int(comeBets.get(key, 0))
 	return normalized
 
 
@@ -829,7 +864,7 @@ def comeNumbersForMode(gameMode: GameMode) -> list:
 
 def settleComeTableBets(comeBets: dict, dComeBets: dict, comeOdds: dict, dComeOdds: dict, roll: int, pointIsOn: bool, working: bool, gameMode: GameMode = GameMode.craps) -> ComeTableSettlement:
 	numbers = comeNumbersForMode(gameMode)
-	updatedComeBets = normalizeComeBets(comeBets)
+	updatedComeBets = normalizeComeBets(comeBets, numbers=numbers)
 	updatedDComeBets = normalizeNumberBetDict(dComeBets, numbers=numbers)
 	updatedComeOdds = normalizeNumberBetDict(comeOdds, numbers=numbers)
 	updatedDComeOdds = normalizeNumberBetDict(dComeOdds, numbers=numbers)
@@ -860,23 +895,14 @@ def settleComeTableBets(comeBets: dict, dComeBets: dict, comeOdds: dict, dComeOd
 		for key in numbers:
 			win += updatedDComeBets[key] * 2
 			chipsOnTableDelta -= updatedDComeBets[key]
-		for key in numbers:
-			if updatedDComeOdds[key] > 0 and (pointIsOn or working):
-				chipsOnTableDelta -= updatedDComeOdds[key]
-				bankDelta += updatedDComeOdds[key]
-				if key in [2, 12]:
-					winOdds += updatedDComeOdds[key]//6
-				elif key in [3, 11]:
-					winOdds += updatedDComeOdds[key]//3
-				elif key in [4, 10]:
-					winOdds += updatedDComeOdds[key]//2
-				elif key in [5, 9]:
-					winOdds += (updatedDComeOdds[key]//3) * 2
-				elif key in [6, 8]:
-					winOdds += (updatedDComeOdds[key]//6) * 5
-			else:
-				chipsOnTableDelta -= updatedDComeOdds[key]
-				winOdds += updatedDComeOdds[key]
+			for key in numbers:
+				if updatedDComeOdds[key] > 0 and (pointIsOn or working):
+					chipsOnTableDelta -= updatedDComeOdds[key]
+					bankDelta += updatedDComeOdds[key]
+					winOdds += dComeOddsWinForMode(number=key, oddsBet=updatedDComeOdds[key], gameMode=gameMode)
+				else:
+					chipsOnTableDelta -= updatedDComeOdds[key]
+					winOdds += updatedDComeOdds[key]
 				updatedDComeOdds[key] = 0
 		if win > 0:
 			messages.append(f"You won ${win//2:,} from your Don't Come Bets!")
@@ -896,17 +922,7 @@ def settleComeTableBets(comeBets: dict, dComeBets: dict, comeOdds: dict, dComeOd
 			chipsOnTableDelta -= updatedComeBets[roll]
 			updatedComeBets[roll] = 0
 			if updatedComeOdds[roll] > 0 and (pointIsOn or working):
-				cOddsWin = 0
-				if roll in [2, 12]:
-					cOddsWin = updatedComeOdds[roll] * 6
-				elif roll in [3, 11]:
-					cOddsWin = updatedComeOdds[roll] * 3
-				elif roll in [4, 10]:
-					cOddsWin = updatedComeOdds[roll] * 2
-				elif roll in [5, 9]:
-					cOddsWin += (updatedComeOdds[roll]//2) * 3
-				elif roll in [6, 8]:
-					cOddsWin += (updatedComeOdds[roll]//5) * 6
+				cOddsWin = comeOddsWinForMode(number=roll, oddsBet=updatedComeOdds[roll], gameMode=gameMode)
 				messages.append(f"You won ${cOddsWin:,} on the Come {roll} Odds!")
 				bankDelta += cOddsWin + updatedComeOdds[roll]
 				chipsOnTableDelta -= updatedComeOdds[roll]

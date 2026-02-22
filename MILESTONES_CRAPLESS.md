@@ -324,3 +324,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- Mode-aware max Come odds for edge numbers.
 	- Crapless Come odds payouts for 11 and 2 hits.
 - Full suite remains green.
+
+## Milestone 38: Centralize Come Odds Policy Helpers
+
+### What changed
+- Added mode-aware odds helpers in engine:
+	- `comeOddsWinForMode(number, oddsBet, gameMode)`
+	- `dComeOddsWinForMode(number, oddsBet, gameMode)`
+- Refactored Come odds settlement in `settleComeTableBets(...)` to use helper functions instead of inline branch payout logic.
+- Refactored Come bet normalization to be mode-aware by number domain:
+	- `normalizeComeBets(comeBets, numbers=None)`
+- Kept number-domain policy centralized via `comeNumbersForMode(gameMode)`.
+
+### Why
+- Odds policy was spread across inline branches, which increases risk for regression and future rule extension.
+- Centralizing payout and domain policy improves predictability and makes iOS service-layer extraction easier.
+
+### Behavior
+- No functional gameplay change intended; this milestone is structural normalization.
+- Existing Craps and Crapless payout behavior remains locked by tests.
+
+### Test coverage
+- Added direct helper tests in `tests/testEngineBehavior.py`:
+	- `testComeOddsWinForModeStandardAndCrapless`
+	- `testDComeOddsWinForModeStandardAndCrapless`
+- Existing Come odds settlement tests remain passing.
+- Full suite remains green.

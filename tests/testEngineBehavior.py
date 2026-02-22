@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -546,6 +546,16 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(maxComeOddsForMode(number=12, baseBet=10, gameMode=GameMode.craplessCraps), 60)
 		self.assertEqual(maxComeOddsForMode(number=3, baseBet=10, gameMode=GameMode.craplessCraps), 30)
 		self.assertEqual(maxComeOddsForMode(number=11, baseBet=10, gameMode=GameMode.craplessCraps), 30)
+
+	def testComeOddsWinForModeStandardAndCrapless(self):
+		self.assertEqual(comeOddsWinForMode(number=6, oddsBet=10, gameMode=GameMode.craps), 12)
+		self.assertEqual(comeOddsWinForMode(number=11, oddsBet=15, gameMode=GameMode.craplessCraps), 45)
+		self.assertEqual(comeOddsWinForMode(number=2, oddsBet=12, gameMode=GameMode.craplessCraps), 72)
+
+	def testDComeOddsWinForModeStandardAndCrapless(self):
+		self.assertEqual(dComeOddsWinForMode(number=9, oddsBet=30, gameMode=GameMode.craps), 20)
+		self.assertEqual(dComeOddsWinForMode(number=11, oddsBet=30, gameMode=GameMode.craplessCraps), 10)
+		self.assertEqual(dComeOddsWinForMode(number=2, oddsBet=30, gameMode=GameMode.craplessCraps), 5)
 
 	def testSettleComeTableBetsCraplessComeElevenHitWithOdds(self):
 		comeBets = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 10, 12: 0, "Come": 0}

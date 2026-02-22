@@ -606,18 +606,18 @@ def processComePostRollAction(roll):
 			max = maxComeOddsForMode(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode)
 			print(f"Moving your Come Bet to the {settlement.movedNumber}.")
 			if str(input(f"Come Odds for the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
-				print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 				while True:
+					print(f"How much on the Come {settlement.movedNumber}? Max Odds is ${max:,}.")
 					comeOdds[settlement.movedNumber] = betPrompt()
 					if comeOdds[settlement.movedNumber] > max:
-						mergeActionResult(actionResult, createActionResult(success=False, messages=["Way too high on your Odds, there. Try again."], stateChanged=False))
+						print("Way too high on your Odds, there. Try again.")
 						chipsOnTable -= comeOdds[settlement.movedNumber]
 						bank += comeOdds[settlement.movedNumber]
 						comeOdds[settlement.movedNumber] = 0
 						continue
 					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=comeOdds[settlement.movedNumber], gameMode=gameMode):
 						unit = comeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
-						mergeActionResult(actionResult, createActionResult(success=False, messages=[f"Invalid odds amount. Must be in increments of ${unit:,}."], stateChanged=False))
+						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
 						chipsOnTable -= comeOdds[settlement.movedNumber]
 						bank += comeOdds[settlement.movedNumber]
 						comeOdds[settlement.movedNumber] = 0
@@ -646,20 +646,21 @@ def processComePostRollAction(roll):
 			dComeBets[settlement.movedNumber] = settlement.movedAmount
 			actionResult["stateChanged"] = True
 			print(f"Moving your Don't Come bet to the {settlement.movedNumber}.")
-			if str(input(f"Don't Come Odds for the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
+			if str(input(f"Lay Odds on the {settlement.movedNumber}? > ")).strip().lower() in ['y', 'yes']:
 				dMax = maxLayOdds(dComeBets[settlement.movedNumber])
-				print(f"How much to lay for your Don't Come Odds? Max Lay is ${dMax:,}.")
+				unit = dComeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
+				effectiveMax = dMax if unit <= 1 else dMax - (dMax % unit)
 				while True:
+					print(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${effectiveMax:,}, multiples of {unit}")
 					dComeOdds[settlement.movedNumber] = betPrompt()
-					if dComeOdds[settlement.movedNumber] > dMax:
-						mergeActionResult(actionResult, createActionResult(success=False, messages=["Way too much for your Lay Odds! Try again."], stateChanged=False))
+					if dComeOdds[settlement.movedNumber] > effectiveMax:
+						print("Way too much for your Lay Odds! Try again.")
 						chipsOnTable -= dComeOdds[settlement.movedNumber]
 						bank += dComeOdds[settlement.movedNumber]
 						dComeOdds[settlement.movedNumber] = 0
 						continue
 					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=dComeOdds[settlement.movedNumber], gameMode=gameMode, isDont=True):
-						unit = dComeOddsUnitForMode(number=settlement.movedNumber, gameMode=gameMode)
-						mergeActionResult(actionResult, createActionResult(success=False, messages=[f"Invalid odds amount. Must be in increments of ${unit:,}."], stateChanged=False))
+						print(f"Invalid odds amount. Must be in increments of ${unit:,}.")
 						chipsOnTable -= dComeOdds[settlement.movedNumber]
 						bank += dComeOdds[settlement.movedNumber]
 						dComeOdds[settlement.movedNumber] = 0

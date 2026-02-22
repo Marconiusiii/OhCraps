@@ -1112,6 +1112,89 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
 			terminal["comeCheck"](5)
 
+	def testComeCheckRetriesWithContextPromptAndImmediateError(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["comeBet"] = 10
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 10
+		printedTexts = []
+
+		def fakePrint(*args, **kwargs):
+			printedTexts.append(" ".join(str(part) for part in args))
+
+		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=["y", "100", "20"]):
+			result = terminal["comeCheck"](5)
+
+		self.assertEqual(result["messages"].count("Way too high on your Odds, there. Try again."), 0)
+		self.assertEqual(result["messages"].count("Ok, $20 on your Come 5 odds."), 1)
+		self.assertEqual(sum(1 for text in printedTexts if "How much on the Come 5? Max Odds is $40." in text), 2)
+		self.assertEqual(sum(1 for text in printedTexts if "Way too high on your Odds, there. Try again." in text), 1)
+		self.assertEqual(terminal["comeOdds"][5], 20)
+
+	def testDontComeCheckUsesLayOddsPromptTextAndRetriesWithContext(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["dComeBet"] = 10
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 10
+		printedTexts = []
+		seenMoveReminder = {"value": False}
+		inputCalls = {"count": 0}
+
+		def fakePrint(*args, **kwargs):
+			text = " ".join(str(part) for part in args)
+			printedTexts.append(text)
+			if "Moving your Don't Come bet to the 5." in text:
+				seenMoveReminder["value"] = True
+
+		def fakeInput(prompt=""):
+			inputCalls["count"] += 1
+			if prompt == "Lay Odds on the 5? > ":
+				self.assertEqual(seenMoveReminder["value"], True)
+				return "y"
+			if prompt == "\t$> ":
+				if inputCalls["count"] == 2:
+					return "120"
+				if inputCalls["count"] == 3:
+					return "90"
+			raise AssertionError(f"Unexpected prompt: {prompt}")
+
+		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
+			result = terminal["comeCheck"](5)
+
+		self.assertEqual(result["messages"].count("Way too much for your Lay Odds! Try again."), 0)
+		self.assertEqual(result["messages"].count("Ok, $90 laid on the Don't Come 5."), 1)
+		self.assertEqual(sum(1 for text in printedTexts if "How much for your Lay 5 Odds? Max is $99, multiples of 3" in text), 2)
+		self.assertEqual(sum(1 for text in printedTexts if "Way too much for your Lay Odds! Try again." in text), 1)
+		self.assertEqual(terminal["dComeOdds"][5], 90)
+
+	def testDontComeCheckUsesEffectiveMaxForUnitRestrictedLayOdds(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["dComeBet"] = 10
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 10
+		printedTexts = []
+
+		def fakePrint(*args, **kwargs):
+			printedTexts.append(" ".join(str(part) for part in args))
+
+		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=["y", "100", "99"]):
+			result = terminal["comeCheck"](5)
+
+		self.assertEqual(result["messages"].count("Way too much for your Lay Odds! Try again."), 0)
+		self.assertEqual(result["messages"].count("Ok, $99 laid on the Don't Come 5."), 1)
+		self.assertEqual(sum(1 for text in printedTexts if "How much for your Lay 5 Odds? Max is $99, multiples of 3" in text), 2)
+		self.assertEqual(sum(1 for text in printedTexts if "Way too much for your Lay Odds! Try again." in text), 1)
+		self.assertEqual(terminal["dComeOdds"][5], 99)
+
 	def testComeCheckReturnsNoChangeActionResultWhenNoBarBets(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps

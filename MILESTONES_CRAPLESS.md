@@ -569,3 +569,27 @@ New milestone updates should be appended here rather than creating new milestone
 	- `Place 3` half-press normalization and accounting,
 	- `Place 2` full-press accounting after buy-style settlement.
 - Full suite remains green.
+
+## Milestone 46: Post-Hit Manual Place Edit Threshold Enforcement
+
+### What changed
+- Added a shared validator in terminal flow for place amounts:
+	- `isPlaceAmountAllowed(number, bet)`
+- Applied this validator to both:
+	- initial `placeBets()` entry,
+	- post-hit manual change path in `placeCheck(...)` when `press == 'y'`.
+
+### Why
+- Threshold rules for Crapless edge numbers (`2,3,11,12`) were previously enforced in initial entry, but not in post-hit manual change edits.
+- This could allow under-`$20` invalid non-multiple edits after a hit, creating inconsistent behavior.
+
+### Behavior
+- Under `$20`, edge-number manual changes now require valid multiples.
+- At `$20+`, edge-number manual changes accept non-multiple amounts (auto-buy threshold path).
+- Invalid manual edits are rejected with immediate retry and refunded wager before reprompt.
+
+### Test coverage
+- Added deterministic tests in `tests/testEngineBehavior.py` for:
+	- under-`$20` invalid-then-valid manual change flow,
+	- `$20+` non-multiple manual change acceptance.
+- Full suite remains green.

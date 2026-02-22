@@ -1479,6 +1479,15 @@ def placeUnitSize(number):
 		return 6
 	return 5
 
+def isPlaceAmountAllowed(number, bet):
+	if bet <= 0:
+		return True
+	if gameMode == GameMode.craplessCraps and number in [2, 12] and bet < 20:
+		return bet%2 == 0
+	if gameMode == GameMode.craplessCraps and number in [3, 11] and bet < 20:
+		return bet%4 == 0
+	return True
+
 def normalizedHalfPressIncrement(number, currentWager):
 	if number in [6, 8]:
 		return calculateHalfPressIncrement(number=number, currentWager=currentWager)
@@ -1856,10 +1865,7 @@ def placeBets():
 					outOfMoney()
 					print(f"How much on the Place {key}?")
 					continue
-				if gameMode == GameMode.craplessCraps and key in [2, 12] and bet < 20 and bet%2 != 0:
-					print("Invalid amount for that Place bet. Try again.")
-					continue
-				if gameMode == GameMode.craplessCraps and key in [3, 11] and bet < 20 and bet%4 != 0:
+				if not isPlaceAmountAllowed(number=key, bet=bet):
 					print("Invalid amount for that Place bet. Try again.")
 					continue
 				madeBet = True
@@ -1927,7 +1933,13 @@ def placeCheck(roll):
 		if press == 'y':
 			print(f"How much on the Place {hitNumber}?")
 			bank += place[hitNumber]
-			bet = betPrompt()
+			while True:
+				bet = betPrompt()
+				if isPlaceAmountAllowed(number=hitNumber, bet=bet):
+					break
+				print("Invalid amount for that Place bet. Try again.")
+				chipsOnTable -= bet
+				bank += bet
 			if bet == 0:
 				chipsOnTable -= place[hitNumber]
 				place[hitNumber] = bet

@@ -1722,6 +1722,32 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 203)
 		self.assertEqual(terminal["chipsOnTable"], 42)
 
+	def testPlaceCheckManualChangeCraplessEdgeUnderTwentyRejectsInvalidThenAccepts(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {2: 18, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["y", "19", "18"]), patch("builtins.print") as mockPrint:
+			terminal["placeCheck"](2)
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("Invalid amount for that Place bet. Try again.", printed)
+		self.assertEqual(terminal["place"][2], 18)
+		self.assertEqual(terminal["bank"], 199)
+		self.assertEqual(terminal["chipsOnTable"], 18)
+
+	def testPlaceCheckManualChangeCraplessEdgeOverTwentyAcceptsNonMultiple(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {2: 18, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.input", side_effect=["y", "21"]), patch("builtins.print"):
+			terminal["placeCheck"](2)
+		self.assertEqual(terminal["place"][2], 21)
+		self.assertEqual(terminal["bank"], 196)
+		self.assertEqual(terminal["chipsOnTable"], 21)
+
 	def testLayAllAcrossSetsEachNumber(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

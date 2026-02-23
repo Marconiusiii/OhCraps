@@ -108,30 +108,30 @@ fireBet = 0
 
 def fireBetting():
 	global fireBet
-	print("\tHow much on the Fire Bet?")
+	writeOutput("\tHow much on the Fire Bet?")
 	fireBet = betPrompt()
-	print(f"\tOk, ${fireBet:,} on the Fire Bet. Good Luck!")
+	writeOutput(f"\tOk, ${fireBet:,} on the Fire Bet. Good Luck!")
 
 def fireCheck():
 	global bank, fire, fireBet, comeOut, p2, chipsOnTable
 	if p2 == 7:
 		chipsOnTable -= fireBet
 		if len(fire) < 4:
-			print(f"You lost ${fireBet:,} from the Fire Bet.")
+			writeOutput(f"You lost ${fireBet:,} from the Fire Bet.")
 			fireBet = 0
 			fire = []
 		elif len(fire) == 4:
-			print(f"You won ${fireBet * 25:,} on the Fire Bet! Great job!")
+			writeOutput(f"You won ${fireBet * 25:,} on the Fire Bet! Great job!")
 			bank += fireBet * 25
 			fireBet = 0
 			fire = []
 		elif len(fire) == 5:
-			print(f"You won ${fireBet * 250:,} on the Fire Bet! Holy Crap!")
+			writeOutput(f"You won ${fireBet * 250:,} on the Fire Bet! Holy Crap!")
 			bank += fireBet * 250
 			fireBet = 0
 			fire = []
 		elif len(fire) == 6:
-			print(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000:,}!!")
+			writeOutput(f"Wowsers! You nailed the Fire Bet Jackpot and won ${fireBet * 1000:,}!!")
 			bank += fireBet * 1000
 			fireBet = 0
 			fire = []
@@ -139,7 +139,7 @@ def fireCheck():
 		if p2 not in fire:
 			fire.append(p2)
 			fire.sort()
-			print(f"Fire Bet Point Numbers: {fire}")
+			writeOutput(f"Fire Bet Point Numbers: {fire}")
 
 # Hard Ways Setup
 rollHard = False
@@ -1267,15 +1267,15 @@ atsOn = False
 def atsBetting():
 	global atsAll, atsSmall, atsTall, atsOn, bank
 	atsOn = True
-	print("How much on the All?")
+	writeOutput("How much on the All?")
 	atsAll = betPrompt()
-	print(f"Ok, ${atsAll:,} on the All.")
-	print("How much on the Tall?")
+	writeOutput(f"Ok, ${atsAll:,} on the All.")
+	writeOutput("How much on the Tall?")
 	atsTall = betPrompt()
-	print(f"Ok, ${atsTall:,} on the Tall.")
-	print("How much on the Small?")
+	writeOutput(f"Ok, ${atsTall:,} on the Tall.")
+	writeOutput("How much on the Small?")
 	atsSmall = betPrompt()
-	print(f"Ok, ${atsSmall:,} on the Small.")
+	writeOutput(f"Ok, ${atsSmall:,} on the Small.")
 
 def ats(roll):
 	global allNums, smallNums, tallNums, bank, chipsOnTable, atsAll, atsSmall, atsTall, atsOn
@@ -1292,7 +1292,7 @@ def ats(roll):
 
 	if roll == 7 and (atsAll + atsSmall + atsTall) > 0:
 		atsOn = False
-		print(f"You lost ${atsAll+atsTall+atsSmall:,} from the All Tall Small.")
+		writeOutput(f"You lost ${atsAll+atsTall+atsSmall:,} from the All Tall Small.")
 		#bank -= atsAll + atsTall + atsSmall
 		chipsOnTable -= atsAll + atsTall + atsSmall
 		atsAll = atsSmall = atsTall = 0
@@ -1301,22 +1301,22 @@ def ats(roll):
 		tallNums = []
 	elif (atsAll + atsSmall + atsTall) > 0:
 		allNums.sort()
-		print(f"All Tall Small: {allNums}")
+		writeOutput(f"All Tall Small: {allNums}")
 
 	if set(smallNums) == set(smallSet):
-		print(f"You won ${atsSmall * 34:,} on the Small!")
+		writeOutput(f"You won ${atsSmall * 34:,} on the Small!")
 		bank += atsSmall * 34
 		chipsOnTable -= atsSmall
 		atsSmall = 0
 		smallNums = []
 	if set(tallNums) == set(tallSet):
-		print(f"You won ${atsTall*34:,} from the Tall!")
+		writeOutput(f"You won ${atsTall*34:,} from the Tall!")
 		bank += atsTall * 34
 		chipsOnTable -= atsTall
 		atsTall = 0
 		tallNums = []
 	if set(allNums) == set(allSet):
-		print(f"You won ${atsAll*175:,} on the All! Holy Crap!")
+		writeOutput(f"You won ${atsAll*175:,} on the All! Holy Crap!")
 		bank += atsAll * 175
 		chipsOnTable -= atsAll
 		atsAll = 0
@@ -2187,7 +2187,7 @@ def handleBettingCommand(command, pointPhase=False):
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "f":
 			fieldShow()
-			fb2 = str(input("Field Bet? > ")).strip().lower()
+			fb2 = str(readInput("Field Bet? > ")).strip().lower()
 			if fb2 in ['y', 'yes']:
 				field()
 			elif fb2 in ['d', 'td', 'takedown']:
@@ -2222,7 +2222,7 @@ def handleBettingCommand(command, pointPhase=False):
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd in ["f", "field"]:
 		fieldShow()
-		fBet = str(input("Field Bet? > ")).strip().lower()
+		fBet = str(readInput("Field Bet? > ")).strip().lower()
 		if fBet in ['y', 'yes']:
 			field()
 		elif fBet in ['d', 'td', 'takedown']:

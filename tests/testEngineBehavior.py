@@ -2093,6 +2093,66 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 8)
 		self.assertIn("Go back up on the Field? > ", prompts)
 
+	def testAtsBettingUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["atsAll"] = 0
+		terminal["atsTall"] = 0
+		terminal["atsSmall"] = 0
+		writes = []
+		inputs = iter(["5", "4", "3"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["atsBetting"]()
+		self.assertEqual(terminal["atsAll"], 5)
+		self.assertEqual(terminal["atsTall"], 4)
+		self.assertEqual(terminal["atsSmall"], 3)
+		self.assertIn("How much on the All?", " ".join(writes))
+		self.assertIn("How much on the Tall?", " ".join(writes))
+		self.assertIn("How much on the Small?", " ".join(writes))
+
+	def testAtsWritesLossOnSevenOut(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsAll"] = 5
+		terminal["atsTall"] = 4
+		terminal["atsSmall"] = 3
+		terminal["chipsOnTable"] = 12
+		terminal["bank"] = 100
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["ats"](7)
+		self.assertEqual(terminal["atsAll"], 0)
+		self.assertEqual(terminal["atsTall"], 0)
+		self.assertEqual(terminal["atsSmall"], 0)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertIn("You lost $12 from the All Tall Small.", " ".join(writes))
+
+	def testFireBettingUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["fireBet"] = 0
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: "5"
+		terminal["fireBetting"]()
+		self.assertEqual(terminal["fireBet"], 5)
+		self.assertIn("How much on the Fire Bet?", " ".join(writes))
+
+	def testHandleBettingCommandFieldPromptUsesReadInput(self):
+		terminal = loadTerminalNamespace()
+		terminal["fieldBet"] = 0
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		inputs = iter(["y", "10"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: None
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("f", pointPhase=False)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(terminal["fieldBet"], 10)
+
 	def testOddsPassRejectOverMaxRefundsBeforeRetry(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

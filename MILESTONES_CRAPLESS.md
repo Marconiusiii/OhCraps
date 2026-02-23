@@ -1353,3 +1353,36 @@ New milestone updates should be appended here rather than creating new milestone
 	- `placeCheck(...)` press prompt consuming input via `readInput(...)`
 - Existing Place and Crapless preset/buy-threshold test matrix remains green.
 - Compile and full suite remain green (`219` tests passing).
+
+## Milestone 76: ATS/Fire and Field Prompt IO Adapter Completion
+
+### What changed
+- Migrated ATS terminal I/O to adapter helpers:
+	- `atsBetting()` now uses `readInput(...)`/`writeOutput(...)`
+	- `ats()` settlement messaging now uses `writeOutput(...)`
+- Migrated Fire terminal I/O to adapter helpers:
+	- `fireBetting()` now uses `writeOutput(...)`
+	- `fireCheck()` settlement messaging now uses `writeOutput(...)`
+- Migrated remaining Field command prompts in betting flow to adapter input:
+	- Point-phase `Field Bet? >` prompt in `handleBettingCommand(...)` now uses `readInput(...)`
+	- Come-out `Field Bet? >` prompt in `handleBettingCommand(...)` now uses `readInput(...)`
+
+### Why
+- ATS and Fire still contained direct terminal I/O and were part of the remaining portability gaps.
+- `handleBettingCommand(...)` still had two direct field-entry prompts; these were the last high-frequency direct inputs in that path.
+- Completing adapter routing improves terminal/UI separation for future iOS integration.
+
+### Behavior
+- No ATS payout-rule changes.
+- No Fire payout-rule changes.
+- No Field bet-rule or bankroll accounting changes.
+- Prompt text and settlement outcomes remain functionally equivalent.
+
+### Test coverage
+- Added deterministic adapter-focused tests for:
+	- ATS betting prompt path using `readInput(...)` and output via `writeOutput(...)`
+	- ATS seven-out loss messaging through adapter output
+	- Fire betting prompt path using adapter output
+	- `handleBettingCommand(...)` field prompts using `readInput(...)`
+- Compile check passed.
+- Full suite remains green (`223` tests passing).

@@ -886,3 +886,35 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Updated command-handler and menu-loop tests in `tests/testEngineBehavior.py` to use typed command results.
 - Compile and full suite remain green.
+
+## Milestone 59: Line Odds Prompt Language Normalization
+
+### What changed
+- Updated Pass Line Odds prompt wording in `odds()` to:
+	- initial: `Odds on the $point?`
+	- existing odds: `You have $amount in Odds for the $point. How much for your Odds?`
+- Updated Don't Pass/Lay Odds prompt wording in `odds()` to:
+	- initial: `Lay Odds against the $point?`
+	- existing odds: `You have $amount laid against the $point. How much do you want to Lay?`
+- Added max reminder as a separate line:
+	- `Max odds is $maxOdds.`
+- Multiples reminder now appears only when unit is not 1:
+	- `Multiples of $unit.`
+- Updated Lay take-down confirmation message to:
+	- `Taking down your Lay Odds.`
+
+### Why
+- Prompt language needed to match requested table wording and reduce clutter.
+- Always printing `multiples of 1` is noisy and not useful to players.
+
+### Behavior
+- No payout-rule changes.
+- No odds-limit logic changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Updated existing odds prompt assertions for Pass and Don't Pass text.
+- Added tests for:
+	- existing Pass Odds wording plus no `Multiples of 1` output.
+	- existing Lay Odds wording plus Lay take-down confirmation string.
+- Compile and full suite remain green.

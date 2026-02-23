@@ -365,11 +365,16 @@ def odds():
 	passLimits = oddsBetLimits(number=comeOut, baseBet=lineBets["Pass"], gameMode=gameMode, isDont=False)
 	dontPassLimits = oddsBetLimits(number=comeOut, baseBet=lineBets["Don't Pass"], gameMode=gameMode, isDont=True)
 	if lineBets["Pass"] > 0:
-		print(f"You have ${lineBets['Pass Odds']:,} for your odds.")
 		while True:
 			chipsOnTable -= lineBets["Pass Odds"]
 			bank += lineBets["Pass Odds"]
-			print(f"How much for your Pass {comeOut} Odds? Max is ${passLimits['effectiveMax']:,}, multiples of {passLimits['unit']}")
+			if lineBets["Pass Odds"] > 0:
+				print(f"You have ${lineBets['Pass Odds']:,} in Odds for the {comeOut}. How much for your Odds?")
+			else:
+				print(f"Odds on the {comeOut}?")
+			print(f"Max odds is ${passLimits['effectiveMax']:,}.")
+			if passLimits["unit"] != 1:
+				print(f"Multiples of {passLimits['unit']}.")
 			pOddsChange = betPrompt()
 			if pOddsChange > 0 and pOddsChange <= passLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=pOddsChange, gameMode=gameMode):
 				lineBets["Pass Odds"] = pOddsChange
@@ -394,11 +399,17 @@ def odds():
 				break
 
 	if lineBets["Don't Pass"] > 0:
-		print(f"You have ${lineBets["Don't Pass Odds"]:,} for your lay odds.")
 		while True:
 			chipsOnTable -= lineBets["Don't Pass Odds"]
 			bank += lineBets["Don't Pass Odds"]
-			print(f"How much for your Don't Pass {comeOut} Lay Odds? Max is ${dontPassLimits['effectiveMax']:,}, multiples of {dontPassLimits['unit']}")
+			if lineBets["Don't Pass Odds"] > 0:
+				currentLayOdds = lineBets["Don't Pass Odds"]
+				print(f"You have ${currentLayOdds:,} laid against the {comeOut}. How much do you want to Lay?")
+			else:
+				print(f"Lay Odds against the {comeOut}?")
+			print(f"Max odds is ${dontPassLimits['effectiveMax']:,}.")
+			if dontPassLimits["unit"] != 1:
+				print(f"Multiples of {dontPassLimits['unit']}.")
 			dpOddsChange = betPrompt()
 			if dpOddsChange > 0 and dpOddsChange <= dontPassLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=dpOddsChange, gameMode=gameMode, isDont=True):
 				lineBets["Don't Pass Odds"] = dpOddsChange
@@ -415,7 +426,7 @@ def odds():
 				bank += dpOddsChange
 				continue
 			elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
-				print("Ok, taking down your Don't Pass Odds.")
+				print("Taking down your Lay Odds.")
 				lineBets["Don't Pass Odds"] = dpOddsChange
 				break
 			else:

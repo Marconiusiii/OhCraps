@@ -1789,7 +1789,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with patch("builtins.input", side_effect=["3", "4"]), patch("builtins.print") as mockPrint:
 			terminal["odds"]()
 		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
-		self.assertIn("How much for your Pass 5 Odds? Max is $40, multiples of 2", printed)
+		self.assertIn("Odds on the 5?", printed)
+		self.assertIn("Max odds is $40.", printed)
+		self.assertIn("Multiples of 2.", printed)
 		self.assertIn("Invalid odds amount. Must be in increments of $2.", printed)
 		self.assertEqual(terminal["lineBets"]["Pass Odds"], 4)
 		self.assertEqual(terminal["bank"], 96)
@@ -1810,7 +1812,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with patch("builtins.input", side_effect=["100", "99"]), patch("builtins.print") as mockPrint:
 			terminal["odds"]()
 		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
-		self.assertIn("How much for your Don't Pass 5 Lay Odds? Max is $99, multiples of 3", printed)
+		self.assertIn("Lay Odds against the 5?", printed)
+		self.assertIn("Max odds is $99.", printed)
+		self.assertIn("Multiples of 3.", printed)
 		self.assertIn("Nope, you laid too much! Try again.", printed)
 		self.assertEqual(terminal["lineBets"]["Don't Pass Odds"], 99)
 		self.assertEqual(terminal["bank"], 101)
@@ -1832,6 +1836,45 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["lineBets"]["Don't Pass Odds"], 90)
 		self.assertEqual(terminal["bank"], 310)
 		self.assertEqual(terminal["chipsOnTable"], 100)
+
+	def testOddsPassExistingWordingAndNoMultiplesWhenUnitOne(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 20
+		terminal["comeOut"] = 2
+		terminal["lineBets"] = {
+			"Pass": 10,
+			"Pass Odds": 12,
+			"Don't Pass": 0,
+			"Don't Pass Odds": 0
+		}
+		with patch("builtins.input", side_effect=["12"]), patch("builtins.print") as mockPrint:
+			terminal["odds"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("You have $12 in Odds for the 2. How much for your Odds?", printed)
+		self.assertIn("Max odds is $60.", printed)
+		self.assertNotIn("Multiples of 1.", printed)
+
+	def testOddsDontPassExistingWordingAndTakeDownMessage(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 50
+		terminal["comeOut"] = 5
+		terminal["lineBets"] = {
+			"Pass": 0,
+			"Pass Odds": 0,
+			"Don't Pass": 10,
+			"Don't Pass Odds": 30
+		}
+		with patch("builtins.input", side_effect=["0"]), patch("builtins.print") as mockPrint:
+			terminal["odds"]()
+		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		self.assertIn("You have $30 laid against the 5. How much do you want to Lay?", printed)
+		self.assertIn("Max odds is $99.", printed)
+		self.assertIn("Multiples of 3.", printed)
+		self.assertIn("Taking down your Lay Odds.", printed)
 
 	def testPropBettingHiLowRetryPreservesAccounting(self):
 		terminal = loadTerminalNamespace()

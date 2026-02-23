@@ -2235,6 +2235,39 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["bank"], 96)
 		self.assertEqual(terminal["chipsOnTable"], 4)
 
+	def testPropBettingUsesIoAdaptersForHiLowFlow(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["hl", "3", "4", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Snake Eyes"], 2)
+		self.assertEqual(terminal["propBets"]["Boxcars"], 2)
+		self.assertEqual(terminal["bank"], 96)
+		self.assertEqual(terminal["chipsOnTable"], 4)
+		printed = " ".join(writes)
+		self.assertIn("Type in your Prop Bet:", printed)
+		self.assertIn("How much on the Hi-Low? Must be a multiple of 2.", printed)
+		self.assertIn("That wasn't a multiple of 2! Try again, genius.", printed)
+		self.assertIn("Done Prop Betting.", printed)
+
+	def testPropPayUsesWriteOutputAdapter(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 0
+		terminal["chipsOnTable"] = 40
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		terminal["propBets"]["Horn"] = 40
+		terminal["die1"] = 5
+		terminal["die2"] = 4
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["propPay"](9)
+		self.assertTrue(len(writes) > 0)
+
 	def testPlacePresetAcrossExcludePoint(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 200

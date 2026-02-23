@@ -1256,3 +1256,28 @@ New milestone updates should be appended here rather than creating new milestone
 	- Post-win field change flow.
 	- Post-loss field re-up flow.
 - Compile and full suite remain green (`212` tests passing).
+
+## Milestone 73: Prop Bets IO Adapter Migration
+
+### What changed
+- Routed Prop betting menu I/O to adapter helpers:
+	- `propHelp()` now uses `writeOutput(...)`
+	- `propBetting()` now uses `readInput(...)` for command entry and `writeOutput(...)` for all menu messages/prompts/retry text
+- Routed Prop settlement message emission to adapter output:
+	- `propPay()` now emits alias, subset settlement, Buffalo settlement, Hop settlement, and manual-management notices via `writeOutput(...)`
+
+### Why
+- Prop betting remained one of the largest interactive direct terminal I/O surfaces.
+- Moving this flow to adapter boundaries significantly improves UI-portability consistency for iOS migration.
+
+### Behavior
+- No prop payout-rule changes.
+- No prop key/alias behavior changes.
+- No prop bankroll/chips accounting rule changes.
+
+### Test coverage
+- Added deterministic adapter-focused tests for:
+	- Hi-Low retry flow through `readInput(...)`/`writeOutput(...)`
+	- Prop settlement output path through `writeOutput(...)`
+- Existing Hi-Low accounting regression remains green.
+- Compile and full suite remain green (`214` tests passing).

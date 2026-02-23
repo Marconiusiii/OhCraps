@@ -375,14 +375,15 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.lostNumber, None)
 		self.assertEqual(settlement.layBets, layBets)
 
-	def testSettleLayBetsForModeCraplessReturnsAnyLay(self):
-		layBets = {4: 20, 5: 0, 6: 30, 8: 0, 9: 0, 10: 0}
+	def testSettleLayBetsForModeCraplessIncludesEdgeLayPayouts(self):
+		layBets = {2: 60, 3: 30, 4: 20, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 30, 12: 60}
 		settlement = settleLayBetsForMode(layBets=layBets, roll=7, gameMode=GameMode.craplessCraps)
-		self.assertEqual(settlement.bankDelta, 50)
-		self.assertEqual(settlement.chipsOnTableDelta, -50)
-		self.assertEqual(settlement.layBets[4], 0)
-		self.assertEqual(settlement.layBets[6], 0)
-		self.assertIn("Lay bets are not available in Crapless Craps. Returning $50.", settlement.messages)
+		self.assertEqual(settlement.totalWinAmount, 50)
+		self.assertEqual(settlement.totalVigAmount, 5)
+		self.assertEqual(settlement.bankDelta, 45)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertIn("You won $10 on the Lay 2!", settlement.messages)
+		self.assertIn("You won $10 on the Lay 12!", settlement.messages)
 
 	def testSettleFieldBetStandardWin(self):
 		settlement = settleFieldBet(fieldBet=10, roll=9)
@@ -1126,14 +1127,17 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["shouldExitMenu"], False)
 		self.assertEqual(terminal["layOff"], True)
 
-	def testHandleLayMenuCommandCraplessGuardExits(self):
+	def testHandleLayMenuCommandCraplessAllowsEntry(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		calls = []
+		terminal["layBetting"] = lambda: calls.append(True)
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("y", pointPhase=True)
-		self.assertEqual(result["success"], False)
-		self.assertEqual(result["stateChanged"], False)
-		self.assertEqual(result["shouldExitMenu"], True)
+		self.assertEqual(result["success"], True)
+		self.assertEqual(result["stateChanged"], True)
+		self.assertEqual(result["shouldExitMenu"], False)
+		self.assertEqual(calls, [True])
 
 	def testHandleLayMenuCommandInvalidNoMutation(self):
 		terminal = loadTerminalNamespace()
@@ -1141,7 +1145,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["layOff"] = False
 		terminal["bank"] = 200
 		terminal["chipsOnTable"] = 0
-		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		terminal["layBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
 		with patch("builtins.print"):
 			result = terminal["handleLayMenuCommand"]("zz", pointPhase=True)
 		self.assertEqual(result["success"], False)
@@ -1150,7 +1154,27 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["layOff"], False)
 		self.assertEqual(terminal["bank"], 200)
 		self.assertEqual(terminal["chipsOnTable"], 0)
-		self.assertEqual(terminal["layBets"], {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+		self.assertEqual(terminal["layBets"], {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0})
+
+	def testHandleLayMenuCommandCraplessEdgeHelpers(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["layBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["readInput"] = lambda promptText: "1"
+		terminal["writeOutput"] = lambda message: None
+		with patch("builtins.print"):
+			edgeResult = terminal["handleLayMenuCommand"]("e", pointPhase=True)
+		self.assertEqual(edgeResult["success"], True)
+		self.assertEqual(terminal["layBets"][2], 5)
+		self.assertEqual(terminal["layBets"][3], 5)
+		self.assertEqual(terminal["layBets"][11], 5)
+		self.assertEqual(terminal["layBets"][12], 5)
+		with patch("builtins.print"):
+			extremeResult = terminal["handleLayMenuCommand"]("ea", pointPhase=True)
+		self.assertEqual(extremeResult["success"], True)
+		self.assertTrue(all(terminal["layBets"][number] == 5 for number in [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]))
 
 	def testHandleHardWaysMenuCommandExit(self):
 		terminal = loadTerminalNamespace()
@@ -2505,23 +2529,54 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 
 	def testLayAllAcrossSetsEachNumber(self):
 		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
 		terminal["bank"] = 100
 		terminal["chipsOnTable"] = 0
-		terminal["layBets"] = {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
-		with patch("builtins.input", side_effect=["2"]):
-			terminal["layAll"]()
-		self.assertEqual(terminal["layBets"], {4: 10, 5: 10, 6: 10, 8: 10, 9: 10, 10: 10})
+		terminal["layBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["readInput"] = lambda promptText: "2"
+		terminal["writeOutput"] = lambda message: None
+		terminal["layAll"]()
+		self.assertEqual(terminal["layBets"], {2: 0, 3: 0, 4: 10, 5: 10, 6: 10, 8: 10, 9: 10, 10: 10, 11: 0, 12: 0})
 		self.assertEqual(terminal["bank"], 40)
 		self.assertEqual(terminal["chipsOnTable"], 60)
 
+	def testLayEdgesCraplessSetsOnlyEdgeNumbers(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 120
+		terminal["chipsOnTable"] = 0
+		terminal["layBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["readInput"] = lambda promptText: "2"
+		terminal["writeOutput"] = lambda message: None
+		terminal["layEdges"]()
+		self.assertEqual(terminal["layBets"], {2: 10, 3: 10, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 10, 12: 10})
+		self.assertEqual(terminal["bank"], 80)
+		self.assertEqual(terminal["chipsOnTable"], 40)
+
+	def testLayExtremeAcrossCraplessSetsAllLayNumbers(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 0
+		terminal["layBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["readInput"] = lambda promptText: "1"
+		terminal["writeOutput"] = lambda message: None
+		terminal["layExtremeAcross"]()
+		self.assertEqual(terminal["layBets"], {2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 8: 5, 9: 5, 10: 5, 11: 5, 12: 5})
+		self.assertEqual(terminal["bank"], 150)
+		self.assertEqual(terminal["chipsOnTable"], 50)
+
 	def testLayBettingTakeDownReturnsFunds(self):
 		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
 		terminal["bank"] = 90
 		terminal["chipsOnTable"] = 10
-		terminal["layBets"] = {4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
-		with patch("builtins.input", side_effect=["0", "", "", "", "", ""]):
-			terminal["layBetting"]()
-		self.assertEqual(terminal["layBets"], {4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0})
+		terminal["layBets"] = {2: 0, 3: 0, 4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		inputs = iter(["0", "", "", "", "", ""])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: None
+		terminal["layBetting"]()
+		self.assertEqual(terminal["layBets"], {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0})
 		self.assertEqual(terminal["bank"], 100)
 		self.assertEqual(terminal["chipsOnTable"], 0)
 

@@ -1328,54 +1328,77 @@ def ats(roll):
 layOff = False
 
 layBets = {
+2: 0,
+3: 0,
 4: 0,
 5: 0,
 6: 0,
 8: 0,
 9: 0,
-10: 0
+10: 0,
+11: 0,
+12: 0
 }
 
-def layAll():
-	global chipsOnTable, bank, layBets
-	total = 0
+def layNumbersForCurrentMode():
+	if gameMode == GameMode.craplessCraps:
+		return [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+	return [4, 5, 6, 8, 9, 10]
+
+def collectLayUnit(numbers, promptText):
 	outlay = 0
-	for number in layBets:
+	for number in numbers:
 		outlay += layBets[number]
 	while True:
-		print("How many units across the Lay Numbers?")
+		writeOutput(promptText)
 		try:
-			unit = int(input("> "))
+			unit = int(readInput("> "))
 		except ValueError:
-			print("That wasn't even a unit! Try again.")
+			writeOutput("That wasn't even a unit! Try again.")
 			continue
-		if (unit*5)*6 > bank + outlay:
-			print("You don't have enough money for that! Egads!")
+		if (unit*5)*len(numbers) > bank + outlay:
+			writeOutput("You don't have enough money for that! Egads!")
 			outOfMoney()
 			continue
-		else:
-			break
-	for key in layBets:
+		return unit
+
+def applyLayUnits(numbers, unit, summaryText):
+	global chipsOnTable, bank, layBets
+	total = 0
+	for key in numbers:
 		chipsOnTable -= layBets[key]
 		bank += layBets[key]
 		layBets[key] = 5 * unit
 		chipsOnTable += layBets[key]
 		bank -= layBets[key]
 		total += layBets[key]
-	print(f"Laying ${total:,} Across.")
+	writeOutput(summaryText.format(total=total))
+
+def layAll():
+	unit = collectLayUnit(numbers=[4, 5, 6, 8, 9, 10], promptText="How many units across the Lay Numbers?")
+	applyLayUnits(numbers=[4, 5, 6, 8, 9, 10], unit=unit, summaryText="Laying ${total:,} Across.")
+
+def layEdges():
+	unit = collectLayUnit(numbers=[2, 3, 11, 12], promptText="How many Edge units for Lay 2, 3, 11, and 12?")
+	applyLayUnits(numbers=[2, 3, 11, 12], unit=unit, summaryText="Laying ${total:,} on the edge Lay numbers.")
+
+def layExtremeAcross():
+	numbers = layNumbersForCurrentMode()
+	unit = collectLayUnit(numbers=numbers, promptText="How many Extreme Across units for Lay 2 through 12?")
+	applyLayUnits(numbers=numbers, unit=unit, summaryText="Laying ${total:,} Extreme Across.")
 
 def layBetting():
 	global layBets, bank, chipsOnTable
-	for key in layBets:
-		print(f"You have ${layBets[key]:,} on the Lay {key}.")
-		print(f"How much on the Lay {key}?")
+	for key in layNumbersForCurrentMode():
+		writeOutput(f"You have ${layBets[key]:,} on the Lay {key}.")
+		writeOutput(f"How much on the Lay {key}?")
 		while True:
 			try:
-				bet = int(input("$>"))
+				bet = int(readInput("$>"))
 				if bet > bank + chipsOnTable - chipsOnTable:
-					print("You don't have enough money to make that bet! Try again.")
+					writeOutput("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
-					print(f"How much on the Place {key}?")
+					writeOutput(f"How much on the Lay {key}?")
 					continue
 				break
 			except ValueError:
@@ -1387,25 +1410,25 @@ def layBetting():
 			layBets[key] = bet
 			chipsOnTable += bet
 			bank -= bet
-			print(f"Ok, ${bet:,} on the Lay {key}.")
+			writeOutput(f"Ok, ${bet:,} on the Lay {key}.")
 		elif layBets[key] > 0 and bet == 0:
-			print(f"Ok, taking down your Lay {key} bet.")
+			writeOutput(f"Ok, taking down your Lay {key} bet.")
 			chipsOnTable -= layBets[key]
 			bank += layBets[key]
 			layBets[key] = 0
 
 def layTakeDown():
 	global layBets, bank, chipsOnTable
-	for key in layBets:
+	for key in layNumbersForCurrentMode():
 		chipsOnTable -= layBets[key]
 		bank += layBets[key]
 		layBets[key] = 0
 
 def layShow():
 	global layBets
-	for key in layBets:
+	for key in layNumbersForCurrentMode():
 		if layBets[key] > 0:
-			print(f"You have ${layBets[key]:,} on the Lay {key}.")
+			writeOutput(f"You have ${layBets[key]:,} on the Lay {key}.")
 
 def layCheck(roll):
 	global layBets, bank, chipsOnTable
@@ -1416,15 +1439,15 @@ def layCheck(roll):
 	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
 	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 	if settlement.lostNumber is not None:
-		if str(input(f"Go back up on your Lay {settlement.lostNumber}? > ")).strip().lower() == 'y':
-			print(f"How much on the Lay {settlement.lostNumber}?")
+		if str(readInput(f"Go back up on your Lay {settlement.lostNumber}? > ")).strip().lower() == 'y':
+			writeOutput(f"How much on the Lay {settlement.lostNumber}?")
 			layBets[settlement.lostNumber] = betPrompt()
-			print(f"Ok, ${layBets[settlement.lostNumber]:,} on the Lay {settlement.lostNumber}.")
+			writeOutput(f"Ok, ${layBets[settlement.lostNumber]:,} on the Lay {settlement.lostNumber}.")
 		else:
-			print("Got it, you are done being Layed.")
+			writeOutput("Got it, you are done being Layed.")
 
 # Bank and bet setup
 bank = 0
@@ -1648,6 +1671,9 @@ def layHelpText(pointPhase=False):
 		"\ta: Lay Bets across all numbers.",
 		"\td: Take down all Lay Bets."
 	]
+	if gameMode == GameMode.craplessCraps:
+		helpLines.append("\te: Lay only 2, 3, 11, and 12.")
+		helpLines.append("\tea: Lay all numbers from 2 through 12.")
 	if pointPhase:
 		helpLines.append("\to: Toggle Lay Bets Off or On for next roll.")
 	helpLines.append("\th: Show this Help menu.")
@@ -1674,8 +1700,6 @@ def hardWaysHelpText(pointPhase=False):
 def handleLayMenuCommand(command, pointPhase=False):
 	global layOff
 	cmd = str(command).strip().lower()
-	if gameMode == GameMode.craplessCraps:
-		return createActionResult(success=False, messages=["Lay bets are not available in Crapless Craps."], stateChanged=False) | {"shouldExitMenu": True}
 	if cmd in ["y", "yes"]:
 		layBetting()
 		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
@@ -1696,6 +1720,16 @@ def handleLayMenuCommand(command, pointPhase=False):
 		return createActionResult(success=True, messages=messages, stateChanged=True) | {"shouldExitMenu": False}
 	if cmd in ["a", "across", "all"]:
 		layAll()
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
+	if cmd == "e":
+		if gameMode != GameMode.craplessCraps:
+			return createActionResult(success=False, messages=["Edge lay helper is only available in Crapless Craps."], stateChanged=False) | {"shouldExitMenu": False}
+		layEdges()
+		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
+	if cmd == "ea":
+		if gameMode != GameMode.craplessCraps:
+			return createActionResult(success=False, messages=["Extreme Across lay helper is only available in Crapless Craps."], stateChanged=False) | {"shouldExitMenu": False}
+		layExtremeAcross()
 		return createActionResult(success=True, messages=[], stateChanged=True) | {"shouldExitMenu": False}
 	if cmd == "h":
 		return createActionResult(success=True, messages=[layHelpText(pointPhase=pointPhase)], stateChanged=False) | {"shouldExitMenu": False}
@@ -2083,7 +2117,7 @@ def runPlaceMenu(pointPhase=False):
 def runLayMenu(pointPhase=False):
 	while True:
 		layShow()
-		layCommand = str(input("Lay Bets? > ")).strip().lower()
+		layCommand = str(readInput("Lay Bets? > ")).strip().lower()
 		commandResult = handleLayMenuCommand(layCommand, pointPhase=pointPhase)
 		emitActionResult(commandResult)
 		if commandResult["shouldExitMenu"]:

@@ -151,13 +151,18 @@ Typing 'p' and hitting Enter on the Place Prompt after the point has been establ
 
 Lay Bets are the opposite of Place Bets. You will be wagering money that the 7 rolls before the number you are betting on hits. This functionality works the same way as the Place Betting system, where you will be asked how much you'd like to Lay against each number. Enter a 0 or just hit Enter to leave the bet alone.
 
-Note: Lay Bets do not exist in Crapless Craps.
+In Craps mode, Lay Bets are available on 4, 5, 6, 8, 9, and 10.
+In Crapless Craps mode, Lay Bets are available on 2, 3, 4, 5, 6, 8, 9, 10, 11, and 12.
 
 Lay bets are always working on the Come Out roll.
 
 At the Lay Bet prompt, typing 'd' and hitting Enter will take down all your Lay Bets.
 
-Also at the prompt, typing 'a' and hitting enter will allow you to make Lay bets across all of the numbers. Enter a unit amount and it will multiply by 5 and lay that amount on each of the box numbers.
+Also at the prompt, typing 'a' and hitting Enter will allow you to make Lay bets across the standard box numbers.
+
+In Crapless mode, you can also use:
+- `e` to lay only 2, 3, 11, and 12.
+- `ea` for Extreme Across, laying 2 through 12.
 
 After a point has been established, you'll be able to turn your Lay bets Off when prompted for the Lay Bets. Type 'o' and hit Enter to turn your Lay Bets Off for the next roll. Just like the Place Bets, they will only be Off for the very next roll. With the Lay bets Off, they will not be affected by a 7 out or by rolling the Lay number.
 
@@ -437,6 +442,12 @@ These bets are available at all times. If there is a bet on the Field, the Field
 </tr>
 <tr>
 <th scope="row">Lay/DC Odds 6, 8</th><td>5:6</td>
+</tr>
+<tr>
+<th scope="row">Lay/DC Odds 3, 11</th><td>1:3</td>
+</tr>
+<tr>
+<th scope="row">Lay/DC Odds 2, 12</th><td>1:6</td>
 </tr>
 </tbody>
 </table>

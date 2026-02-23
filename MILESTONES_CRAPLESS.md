@@ -1281,3 +1281,44 @@ New milestone updates should be appended here rather than creating new milestone
 	- Prop settlement output path through `writeOutput(...)`
 - Existing Hi-Low accounting regression remains green.
 - Compile and full suite remain green (`214` tests passing).
+
+## Milestone 74: Crapless Lay Expansion, Payout Alignment, and Lay IO Migration
+
+### What changed
+- Expanded Lay support in Crapless mode to include edge numbers:
+	- 2, 3, 11, 12 (alongside 4, 5, 6, 8, 9, 10)
+- Added Crapless Lay helpers:
+	- `e`: lays only 2, 3, 11, and 12
+	- `ea`: Extreme Across lays all numbers from 2 through 12
+- Kept standard `a` helper behavior as the original Lay Across on box numbers.
+- Migrated Lay subsystem I/O to adapter helpers:
+	- `layAll()` / `layBetting()` / `layShow()` / `layCheck()` / `runLayMenu()` now use `readInput(...)` and `writeOutput(...)`.
+- Updated Lay payouts in engine settlement logic for Crapless edge numbers using Stratosphere-aligned true-odds lay structure:
+	- Lay 2/12: 1:6
+	- Lay 3/11: 1:3
+	- Existing Lay 4/10, 5/9, 6/8 payouts unchanged.
+
+### Why
+- Lay betting in Crapless needed feature parity with edge numbers and helper workflows.
+- Existing code still hard-blocked Lay in Crapless and used direct terminal I/O in Lay flows.
+- Payout logic needed to include edge-number Lay math for consistent Crapless rules.
+
+### Behavior
+- Crapless mode now supports direct Lay entry/edit for 2, 3, 11, and 12.
+- Lay settle/win/loss behavior now evaluates edge lays in Crapless mode.
+- Lay menu help in Crapless now includes `e` and `ea` helper guidance.
+
+### Documentation updates
+- Updated README Lay section to reflect Crapless Lay availability and new helper commands (`e`, `ea`).
+- Updated README payout table with Lay/DC Odds rows for:
+	- 3, 11 (1:3)
+	- 2, 12 (1:6)
+
+### Test coverage
+- Replaced old Crapless Lay-block test with edge-payout settlement coverage.
+- Added/updated regression tests for:
+	- Crapless Lay menu entry
+	- Crapless Lay helper commands (`e`, `ea`)
+	- Lay Across behavior with adapter input/output
+	- Lay take-down behavior with adapter input/output
+- Compile and full suite remain green (`217` tests passing).

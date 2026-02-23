@@ -683,15 +683,18 @@ def settlePlaceBetsForMode(placeBets: dict, roll: int, gameMode: GameMode) -> Pl
 	return settlePlaceBets(placeBets=placeBets, roll=roll)
 
 
-def normalizeLayBets(layBets: dict) -> dict:
-	normalized = {
-		4: 0,
-		5: 0,
-		6: 0,
-		8: 0,
-		9: 0,
-		10: 0
-	}
+def layNumbersForMode(gameMode: GameMode) -> list:
+	if gameMode == GameMode.craplessCraps:
+		return [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+	return [4, 5, 6, 8, 9, 10]
+
+
+def normalizeLayBets(layBets: dict, numbers: list | None = None) -> dict:
+	if numbers is None:
+		numbers = [4, 5, 6, 8, 9, 10]
+	normalized = {}
+	for number in numbers:
+		normalized[number] = 0
 	for key in normalized:
 		if key in layBets:
 			normalized[key] = int(layBets[key])
@@ -699,6 +702,10 @@ def normalizeLayBets(layBets: dict) -> dict:
 
 
 def calculateLayWin(number: int, bet: int) -> int:
+	if number in [2, 12]:
+		return bet//6
+	if number in [3, 11]:
+		return bet//3
 	if number in [4, 10]:
 		return bet//2
 	if number in [5, 9]:
@@ -717,8 +724,10 @@ def calculateLayVig(win: int) -> int:
 	return math.floor(vig)
 
 
-def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
-	updatedLayBets = normalizeLayBets(layBets)
+def settleLayBets(layBets: dict, roll: int, numbers: list | None = None) -> LaySettlement:
+	if numbers is None:
+		numbers = [4, 5, 6, 8, 9, 10]
+	updatedLayBets = normalizeLayBets(layBets, numbers=numbers)
 	bankDelta = 0
 	chipsOnTableDelta = 0
 	lostNumber = None
@@ -727,7 +736,7 @@ def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
 	totalVigAmount = 0
 	messages = []
 
-	if roll in [4, 5, 6, 8, 9, 10] and updatedLayBets[roll] > 0:
+	if roll in numbers and updatedLayBets[roll] > 0:
 		lostNumber = roll
 		lostAmount = updatedLayBets[roll]
 		messages.append(f"You lost ${lostAmount:,} from the Lay {roll}.")
@@ -761,28 +770,7 @@ def settleLayBets(layBets: dict, roll: int) -> LaySettlement:
 
 
 def settleLayBetsForMode(layBets: dict, roll: int, gameMode: GameMode) -> LaySettlement:
-	if gameMode == GameMode.craplessCraps:
-		updatedLayBets = {}
-		returnAmount = 0
-		for key in layBets:
-			updatedLayBets[key] = int(layBets[key])
-			returnAmount += updatedLayBets[key]
-			updatedLayBets[key] = 0
-
-		messages = []
-		if returnAmount > 0:
-			messages.append(f"Lay bets are not available in Crapless Craps. Returning ${returnAmount:,}.")
-		return LaySettlement(
-			layBets=updatedLayBets,
-			bankDelta=returnAmount,
-			chipsOnTableDelta=-returnAmount,
-			lostNumber=None,
-			lostAmount=0,
-			totalWinAmount=0,
-			totalVigAmount=0,
-			messages=messages
-		)
-	return settleLayBets(layBets=layBets, roll=roll)
+	return settleLayBets(layBets=layBets, roll=roll, numbers=layNumbersForMode(gameMode))
 
 
 def settleFieldBet(fieldBet: int, roll: int) -> FieldSettlement:

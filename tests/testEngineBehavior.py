@@ -911,6 +911,33 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("How much on the Pass Line?", printed)
 		self.assertIn("Ok, $10 on the Pass Line.", printed)
 
+	def testDpPhase2UsesIoAdaptersAndTakesDownBets(self):
+		terminal = loadTerminalNamespace()
+		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 30}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 45
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: "y"
+		terminal["dpPhase2"]()
+		self.assertEqual(terminal["lineBets"]["Don't Pass"], 0)
+		self.assertEqual(terminal["lineBets"]["Don't Pass Odds"], 0)
+		self.assertEqual(terminal["bank"], 145)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertIn("Take down Don't Pass Bet and Odds?", " ".join(writes))
+		self.assertIn("Ok, taking down your Don't Pass.", " ".join(writes))
+
+	def testOddsCheckUsesWriteOutputAdapter(self):
+		terminal = loadTerminalNamespace()
+		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 10, "Don't Pass": 0, "Don't Pass Odds": 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["comeOut"] = 5
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["oddsCheck"](5)
+		self.assertIn("You won $15 from your Pass Line Odds!", " ".join(writes))
+
 	def testValidPlaceNumbersInCraplessIncludesEdgeNumbers(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps

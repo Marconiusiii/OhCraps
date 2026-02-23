@@ -961,3 +961,27 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated Crapless Don't Pass rejection test to use adapter stubs.
 - Added adapter-focused line-betting test for Pass entry path and prompt messaging.
 - Compile and full suite remain green.
+
+## Milestone 62: Point-Phase Line Control IO Adapter Routing
+
+### What changed
+- Routed `dpPhase2()` prompt/output through adapter helpers:
+	- `readInput(...)`
+	- `writeOutput(...)`
+- Routed `oddsCheck()` settlement message output through `writeOutput(...)`.
+- Preserved existing wording and bet/accounting behavior.
+
+### Why
+- Point-phase line control still had direct terminal I/O after previous adapter milestones.
+- Moving this flow to adapter wrappers keeps controller-layer migration consistent for iOS.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Added adapter-focused tests in `tests/testEngineBehavior.py` for:
+	- `dpPhase2()` take-down path with adapter stubs.
+	- `oddsCheck()` message emission through `writeOutput`.
+- Compile and full suite remain green.

@@ -339,21 +339,21 @@ def lineCheck(roll, p2roll):
 
 def dpPhase2():
 	global lineBets, bank, chipsOnTable
-	print("Take down Don't Pass Bet and Odds?")
+	writeOutput("Take down Don't Pass Bet and Odds?")
 	while True:
 		try:
-			takeDown = input(">")
+			takeDown = readInput(">")
 			break
 		except ValueError:
-			print("Invalid entry, try again!")
+			writeOutput("Invalid entry, try again!")
 			continue
 	if takeDown.lower() in ['y', 'yes']:
-		print("Ok, taking down your Don't Pass.")
+		writeOutput("Ok, taking down your Don't Pass.")
 		chipsOnTable -= lineBets["Don't Pass"] + lineBets["Don't Pass Odds"]
 		bank += lineBets["Don't Pass"] + lineBets["Don't Pass Odds"]
 		lineBets["Don't Pass"] = lineBets["Don't Pass Odds"] =  0
 	elif takeDown.lower() in ['n', 'no']:
-		print("Ok leaving your Don't Pass bets up.")
+		writeOutput("Ok leaving your Don't Pass bets up.")
 	else:
 		pass
 
@@ -448,7 +448,7 @@ def oddsCheck(roll):
 	bank += settlement.bankDelta
 	chipsOnTable += settlement.chipsOnTableDelta
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 # Come Betting
 

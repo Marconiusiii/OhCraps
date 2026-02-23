@@ -1071,7 +1071,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["runPlaceMenu"] = fakeRunPlaceMenu
 		with patch("builtins.print"):
 			result = terminal["handleBettingCommand"]("p", pointPhase=False)
-		self.assertEqual(result["shouldRoll"], False)
+		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(calls, [False])
 
 	def testHandleBettingCommandRoutesPlaceMenuInPointPhase(self):
@@ -1082,21 +1082,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["runPlaceMenu"] = fakeRunPlaceMenu
 		with patch("builtins.print"):
 			result = terminal["handleBettingCommand"]("p", pointPhase=True)
-		self.assertEqual(result["shouldRoll"], False)
+		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(calls, [True])
 
 	def testHandleBettingCommandPointRollReturnsTrue(self):
 		terminal = loadTerminalNamespace()
 		with patch("builtins.print"):
 			result = terminal["handleBettingCommand"]("x", pointPhase=True)
-		self.assertEqual(result["shouldRoll"], True)
+		self.assertEqual(result.shouldRoll, True)
 
 	def testHandleBettingCommandPointOddsWithoutLineBet(self):
 		terminal = loadTerminalNamespace()
 		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
 		with patch("builtins.print") as mockPrint:
 			result = terminal["handleBettingCommand"]("o", pointPhase=True)
-		self.assertEqual(result["shouldRoll"], False)
+		self.assertEqual(result.shouldRoll, False)
 		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
 		self.assertIn("You don't have a Line bet, silly!", printed)
 
@@ -1204,7 +1204,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		calls = []
 		def fakeHandleBettingCommand(command, pointPhase=False):
 			calls.append((command, pointPhase))
-			return {"shouldRoll": command == "x"}
+			return terminal["bettingCommandResult"](shouldRoll=(command == "x"), handled=True)
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
 		inputs = iter(["h", "x"])
 		terminal["readInput"] = lambda promptText: next(inputs)
@@ -1218,7 +1218,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		pointPhaseFlags = []
 		def fakeHandleBettingCommand(command, pointPhase=False):
 			pointPhaseFlags.append(pointPhase)
-			return {"shouldRoll": True}
+			return terminal["bettingCommandResult"](shouldRoll=True, handled=True)
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
 		terminal["readInput"] = lambda promptText: "x"
 		terminal["writeOutput"] = lambda message: None
@@ -1231,7 +1231,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		calls = []
 		def fakeHandleBettingCommand(command, pointPhase=False):
 			calls.append((command, pointPhase))
-			return {"shouldRoll": command == "r"}
+			return terminal["bettingCommandResult"](shouldRoll=(command == "r"), handled=True)
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
 		inputs = iter(["h", "r"])
 		terminal["readInput"] = lambda promptText: next(inputs)
@@ -1245,7 +1245,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		pointPhaseFlags = []
 		def fakeHandleBettingCommand(command, pointPhase=False):
 			pointPhaseFlags.append(pointPhase)
-			return {"shouldRoll": True}
+			return terminal["bettingCommandResult"](shouldRoll=True, handled=True)
 		terminal["handleBettingCommand"] = fakeHandleBettingCommand
 		terminal["readInput"] = lambda promptText: "x"
 		terminal["writeOutput"] = lambda message: None

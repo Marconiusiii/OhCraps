@@ -864,3 +864,25 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated menu tests to patch `readInput`/`writeOutput` adapter functions directly.
 - Added explicit adapter usage test for `showPointPhaseStatus()` output flow.
 - Compile and full suite remain green.
+
+## Milestone 58: Typed Betting Command Result
+
+### What changed
+- Added typed command result class:
+	- `bettingCommandResult(shouldRoll, handled)`
+- Updated `handleBettingCommand(...)` to return `bettingCommandResult` instead of dicts.
+- Updated orchestrator menu callers to read `commandResult.shouldRoll`.
+- Updated deterministic tests to assert typed command result attributes and use typed fake command results.
+
+### Why
+- Dict-key command control results were fragile and less explicit in orchestration paths.
+- Typed command results improve readability, reduce key-typo risk, and align with iOS controller modeling patterns.
+
+### Behavior
+- No payout-rule changes.
+- No command routing changes.
+- No prompt wording changes.
+
+### Test coverage
+- Updated command-handler and menu-loop tests in `tests/testEngineBehavior.py` to use typed command results.
+- Compile and full suite remain green.

@@ -1676,6 +1676,26 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(promptLog[0], "Lay Odds on the 5? > ")
 		self.assertEqual(sum(1 for promptText in promptLog if "$>" in promptText), 2)
 
+	def testComeCheckCraplessUnitOnePromptOmitsMultiplesText(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["comeBet"] = 10
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 200
+		terminal["chipsOnTable"] = 10
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		inputs = iter(["y", "10"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+
+		with patch("builtins.print"):
+			terminal["comeCheck"](2)
+
+		printed = " ".join(writes)
+		self.assertIn("How much for your Come 2 Odds? Max is $60", printed)
+		self.assertNotIn("multiples of 1", printed.lower())
+
 	def testComeCheckReturnsNoChangeActionResultWhenNoBarBets(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps
@@ -1711,6 +1731,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["dComeOdds"][2], 6)
 		self.assertEqual(terminal["bank"], 94)
 		self.assertEqual(terminal["chipsOnTable"], 6)
+
+	def testCdcOddsChangeComeUnitOnePromptOmitsMultiplesText(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["comeBets"] = {2: 10, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		printed = []
+
+		def capturePrint(*args, **kwargs):
+			printed.append(" ".join(str(arg) for arg in args))
+
+		with patch("builtins.input", side_effect=["10"]), patch("builtins.print", side_effect=capturePrint):
+			terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
+
+		printedText = " ".join(printed)
+		self.assertIn("How much for your Come 2 Odds? Max is $60; you have $0 in Odds.", printedText)
+		self.assertNotIn("multiples of 1", printedText.lower())
 
 	def testPlacePresetAcrossWorksInCrapless(self):
 		terminal = loadTerminalNamespace()

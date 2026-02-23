@@ -583,10 +583,12 @@ def cdcOddsChange(dict, dict2):
 		if dict[key] > 0:
 			if 'Come' in dict:
 				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=False)
-				print(f"How much for your Come {key} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}; you have ${dict2[key]:,} in Odds.")
+				multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+				print(f"How much for your Come {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Odds.")
 			else:
 				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=True)
-				print(f"How much for your Lay {key} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}; you have ${dict2[key]:,} in Lay Odds.")
+				multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+				print(f"How much for your Lay {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
 					bet = int(input("$>"))
@@ -662,7 +664,8 @@ def processComePostRollAction(roll):
 				writeOutput(f"Moving your Come Bet to the {settlement.movedNumber}.")
 				if readInput(f"Come Odds for the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
 					while True:
-						writeOutput(f"How much for your Come {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}")
+						multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+						writeOutput(f"How much for your Come {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
 						comeOdds[settlement.movedNumber] = betPrompt()
 						if comeOdds[settlement.movedNumber] > limits["effectiveMax"]:
 							writeOutput("Way too high on your Odds, there. Try again.")
@@ -702,7 +705,8 @@ def processComePostRollAction(roll):
 				if readInput(f"Lay Odds on the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
 					limits = oddsBetLimits(number=settlement.movedNumber, baseBet=dComeBets[settlement.movedNumber], gameMode=gameMode, isDont=True)
 					while True:
-						writeOutput(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}, multiples of {limits['unit']}")
+						multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+						writeOutput(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
 						dComeOdds[settlement.movedNumber] = betPrompt()
 						if dComeOdds[settlement.movedNumber] > limits["effectiveMax"]:
 							writeOutput("Way too much for your Lay Odds! Try again.")

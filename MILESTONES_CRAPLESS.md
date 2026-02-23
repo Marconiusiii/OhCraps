@@ -1092,3 +1092,26 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated Come/Don’t Come movement regression tests to feed `readInput(...)` for both yes/no and odds amount paths.
 - Preserved assertions for prompt ordering, max-odds retry behavior, and accepted odds persistence.
 - Compile and full suite remain green (`201` tests passing).
+
+## Milestone 67: Suppress Unit-1 Multiples Text Across Prompts
+
+### What changed
+- Removed unit-1 multiples wording from all prompt paths by making multiples text conditional (`unit != 1`) in:
+	- `cdcOddsChange(...)` Come and Lay odds-change prompts
+	- `processComePostRollAction(...)` Come moved-bet odds prompt
+	- `processComePostRollAction(...)` Don't Come moved-bet lay-odds prompt
+- Existing odds prompts that already conditionally hide unit-1 multiples remain unchanged.
+
+### Why
+- `Multiples of 1` is redundant and confusing in player prompts.
+- Standardized prompt behavior so unit-1 contexts never display multiples text in any flow.
+
+### Behavior
+- No payout-rule changes.
+- No max-odds math changes.
+- No bet validation changes.
+
+### Test coverage
+- Added regression test for Crapless Come moved-bet odds prompt to confirm unit-1 prompt omits multiples text.
+- Added regression test for `cdcOddsChange(...)` Come unit-1 prompt to confirm multiples text omission.
+- Compile and full suite remain green (`203` tests passing).

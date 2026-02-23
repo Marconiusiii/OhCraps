@@ -939,3 +939,25 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated odds prompt tests to capture adapter output via `writeOutput` instead of patching `builtins.print`.
 - Existing line-odds wording and validation assertions remain covered.
 - Compile and full suite remain green.
+
+## Milestone 61: Line Betting IO Adapter Routing
+
+### What changed
+- Routed `lineBetting()` menu output through `writeOutput(...)`.
+- Routed `lineBetting()` command input through `readInput(...)`.
+- Kept bet amount entry path via `betPrompt()` unchanged.
+- Preserved existing line-bet command behavior and prompt wording.
+
+### Why
+- Line betting remained a direct terminal I/O hotspot after earlier adapter work.
+- Moving this menu flow onto the adapter boundary improves portability toward iOS UI integration.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Updated Crapless Don't Pass rejection test to use adapter stubs.
+- Added adapter-focused line-betting test for Pass entry path and prompt messaging.
+- Compile and full suite remain green.

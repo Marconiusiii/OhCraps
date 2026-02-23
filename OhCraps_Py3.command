@@ -283,40 +283,40 @@ def lineBetting():
 	global lineBets, bank, chipsOnTable
 	for key in lineBets:
 		if lineBets[key] > 0:
-			print(f"You have ${lineBets[key]:,} on the {key} bet.")
-	print("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
+			writeOutput(f"You have ${lineBets[key]:,} on the {key} bet.")
+	writeOutput("Enter the Line Bet you'd like to make, or type 'x' and hit Enter to finish Line Betting.")
 	while True:
 		if lineBets["Pass"] > 0:
-			print(f'You have ${lineBets["Pass"]:,} on the Pass Line.')
+			writeOutput(f'You have ${lineBets["Pass"]:,} on the Pass Line.')
 		if lineBets["Don't Pass"] > 0:
-			print(f"You have ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
+			writeOutput(f"You have ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
 		try:
-			lBet = input(">")
+			lBet = readInput(">")
 		except ValueError:
-			print("That won't work, try again.")
+			writeOutput("That won't work, try again.")
 			continue
 		if lBet.lower() in ['p', 'pass', 'passline', 'pass line']:
 			chipsOnTable -= lineBets["Pass"]
 			bank += lineBets["Pass"]
-			print("How much on the Pass Line?")
+			writeOutput("How much on the Pass Line?")
 			lineBets["Pass"] = betPrompt()
-			print(f'Ok, ${lineBets["Pass"]:,} on the Pass Line.')
+			writeOutput(f'Ok, ${lineBets["Pass"]:,} on the Pass Line.')
 			continue
 		elif lBet.lower() in ["d", "dp", "don't pass", "don't"]:
 			if gameMode == GameMode.craplessCraps:
-				print("Don't Pass is not available in Crapless Craps.")
+				writeOutput("Don't Pass is not available in Crapless Craps.")
 				continue
 			chipsOnTable -= lineBets["Don't Pass"]
 			bank += lineBets["Don't Pass"]
-			print("How much on the Don't Pass line?")
+			writeOutput("How much on the Don't Pass line?")
 			lineBets["Don't Pass"] = betPrompt()
-			print(f"Ok, ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
+			writeOutput(f"Ok, ${lineBets["Don't Pass"]:,} on the Don't Pass Line.")
 			continue
 		elif lBet.lower() in ['x', 'close', 'esc', 'exit', 'done']:
-			print("Ok, moving on!")
+			writeOutput("Ok, moving on!")
 			break
 		else:
-			print("Invalid entry, try again or type 'x' and hit Enter!")
+			writeOutput("Invalid entry, try again or type 'x' and hit Enter!")
 			continue
 
 def lineCheck(roll, p2roll):

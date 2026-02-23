@@ -886,9 +886,30 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
 		terminal["bank"] = 100
 		terminal["chipsOnTable"] = 0
-		with patch("builtins.input", side_effect=["d", "x"]), patch("builtins.print"):
-			terminal["lineBetting"]()
+		inputs = iter(["d", "x"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["lineBetting"]()
 		self.assertEqual(terminal["lineBets"]["Don't Pass"], 0)
+		self.assertIn("Don't Pass is not available in Crapless Craps.", " ".join(writes))
+
+	def testLineBettingUsesIoAdaptersForPassEntry(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		inputs = iter(["p", "x"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.input", side_effect=["10"]):
+			terminal["lineBetting"]()
+		self.assertEqual(terminal["lineBets"]["Pass"], 10)
+		printed = " ".join(writes)
+		self.assertIn("How much on the Pass Line?", printed)
+		self.assertIn("Ok, $10 on the Pass Line.", printed)
 
 	def testValidPlaceNumbersInCraplessIncludesEdgeNumbers(self):
 		terminal = loadTerminalNamespace()

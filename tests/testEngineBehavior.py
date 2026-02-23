@@ -910,6 +910,23 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("How much on the Pass Line?", printed)
 		self.assertIn("Ok, $10 on the Pass Line.", printed)
 
+	def testComeBettingInCraplessSkipsDontComeChoice(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["comeBet"] = 0
+		writes = []
+		inputs = iter(["10"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["come"]()
+		self.assertEqual(terminal["comeBet"], 10)
+		self.assertEqual(terminal["bank"], 90)
+		self.assertEqual(terminal["chipsOnTable"], 10)
+		self.assertIn("How much on the Come?", " ".join(writes))
+		self.assertNotIn("Come or Don't Come?", " ".join(writes))
+
 	def testDpPhase2UsesIoAdaptersAndTakesDownBets(self):
 		terminal = loadTerminalNamespace()
 		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 15, "Don't Pass Odds": 30}
@@ -1205,6 +1222,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result.shouldRoll, False)
 		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
 		self.assertIn("You don't have a Line bet, silly!", printed)
+
+	def testHandleBettingCommandBlocksDcdInCraplessAndRefundsLegacyDontCome(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 27
+		terminal["dComeBet"] = 5
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 10, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 12, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		with patch("builtins.print") as mockPrint:
+			result = terminal["handleBettingCommand"]("dcd", pointPhase=True)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(terminal["dComeBet"], 0)
+		self.assertEqual(sum(terminal["dComeBets"].values()), 0)
+		self.assertEqual(sum(terminal["dComeOdds"].values()), 0)
+		self.assertEqual(terminal["bank"], 127)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
+		self.assertIn("Don't Come is not available in Crapless Craps.", printed)
 
 	def testHandleBettingCommandBbCallsOutOfMoneyComeOut(self):
 		terminal = loadTerminalNamespace()

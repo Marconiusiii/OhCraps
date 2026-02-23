@@ -1197,3 +1197,34 @@ New milestone updates should be appended here rather than creating new milestone
 	- loss on 2 includes message and state change
 	- win on 7 includes message and state change
 - Compile and full suite remain green (`207` tests passing).
+
+## Milestone 71: Enforce No Don't Pass / Don't Come in Crapless Mode
+
+### What changed
+- Enforced Come-only entry in Crapless mode:
+	- `come()` now bypasses the Come/Don't Come chooser and only accepts a Come wager when mode is Crapless.
+- Added strict command gates in Crapless mode:
+	- `dp` is blocked with a mode message.
+	- `dcd` is blocked with a mode message.
+	- point-phase and come-out help menus no longer list `dcd` in Crapless mode.
+	- point-phase help no longer lists `dp` in Crapless mode.
+- Added cleanup safety for legacy Don't Come state:
+	- `clearDontComeForCrapless()` refunds and clears `dComeBet`, `dComeBets`, and `dComeOdds` if found while in Crapless mode.
+	- invoked from `comeCheck()` and from blocked `dcd` flow in Crapless mode.
+- Restricted Don't Come display/management prompts in Crapless:
+	- `comeShow()` no longer shows Don't Come rows in Crapless.
+	- `comeOddsChange()` no longer opens Don't Come odds change path in Crapless.
+
+### Why
+- Crapless rules do not permit Don't Pass or Don't Come betting.
+- Prior behavior still allowed Don't Come command flows and stale-state processing in Crapless sessions.
+
+### Behavior
+- Crapless mode now behaves as Come-only (no Don't Come controls).
+- Legacy Don't Come amounts (if present from previous state) are returned to bankroll and cleared.
+- Craps mode behavior remains unchanged.
+
+### Test coverage
+- Added regression test: Crapless `come()` path does not present Don't Come choice.
+- Added regression test: `dcd` command is blocked in Crapless and refunds/clears legacy Don't Come state.
+- Full compile and test suite remain green (`209` tests passing).

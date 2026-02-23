@@ -369,33 +369,33 @@ def odds():
 			chipsOnTable -= lineBets["Pass Odds"]
 			bank += lineBets["Pass Odds"]
 			if lineBets["Pass Odds"] > 0:
-				print(f"You have ${lineBets['Pass Odds']:,} in Odds for the {comeOut}. How much for your Odds?")
+				writeOutput(f"You have ${lineBets['Pass Odds']:,} in Odds for the {comeOut}. How much for your Odds?")
 			else:
-				print(f"Odds on the {comeOut}?")
-			print(f"Max odds is ${passLimits['effectiveMax']:,}.")
+				writeOutput(f"Odds on the {comeOut}?")
+			writeOutput(f"Max odds is ${passLimits['effectiveMax']:,}.")
 			if passLimits["unit"] != 1:
-				print(f"Multiples of {passLimits['unit']}.")
+				writeOutput(f"Multiples of {passLimits['unit']}.")
 			pOddsChange = betPrompt()
 			if pOddsChange > 0 and pOddsChange <= passLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=pOddsChange, gameMode=gameMode):
 				lineBets["Pass Odds"] = pOddsChange
-				print(f"Ok, ${lineBets['Pass Odds']:,} on your Pass Line Odds.")
+				writeOutput(f"Ok, ${lineBets['Pass Odds']:,} on your Pass Line Odds.")
 				break
 			elif pOddsChange > passLimits["effectiveMax"]:
-				print("Nope, that bet is over the Max Odds. Try again!")
+				writeOutput("Nope, that bet is over the Max Odds. Try again!")
 				chipsOnTable -= pOddsChange
 				bank += pOddsChange
 				continue
 			elif not isOddsBetUnitValid(number=comeOut, oddsBet=pOddsChange, gameMode=gameMode):
-				print(f"Invalid odds amount. Must be in increments of ${passLimits['unit']:,}.")
+				writeOutput(f"Invalid odds amount. Must be in increments of ${passLimits['unit']:,}.")
 				chipsOnTable -= pOddsChange
 				bank += pOddsChange
 				continue
 			elif lineBets["Pass Odds"] > 0 and pOddsChange == 0:
-				print("Ok, taking down your Pass Line Odds.")
+				writeOutput("Ok, taking down your Pass Line Odds.")
 				lineBets["Pass Odds"] = pOddsChange
 				break
 			else:
-				print("No change to your Pass Line Odds.")
+				writeOutput("No change to your Pass Line Odds.")
 				break
 
 	if lineBets["Don't Pass"] > 0:
@@ -404,33 +404,34 @@ def odds():
 			bank += lineBets["Don't Pass Odds"]
 			if lineBets["Don't Pass Odds"] > 0:
 				currentLayOdds = lineBets["Don't Pass Odds"]
-				print(f"You have ${currentLayOdds:,} laid against the {comeOut}. How much do you want to Lay?")
+				writeOutput(f"You have ${currentLayOdds:,} laid against the {comeOut}. How much do you want to Lay?")
 			else:
-				print(f"Lay Odds against the {comeOut}?")
-			print(f"Max odds is ${dontPassLimits['effectiveMax']:,}.")
+				writeOutput(f"Lay Odds against the {comeOut}?")
+			writeOutput(f"Max odds is ${dontPassLimits['effectiveMax']:,}.")
 			if dontPassLimits["unit"] != 1:
-				print(f"Multiples of {dontPassLimits['unit']}.")
+				writeOutput(f"Multiples of {dontPassLimits['unit']}.")
 			dpOddsChange = betPrompt()
 			if dpOddsChange > 0 and dpOddsChange <= dontPassLimits["effectiveMax"] and isOddsBetUnitValid(number=comeOut, oddsBet=dpOddsChange, gameMode=gameMode, isDont=True):
 				lineBets["Don't Pass Odds"] = dpOddsChange
-				print(f"Ok, ${lineBets["Don't Pass Odds"]:,} laid against the Point.")
+				currentLayOdds = lineBets["Don't Pass Odds"]
+				writeOutput(f"Ok, ${currentLayOdds:,} laid against the Point.")
 				break
 			elif dpOddsChange > dontPassLimits["effectiveMax"]:
-				print("Nope, you laid too much! Try again.")
+				writeOutput("Nope, you laid too much! Try again.")
 				chipsOnTable -= dpOddsChange
 				bank += dpOddsChange
 				continue
 			elif not isOddsBetUnitValid(number=comeOut, oddsBet=dpOddsChange, gameMode=gameMode, isDont=True):
-				print(f"Invalid odds amount. Must be in increments of ${dontPassLimits['unit']:,}.")
+				writeOutput(f"Invalid odds amount. Must be in increments of ${dontPassLimits['unit']:,}.")
 				chipsOnTable -= dpOddsChange
 				bank += dpOddsChange
 				continue
 			elif lineBets["Don't Pass Odds"] > 0 and dpOddsChange == 0:
-				print("Taking down your Lay Odds.")
+				writeOutput("Taking down your Lay Odds.")
 				lineBets["Don't Pass Odds"] = dpOddsChange
 				break
 			else:
-				print("Leaving your Don't Pass Odds as is.")
+				writeOutput("Leaving your Don't Pass Odds as is.")
 				chipsOnTable += lineBets["Don't Pass Odds"]
 				bank -= lineBets["Don't Pass Odds"]
 				break

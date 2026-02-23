@@ -1786,9 +1786,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			"Don't Pass": 0,
 			"Don't Pass Odds": 0
 		}
-		with patch("builtins.input", side_effect=["3", "4"]), patch("builtins.print") as mockPrint:
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.input", side_effect=["3", "4"]):
 			terminal["odds"]()
-		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		printed = " ".join(writes)
 		self.assertIn("Odds on the 5?", printed)
 		self.assertIn("Max odds is $40.", printed)
 		self.assertIn("Multiples of 2.", printed)
@@ -1809,9 +1811,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			"Don't Pass": 10,
 			"Don't Pass Odds": 0
 		}
-		with patch("builtins.input", side_effect=["100", "99"]), patch("builtins.print") as mockPrint:
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.input", side_effect=["100", "99"]):
 			terminal["odds"]()
-		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		printed = " ".join(writes)
 		self.assertIn("Lay Odds against the 5?", printed)
 		self.assertIn("Max odds is $99.", printed)
 		self.assertIn("Multiples of 3.", printed)
@@ -1849,9 +1853,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			"Don't Pass": 0,
 			"Don't Pass Odds": 0
 		}
-		with patch("builtins.input", side_effect=["12"]), patch("builtins.print") as mockPrint:
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.input", side_effect=["12"]):
 			terminal["odds"]()
-		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		printed = " ".join(writes)
 		self.assertIn("You have $12 in Odds for the 2. How much for your Odds?", printed)
 		self.assertIn("Max odds is $60.", printed)
 		self.assertNotIn("Multiples of 1.", printed)
@@ -1868,9 +1874,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			"Don't Pass": 10,
 			"Don't Pass Odds": 30
 		}
-		with patch("builtins.input", side_effect=["0"]), patch("builtins.print") as mockPrint:
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.input", side_effect=["0"]):
 			terminal["odds"]()
-		printed = " ".join(" ".join(str(a) for a in call.args) for call in mockPrint.call_args_list)
+		printed = " ".join(writes)
 		self.assertIn("You have $30 laid against the 5. How much do you want to Lay?", printed)
 		self.assertIn("Max odds is $99.", printed)
 		self.assertIn("Multiples of 3.", printed)

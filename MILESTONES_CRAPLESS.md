@@ -918,3 +918,24 @@ New milestone updates should be appended here rather than creating new milestone
 	- existing Pass Odds wording plus no `Multiples of 1` output.
 	- existing Lay Odds wording plus Lay take-down confirmation string.
 - Compile and full suite remain green.
+
+## Milestone 60: Line Odds IO Adapter Routing
+
+### What changed
+- Routed line-odds output messaging in `odds()` through `writeOutput(...)`.
+- Kept existing input path via `betPrompt()` unchanged for odds amount entry.
+- Preserved all line-odds prompt wording and validation behavior from the prior milestone.
+
+### Why
+- Line-odds flow remained a direct terminal I/O hotspot after orchestrator adapter extraction.
+- Moving this flow to the adapter boundary is a direct step toward UI portability for iOS.
+
+### Behavior
+- No payout-rule changes.
+- No odds-limit logic changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Updated odds prompt tests to capture adapter output via `writeOutput` instead of patching `builtins.print`.
+- Existing line-odds wording and validation assertions remain covered.
+- Compile and full suite remain green.

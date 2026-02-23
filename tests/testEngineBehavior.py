@@ -1554,7 +1554,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
 		terminal["bank"] = 100
 		terminal["chipsOnTable"] = 10
-		with patch("builtins.input", side_effect=["n"]), patch("builtins.print"):
+		terminal["readInput"] = lambda promptText: "n"
+		terminal["writeOutput"] = lambda message: None
+		with patch("builtins.print"):
 			result = terminal["comeCheck"](5)
 		self.assertEqual(result["stateChanged"], True)
 		self.assertEqual(any("Moving your Come Bet to the 5." in msg for msg in result["messages"]), False)
@@ -1570,17 +1572,18 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 10
 		seenMoveReminder = {"value": False}
 
-		def fakePrint(*args, **kwargs):
-			text = " ".join(str(part) for part in args)
+		def fakeWriteOutput(text):
 			if "Moving your Come Bet to the 5." in text:
 				seenMoveReminder["value"] = True
 
-		def fakeInput(prompt=""):
-			self.assertEqual(prompt, "Come Odds for the 5? > ")
+		def fakeReadInput(promptText):
+			self.assertEqual(promptText, "Come Odds for the 5? > ")
 			self.assertEqual(seenMoveReminder["value"], True)
 			return "n"
 
-		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
+		terminal["writeOutput"] = fakeWriteOutput
+		terminal["readInput"] = fakeReadInput
+		with patch("builtins.print"):
 			terminal["comeCheck"](5)
 
 	def testComeCheckRetriesWithContextPromptAndImmediateError(self):
@@ -1593,17 +1596,24 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 10
 		printedTexts = []
 
-		def fakePrint(*args, **kwargs):
-			printedTexts.append(" ".join(str(part) for part in args))
+		terminal["writeOutput"] = lambda message: printedTexts.append(str(message))
+		inputs = iter(["y", "100", "20"])
+		promptLog = []
 
-		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=["y", "100", "20"]):
-			result = terminal["comeCheck"](5)
+		def fakeReadInput(promptText):
+			promptLog.append(promptText)
+			return next(inputs)
+
+		terminal["readInput"] = fakeReadInput
+		result = terminal["comeCheck"](5)
 
 		self.assertEqual(result["messages"].count("Way too high on your Odds, there. Try again."), 0)
 		self.assertEqual(result["messages"].count("Ok, $20 on your Come 5 odds."), 1)
 		self.assertEqual(sum(1 for text in printedTexts if "How much for your Come 5 Odds? Max is $40, multiples of 2" in text), 2)
 		self.assertEqual(sum(1 for text in printedTexts if "Way too high on your Odds, there. Try again." in text), 1)
 		self.assertEqual(terminal["comeOdds"][5], 20)
+		self.assertEqual(promptLog[0], "Come Odds for the 5? > ")
+		self.assertEqual(sum(1 for promptText in promptLog if "$>" in promptText), 2)
 
 	def testDontComeCheckUsesLayOddsPromptTextAndRetriesWithContext(self):
 		terminal = loadTerminalNamespace()
@@ -1617,26 +1627,24 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		seenMoveReminder = {"value": False}
 		inputCalls = {"count": 0}
 
-		def fakePrint(*args, **kwargs):
-			text = " ".join(str(part) for part in args)
+		def fakeWriteOutput(text):
 			printedTexts.append(text)
 			if "Moving your Don't Come bet to the 5." in text:
 				seenMoveReminder["value"] = True
 
-		def fakeInput(prompt=""):
-			inputCalls["count"] += 1
-			if prompt == "Lay Odds on the 5? > ":
-				self.assertEqual(seenMoveReminder["value"], True)
-				return "y"
-			if prompt == "\t$> ":
-				if inputCalls["count"] == 2:
-					return "120"
-				if inputCalls["count"] == 3:
-					return "90"
-			raise AssertionError(f"Unexpected prompt: {prompt}")
+		inputs = iter(["y", "120", "90"])
 
-		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=fakeInput):
-			result = terminal["comeCheck"](5)
+		def fakeReadInput(promptText):
+			inputCalls["count"] += 1
+			if promptText == "Lay Odds on the 5? > ":
+				self.assertEqual(seenMoveReminder["value"], True)
+			elif "$>" not in promptText:
+				raise AssertionError(f"Unexpected prompt: {promptText}")
+			return next(inputs)
+
+		terminal["writeOutput"] = fakeWriteOutput
+		terminal["readInput"] = fakeReadInput
+		result = terminal["comeCheck"](5)
 
 		self.assertEqual(result["messages"].count("Way too much for your Lay Odds! Try again."), 0)
 		self.assertEqual(result["messages"].count("Ok, $90 laid on the Don't Come 5."), 1)
@@ -1654,17 +1662,19 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 10
 		printedTexts = []
 
-		def fakePrint(*args, **kwargs):
-			printedTexts.append(" ".join(str(part) for part in args))
-
-		with patch("builtins.print", side_effect=fakePrint), patch("builtins.input", side_effect=["y", "100", "99"]):
-			result = terminal["comeCheck"](5)
+		terminal["writeOutput"] = lambda message: printedTexts.append(str(message))
+		inputs = iter(["y", "100", "99"])
+		promptLog = []
+		terminal["readInput"] = lambda promptText: promptLog.append(promptText) or next(inputs)
+		result = terminal["comeCheck"](5)
 
 		self.assertEqual(result["messages"].count("Way too much for your Lay Odds! Try again."), 0)
 		self.assertEqual(result["messages"].count("Ok, $99 laid on the Don't Come 5."), 1)
 		self.assertEqual(sum(1 for text in printedTexts if "How much for your Lay 5 Odds? Max is $99, multiples of 3" in text), 2)
 		self.assertEqual(sum(1 for text in printedTexts if "Way too much for your Lay Odds! Try again." in text), 1)
 		self.assertEqual(terminal["dComeOdds"][5], 99)
+		self.assertEqual(promptLog[0], "Lay Odds on the 5? > ")
+		self.assertEqual(sum(1 for promptText in promptLog if "$>" in promptText), 2)
 
 	def testComeCheckReturnsNoChangeActionResultWhenNoBarBets(self):
 		terminal = loadTerminalNamespace()

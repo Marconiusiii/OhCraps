@@ -1066,3 +1066,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- insufficient-bank path invoking `outOfMoney()` then accepted wager path.
 - Updated existing line-betting adapter test to provide `readInput` values for shared `betPrompt()` path.
 - Full suite remains green.
+
+## Milestone 66: Come Movement IO Adapter Routing
+
+### What changed
+- Routed Come/Don’t Come post-roll movement prompts in `processComePostRollAction(...)` through adapter helpers:
+	- `readInput(...)`
+	- `writeOutput(...)`
+- Kept movement message order aligned with current game flow:
+	- move message first
+	- odds yes/no prompt second
+	- odds amount prompt/retry loop third
+- Fixed malformed indentation/control flow in the moved-bet odds loops for both Come and Don’t Come branches.
+
+### Why
+- Come movement and odds attachment remained a high-impact direct terminal I/O path.
+- Adapter routing here is required for predictable UI migration to iOS while preserving existing table behavior.
+
+### Behavior
+- No payout-rule changes.
+- No odds limit rule changes.
+- No command surface changes.
+
+### Test coverage
+- Updated Come/Don’t Come movement regression tests to feed `readInput(...)` for both yes/no and odds amount paths.
+- Preserved assertions for prompt ordering, max-odds retry behavior, and accepted odds persistence.
+- Compile and full suite remain green (`201` tests passing).

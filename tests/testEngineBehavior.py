@@ -938,6 +938,38 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["oddsCheck"](5)
 		self.assertIn("You won $15 from your Pass Line Odds!", " ".join(writes))
 
+	def testCashInUsesIoAdaptersAndRetriesInvalid(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 0
+		terminal["initBank"] = 0
+		inputs = iter(["nope", "0", "250"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["cashIn"]()
+		self.assertEqual(terminal["bank"], 250)
+		self.assertEqual(terminal["initBank"], 250)
+		printed = " ".join(writes)
+		self.assertIn("How much are you cashing in for your bankroll?", printed)
+		self.assertIn("That wasn't a number, doofus!", printed)
+		self.assertIn("You won't get very far trying to play without any money, come on now...", printed)
+		self.assertIn("Great, starting you off with $250.", printed)
+
+	def testOutOfMoneyUsesIoAdaptersAndRejectsNegative(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		inputs = iter(["abc", "-5", "50"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["outOfMoney"]()
+		self.assertEqual(terminal["bank"], 150)
+		printed = " ".join(writes)
+		self.assertIn("Your chips are getting really low.", printed)
+		self.assertIn("You forgot what numbers were and the ATM beeps at you in annoyance.", printed)
+		self.assertIn("This is for withdrawals only! Try again.", printed)
+		self.assertIn("Alright, starting you off again with $150.", printed)
+
 	def testValidPlaceNumbersInCraplessIncludesEdgeNumbers(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps

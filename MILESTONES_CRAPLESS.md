@@ -1016,3 +1016,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- `bb` calls `outOfMoney()` in point-phase context.
 	- `bb` returns non-roll command result.
 - Compile and full suite remain green.
+
+## Milestone 64: Bankroll Management IO Adapter Routing
+
+### What changed
+- Routed `cashIn()` prompts and messages through adapter helpers:
+	- `readInput(...)`
+	- `writeOutput(...)`
+- Routed `outOfMoney()` prompts and messages through adapter helpers:
+	- `readInput(...)`
+	- `writeOutput(...)`
+- Kept bankroll accounting behavior unchanged.
+
+### Why
+- Bankroll management remained a core direct-I/O area after `bb` command was added.
+- Adapter routing here is required for clean UI portability to iOS flows.
+
+### Behavior
+- No payout-rule changes.
+- No betting command changes.
+- No bankroll math changes.
+
+### Test coverage
+- Added deterministic adapter-focused tests in `tests/testEngineBehavior.py` for:
+	- `cashIn()` invalid/zero retry path then successful bankroll set.
+	- `outOfMoney()` invalid/negative retry path then successful bankroll top-up.
+- Compile and full suite remain green.

@@ -1397,21 +1397,21 @@ chipsOnTable = 0
 
 def cashIn():
 	global bank, initBank
-	print("How much are you cashing in for your bankroll?")
+	writeOutput("How much are you cashing in for your bankroll?")
 	while True:
 		try:
-			cash = int(input("$>"))
+			cash = int(readInput("$>"))
 		except ValueError:
-			print("That wasn't a number, doofus!")
+			writeOutput("That wasn't a number, doofus!")
 			continue
 		if cash <= 0:
-			print("You won't get very far trying to play without any money, come on now...")
+			writeOutput("You won't get very far trying to play without any money, come on now...")
 			continue
 		else:
 			bank += cash
 			initBank = cash
 			break
-	print(f"Great, starting you off with ${bank:,}.")
+	writeOutput(f"Great, starting you off with ${bank:,}.")
 
 def quitGame():
 	global bank, chipsOnTable, initBank
@@ -1443,22 +1443,22 @@ def betPrompt():
 def outOfMoney():
 	global bank
 	if bank <= 0:
-		print("\tYou are totally out of money.\n\tLet's hit the ATM again and get you more cash.\n\tHow much do you want?")
+		writeOutput("\tYou are totally out of money.\n\tLet's hit the ATM again and get you more cash.\n\tHow much do you want?")
 	else:
-		print("\tYour chips are getting really low.\n\tHow much would you like to add to your bankroll?")
+		writeOutput("\tYour chips are getting really low.\n\tHow much would you like to add to your bankroll?")
 	while True:
 		try:
-			cash = int(input("\t$>"))
+			cash = int(readInput("\t$>"))
 		except ValueError:
-			print("\tYou forgot what numbers were and the ATM beeps at you in annoyance.\n\tTry again.")
+			writeOutput("\tYou forgot what numbers were and the ATM beeps at you in annoyance.\n\tTry again.")
 			continue
 		if cash < 0:
-			print("\tWhat am I, a bank?\n\tThis is for withdrawals only! Try again.")
+			writeOutput("\tWhat am I, a bank?\n\tThis is for withdrawals only! Try again.")
 			continue
 		else:
 			bank += cash
 			break
-	print(f"\tAlright, starting you off again with ${bank:,}. Don't lose it all this time!")
+	writeOutput(f"\tAlright, starting you off again with ${bank:,}. Don't lose it all this time!")
 
 #Place Betting
 

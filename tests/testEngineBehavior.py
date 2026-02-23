@@ -1232,6 +1232,16 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(calls, [True])
 
+	def testRunPlaceMenuUsesReadInputAdapter(self):
+		terminal = loadTerminalNamespace()
+		seenCommands = []
+		terminal["placeShow"] = lambda: None
+		terminal["readInput"] = lambda promptText: "x"
+		terminal["handlePlaceMenuCommand"] = lambda placeCommand, pointPhase=False: seenCommands.append((placeCommand, pointPhase)) or {"success": True, "messages": [], "stateChanged": False, "shouldExitMenu": True}
+		terminal["emitActionResult"] = lambda actionResult: None
+		terminal["runPlaceMenu"](pointPhase=True)
+		self.assertEqual(seenCommands, [("x", True)])
+
 	def testHandleBettingCommandPointRollReturnsTrue(self):
 		terminal = loadTerminalNamespace()
 		with patch("builtins.print"):
@@ -2373,6 +2383,18 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["place"][6], 24)
 		self.assertEqual(terminal["bank"], 115)
 		self.assertEqual(terminal["chipsOnTable"], 24)
+
+	def testPlaceCheckUsesReadInputForPressPrompt(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 18
+		terminal["place"] = {4: 0, 5: 0, 6: 18, 8: 0, 9: 0, 10: 0}
+		prompts = []
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or ""
+		terminal["writeOutput"] = lambda message: None
+		terminal["placeCheck"](6)
+		self.assertEqual(len(prompts), 1)
+		self.assertIn("Change your bet?", prompts[0])
 
 	def testPlaceCheckHalfPressNormalizedAfterCraplessHelperFlow(self):
 		terminal = loadTerminalNamespace()

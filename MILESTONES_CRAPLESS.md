@@ -1322,3 +1322,34 @@ New milestone updates should be appended here rather than creating new milestone
 	- Lay Across behavior with adapter input/output
 	- Lay take-down behavior with adapter input/output
 - Compile and full suite remain green (`217` tests passing).
+
+## Milestone 75: Place Menu and Prompt IO Adapter Completion
+
+### What changed
+- Completed Place subsystem/menu input routing to adapter helpers in:
+	- `runPlaceMenu()`
+	- `placePreset(...)`
+	- `placeBets()`
+	- `placeShow()`
+	- `placeMover()`
+	- `placeCheck(...)`
+	- `vig(...)`
+- Replaced direct `input(...)`/`print(...)` calls in those Place flows with:
+	- `readInput(...)`
+	- `writeOutput(...)`
+
+### Why
+- Place betting remains one of the most-used interaction surfaces and was still partially direct terminal I/O.
+- Finishing adapter routing here improves UI-boundary consistency for iOS port readiness.
+
+### Behavior
+- No Place payout-rule changes.
+- No Place unit/multiple validation changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Added adapter-focused regression tests for:
+	- `runPlaceMenu()` consuming commands via `readInput(...)`
+	- `placeCheck(...)` press prompt consuming input via `readInput(...)`
+- Existing Place and Crapless preset/buy-threshold test matrix remains green.
+- Compile and full suite remain green (`219` tests passing).

@@ -1774,7 +1774,7 @@ def placePreset(pre):
 	global chipsOnTable, bank, pointIsOn, place, comeOut
 	preset = pre.strip().lower()
 	if preset not in validPlacePresetCodesForMode():
-		print("That preset is not valid for this game mode.")
+		writeOutput("That preset is not valid for this game mode.")
 		return
 	total = 0
 	outlay = 0
@@ -1782,24 +1782,25 @@ def placePreset(pre):
 		outlay += place[number]
 	if preset == 'a':
 		while True:
-			print("How many units across the Place Numbers?")
+			writeOutput("How many units across the Place Numbers?")
 			try:
-				unit = int(input("> "))
+				unit = int(readInput("> "))
 			except ValueError:
-				print("That wasn't even a unit! Try again.")
+				writeOutput("That wasn't even a unit! Try again.")
 				continue
 			if ((unit*5)*4 + (unit*6)*2) > bank + outlay:
-				print("You don't have enough money for that! Egads!")
+				writeOutput("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
 			else:
 				break
+		point = "y"
 		if pointIsOn:
-			print("Include the Point?")
+			writeOutput("Include the Point?")
 			try:
-				point = input("> ")
+				point = readInput("> ")
 			except ValueError:
-				pass
+				point = "y"
 		for key in place:
 			chipsOnTable -= place[key]
 			bank += place[key]
@@ -1807,35 +1808,33 @@ def placePreset(pre):
 				place[key] = 5 * unit
 			elif key in [6, 8]:
 				place[key] = 6 * unit
-			if pointIsOn and point not in ['y', 'yes']:
-				if key == comeOut:
-					place[key] = 0
+			if pointIsOn and point not in ['y', 'yes'] and key == comeOut:
+				place[key] = 0
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Placing ${total:,} Across.")
+		writeOutput(f"Placing ${total:,} Across.")
 	elif preset == 'i':
-		print("How many units Inside?")
+		writeOutput("How many units Inside?")
 		while True:
 			try:
-				unit = int(input("> "))
+				unit = int(readInput("> "))
 			except ValueError:
-				print("Invalid entry, try again.")
+				writeOutput("Invalid entry, try again.")
 				continue
 			if ((unit*5)*2 + (unit*6)*2) > bank + outlay:
-				print("You don't have enough money for that! Egads!")
+				writeOutput("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
 			else:
 				break
 
 		if pointIsOn:
-			print("Include the Point?")
+			writeOutput("Include the Point?")
 			try:
-				insidePoint = input("> ")
+				insidePoint = readInput("> ")
 			except ValueError:
 				insidePoint = "n"
-				pass
 		else:
 			insidePoint = 'y'
 		for key in place:
@@ -1849,22 +1848,21 @@ def placePreset(pre):
 				place[key] = 0
 			if insidePoint not in ['y', 'yes'] and key == comeOut:
 				place[key] = 0
-			else:
-				chipsOnTable += place[key]
-				bank -= place[key]
-				total += place[key]
-		print(f"Ok, placing ${total:,} inside.")
+			chipsOnTable += place[key]
+			bank -= place[key]
+			total += place[key]
+		writeOutput(f"Ok, placing ${total:,} inside.")
 
 	elif preset == "c":
-		print("How many units on the 6 and 8?")
+		writeOutput("How many units on the 6 and 8?")
 		while True:
 			try:
-				unit = int(input("> "))
+				unit = int(readInput("> "))
 			except ValueError:
-				print("Invalid entry, try again.")
+				writeOutput("Invalid entry, try again.")
 				continue
 			if (unit*6)*2 > bank + outlay:
-				print("You don't have enough money for that! Egads!")
+				writeOutput("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
 			else:
@@ -1880,21 +1878,21 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-			print(f"Ok, placing ${total:,} on the 6 and 8.")
+		writeOutput(f"Ok, placing ${total:,} on the 6 and 8.")
 	elif preset == "ea":
 		while True:
-			print("How many Extreme Across units from 2 through 12?")
+			writeOutput("How many Extreme Across units from 2 through 12?")
 			try:
-				unit = int(input("> "))
+				unit = int(readInput("> "))
 			except ValueError:
-				print("That wasn't even a unit! Try again.")
+				writeOutput("That wasn't even a unit! Try again.")
 				continue
 			targetNumbers = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
 			totalNeed = 0
 			for number in targetNumbers:
 				totalNeed += placeUnitSize(number) * unit
 			if totalNeed > bank + outlay:
-				print("You don't have enough money for that! Egads!")
+				writeOutput("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
 			break
@@ -1909,21 +1907,21 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Ok, placing ${total:,} Extreme Across.")
+		writeOutput(f"Ok, placing ${total:,} Extreme Across.")
 	elif preset == "e":
 		while True:
-			print("How many Edge units on 2, 3, 11, and 12?")
+			writeOutput("How many Edge units on 2, 3, 11, and 12?")
 			try:
-				unit = int(input("> "))
+				unit = int(readInput("> "))
 			except ValueError:
-				print("That wasn't even a unit! Try again.")
+				writeOutput("That wasn't even a unit! Try again.")
 				continue
 			targetNumbers = [2, 3, 11, 12]
 			totalNeed = 0
 			for number in targetNumbers:
 				totalNeed += placeUnitSize(number) * unit
 			if totalNeed > bank + outlay:
-				print("You don't have enough money for that! Egads!")
+				writeOutput("You don't have enough money for that! Egads!")
 				outOfMoney()
 				continue
 			break
@@ -1938,13 +1936,13 @@ def placePreset(pre):
 			chipsOnTable += place[key]
 			bank -= place[key]
 			total += place[key]
-		print(f"Ok, placing ${total:,} on the edges.")
+		writeOutput(f"Ok, placing ${total:,} on the edges.")
 
 
 def placeMover():
 	global place, chipsOnTable, bank, comeOut
 	if gameMode == GameMode.craplessCraps:
-		print("Place mover is currently disabled in Crapless Craps.")
+		writeOutput("Place mover is currently disabled in Crapless Craps.")
 		return
 	for key in place:
 		if place[key] == 0 and place[comeOut] > 0:
@@ -1956,7 +1954,7 @@ def placeMover():
 				place[key] = place[comeOut] - place[comeOut]//6
 			elif key in [4, 5, 9, 10] and comeOut in [4, 5, 9, 10]:
 				place[key] = place[comeOut]
-			print(f"Moving your ${place[comeOut]:,} Place {comeOut} bet. You now have ${place[key]:,} on the {key}.")
+				writeOutput(f"Moving your ${place[comeOut]:,} Place {comeOut} bet. You now have ${place[key]:,} on the {key}.")
 			chipsOnTable -= place[comeOut]
 			bank += place[comeOut]
 			chipsOnTable += place[key]
@@ -1967,19 +1965,19 @@ def placeBets():
 	global place, chipsOnTable, bank
 	madeBet = True
 	for key in validPlaceNumbers():
-		print(f"You have ${place[key]:,} on the Place {key}.")
-		print(f"How much on the Place {key}?")
+		writeOutput(f"You have ${place[key]:,} on the Place {key}.")
+		writeOutput(f"How much on the Place {key}?")
 		while True:
 			bet = 0
 			try:
-				bet = int(input("$>"))
+				bet = int(readInput("$>"))
 				if bet > bank + chipsOnTable:
-					print("You don't have enough money to make that bet! Try again.")
+					writeOutput("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
-					print(f"How much on the Place {key}?")
+					writeOutput(f"How much on the Place {key}?")
 					continue
 				if not isPlaceAmountAllowed(number=key, bet=bet):
-					print("Invalid amount for that Place bet. Try again.")
+					writeOutput("Invalid amount for that Place bet. Try again.")
 					continue
 				madeBet = True
 				break
@@ -1995,11 +1993,11 @@ def placeBets():
 			place[key] = bet
 			chipsOnTable += bet
 			if (key in [4, 10] and bet >= 10) or (gameMode == GameMode.craplessCraps and key in [2, 3, 11, 12] and bet >= 20):
-				print(f"Buying the {key} for ${bet:,}.")
+				writeOutput(f"Buying the {key} for ${bet:,}.")
 			else:
-				print(f"${bet:,} on the Place {key}.")
+				writeOutput(f"${bet:,} on the Place {key}.")
 		elif place[key] > 0 and bet == 0:
-			print(f"Ok, taking down your Place {key} bet.")
+			writeOutput(f"Ok, taking down your Place {key} bet.")
 			chipsOnTable -= place[key]
 			bank += place[key]
 			place[key] = 0
@@ -2008,7 +2006,7 @@ def placeShow():
 	global place
 	for key in validPlaceNumbers():
 		if place[key] > 0:
-			print(f"You have ${place[key]:,} on the Place {key}.")
+			writeOutput(f"You have ${place[key]:,} on the Place {key}.")
 
 def placeTakeDown():
 	global place, bank, chipsOnTable
@@ -2023,7 +2021,7 @@ def vig(bet):
 		commission = math.ceil(total)
 	else:
 		commission = math.floor(total)
-	print(f"${commission:,} paid to the House for the vig.")
+	writeOutput(f"${commission:,} paid to the House for the vig.")
 	return commission
 
 def placeCheck(roll):
@@ -2038,50 +2036,50 @@ def placeCheck(roll):
 	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
 	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 	hitNumber = settlement.hitNumber
 	if hitNumber is not None:
-		press = str(input("Change your bet? 'y' to change, 'p' to full-press, 'hp' to half-press, or 'u' to press 1 unit, or Enter to do nothing.\n > ")).strip().lower()
+		press = str(readInput("Change your bet? 'y' to change, 'p' to full-press, 'hp' to half-press, or 'u' to press 1 unit, or Enter to do nothing.\n > ")).strip().lower()
 		if press == 'y':
-			print(f"How much on the Place {hitNumber}?")
+			writeOutput(f"How much on the Place {hitNumber}?")
 			bank += place[hitNumber]
 			while True:
 				bet = betPrompt()
 				if isPlaceAmountAllowed(number=hitNumber, bet=bet):
 					break
-				print("Invalid amount for that Place bet. Try again.")
+				writeOutput("Invalid amount for that Place bet. Try again.")
 				chipsOnTable -= bet
 				bank += bet
 			if bet == 0:
 				chipsOnTable -= place[hitNumber]
 				place[hitNumber] = bet
-				print(f"Ok, taking down your Place {hitNumber} bet.")
+				writeOutput(f"Ok, taking down your Place {hitNumber} bet.")
 			else:
 				chipsOnTable -= place[hitNumber]
 				place[hitNumber] = bet
-				print(f"Ok, ${place[hitNumber]:,} on the Place {hitNumber}.")
+				writeOutput(f"Ok, ${place[hitNumber]:,} on the Place {hitNumber}.")
 		elif press == 'p':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
 			place[hitNumber] *= 2
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
-			print(f"Full Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
+			writeOutput(f"Full Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
 		elif press == 'hp':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
 			place[hitNumber] += normalizedHalfPressIncrement(number=hitNumber, currentWager=place[hitNumber])
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
-			print(f"Half Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
+			writeOutput(f"Half Press! You now have ${place[hitNumber]} on the Place {hitNumber}")
 		elif press == 'u':
 			bank += place[hitNumber]
 			chipsOnTable -= place[hitNumber]
 			place[hitNumber] += placeUnitSize(hitNumber)
 			bank -= place[hitNumber]
 			chipsOnTable += place[hitNumber]
-			print(f"Pressing up one unit. You now have ${place[hitNumber]} on the Place {hitNumber}")
+			writeOutput(f"Pressing up one unit. You now have ${place[hitNumber]} on the Place {hitNumber}")
 
 def showAllBets():
 	global comeBet, dComeBet, fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
@@ -2108,7 +2106,7 @@ def showAllBets():
 def runPlaceMenu(pointPhase=False):
 	while True:
 		placeShow()
-		placeCommand = str(input("Place Bets? > ")).strip().lower()
+		placeCommand = str(readInput("Place Bets? > ")).strip().lower()
 		commandResult = handlePlaceMenuCommand(placeCommand, pointPhase=pointPhase)
 		emitActionResult(commandResult)
 		if commandResult["shouldExitMenu"]:

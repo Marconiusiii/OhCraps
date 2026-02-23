@@ -1427,12 +1427,12 @@ def betPrompt():
 	global bank, chipsOnTable
 	while True:
 		try:
-			playerBet =  int(input("\t$> "))
+			playerBet =  int(readInput("\t$> "))
 		except ValueError:
-			print("\tThat wasn't a number!")
+			writeOutput("\tThat wasn't a number!")
 			continue
 		if playerBet > bank:
-			if str(input("\tYou simply don't have enough money to do that! DO you want to add more to your bankroll? > ")).strip().lower() == "y":
+			if readInput("\tYou simply don't have enough money to do that! DO you want to add more to your bankroll? > ").strip().lower() == "y":
 				outOfMoney()
 			continue
 		else:

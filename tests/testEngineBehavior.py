@@ -900,12 +900,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
 		terminal["bank"] = 100
 		terminal["chipsOnTable"] = 0
-		inputs = iter(["p", "x"])
+		inputs = iter(["p", "10", "x"])
 		writes = []
 		terminal["readInput"] = lambda promptText: next(inputs)
 		terminal["writeOutput"] = lambda message: writes.append(str(message))
-		with patch("builtins.input", side_effect=["10"]):
-			terminal["lineBetting"]()
+		terminal["lineBetting"]()
 		self.assertEqual(terminal["lineBets"]["Pass"], 10)
 		printed = " ".join(writes)
 		self.assertIn("How much on the Pass Line?", printed)
@@ -969,6 +968,33 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("You forgot what numbers were and the ATM beeps at you in annoyance.", printed)
 		self.assertIn("This is for withdrawals only! Try again.", printed)
 		self.assertIn("Alright, starting you off again with $150.", printed)
+
+	def testBetPromptUsesIoAdaptersAndRetriesInvalid(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		inputs = iter(["abc", "25"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		result = terminal["betPrompt"]()
+		self.assertEqual(result, 25)
+		self.assertEqual(terminal["bank"], 75)
+		self.assertEqual(terminal["chipsOnTable"], 25)
+		self.assertIn("That wasn't a number!", " ".join(writes))
+
+	def testBetPromptInsufficientBankTriggersOutOfMoneyBranch(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 50
+		terminal["chipsOnTable"] = 0
+		inputs = iter(["60", "y", "20"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		outCalls = []
+		terminal["outOfMoney"] = lambda: outCalls.append(True)
+		terminal["writeOutput"] = lambda message: None
+		result = terminal["betPrompt"]()
+		self.assertEqual(result, 20)
+		self.assertEqual(outCalls, [True])
 
 	def testValidPlaceNumbersInCraplessIncludesEdgeNumbers(self):
 		terminal = loadTerminalNamespace()

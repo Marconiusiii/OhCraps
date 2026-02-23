@@ -1042,3 +1042,27 @@ New milestone updates should be appended here rather than creating new milestone
 	- `cashIn()` invalid/zero retry path then successful bankroll set.
 	- `outOfMoney()` invalid/negative retry path then successful bankroll top-up.
 - Compile and full suite remain green.
+
+## Milestone 65: Bet Prompt IO Adapter Routing
+
+### What changed
+- Routed `betPrompt()` input/output through adapter helpers:
+	- `readInput(...)` for wager and follow-up bankroll prompt
+	- `writeOutput(...)` for invalid-number message
+- Preserved wager accounting and existing `outOfMoney()` branch behavior.
+
+### Why
+- `betPrompt()` is a high-fanout input path used across many betting systems.
+- Moving it to adapter I/O significantly improves portability toward non-terminal UIs.
+
+### Behavior
+- No payout-rule changes.
+- No command changes.
+- No wager/accounting logic changes.
+
+### Test coverage
+- Added deterministic adapter-focused tests in `tests/testEngineBehavior.py` for:
+	- invalid-number retry then accepted wager path.
+	- insufficient-bank path invoking `outOfMoney()` then accepted wager path.
+- Updated existing line-betting adapter test to provide `readInput` values for shared `betPrompt()` path.
+- Full suite remains green.

@@ -1386,3 +1386,34 @@ New milestone updates should be appended here rather than creating new milestone
 	- `handleBettingCommand(...)` field prompts using `readInput(...)`
 - Compile check passed.
 - Full suite remains green (`223` tests passing).
+
+## Milestone 77: Hard Ways and Game Mode Selection IO Adapter Normalization
+
+### What changed
+- Migrated remaining direct Hard Ways menu command input to adapter input:
+	- `runHardWaysMenu()` now reads command via `readInput("Hard Ways Bets? > ")`
+- Migrated game mode selection flow to adapter I/O:
+	- `selectGameMode()` now emits all mode-selection lines via `writeOutput(...)`
+	- `selectGameMode()` now reads mode choice via `readInput("> ")`
+	- Invalid-choice and selected-mode feedback now emit via `writeOutput(...)`
+
+### Why
+- Hard Ways menu entry and game mode selection were still using direct terminal I/O.
+- These are high-frequency controller interaction paths and needed the same adapter boundary used elsewhere.
+- This further reduces coupling to terminal-only execution and improves iOS-portability readiness.
+
+### Behavior
+- No game rules changed.
+- No payout logic changed.
+- No bankroll/chips accounting changed.
+- Prompts and outcomes remain functionally the same while routed through adapters.
+
+### Test coverage
+- Updated mode selection tests to assert adapter-driven flows:
+	- `testSelectGameModeAcceptsCraps`
+	- `testSelectGameModeAcceptsCrapless`
+	- `testSelectGameModeRejectsInvalidThenAccepts`
+- Added Hard Ways menu adapter regression:
+	- `testRunHardWaysMenuUsesReadInput`
+- Compile check passed.
+- Full suite remains green (`224` tests passing).

@@ -2124,7 +2124,7 @@ def runLayMenu(pointPhase=False):
 def runHardWaysMenu(pointPhase=False):
 	while True:
 		hardShow()
-		hardCommand = str(input("Hard Ways Bets? > ")).strip().lower()
+		hardCommand = str(readInput("Hard Ways Bets? > ")).strip().lower()
 		commandResult = handleHardWaysMenuCommand(hardCommand, pointPhase=pointPhase)
 		emitActionResult(commandResult)
 		if commandResult["shouldExitMenu"]:
@@ -2415,18 +2415,18 @@ gameMode = GameMode.craps
 
 def selectGameMode():
 	global gameMode
-	print("Choose game mode:")
-	print("1. Craps")
-	print("2. Crapless Craps")
+	writeOutput("Choose game mode:")
+	writeOutput("1. Craps")
+	writeOutput("2. Crapless Craps")
 	while True:
-		choice = str(input("> ")).strip()
+		choice = str(readInput("> ")).strip()
 		selectedMode = parseGameModeChoice(choice)
 		if selectedMode is None:
-			print("Invalid choice. Enter 1 or 2.")
+			writeOutput("Invalid choice. Enter 1 or 2.")
 			continue
 		gameMode = selectedMode
 		selectedProfile = getRulesProfile(gameMode)
-		print(f"{selectedProfile.displayName} selected.")
+		writeOutput(f"{selectedProfile.displayName} selected.")
 		break
 
 gameState = createGameState(

@@ -863,23 +863,46 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testSelectGameModeAcceptsCraps(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
-		with patch("builtins.input", side_effect=["1"]):
-			terminal["selectGameMode"]()
+		inputs = iter(["1"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["selectGameMode"]()
 		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craps)
+		self.assertIn("Craps selected.", " ".join(writes))
 
 	def testSelectGameModeAcceptsCrapless(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps
-		with patch("builtins.input", side_effect=["2"]):
-			terminal["selectGameMode"]()
+		inputs = iter(["2"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["selectGameMode"]()
 		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertIn("Crapless Craps selected.", " ".join(writes))
 
 	def testSelectGameModeRejectsInvalidThenAccepts(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps
-		with patch("builtins.input", side_effect=["x", "2"]):
-			terminal["selectGameMode"]()
+		inputs = iter(["x", "2"])
+		writes = []
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["selectGameMode"]()
 		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		writtenText = " ".join(writes)
+		self.assertIn("Invalid choice. Enter 1 or 2.", writtenText)
+		self.assertIn("Crapless Craps selected.", writtenText)
+
+	def testRunHardWaysMenuUsesReadInput(self):
+		terminal = loadTerminalNamespace()
+		prompts = []
+		terminal["hardShow"] = lambda: None
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or "x"
+		with patch("builtins.print"):
+			terminal["runHardWaysMenu"](pointPhase=False)
+		self.assertIn("Hard Ways Bets? > ", prompts)
 
 	def testLineBettingRejectsDontPassInCrapless(self):
 		terminal = loadTerminalNamespace()

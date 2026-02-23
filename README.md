@@ -29,6 +29,8 @@ Crapless Craps removes the standard come-out craps numbers as automatic losers f
 
 After choosing a Game Mode, a bankroll prompt will appear. Enter a numeric value to start.
 
+At any betting prompt, you can type `bb` to reopen the bankroll add-on flow and pull more money from the ATM without waiting to run out.
+
 ### Coming Out Roll
 
 You've established your bankroll and are now ready to start betting. You have a few options for the very first roll, and all options are accessed by typing the bet code at the prompt and hitting Enter.
@@ -73,6 +75,9 @@ You've established your bankroll and are now ready to start betting. You have a 
 </tr>
 <tr>
 <td>h</td><td>Show Help Menu for Bet Codes</td>
+</tr>
+<tr>
+<td>bb</td><td>Add bankroll from the ATM</td>
 </tr>
 <tr>
 <td>a</td><td>Show all current bets</td>
@@ -310,6 +315,9 @@ New betting modes appear in the Point phase, and are accessed through the follow
 </tr>
 <tr>
 <td>pr</td><td>Prop Bets mode</td>
+</tr>
+<tr>
+<td>bb</td><td>Add bankroll from the ATM</td>
 </tr>
 <tr>
 <td>h</td><td>Help Menu for Bet Codes</td>

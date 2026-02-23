@@ -2074,6 +2074,9 @@ def handleBettingCommand(command, pointPhase=False):
 		else:
 			print(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
 		return bettingCommandResult(shouldRoll=False, handled=True)
+	if cmd == "bb":
+		outOfMoney()
+		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "a":
 		showAllBets()
 		return bettingCommandResult(shouldRoll=False, handled=True)
@@ -2122,7 +2125,7 @@ def handleBettingCommand(command, pointPhase=False):
 			propBetting()
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "h":
-			print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+			print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd in ["r", "x"]:
 			print("Dice are rolling!")
@@ -2195,7 +2198,7 @@ def handleBettingCommand(command, pointPhase=False):
 			print(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "h":
-		print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+		print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd in ["x", "r"]:
 		print("Rolling the dice!")

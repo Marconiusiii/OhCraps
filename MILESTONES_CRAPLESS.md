@@ -985,3 +985,34 @@ New milestone updates should be appended here rather than creating new milestone
 	- `dpPhase2()` take-down path with adapter stubs.
 	- `oddsCheck()` message emission through `writeOutput`.
 - Compile and full suite remain green.
+
+## Milestone 63: Bankroll Shortcut Command (`bb`)
+
+### What changed
+- Added new shared betting command `bb` in `handleBettingCommand(...)`.
+- `bb` now opens bankroll refill flow via `outOfMoney()` in both:
+	- Come Out betting
+	- Point-phase betting
+- Updated in-game help text strings to include:
+	- `bb: Add bankroll from the ATM`
+
+### README updates
+- Added `bb` to both command tables:
+	- Come Out Roll Bet Codes
+	- Point Phase Bet Codes
+- Added bankroll note near startup bankroll section explaining that `bb` can be used at betting prompts.
+
+### Why
+- Players need a manual way to add bankroll on demand in all game modes without waiting for an out-of-money trigger.
+
+### Behavior
+- `bb` does not roll dice.
+- `bb` does not change bet states directly.
+- `bb` only invokes bankroll top-up flow.
+
+### Test coverage
+- Added deterministic command-handler tests in `tests/testEngineBehavior.py` to confirm:
+	- `bb` calls `outOfMoney()` in come-out context.
+	- `bb` calls `outOfMoney()` in point-phase context.
+	- `bb` returns non-roll command result.
+- Compile and full suite remain green.

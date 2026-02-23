@@ -1148,6 +1148,24 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		printed = "\n".join(str(args[0]) for args, _ in mockPrint.call_args_list if args)
 		self.assertIn("You don't have a Line bet, silly!", printed)
 
+	def testHandleBettingCommandBbCallsOutOfMoneyComeOut(self):
+		terminal = loadTerminalNamespace()
+		calls = []
+		terminal["outOfMoney"] = lambda: calls.append(True)
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("bb", pointPhase=False)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(calls, [True])
+
+	def testHandleBettingCommandBbCallsOutOfMoneyPointPhase(self):
+		terminal = loadTerminalNamespace()
+		calls = []
+		terminal["outOfMoney"] = lambda: calls.append(True)
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("bb", pointPhase=True)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(calls, [True])
+
 	def testResolveComeOutRollNaturalResetsThrowCount(self):
 		terminal = loadTerminalNamespace()
 		terminal["atsOn"] = False

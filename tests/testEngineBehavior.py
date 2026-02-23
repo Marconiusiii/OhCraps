@@ -2176,6 +2176,58 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(terminal["fieldBet"], 10)
 
+	def testShowAllBetsUsesWriteOutputForSummaryRows(self):
+		terminal = loadTerminalNamespace()
+		terminal["lineBets"] = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		terminal["comeBet"] = 5
+		terminal["dComeBet"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		terminal["propBets"]["Any Craps"] = 4
+		terminal["atsAll"] = 2
+		terminal["atsTall"] = 3
+		terminal["atsSmall"] = 1
+		terminal["fireBet"] = 6
+		terminal["comeShow"] = lambda: None
+		terminal["placeShow"] = lambda: None
+		terminal["layShow"] = lambda: None
+		terminal["fieldShow"] = lambda: None
+		terminal["hardShow"] = lambda: None
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			terminal["showAllBets"]()
+		self.assertEqual(mockPrint.call_count, 0)
+		writtenText = " ".join(writes)
+		self.assertIn("You have $10 on the Pass.", writtenText)
+		self.assertIn("You have $5 on the Come.", writtenText)
+		self.assertIn("$4 on Any Craps.", writtenText)
+		self.assertIn("You have $2 on the All, $3 on the Tall, and $1 on the Small.", writtenText)
+		self.assertIn("You have $6 on the Fire Bet.", writtenText)
+
+	def testHandleBettingCommandBankUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 120
+		terminal["chipsOnTable"] = 30
+		terminal["comeOut"] = 8
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			result = terminal["handleBettingCommand"]("b", pointPhase=True)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("You have $120 in your rack with $30 on the table. The Point is 8.", " ".join(writes))
+
+	def testHandleBettingCommandHelpUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			result = terminal["handleBettingCommand"]("h", pointPhase=False)
+		self.assertEqual(result.shouldRoll, False)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("Betting Codes:", " ".join(writes))
+
 	def testOddsPassRejectOverMaxRefundsBeforeRetry(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

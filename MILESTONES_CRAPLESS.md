@@ -1417,3 +1417,41 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRunHardWaysMenuUsesReadInput`
 - Compile check passed.
 - Full suite remains green (`224` tests passing).
+
+## Milestone 78: Betting Status and Command Output Adapter Normalization
+
+### What changed
+- Migrated summary/status output in `showAllBets()` to `writeOutput(...)`:
+	- Line bet rows
+	- Come / Don't Come summary rows
+	- Prop rows
+	- ATS summary row
+	- Fire bet summary row
+- Migrated controller feedback output in `handleBettingCommand(...)` to `writeOutput(...)` for both point-phase and come-out command handling:
+	- Bank display lines
+	- Missing/blocked bet messages
+	- Come bet header line
+	- Help menu output
+	- Working/Off toggle messages
+	- ATS and Fire menu/status lines
+	- Roll-ready messages and invalid-command messages
+	- Line betting menu header line
+
+### Why
+- These betting/status controller paths were still using direct `print(...)` calls.
+- Moving them to adapter output improves UI-boundary consistency and keeps terminal I/O behavior portable for iOS migration.
+- Scope remained output-only; no bet math/rules were changed.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Existing text and flow behavior preserved while output routing is standardized.
+
+### Test coverage
+- Added deterministic adapter-focused regressions in `tests/testEngineBehavior.py`:
+	- `testShowAllBetsUsesWriteOutputForSummaryRows`
+	- `testHandleBettingCommandBankUsesWriteOutput`
+	- `testHandleBettingCommandHelpUsesWriteOutput`
+- Existing `Field Bet?` adapter routing regression retained and passing.
+- Compile check passed.
+- Full suite remains green (`227` tests passing).

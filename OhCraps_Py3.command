@@ -2085,11 +2085,11 @@ def showAllBets():
 	global comeBet, dComeBet, fireBet, lineBets, propBets, atsAll, atsTall, atsSmall
 	for value in lineBets:
 		if lineBets[value] > 0:
-			print(f"You have ${lineBets[value]:,} on the {value}.")
+			writeOutput(f"You have ${lineBets[value]:,} on the {value}.")
 	if comeBet > 0:
-		print(f"You have ${comeBet:,} on the Come.")
+		writeOutput(f"You have ${comeBet:,} on the Come.")
 	if dComeBet > 0:
-		print(f"You have ${dComeBet:,} on the Don't Come.")
+		writeOutput(f"You have ${dComeBet:,} on the Don't Come.")
 	comeShow()
 	placeShow()
 	layShow() 
@@ -2097,11 +2097,11 @@ def showAllBets():
 	hardShow()
 	for value in propBets:
 		if propBets[value] > 0:
-			print(f"${propBets[value]:,} on {value}.")
+			writeOutput(f"${propBets[value]:,} on {value}.")
 	if atsAll + atsSmall + atsTall > 0:
-		print(f"You have ${atsAll:,} on the All, ${atsTall:,} on the Tall, and ${atsSmall:,} on the Small.")
+		writeOutput(f"You have ${atsAll:,} on the All, ${atsTall:,} on the Tall, and ${atsSmall:,} on the Small.")
 	if fireBet > 0:
-		print(f"You have ${fireBet:,} on the Fire Bet.")
+		writeOutput(f"You have ${fireBet:,} on the Fire Bet.")
 
 def runPlaceMenu(pointPhase=False):
 	while True:
@@ -2138,9 +2138,9 @@ def handleBettingCommand(command, pointPhase=False):
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "b":
 		if pointPhase:
-			print(f"You have ${bank:,} in your rack with ${chipsOnTable:,} on the table. The Point is {comeOut}.")
+			writeOutput(f"You have ${bank:,} in your rack with ${chipsOnTable:,} on the table. The Point is {comeOut}.")
 		else:
-			print(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
+			writeOutput(f"You have ${bank:,} in the Bank and ${chipsOnTable:,} out on the table.")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "bb":
 		outOfMoney()
@@ -2153,20 +2153,20 @@ def handleBettingCommand(command, pointPhase=False):
 			if lineBets["Pass"] > 0 or lineBets["Don't Pass"] > 0:
 				odds()
 			else:
-				print("You don't have a Line bet, silly!")
+				writeOutput("You don't have a Line bet, silly!")
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "dp":
 			if gameMode == GameMode.craplessCraps:
-				print("Don't Pass is not available in Crapless Craps.")
+				writeOutput("Don't Pass is not available in Crapless Craps.")
 				return bettingCommandResult(shouldRoll=False, handled=True)
 			if lineBets["Don't Pass"] > 0:
 				dpPhase2()
 			else:
-				print("You don't have a Don't Pass bet!")
+				writeOutput("You don't have a Don't Pass bet!")
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "c":
 			comeShow()
-			print("Come Bet:\n")
+			writeOutput("Come Bet:\n")
 			come()
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "co":
@@ -2175,7 +2175,7 @@ def handleBettingCommand(command, pointPhase=False):
 		if cmd == "dcd":
 			if gameMode == GameMode.craplessCraps:
 				clearDontComeForCrapless()
-				print("Don't Come is not available in Crapless Craps.")
+				writeOutput("Don't Come is not available in Crapless Craps.")
 				return bettingCommandResult(shouldRoll=False, handled=True)
 			dComeDown()
 			return bettingCommandResult(shouldRoll=False, handled=True)
@@ -2201,17 +2201,17 @@ def handleBettingCommand(command, pointPhase=False):
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd == "h":
 			if gameMode == GameMode.craplessCraps:
-				print("Betting Codes:\n\n\to: Line and Lay Odds\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+				writeOutput("Betting Codes:\n\n\to: Line and Lay Odds\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
 			else:
-				print("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
+				writeOutput("Betting Codes:\n\n\to: Line and Lay Odds\n\tdp: Take Down Don't Pass Bet\n\tp: Place Bets\n\tly: Lay Bets\n\tc: Come Bets\n\tdcd: Take down DC and Odds\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx: Finish betting and Roll the Dice")
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		if cmd in ["r", "x"]:
-			print("Dice are rolling!")
+			writeOutput("Dice are rolling!")
 			return bettingCommandResult(shouldRoll=True, handled=True)
-		print("That's not a betting option, silly!")
+		writeOutput("That's not a betting option, silly!")
 		return bettingCommandResult(shouldRoll=False, handled=False)
 	if cmd in ["l", "line", "line bets"]:
-		print("Line Bets:\n")
+		writeOutput("Line Bets:\n")
 		lineBetting()
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "p":
@@ -2246,12 +2246,12 @@ def handleBettingCommand(command, pointPhase=False):
 		if plCheck > 0 or hCheck > 0 or lCheck > 0 or cCheck > 0:
 			if working:
 				working = False
-				print("Ok, all bets are Off.")
+				writeOutput("Ok, all bets are Off.")
 			else:
 				working = True
-				print("Ok, all bets are Working!")
+				writeOutput("Ok, all bets are Working!")
 		else:
-			print("Make some bets first so they can Work!")
+			writeOutput("Make some bets first so they can Work!")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd in ["pr", "prop"]:
 		propBetting()
@@ -2259,36 +2259,36 @@ def handleBettingCommand(command, pointPhase=False):
 	if cmd == "dcd":
 		if gameMode == GameMode.craplessCraps:
 			clearDontComeForCrapless()
-			print("Don't Come is not available in Crapless Craps.")
+			writeOutput("Don't Come is not available in Crapless Craps.")
 			return bettingCommandResult(shouldRoll=False, handled=True)
 		dComeDown()
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "ats":
 		if atsOn == True:
-			print(f"All Tall Small: {allNums}")
+			writeOutput(f"All Tall Small: {allNums}")
 		elif throws == 0:
-			print("All Tall Small:\n")
+			writeOutput("All Tall Small:\n")
 			atsBetting()
 		else:
-			print("All Tall Small will be available after the next 7 rolls.")
+			writeOutput("All Tall Small will be available after the next 7 rolls.")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "fire":
 		if fireBet == 0:
-			print("Fire Bet:\n")
+			writeOutput("Fire Bet:\n")
 			fireBetting()
 		else:
-			print(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
+			writeOutput(f"You have ${fireBet:,} on the Fire Bet; Numbers Hit: {fire}.")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd == "h":
 		if gameMode == GameMode.craplessCraps:
-			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tats: All Tall Small\n\tfire: Fire Bet\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+			writeOutput("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tats: All Tall Small\n\tfire: Fire Bet\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
 		else:
-			print("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
+			writeOutput("Betting Codes:\n\tl: Line Bets\n\tp: Place Bets\n\tly: Lay Bets\n\tf: Field Bet\n\thd: Hard Ways Bets\n\tpr: Prop Bets\n\tw: Toggle if Bets are Working\n\tdcd: Take down Don't Come bet\n\tats: All Tall Small\n\tfire: Fire Bet\n\tbb: Add bankroll from the ATM\n\th: Show this Help Menu\n\tx or r: Roll the Dice!")
 		return bettingCommandResult(shouldRoll=False, handled=True)
 	if cmd in ["x", "r"]:
-		print("Rolling the dice!")
+		writeOutput("Rolling the dice!")
 		return bettingCommandResult(shouldRoll=True, handled=True)
-	print("That's not an option, silly!")
+	writeOutput("That's not an option, silly!")
 	return bettingCommandResult(shouldRoll=False, handled=False)
 
 def resolveComeOutRoll():

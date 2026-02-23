@@ -1706,6 +1706,44 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["success"], True)
 		self.assertEqual(result["stateChanged"], False)
 
+	def testComeCheckCrapsComeBarLossOnTwoIncludesMessageAndStateChange(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["comeBet"] = 10
+		terminal["dComeBet"] = 0
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["writeOutput"] = lambda message: None
+		terminal["readInput"] = lambda promptText: "n"
+		with patch("builtins.print"):
+			result = terminal["comeCheck"](2)
+		self.assertEqual(terminal["comeBet"], 0)
+		self.assertEqual(terminal["bank"], 100)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertIn("You lost $10 from the Come Bet.", result["messages"])
+		self.assertEqual(result["stateChanged"], True)
+
+	def testComeCheckCrapsComeBarWinOnSevenIncludesMessageAndStateChange(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["comeBet"] = 10
+		terminal["dComeBet"] = 0
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["writeOutput"] = lambda message: None
+		terminal["readInput"] = lambda promptText: "n"
+		with patch("builtins.print"):
+			result = terminal["comeCheck"](7)
+		self.assertEqual(terminal["comeBet"], 0)
+		self.assertEqual(terminal["bank"], 120)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertIn("You won $10 on the Come!", result["messages"])
+		self.assertEqual(result["stateChanged"], True)
+
 	def testCdcOddsChangeRejectsInvalidComeOddsUnitInCraps(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps

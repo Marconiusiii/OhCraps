@@ -1171,3 +1171,29 @@ New milestone updates should be appended here rather than creating new milestone
 	- press flow after a hard-way hit
 	- re-up flow after an easy-way loss
 - Compile and full suite remain green (`205` tests passing).
+
+## Milestone 70: Fix Come/Don't Come Bar-Bet Settlement Emission in Craps Mode
+
+### What changed
+- Fixed `processComePostRollAction(...)` so Come and Don't Come settlement action results are merged for all bar-bet outcomes, not only moved-number outcomes.
+- Kept moved-number de-duplication behavior in place so move messages are not duplicated when adapter prompts run.
+
+### Why
+- A regression caused non-move bar-bet outcomes (for example, Come losing on 2/3/12 in Craps, Come winning on 7/11, and Don't Come bar resolutions) to settle money but return empty action messages and `stateChanged=False`.
+- This broke visible evaluation feedback and downstream flow state checks.
+
+### Behavior
+- Restores proper bar-bet evaluation reporting in Craps mode:
+	- Come wins on 7/11
+	- Come loses on 2/3/12
+- Preserves existing Crapless Come behavior where 2/3/11/12 move to numbers.
+- Preserves Don't Come bar rules:
+	- wins on 2/3
+	- loses on 7/11
+	- pushes on 12
+
+### Test coverage
+- Added targeted regression tests in `tests/testEngineBehavior.py` to verify Craps-mode Come bar:
+	- loss on 2 includes message and state change
+	- win on 7 includes message and state change
+- Compile and full suite remain green (`207` tests passing).

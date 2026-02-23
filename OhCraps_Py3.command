@@ -649,38 +649,38 @@ def processComePostRollAction(roll):
 		if settlement.movedNumber is not None:
 			moveMessage = f"Moving your Come Bet to the {settlement.movedNumber}."
 			settlementMessages = [msg for msg in settlementMessages if msg != moveMessage]
-			mergeActionResult(
-				actionResult,
-				createActionResult(
-					success=True,
-					messages=settlementMessages,
-					stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
-				)
+		mergeActionResult(
+			actionResult,
+			createActionResult(
+				success=True,
+				messages=settlementMessages,
+				stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
 			)
-			if settlement.movedNumber is not None:
-				comeBets[settlement.movedNumber] = settlement.movedAmount
-				actionResult["stateChanged"] = True
-				limits = oddsBetLimits(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode, isDont=False)
-				writeOutput(f"Moving your Come Bet to the {settlement.movedNumber}.")
-				if readInput(f"Come Odds for the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
-					while True:
-						multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
-						writeOutput(f"How much for your Come {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
-						comeOdds[settlement.movedNumber] = betPrompt()
-						if comeOdds[settlement.movedNumber] > limits["effectiveMax"]:
-							writeOutput("Way too high on your Odds, there. Try again.")
-							chipsOnTable -= comeOdds[settlement.movedNumber]
-							bank += comeOdds[settlement.movedNumber]
-							comeOdds[settlement.movedNumber] = 0
-							continue
-						if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=comeOdds[settlement.movedNumber], gameMode=gameMode):
-							writeOutput(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
-							chipsOnTable -= comeOdds[settlement.movedNumber]
-							bank += comeOdds[settlement.movedNumber]
-							comeOdds[settlement.movedNumber] = 0
-							continue
-						mergeActionResult(actionResult, createActionResult(success=True, messages=[f"Ok, ${comeOdds[settlement.movedNumber]:,} on your Come {settlement.movedNumber} odds."], stateChanged=True))
-						break
+		)
+		if settlement.movedNumber is not None:
+			comeBets[settlement.movedNumber] = settlement.movedAmount
+			actionResult["stateChanged"] = True
+			limits = oddsBetLimits(number=settlement.movedNumber, baseBet=comeBets[settlement.movedNumber], gameMode=gameMode, isDont=False)
+			writeOutput(f"Moving your Come Bet to the {settlement.movedNumber}.")
+			if readInput(f"Come Odds for the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
+				while True:
+					multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+					writeOutput(f"How much for your Come {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
+					comeOdds[settlement.movedNumber] = betPrompt()
+					if comeOdds[settlement.movedNumber] > limits["effectiveMax"]:
+						writeOutput("Way too high on your Odds, there. Try again.")
+						chipsOnTable -= comeOdds[settlement.movedNumber]
+						bank += comeOdds[settlement.movedNumber]
+						comeOdds[settlement.movedNumber] = 0
+						continue
+					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=comeOdds[settlement.movedNumber], gameMode=gameMode):
+						writeOutput(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
+						chipsOnTable -= comeOdds[settlement.movedNumber]
+						bank += comeOdds[settlement.movedNumber]
+						comeOdds[settlement.movedNumber] = 0
+						continue
+					mergeActionResult(actionResult, createActionResult(success=True, messages=[f"Ok, ${comeOdds[settlement.movedNumber]:,} on your Come {settlement.movedNumber} odds."], stateChanged=True))
+					break
 	elif dComeBet > 0:
 		settlement = settleDComeBarBet(dComeBet=dComeBet, roll=roll)
 		dComeBet = settlement.dComeBet
@@ -690,38 +690,38 @@ def processComePostRollAction(roll):
 		if settlement.movedNumber is not None:
 			moveMessage = f"Moving your Don't Come bet to the {settlement.movedNumber}."
 			settlementMessages = [msg for msg in settlementMessages if msg != moveMessage]
-			mergeActionResult(
-				actionResult,
-				createActionResult(
-					success=True,
-					messages=settlementMessages,
-					stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
-				)
+		mergeActionResult(
+			actionResult,
+			createActionResult(
+				success=True,
+				messages=settlementMessages,
+				stateChanged=(settlement.bankDelta != 0 or settlement.chipsOnTableDelta != 0 or settlement.movedNumber is not None)
 			)
-			if settlement.movedNumber is not None:
-				dComeBets[settlement.movedNumber] = settlement.movedAmount
-				actionResult["stateChanged"] = True
-				writeOutput(f"Moving your Don't Come bet to the {settlement.movedNumber}.")
-				if readInput(f"Lay Odds on the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
-					limits = oddsBetLimits(number=settlement.movedNumber, baseBet=dComeBets[settlement.movedNumber], gameMode=gameMode, isDont=True)
-					while True:
-						multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
-						writeOutput(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
-						dComeOdds[settlement.movedNumber] = betPrompt()
-						if dComeOdds[settlement.movedNumber] > limits["effectiveMax"]:
-							writeOutput("Way too much for your Lay Odds! Try again.")
-							chipsOnTable -= dComeOdds[settlement.movedNumber]
-							bank += dComeOdds[settlement.movedNumber]
-							dComeOdds[settlement.movedNumber] = 0
-							continue
-						if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=dComeOdds[settlement.movedNumber], gameMode=gameMode, isDont=True):
-							writeOutput(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
-							chipsOnTable -= dComeOdds[settlement.movedNumber]
-							bank += dComeOdds[settlement.movedNumber]
-							dComeOdds[settlement.movedNumber] = 0
-							continue
-						mergeActionResult(actionResult, createActionResult(success=True, messages=[f"Ok, ${dComeOdds[settlement.movedNumber]:,} laid on the Don't Come {settlement.movedNumber}."], stateChanged=True))
-						break
+		)
+		if settlement.movedNumber is not None:
+			dComeBets[settlement.movedNumber] = settlement.movedAmount
+			actionResult["stateChanged"] = True
+			writeOutput(f"Moving your Don't Come bet to the {settlement.movedNumber}.")
+			if readInput(f"Lay Odds on the {settlement.movedNumber}? > ").strip().lower() in ['y', 'yes']:
+				limits = oddsBetLimits(number=settlement.movedNumber, baseBet=dComeBets[settlement.movedNumber], gameMode=gameMode, isDont=True)
+				while True:
+					multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
+					writeOutput(f"How much for your Lay {settlement.movedNumber} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}")
+					dComeOdds[settlement.movedNumber] = betPrompt()
+					if dComeOdds[settlement.movedNumber] > limits["effectiveMax"]:
+						writeOutput("Way too much for your Lay Odds! Try again.")
+						chipsOnTable -= dComeOdds[settlement.movedNumber]
+						bank += dComeOdds[settlement.movedNumber]
+						dComeOdds[settlement.movedNumber] = 0
+						continue
+					if not isOddsBetUnitValid(number=settlement.movedNumber, oddsBet=dComeOdds[settlement.movedNumber], gameMode=gameMode, isDont=True):
+						writeOutput(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
+						chipsOnTable -= dComeOdds[settlement.movedNumber]
+						bank += dComeOdds[settlement.movedNumber]
+						dComeOdds[settlement.movedNumber] = 0
+						continue
+					mergeActionResult(actionResult, createActionResult(success=True, messages=[f"Ok, ${dComeOdds[settlement.movedNumber]:,} laid on the Don't Come {settlement.movedNumber}."], stateChanged=True))
+					break
 	return actionResult
 
 

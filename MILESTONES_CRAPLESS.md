@@ -1141,3 +1141,33 @@ New milestone updates should be appended here rather than creating new milestone
 	- accepted odds persistence
 	- unit-1 prompt omission of multiples text
 - Compile and full suite remain green (`203` tests passing).
+
+## Milestone 69: Hard Ways IO Adapter Migration
+
+### What changed
+- Routed Hard Ways subsystem prompts/messages to adapter helpers in:
+	- `hardWaysBetting()`
+	- `hardTakeDown()`
+	- `hardAuto()`
+	- `hardHigh()`
+	- `hardCheck()`
+	- `hardShow()`
+- Replaced direct `input(...)`/`print(...)` in those flows with:
+	- `readInput(...)`
+	- `writeOutput(...)`
+
+### Why
+- Hard Ways remained a high-use direct terminal I/O hotspot.
+- Adapter routing here improves portability and keeps command/controller boundaries consistent for iOS UI migration.
+
+### Behavior
+- No payout-rule changes.
+- No Hard Ways press/re-up logic changes.
+- No bankroll/chips accounting rule changes.
+
+### Test coverage
+- Updated Hard Ways betting tests to use adapter stubs for input/output.
+- Added adapter-focused post-roll tests for:
+	- press flow after a hard-way hit
+	- re-up flow after an easy-way loss
+- Compile and full suite remain green (`205` tests passing).

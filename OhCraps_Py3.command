@@ -156,17 +156,17 @@ def hardWaysBetting():
 	global hardWays, bank, chipsOnTable
 	for key in hardWays:
 		if hardWays[key] > 0:
-			print(f"You have ${hardWays[key]:,} on the hard {key}.")
-		print(f"How much on the Hard {key}?")
+			writeOutput(f"You have ${hardWays[key]:,} on the hard {key}.")
+		writeOutput(f"How much on the Hard {key}?")
 		madeBet = True
 		while True:
 			bet = 0
 			try:
-				bet = int(input("$>"))
+				bet = int(readInput("$>"))
 				if bet > bank + chipsOnTable:
-					print("You don't have enough money to make that bet! Try again.")
+					writeOutput("You don't have enough money to make that bet! Try again.")
 					outOfMoney()
-					print(f"How much on the Hard {key}?")
+					writeOutput(f"How much on the Hard {key}?")
 					continue
 				madeBet = True
 				break
@@ -181,16 +181,16 @@ def hardWaysBetting():
 				bank -= bet - hardWays[key]
 			hardWays[key] = bet
 			chipsOnTable += bet
-			print(f"${bet:,} on the Hard {key}.")
+			writeOutput(f"${bet:,} on the Hard {key}.")
 		elif hardWays[key] > 0 and bet == 0:
-			print(f"Ok, taking down your Hard {key} bet.")
+			writeOutput(f"Ok, taking down your Hard {key} bet.")
 			chipsOnTable -= hardWays[key]
 			bank += hardWays[key]
 			hardWays[key] = 0
 
 def hardTakeDown():
 	global hardWays, bank, chipsOnTable
-	print("Taking down your Hard Ways.")
+	writeOutput("Taking down your Hard Ways.")
 	for key in hardWays:
 		chipsOnTable -= hardWays[key]
 		bank += hardWays[key]
@@ -198,7 +198,7 @@ def hardTakeDown():
 
 def hardAuto():
 	global chipsOnTable, bank, hardWays
-	print("How many $1 units on each of the Hard Ways?")
+	writeOutput("How many $1 units on each of the Hard Ways?")
 	hardAcr = betPrompt()
 	chipsOnTable -= hardAcr
 	bank += hardAcr
@@ -208,12 +208,12 @@ def hardAuto():
 		hardWays[key] = hardAcr
 		chipsOnTable += hardAcr
 		bank -= hardAcr
-	print(f"Ok, ${hardAcr:,} on each of the Hard Ways.")
+	writeOutput(f"Ok, ${hardAcr:,} on each of the Hard Ways.")
 
 def hardHigh(num):
 	global chipsOnTable, bank, hardWays
 	number = int(num[1:])
-	print(f"How much to spread across the Hard Ways, high on the {number}?")
+	writeOutput(f"How much to spread across the Hard Ways, high on the {number}?")
 	bet = betPrompt()
 	lowBet = bet//5
 	highBet = bet - (lowBet*3)
@@ -224,7 +224,7 @@ def hardHigh(num):
 			hardWays[key] = highBet
 		else:
 			hardWays[key] = lowBet
-	print(f"Ok, ${highBet:,} on the Hard {number}, ${lowBet:,} each on the other Hard Ways for a total of ${bet:,}.")
+	writeOutput(f"Ok, ${highBet:,} on the Hard {number}, ${lowBet:,} each on the other Hard Ways for a total of ${bet:,}.")
 
 
 """
@@ -242,23 +242,23 @@ def hardCheck(roll):
 	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
 	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 	if settlement.hitNumber is not None:
-		if str(input("Press your bet? > ")).lower() in ['y', 'yes']:
-			print(f"How much on the Hard {settlement.hitNumber}?")
+		if str(readInput("Press your bet? > ")).lower() in ['y', 'yes']:
+			writeOutput(f"How much on the Hard {settlement.hitNumber}?")
 			chipsOnTable -= hardWays[settlement.hitNumber]
 			bank += hardWays[settlement.hitNumber]
 			hardWays[settlement.hitNumber] = betPrompt()
 			if hardWays[settlement.hitNumber] == 0:
-				print(f"Ok, taking down your Hard {settlement.hitNumber} bet.")
+				writeOutput(f"Ok, taking down your Hard {settlement.hitNumber} bet.")
 			else:
-				print(f"Ok, bumping up your Hard {settlement.hitNumber} bet to ${hardWays[settlement.hitNumber]:,}.")
+				writeOutput(f"Ok, bumping up your Hard {settlement.hitNumber} bet to ${hardWays[settlement.hitNumber]:,}.")
 	elif settlement.lostNumber is not None:
-		if str(input(f"Go back up on your Hard {settlement.lostNumber} bet? > ")).lower() in ['y', 'yes']:
-			print(f"How much on the Hard {settlement.lostNumber}?")
+		if str(readInput(f"Go back up on your Hard {settlement.lostNumber} bet? > ")).lower() in ['y', 'yes']:
+			writeOutput(f"How much on the Hard {settlement.lostNumber}?")
 			hardWays[settlement.lostNumber] = betPrompt()
-			print(f"Ok, going back up on the Hard {settlement.lostNumber} for ${hardWays[settlement.lostNumber]:,}.")
+			writeOutput(f"Ok, going back up on the Hard {settlement.lostNumber} for ${hardWays[settlement.lostNumber]:,}.")
 		else:
 			hardWays[settlement.lostNumber] = 0
 
@@ -267,7 +267,7 @@ def hardShow():
 	global hardWays
 	for key in hardWays:
 		if hardWays[key] > 0:
-			print(f"You have ${hardWays[key]:,} on the Hard {key}.")
+			writeOutput(f"You have ${hardWays[key]:,} on the Hard {key}.")
 
 #Line Bets
 

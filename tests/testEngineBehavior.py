@@ -1878,25 +1878,65 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["bank"] = 100
 		terminal["chipsOnTable"] = 0
 		terminal["hardWays"] = {4: 0, 6: 0, 8: 0, 10: 0}
-		with patch("builtins.input", side_effect=["5", "", "", ""]):
-			terminal["hardWaysBetting"]()
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		inputs = iter(["5", "", "", ""])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["hardWaysBetting"]()
 		self.assertEqual(terminal["hardWays"][4], 5)
 		self.assertEqual(terminal["hardWays"][6], 0)
 		self.assertEqual(terminal["hardWays"][8], 0)
 		self.assertEqual(terminal["hardWays"][10], 0)
 		self.assertEqual(terminal["bank"], 95)
 		self.assertEqual(terminal["chipsOnTable"], 5)
+		self.assertEqual(sum(1 for text in writes if "How much on the Hard" in text), 4)
 
 	def testHardWaysBettingTakeDownReturnsFunds(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 90
 		terminal["chipsOnTable"] = 10
 		terminal["hardWays"] = {4: 0, 6: 10, 8: 0, 10: 0}
-		with patch("builtins.input", side_effect=["", "0", "", ""]):
-			terminal["hardWaysBetting"]()
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		inputs = iter(["", "0", "", ""])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["hardWaysBetting"]()
 		self.assertEqual(terminal["hardWays"][6], 0)
 		self.assertEqual(terminal["bank"], 100)
 		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertIn("Ok, taking down your Hard 6 bet.", " ".join(writes))
+
+	def testHardCheckHitPressUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 5
+		terminal["rollHard"] = True
+		writes = []
+		prompts = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or "y"
+		terminal["betPrompt"] = lambda: 10
+		terminal["hardCheck"](4)
+		self.assertEqual(terminal["hardWays"][4], 10)
+		self.assertIn("Press your bet? > ", prompts)
+		self.assertIn("Ok, bumping up your Hard 4 bet to $10.", " ".join(writes))
+
+	def testHardCheckLostNumberReUpUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["hardWays"] = {4: 5, 6: 0, 8: 0, 10: 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 5
+		terminal["rollHard"] = False
+		writes = []
+		prompts = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or "y"
+		terminal["betPrompt"] = lambda: 5
+		terminal["hardCheck"](4)
+		self.assertEqual(terminal["hardWays"][4], 5)
+		self.assertIn("Go back up on your Hard 4 bet? > ", prompts)
+		self.assertIn("Ok, going back up on the Hard 4 for $5.", " ".join(writes))
 
 	def testOddsPassRejectOverMaxRefundsBeforeRetry(self):
 		terminal = loadTerminalNamespace()

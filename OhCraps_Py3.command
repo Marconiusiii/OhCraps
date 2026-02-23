@@ -794,20 +794,20 @@ fieldBet = 0
 
 def fieldShow():
 	if fieldBet > 0:
-		print(f"You have ${fieldBet:,} on the Field.")
+		writeOutput(f"You have ${fieldBet:,} on the Field.")
 
 def field():
 	global fieldBet, chipsOnTable, bank
-	print("How much on the Field?")
+	writeOutput("How much on the Field?")
 	bet = betPrompt()
 	if bet > 0:
 		chipsOnTable -= fieldBet
 		fieldBet = bet
-		print(f"Ok, ${fieldBet:,} on the Field.")
+		writeOutput(f"Ok, ${fieldBet:,} on the Field.")
 	elif fieldBet > 0 and bet == 0:
 		bank += fieldBet
 		chipsOnTable -= fieldBet
-		print("Taking down your Field bet.")
+		writeOutput("Taking down your Field bet.")
 		fieldBet = 0
 
 def fieldTakeDown():
@@ -815,7 +815,7 @@ def fieldTakeDown():
 	chipsOnTable -= fieldBet
 	bank += fieldBet
 	fieldBet = 0
-	print("Taking down your Field Bet.")
+	writeOutput("Taking down your Field Bet.")
 
 def fieldCheck(roll):
 	global fieldBet, bank, chipsOnTable
@@ -826,16 +826,16 @@ def fieldCheck(roll):
 	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
 	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 	if settlement.didWin and fieldBet > 0:
-		if str(input("Change your Field bet? > ")).strip().lower() in ['y', 'yes']:
+		if str(readInput("Change your Field bet? > ")).strip().lower() in ['y', 'yes']:
 			chipsOnTable -= fieldBet
 			bank += fieldBet
 			fieldBet = 0
 			field()
 	elif settlement.lossAmount > 0:
-		if str(input("Go back up on the Field? > ")).strip().lower() in ['y', 'yes']:
+		if str(readInput("Go back up on the Field? > ")).strip().lower() in ['y', 'yes']:
 			field()
 
 propBets = createDefaultPropBets()

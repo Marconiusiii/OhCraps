@@ -1228,3 +1228,31 @@ New milestone updates should be appended here rather than creating new milestone
 - Added regression test: Crapless `come()` path does not present Don't Come choice.
 - Added regression test: `dcd` command is blocked in Crapless and refunds/clears legacy Don't Come state.
 - Full compile and test suite remain green (`209` tests passing).
+
+## Milestone 72: Field Subsystem IO Adapter Migration
+
+### What changed
+- Routed Field subsystem prompts/messages to adapter helpers in:
+	- `fieldShow()`
+	- `field()`
+	- `fieldTakeDown()`
+	- `fieldCheck()`
+- Replaced direct `print(...)`/`input(...)` in those paths with:
+	- `writeOutput(...)`
+	- `readInput(...)`
+
+### Why
+- Field betting remained a frequent direct terminal I/O hotspot.
+- Adapter routing keeps controller I/O boundaries consistent for iOS portability.
+
+### Behavior
+- No Field payout-rule changes.
+- No bankroll/chips accounting rule changes.
+- Existing win/loss change and re-up behavior preserved.
+
+### Test coverage
+- Added deterministic adapter-focused tests for:
+	- Field entry wager flow.
+	- Post-win field change flow.
+	- Post-loss field re-up flow.
+- Compile and full suite remain green (`212` tests passing).

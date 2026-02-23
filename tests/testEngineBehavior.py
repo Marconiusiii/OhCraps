@@ -2012,6 +2012,53 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("Go back up on your Hard 4 bet? > ", prompts)
 		self.assertIn("Ok, going back up on the Hard 4 for $5.", " ".join(writes))
 
+	def testFieldUsesIoAdaptersForEntry(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["fieldBet"] = 0
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: "15"
+		terminal["field"]()
+		self.assertEqual(terminal["fieldBet"], 15)
+		self.assertEqual(terminal["bank"], 85)
+		self.assertEqual(terminal["chipsOnTable"], 15)
+		self.assertIn("How much on the Field?", " ".join(writes))
+		self.assertIn("Ok, $15 on the Field.", " ".join(writes))
+
+	def testFieldCheckWinChangePathUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["fieldBet"] = 10
+		writes = []
+		prompts = []
+		inputs = iter(["y", "12"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or next(inputs)
+		terminal["fieldCheck"](9)
+		self.assertEqual(terminal["fieldBet"], 12)
+		self.assertEqual(terminal["bank"], 108)
+		self.assertEqual(terminal["chipsOnTable"], 12)
+		self.assertIn("Change your Field bet? > ", prompts)
+
+	def testFieldCheckLossReUpPathUsesIoAdapters(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["fieldBet"] = 10
+		writes = []
+		prompts = []
+		inputs = iter(["y", "8"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: prompts.append(promptText) or next(inputs)
+		terminal["fieldCheck"](6)
+		self.assertEqual(terminal["fieldBet"], 8)
+		self.assertEqual(terminal["bank"], 92)
+		self.assertEqual(terminal["chipsOnTable"], 8)
+		self.assertIn("Go back up on the Field? > ", prompts)
+
 	def testOddsPassRejectOverMaxRefundsBeforeRetry(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

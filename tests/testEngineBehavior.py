@@ -1713,11 +1713,15 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 0
 		terminal["comeBets"] = {2: 0, 3: 0, 4: 0, 5: 10, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
 		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-		with patch("builtins.input", side_effect=["3", "4"]), patch("builtins.print"):
-			terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		inputs = iter(["3", "4"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
 		self.assertEqual(terminal["comeOdds"][5], 4)
 		self.assertEqual(terminal["bank"], 96)
 		self.assertEqual(terminal["chipsOnTable"], 4)
+		self.assertIn("Invalid odds amount. Must be in increments of $2.", " ".join(writes))
 
 	def testCdcOddsChangeRejectsInvalidDontComeOddsUnitInCrapless(self):
 		terminal = loadTerminalNamespace()
@@ -1726,11 +1730,15 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 0
 		terminal["dComeBets"] = {2: 12, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
 		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-		with patch("builtins.input", side_effect=["5", "6"]), patch("builtins.print"):
-			terminal["cdcOddsChange"](terminal["dComeBets"], terminal["dComeOdds"])
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		inputs = iter(["5", "6"])
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["cdcOddsChange"](terminal["dComeBets"], terminal["dComeOdds"])
 		self.assertEqual(terminal["dComeOdds"][2], 6)
 		self.assertEqual(terminal["bank"], 94)
 		self.assertEqual(terminal["chipsOnTable"], 6)
+		self.assertIn("Invalid odds amount. Must be in increments of $6.", " ".join(writes))
 
 	def testCdcOddsChangeComeUnitOnePromptOmitsMultiplesText(self):
 		terminal = loadTerminalNamespace()
@@ -1739,15 +1747,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["chipsOnTable"] = 0
 		terminal["comeBets"] = {2: 10, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
 		terminal["comeOdds"] = {2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-		printed = []
-
-		def capturePrint(*args, **kwargs):
-			printed.append(" ".join(str(arg) for arg in args))
-
-		with patch("builtins.input", side_effect=["10"]), patch("builtins.print", side_effect=capturePrint):
-			terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
-
-		printedText = " ".join(printed)
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: "10"
+		terminal["cdcOddsChange"](terminal["comeBets"], terminal["comeOdds"])
+		printedText = " ".join(writes)
 		self.assertIn("How much for your Come 2 Odds? Max is $60; you have $0 in Odds.", printedText)
 		self.assertNotIn("multiples of 1", printedText.lower())
 

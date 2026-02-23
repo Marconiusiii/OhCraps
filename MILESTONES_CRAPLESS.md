@@ -1115,3 +1115,29 @@ New milestone updates should be appended here rather than creating new milestone
 - Added regression test for Crapless Come moved-bet odds prompt to confirm unit-1 prompt omits multiples text.
 - Added regression test for `cdcOddsChange(...)` Come unit-1 prompt to confirm multiples text omission.
 - Compile and full suite remain green (`203` tests passing).
+
+## Milestone 68: `cdcOddsChange` IO Adapter Migration
+
+### What changed
+- Routed `cdcOddsChange(...)` prompts and messages through adapter helpers:
+	- `readInput(...)`
+	- `writeOutput(...)`
+- Removed direct `input(...)`/`print(...)` use from this odds-edit flow.
+- Preserved unit-aware prompt text behavior so unit-1 contexts do not show multiples text.
+
+### Why
+- `cdcOddsChange(...)` was still a direct terminal I/O path and blocked consistent UI boundary handling for iOS porting.
+- Adapter routing here completes another high-traffic odds control surface.
+
+### Behavior
+- No payout-rule changes.
+- No odds limit or unit validation rule changes.
+- No bankroll/chips accounting changes.
+
+### Test coverage
+- Updated deterministic `cdcOddsChange(...)` tests to stub `readInput(...)`/`writeOutput(...)` directly.
+- Kept validations for:
+	- invalid unit retry
+	- accepted odds persistence
+	- unit-1 prompt omission of multiples text
+- Compile and full suite remain green (`203` tests passing).

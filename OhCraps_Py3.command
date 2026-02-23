@@ -584,24 +584,24 @@ def cdcOddsChange(dict, dict2):
 			if 'Come' in dict:
 				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=False)
 				multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
-				print(f"How much for your Come {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Odds.")
+				writeOutput(f"How much for your Come {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Odds.")
 			else:
 				limits = oddsBetLimits(number=key, baseBet=dict[key], gameMode=gameMode, isDont=True)
 				multiplesText = f", multiples of {limits['unit']}" if limits["unit"] != 1 else ""
-				print(f"How much for your Lay {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Lay Odds.")
+				writeOutput(f"How much for your Lay {key} Odds? Max is ${limits['effectiveMax']:,}{multiplesText}; you have ${dict2[key]:,} in Lay Odds.")
 			while True:
 				try:
-					bet = int(input("$>"))
+					bet = int(readInput("	$> "))
 					if bet > bank:
-						print("You don't have enough money to make that bet! Try again.")
+						writeOutput("You don't have enough money to make that bet! Try again.")
 						outOfMoney()
-						print("Change your Odds?")
+						writeOutput("Change your Odds?")
 						continue
 					if bet > limits["effectiveMax"]:
-						print("Nope, that is over the max odds. Try again.")
+						writeOutput("Nope, that is over the max odds. Try again.")
 						continue
 					if not isOddsBetUnitValid(number=key, oddsBet=bet, gameMode=gameMode, isDont=('Come' not in dict)):
-						print(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
+						writeOutput(f"Invalid odds amount. Must be in increments of ${limits['unit']:,}.")
 						continue
 					break
 				except ValueError:
@@ -610,12 +610,12 @@ def cdcOddsChange(dict, dict2):
 			if bet > 0:
 				chipsOnTable -= dict2[key]
 				bank += dict2[key]
-				print(f"Ok, you have ${bet:,} Odds for your {key}.")
+				writeOutput(f"Ok, you have ${bet:,} Odds for your {key}.")
 				dict2[key] = bet
 				chipsOnTable += bet
 				bank -= bet
 			elif dict2[key] > 0 and bet == 0:
-				print("Ok, taking down your Odds.")
+				writeOutput("Ok, taking down your Odds.")
 				chipsOnTable -= dict2[key]
 				bank += dict2[key]
 				dict2[key] = bet

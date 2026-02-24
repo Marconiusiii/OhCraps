@@ -2599,6 +2599,29 @@ def submitCommand(commandText, pointPhase=False):
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
 
+def step(commandText=None, pointPhase=False):
+	if commandText is not None:
+		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase)
+		stepPayload = {
+			"stepType": "command",
+			"commandResult": commandPayload,
+			"cycleResult": None,
+			"runtimeState": commandPayload["runtimeState"]
+		}
+		emitEvent("stepCompleted", stepPayload)
+		return stepPayload
+	if pointPhase:
+		raise ValueError("pointPhase can only be used with commandText.")
+	cyclePayload = runOneCycle()
+	stepPayload = {
+		"stepType": "cycle",
+		"commandResult": None,
+		"cycleResult": dict(cyclePayload),
+		"runtimeState": getRuntimeState()
+	}
+	emitEvent("stepCompleted", stepPayload)
+	return stepPayload
+
 def resolveComeOutRoll():
 	global comeOut, throws, working, pointIsOn
 	syncRuntimeFromGlobals()

@@ -1898,3 +1898,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testSubmitCommandEmitsCommandProcessedEvent`
 - Compile check passed.
 - Full suite remains green (`262` tests passing).
+
+## Milestone 92: Unified Host Step API for Command and Cycle Execution
+
+### What changed
+- Added unified host-facing step executor:
+	- `step(commandText=None, pointPhase=False)`
+- `step(...)` supports two modes:
+	- Command step: routes through `submitCommand(...)`
+	- Cycle step: routes through `runOneCycle()`
+- `step(...)` now returns a normalized payload shape:
+	- `stepType` (`"command"` or `"cycle"`)
+	- `commandResult` (or `None`)
+	- `cycleResult` (or `None`)
+	- `runtimeState`
+- Added `stepCompleted` event emission with the same payload.
+- Added input guard:
+	- raises `ValueError` when `pointPhase=True` is provided without `commandText`.
+
+### Why
+- Host integrations need one orchestration entrypoint instead of branching manually between command and cycle APIs.
+- Normalized payload/event shape simplifies iOS/web controller loops and UI update pipelines.
+- Input guard prevents ambiguous/invalid host calls.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Existing APIs (`submitCommand`, `runOneCycle`, `runGame`) remain unchanged.
+
+### Test coverage
+- Added deterministic `step(...)` regressions in `tests/testEngineBehavior.py`:
+	- `testStepCommandReturnsNormalizedPayload`
+	- `testStepCycleReturnsNormalizedPayload`
+	- `testStepEmitsStepCompletedEvent`
+	- `testStepRejectsPointPhaseWithoutCommand`
+- Compile check passed.
+- Full suite remains green (`266` tests passing).

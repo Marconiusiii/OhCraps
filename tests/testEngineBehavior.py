@@ -1390,6 +1390,48 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(events[0][1], payload)
 		terminal["resetEventHandler"]()
 
+	def testStepCommandReturnsNormalizedPayload(self):
+		terminal = loadTerminalNamespace()
+		stepPayload = terminal["step"](commandText="x", pointPhase=True)
+		self.assertEqual(stepPayload["stepType"], "command")
+		self.assertEqual(stepPayload["commandResult"]["command"], "x")
+		self.assertEqual(stepPayload["commandResult"]["pointPhase"], True)
+		self.assertEqual(stepPayload["commandResult"]["shouldRoll"], True)
+		self.assertEqual(stepPayload["cycleResult"], None)
+		self.assertIn("runtimeState", stepPayload)
+
+	def testStepCycleReturnsNormalizedPayload(self):
+		terminal = loadTerminalNamespace()
+		terminal["runOneCycle"] = lambda: {
+			"enteredPointPhase": False,
+			"comeOutOutcome": terminal["RollOutcome"].natural,
+			"pointPhaseOutcome": None,
+			"pointRoundEnded": False,
+			"point": 0,
+			"throws": 1
+		}
+		stepPayload = terminal["step"]()
+		self.assertEqual(stepPayload["stepType"], "cycle")
+		self.assertEqual(stepPayload["commandResult"], None)
+		self.assertEqual(stepPayload["cycleResult"]["enteredPointPhase"], False)
+		self.assertIn("runtimeState", stepPayload)
+
+	def testStepEmitsStepCompletedEvent(self):
+		terminal = loadTerminalNamespace()
+		events = []
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		stepPayload = terminal["step"](commandText="x", pointPhase=False)
+		self.assertEqual(len(events), 2)
+		self.assertEqual(events[0][0], "commandProcessed")
+		self.assertEqual(events[1][0], "stepCompleted")
+		self.assertEqual(events[1][1], stepPayload)
+		terminal["resetEventHandler"]()
+
+	def testStepRejectsPointPhaseWithoutCommand(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["step"](pointPhase=True)
+
 	def testResolveComeOutRollNaturalResetsThrowCount(self):
 		terminal = loadTerminalNamespace()
 		terminal["atsOn"] = False

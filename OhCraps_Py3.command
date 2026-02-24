@@ -310,6 +310,9 @@ def hostSchemaDescriptor():
 					"engineApiVersion", "ok", "expectedApiVersion", "schemaApiVersion",
 					"requiredPayloadKeys", "requiredErrorCodes", "missingPayloadKeys", "missingErrorCodes", "reasons"
 				],
+				"eventValidationReport": [
+					"engineApiVersion", "ok", "eventName", "requiredKeys", "missingKeys", "unknownEvent", "reasons"
+				],
 				"soloDebugBundle": [
 					"engineApiVersion", "ok", "summaryLine", "actionExecuted", "actionResult",
 					"workflowStatus", "healthReport", "statusPanel", "uiSnapshot"
@@ -380,6 +383,36 @@ def validateHostApiCompatibility(expectedApiVersion=None, requiredPayloadKeys=No
 		"requiredErrorCodes": requestedErrorCodes,
 		"missingPayloadKeys": missingPayloadKeys,
 		"missingErrorCodes": missingErrorCodes,
+		"reasons": reasons
+	})
+	if raiseOnFailure and not bool(report["ok"]):
+		raise ValueError("; ".join(reasons))
+	return report
+
+def validateHostEventPayload(eventName, payload, raiseOnFailure=False):
+	schemaDescriptor = hostSchemaDescriptor()
+	eventContracts = schemaDescriptor.get("payloadKeys", {}).get("events", {})
+	eventKey = str(eventName)
+	requiredKeys = list(eventContracts.get(eventKey, [])) if eventKey in eventContracts else []
+	missingKeys = []
+	reasons = []
+	unknownEvent = (eventKey not in eventContracts)
+	if unknownEvent:
+		reasons.append(f"Unknown host event name: {eventKey}")
+	if not isinstance(payload, dict):
+		reasons.append("Event payload must be a dictionary.")
+		if len(requiredKeys) > 0:
+			missingKeys = list(requiredKeys)
+	else:
+		missingKeys = [key for key in requiredKeys if key not in payload]
+		if len(missingKeys) > 0:
+			reasons.append(f"Missing event payload keys: {', '.join(missingKeys)}")
+	report = withApiVersion({
+		"ok": len(reasons) == 0,
+		"eventName": eventKey,
+		"requiredKeys": requiredKeys,
+		"missingKeys": missingKeys,
+		"unknownEvent": bool(unknownEvent),
 		"reasons": reasons
 	})
 	if raiseOnFailure and not bool(report["ok"]):

@@ -3114,3 +3114,43 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added tests for bootstrap success, compatibility-failure reporting, and strict raise behavior.
 - Full suite remains green after this milestone.
+
+## Milestone 124: Host Event Contract Validator
+
+### What problem this solves
+- App adapters could consume emitted events, but there was no explicit contract validator for event payloads.
+- That made event-stream integration checks less strict than command payload checks.
+
+### What changed
+- Added `eventValidationReport` contract keys in `hostSchemaDescriptor()`.
+- Added `validateHostEventPayload(eventName, payload, raiseOnFailure=False)`.
+- Validator checks:
+	- event name exists in event contract map
+	- payload is a dictionary
+	- required keys for that event are present
+- Added strict mode that raises on validation failures.
+
+### Why this helps
+- Event-stream consumers (iOS/web) can validate event contracts deterministically.
+- Faster detection of adapter mismatches when event handling changes.
+
+### How to use
+- Validate an event payload:
+	- `validateHostEventPayload("inputRequested", payload)`
+- Strict gate:
+	- `validateHostEventPayload("inputRequested", payload, raiseOnFailure=True)`
+
+### How to run in your test cycle
+- Focused event validation tests:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k ValidateHostEventPayload`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for known-event pass, unknown-event failure, missing-key failure, and strict raise.
+- Full suite remains green after this milestone.

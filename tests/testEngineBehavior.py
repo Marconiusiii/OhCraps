@@ -1619,6 +1619,40 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["hostEventNames"]["stepCompleted"], "stepCompleted")
 		self.assertEqual(terminal["hostEventNames"]["cycleCompleted"], "cycleCompleted")
 
+	def testValidateHostEventPayloadPassesForKnownEvent(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["buildInputRequestedEventPayload"]("Bankroll? > ")
+		report = terminal["validateHostEventPayload"](terminal["hostEventNames"]["inputRequested"], payload)
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["missingKeys"], [])
+		self.assertEqual(report["unknownEvent"], False)
+
+	def testValidateHostEventPayloadFailsForUnknownEvent(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["validateHostEventPayload"]("notARealEvent", {"engineApiVersion": terminal["engineApiVersion"]})
+		self.assertEqual(report["ok"], False)
+		self.assertEqual(report["unknownEvent"], True)
+		self.assertIn("Unknown host event name: notARealEvent", report["reasons"])
+
+	def testValidateHostEventPayloadFailsForMissingRequiredKey(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["validateHostEventPayload"](
+			terminal["hostEventNames"]["inputRequested"],
+			{"engineApiVersion": terminal["engineApiVersion"]}
+		)
+		self.assertEqual(report["ok"], False)
+		self.assertIn("prompt", report["missingKeys"])
+		self.assertIn("Missing event payload keys:", report["reasons"][0])
+
+	def testValidateHostEventPayloadRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["validateHostEventPayload"](
+				terminal["hostEventNames"]["inputRequested"],
+				{"engineApiVersion": terminal["engineApiVersion"]},
+				raiseOnFailure=True
+			)
+
 	def testBuildCycleCompletedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()
 		payload = terminal["buildCycleCompletedEventPayload"](
@@ -1692,6 +1726,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("workflowReport", descriptor["payloadKeys"])
 		self.assertIn("bootstrapReport", descriptor["payloadKeys"])
 		self.assertIn("compatibilityReport", descriptor["payloadKeys"])
+		self.assertIn("eventValidationReport", descriptor["payloadKeys"])
 		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
 		self.assertIn("actionLogRun", descriptor["payloadKeys"])

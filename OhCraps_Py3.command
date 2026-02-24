@@ -1597,6 +1597,145 @@ def applyBetSnapshot(snapshot):
 	hardWays = dict(snapshot["hardWays"])
 	fieldBet = int(snapshot["fieldBet"])
 
+def normalizedGameMode(modeValue):
+	if isinstance(modeValue, GameMode):
+		return modeValue
+	modeText = str(modeValue).strip().lower()
+	if modeText in ["1", "craps"]:
+		return GameMode.craps
+	if modeText in ["2", "crapless craps", "craplesscraps"]:
+		return GameMode.craplessCraps
+	raise ValueError("Invalid game mode value.")
+
+def getRuntimeState():
+	return {
+		"bank": int(bank),
+		"initBank": int(initBank),
+		"chipsOnTable": int(chipsOnTable),
+		"throws": int(throws),
+		"pointIsOn": bool(pointIsOn),
+		"comeOut": int(comeOut),
+		"p2": int(p2),
+		"working": bool(working),
+		"placeOff": bool(placeOff),
+		"layOff": bool(layOff),
+		"hardOff": bool(hardOff),
+		"rollHard": bool(rollHard),
+		"gameMode": gameMode,
+		"lineBets": dict(lineBets),
+		"propBets": dict(propBets),
+		"atsAll": int(atsAll),
+		"atsTall": int(atsTall),
+		"atsSmall": int(atsSmall),
+		"atsOn": bool(atsOn),
+		"allNums": list(allNums),
+		"fire": list(fire),
+		"fireBet": int(fireBet),
+		"betSnapshot": captureBetSnapshot()
+	}
+
+def setRuntimeState(runtimeState):
+	global bank, initBank, chipsOnTable, throws, pointIsOn, comeOut, p2, working, placeOff, layOff, hardOff, rollHard, gameMode, lineBets, propBets, atsAll, atsTall, atsSmall, atsOn, allNums, fire, fireBet
+	if not isinstance(runtimeState, dict):
+		raise ValueError("Runtime state must be a dictionary.")
+	allowedKeys = {
+		"bank", "initBank", "chipsOnTable", "throws", "pointIsOn", "comeOut", "p2",
+		"working", "placeOff", "layOff", "hardOff", "rollHard", "gameMode",
+		"lineBets", "propBets", "atsAll", "atsTall", "atsSmall", "atsOn",
+		"allNums", "fire", "fireBet", "betSnapshot"
+	}
+	unknownKeys = [key for key in runtimeState if key not in allowedKeys]
+	if unknownKeys:
+		raise ValueError(f"Unsupported runtime state keys: {', '.join(str(key) for key in sorted(unknownKeys))}")
+	if "betSnapshot" in runtimeState:
+		applyBetSnapshot(runtimeState["betSnapshot"])
+	if "bank" in runtimeState:
+		bank = int(runtimeState["bank"])
+	if "initBank" in runtimeState:
+		initBank = int(runtimeState["initBank"])
+	if "chipsOnTable" in runtimeState:
+		chipsOnTable = int(runtimeState["chipsOnTable"])
+	if "throws" in runtimeState:
+		throws = int(runtimeState["throws"])
+	if "pointIsOn" in runtimeState:
+		pointIsOn = bool(runtimeState["pointIsOn"])
+	if "comeOut" in runtimeState:
+		comeOut = int(runtimeState["comeOut"])
+	if "p2" in runtimeState:
+		p2 = int(runtimeState["p2"])
+	if "working" in runtimeState:
+		working = bool(runtimeState["working"])
+	if "placeOff" in runtimeState:
+		placeOff = bool(runtimeState["placeOff"])
+	if "layOff" in runtimeState:
+		layOff = bool(runtimeState["layOff"])
+	if "hardOff" in runtimeState:
+		hardOff = bool(runtimeState["hardOff"])
+	if "rollHard" in runtimeState:
+		rollHard = bool(runtimeState["rollHard"])
+	if "gameMode" in runtimeState:
+		gameMode = normalizedGameMode(runtimeState["gameMode"])
+	if "lineBets" in runtimeState:
+		lineBets = dict(runtimeState["lineBets"])
+	if "propBets" in runtimeState:
+		propBets = dict(runtimeState["propBets"])
+	if "atsAll" in runtimeState:
+		atsAll = int(runtimeState["atsAll"])
+	if "atsTall" in runtimeState:
+		atsTall = int(runtimeState["atsTall"])
+	if "atsSmall" in runtimeState:
+		atsSmall = int(runtimeState["atsSmall"])
+	if "atsOn" in runtimeState:
+		atsOn = bool(runtimeState["atsOn"])
+	if "allNums" in runtimeState:
+		allNums = list(runtimeState["allNums"])
+	if "fire" in runtimeState:
+		fire = list(runtimeState["fire"])
+	if "fireBet" in runtimeState:
+		fireBet = int(runtimeState["fireBet"])
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	return getRuntimeState()
+
+def resetRuntimeState():
+	return setRuntimeState({
+		"bank": 0,
+		"initBank": 0,
+		"chipsOnTable": 0,
+		"throws": 0,
+		"pointIsOn": False,
+		"comeOut": 0,
+		"p2": 0,
+		"working": False,
+		"placeOff": False,
+		"layOff": False,
+		"hardOff": False,
+		"rollHard": False,
+		"gameMode": GameMode.craps,
+		"lineBets": {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0},
+		"propBets": createDefaultPropBets(),
+		"atsAll": 0,
+		"atsTall": 0,
+		"atsSmall": 0,
+		"atsOn": False,
+		"allNums": [],
+		"fire": [],
+		"fireBet": 0,
+		"betSnapshot": {
+			"bank": 0,
+			"chipsOnTable": 0,
+			"comeBet": 0,
+			"dComeBet": 0,
+			"comeBets": {key: 0 for key in comeBets},
+			"dComeBets": {key: 0 for key in dComeBets},
+			"comeOdds": {key: 0 for key in comeOdds},
+			"dComeOdds": {key: 0 for key in dComeOdds},
+			"place": {key: 0 for key in place},
+			"layBets": {key: 0 for key in layBets},
+			"hardWays": {key: 0 for key in hardWays},
+			"fieldBet": 0
+		}
+	})
+
 placeOff = False
 
 def validPlaceNumbers():

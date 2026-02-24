@@ -1788,6 +1788,65 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["layBets"][5], 5)
 		self.assertEqual(terminal["hardWays"][4], 5)
 
+	def testGetRuntimeStateIncludesCoreAndSnapshot(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 250
+		terminal["chipsOnTable"] = 40
+		terminal["throws"] = 7
+		runtimeState = terminal["getRuntimeState"]()
+		self.assertEqual(runtimeState["bank"], 250)
+		self.assertEqual(runtimeState["chipsOnTable"], 40)
+		self.assertEqual(runtimeState["throws"], 7)
+		self.assertIn("betSnapshot", runtimeState)
+		self.assertEqual(runtimeState["betSnapshot"]["bank"], 250)
+
+	def testSetRuntimeStateAppliesCoreValuesAndMode(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({
+			"bank": 500,
+			"chipsOnTable": 35,
+			"throws": 4,
+			"pointIsOn": True,
+			"comeOut": 9,
+			"gameMode": "crapless craps"
+		})
+		self.assertEqual(terminal["bank"], 500)
+		self.assertEqual(terminal["chipsOnTable"], 35)
+		self.assertEqual(terminal["throws"], 4)
+		self.assertEqual(terminal["pointIsOn"], True)
+		self.assertEqual(terminal["comeOut"], 9)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+
+	def testSetRuntimeStateRejectsUnknownKeys(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["setRuntimeState"]({"unknownKey": 1})
+
+	def testResetRuntimeStateRestoresDefaults(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 500
+		terminal["chipsOnTable"] = 100
+		terminal["throws"] = 12
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 10
+		terminal["placeOff"] = True
+		terminal["working"] = True
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["lineBets"]["Pass"] = 25
+		terminal["fieldBet"] = 15
+		resetState = terminal["resetRuntimeState"]()
+		self.assertEqual(terminal["bank"], 0)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertEqual(terminal["throws"], 0)
+		self.assertEqual(terminal["pointIsOn"], False)
+		self.assertEqual(terminal["comeOut"], 0)
+		self.assertEqual(terminal["placeOff"], False)
+		self.assertEqual(terminal["working"], False)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craps)
+		self.assertEqual(terminal["lineBets"]["Pass"], 0)
+		self.assertEqual(terminal["fieldBet"], 0)
+		self.assertEqual(resetState["bank"], 0)
+
 	def testCreateActionResultShape(self):
 		terminal = loadTerminalNamespace()
 		result = terminal["createActionResult"](success=False, messages=["m1"], stateChanged=True)

@@ -1584,3 +1584,44 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRollUsesInjectedRandomProviderForNarrationBranch`
 - Compile check passed.
 - Full suite remains green (`240` tests passing).
+
+## Milestone 83: Runtime State Snapshot, Apply, and Reset API
+
+### What changed
+- Added runtime mode normalization helper:
+	- `normalizedGameMode(modeValue)`
+- Added host-facing runtime state APIs:
+	- `getRuntimeState()`
+	- `setRuntimeState(runtimeState)`
+	- `resetRuntimeState()`
+- `getRuntimeState()` now returns a normalized state payload including:
+	- core runtime values (`bank`, `chipsOnTable`, `throws`, `pointIsOn`, `comeOut`, `p2`, toggles)
+	- mode (`gameMode`)
+	- line/prop/ATS/fire values
+	- full bet snapshot (`betSnapshot`) via existing snapshot helpers
+- `setRuntimeState(...)` now:
+	- validates input type
+	- rejects unsupported keys
+	- applies partial updates for supported keys
+	- supports game mode values as enum or normalized text
+	- syncs `gameState` after updates
+- `resetRuntimeState()` now restores a deterministic new-session baseline for runtime/bet structures and returns the resulting state.
+
+### Why
+- iOS/app host integration needs a safe and explicit way to inspect/apply session state without mutating globals directly.
+- Deterministic reset and controlled partial updates reduce host-side coupling and state drift risk.
+- Reusing existing snapshot structures minimizes behavioral risk.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Default terminal gameplay flow unchanged.
+
+### Test coverage
+- Added deterministic runtime-state regression tests in `tests/testEngineBehavior.py`:
+	- `testGetRuntimeStateIncludesCoreAndSnapshot`
+	- `testSetRuntimeStateAppliesCoreValuesAndMode`
+	- `testSetRuntimeStateRejectsUnknownKeys`
+	- `testResetRuntimeStateRestoresDefaults`
+- Compile check passed.
+- Full suite remains green (`244` tests passing).

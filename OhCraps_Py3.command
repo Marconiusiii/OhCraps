@@ -8,11 +8,43 @@ from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsFor
 #Version Number
 version = "7.0.0"
 
+outputHandler = None
+inputHandler = None
+randomProvider = random
+
+def setIoHandlers(outputFunc=None, inputFunc=None):
+	global outputHandler, inputHandler
+	if outputFunc is not None:
+		outputHandler = outputFunc
+	if inputFunc is not None:
+		inputHandler = inputFunc
+
+def resetIoHandlers():
+	global outputHandler, inputHandler
+	outputHandler = None
+	inputHandler = None
+
+def setRandomProvider(provider=None):
+	global randomProvider
+	if provider is None:
+		randomProvider = random
+	else:
+		randomProvider = provider
+
+def resetRandomProvider():
+	global randomProvider
+	randomProvider = random
+
 def writeOutput(message):
-	print(message)
+	if outputHandler is None:
+		print(message)
+	else:
+		outputHandler(message)
 
 def readInput(promptText):
-	return str(input(promptText))
+	if inputHandler is None:
+		return str(input(promptText))
+	return str(inputHandler(promptText))
 
 class comeOutRollResult:
 	def __init__(self, enteredPointPhase, outcome):
@@ -61,7 +93,7 @@ def roll():
 	elif total == 11 and pointIsOn == False and gameMode == GameMode.craps:
 		writeOutput(f"\n{total} winner! Pay the line, take the don't!\n")
 	else:
-		call = random.randrange(1, 21)
+		call = randomProvider.randrange(1, 21)
 
 		# Call picks a random number between 1 and 20. If the number is <= 10,
 		# or if the total is in [2, 3, 11, 12], it uses stickman.
@@ -97,9 +129,9 @@ hardCalls = {
 def stickman(roll):
 	global rollHard
 	if rollHard:
-		return hardCalls[roll][random.randrange(0, len(hardCalls[roll]))]
+		return hardCalls[roll][randomProvider.randrange(0, len(hardCalls[roll]))]
 	else:
-		return dealerCalls[roll][random.randrange(0, len(dealerCalls[roll]))]
+		return dealerCalls[roll][randomProvider.randrange(0, len(dealerCalls[roll]))]
 
 # Fire Bet Setup
 

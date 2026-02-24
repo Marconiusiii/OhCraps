@@ -1609,6 +1609,61 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			terminal["runGame"]()
 		self.assertEqual(pointPhaseCalls, [True])
 
+	def testSetIoHandlersOverridesReadAndWrite(self):
+		terminal = loadTerminalNamespace()
+		writes = []
+		prompts = []
+		terminal["setIoHandlers"](
+			outputFunc=lambda message: writes.append(str(message)),
+			inputFunc=lambda promptText: prompts.append(promptText) or "abc"
+		)
+		terminal["writeOutput"]("hello")
+		response = terminal["readInput"]("prompt> ")
+		self.assertEqual(writes, ["hello"])
+		self.assertEqual(prompts, ["prompt> "])
+		self.assertEqual(response, "abc")
+
+	def testResetIoHandlersRestoresDefaults(self):
+		terminal = loadTerminalNamespace()
+		terminal["setIoHandlers"](outputFunc=lambda message: None, inputFunc=lambda promptText: "x")
+		terminal["resetIoHandlers"]()
+		self.assertEqual(terminal["outputHandler"], None)
+		self.assertEqual(terminal["inputHandler"], None)
+
+	def testSetRandomProviderControlsStickmanChoice(self):
+		terminal = loadTerminalNamespace()
+		class fakeRandomProvider:
+			def __init__(self, values):
+				self.values = iter(values)
+			def randrange(self, start, stop=None):
+				return next(self.values)
+		terminal["dealerCalls"] = {5: ["first", "second"]}
+		terminal["rollHard"] = False
+		terminal["setRandomProvider"](fakeRandomProvider([1]))
+		self.assertEqual(terminal["stickman"](5), "second")
+		terminal["resetRandomProvider"]()
+		self.assertIs(terminal["randomProvider"], terminal["random"])
+
+	def testRollUsesInjectedRandomProviderForNarrationBranch(self):
+		terminal = loadTerminalNamespace()
+		class fakeRandomProvider:
+			def __init__(self, values):
+				self.values = iter(values)
+			def randrange(self, start, stop=None):
+				return next(self.values)
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["pointIsOn"] = False
+		terminal["rollDice"] = lambda: type("diceResult", (), {"die1": 4, "die2": 5, "total": 9})()
+		terminal["setRandomProvider"](fakeRandomProvider([20]))
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			total = terminal["roll"]()
+		self.assertEqual(total, 9)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("a 4 5 9", " ".join(writes))
+		terminal["resetRandomProvider"]()
+
 	def testShowPointPhaseStatusWithChipsShowsTableAmount(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 250

@@ -1548,3 +1548,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRunGameTransitionsIntoPointPhaseRound`
 - Compile check passed.
 - Full suite remains green (`236` tests passing).
+
+## Milestone 82: Runtime IO and Random Provider Injection Hooks
+
+### What changed
+- Added injectable runtime IO hooks:
+	- `setIoHandlers(outputFunc=None, inputFunc=None)`
+	- `resetIoHandlers()`
+- Added injectable random provider hooks:
+	- `setRandomProvider(provider=None)`
+	- `resetRandomProvider()`
+- Updated adapter wrappers to use injected hooks when provided:
+	- `writeOutput(...)` routes to injected `outputHandler` when set; otherwise falls back to live `print(...)`
+	- `readInput(...)` routes to injected `inputHandler` when set; otherwise falls back to live `input(...)`
+- Updated random call sites to use injected random provider:
+	- `roll()` dealer-call branch selection
+	- `stickman()` call selection
+
+### Why
+- Host integration (iOS/app layers) needs explicit runtime injection seams for input/output and deterministic randomness.
+- Keeping default behavior as live builtins preserves terminal gameplay and existing tests that patch builtins.
+- Random provider injection gives deterministic control over narration/call selection without changing game rules.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Terminal behavior unchanged by default.
+- Host/test harness can now inject custom IO and randomness without monkeypatching internals.
+
+### Test coverage
+- Added deterministic runtime-hook regressions in `tests/testEngineBehavior.py`:
+	- `testSetIoHandlersOverridesReadAndWrite`
+	- `testResetIoHandlersRestoresDefaults`
+	- `testSetRandomProviderControlsStickmanChoice`
+	- `testRollUsesInjectedRandomProviderForNarrationBranch`
+- Compile check passed.
+- Full suite remains green (`240` tests passing).

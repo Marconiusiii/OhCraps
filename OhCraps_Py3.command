@@ -2575,6 +2575,25 @@ def runPointPhaseRound():
 			return pointPhaseRoundResult(roundEnded=True, outcome=pointRollResult.outcome)
 		continue
 
+def runOneCycle():
+	comeOutResult = runComeOutRound()
+	cycleResult = {
+		"enteredPointPhase": bool(comeOutResult.enteredPointPhase),
+		"comeOutOutcome": comeOutResult.outcome,
+		"pointPhaseOutcome": None,
+		"pointRoundEnded": False,
+		"point": int(comeOut),
+		"throws": int(throws)
+	}
+	if not comeOutResult.enteredPointPhase:
+		return cycleResult
+	pointPhaseResult = runPointPhaseRound()
+	cycleResult["pointPhaseOutcome"] = pointPhaseResult.outcome
+	cycleResult["pointRoundEnded"] = bool(pointPhaseResult.roundEnded)
+	cycleResult["point"] = int(comeOut)
+	cycleResult["throws"] = int(throws)
+	return cycleResult
+
 #Additional Global Variables
 p2 = 0
 pointIsOn = False
@@ -2626,12 +2645,7 @@ def runGame():
 
 	# Initial bets
 
-		comeOutResult = runComeOutRound()
-		if not comeOutResult.enteredPointPhase:
-			continue
-		runPointPhaseRound()
-
-		continue
+		runOneCycle()
 
 # Game Start
 if __name__ == "__main__":

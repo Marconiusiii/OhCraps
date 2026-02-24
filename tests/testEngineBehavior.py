@@ -1564,6 +1564,34 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(len(menuCalls), 1)
 		self.assertEqual(len(resolveCalls), 1)
 
+	def testRunOneCycleReturnsComeOutOnlyPath(self):
+		terminal = loadTerminalNamespace()
+		terminal["comeOut"] = 0
+		terminal["throws"] = 3
+		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=False, outcome=terminal["RollOutcome"].natural)
+		pointPhaseCalls = []
+		terminal["runPointPhaseRound"] = lambda: pointPhaseCalls.append(True)
+		result = terminal["runOneCycle"]()
+		self.assertEqual(result["enteredPointPhase"], False)
+		self.assertEqual(result["comeOutOutcome"], terminal["RollOutcome"].natural)
+		self.assertEqual(result["pointPhaseOutcome"], None)
+		self.assertEqual(result["pointRoundEnded"], False)
+		self.assertEqual(pointPhaseCalls, [])
+
+	def testRunOneCycleReturnsPointPhasePath(self):
+		terminal = loadTerminalNamespace()
+		terminal["comeOut"] = 8
+		terminal["throws"] = 5
+		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=True, outcome=terminal["RollOutcome"].pointEstablished)
+		terminal["runPointPhaseRound"] = lambda: terminal["pointPhaseRoundResult"](roundEnded=True, outcome=terminal["RollOutcome"].pointHit)
+		result = terminal["runOneCycle"]()
+		self.assertEqual(result["enteredPointPhase"], True)
+		self.assertEqual(result["comeOutOutcome"], terminal["RollOutcome"].pointEstablished)
+		self.assertEqual(result["pointPhaseOutcome"], terminal["RollOutcome"].pointHit)
+		self.assertEqual(result["pointRoundEnded"], True)
+		self.assertEqual(result["point"], 8)
+		self.assertEqual(result["throws"], 5)
+
 	def testRunGameBootstrapsAndLoopsThroughComeOutStatus(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100
@@ -1577,7 +1605,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["selectGameMode"] = lambda: selectCalls.append(True)
 		terminal["cashIn"] = lambda: cashInCalls.append(True)
 		terminal["syncGameState"] = lambda **kwargs: syncCalls.append(kwargs)
-		terminal["runComeOutRound"] = lambda: (_ for _ in ()).throw(SystemExit())
+		terminal["runOneCycle"] = lambda: (_ for _ in ()).throw(SystemExit())
 		terminal["writeOutput"] = lambda message: writes.append(str(message))
 		with self.assertRaises(SystemExit):
 			terminal["runGame"]()
@@ -1598,12 +1626,11 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["selectGameMode"] = lambda: None
 		terminal["cashIn"] = lambda: None
 		terminal["syncGameState"] = lambda **kwargs: None
-		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=True, outcome=terminal["RollOutcome"].pointEstablished)
 		pointPhaseCalls = []
 		def fakeRunPointPhaseRound():
 			pointPhaseCalls.append(True)
 			raise SystemExit()
-		terminal["runPointPhaseRound"] = fakeRunPointPhaseRound
+		terminal["runOneCycle"] = fakeRunPointPhaseRound
 		terminal["writeOutput"] = lambda message: None
 		with self.assertRaises(SystemExit):
 			terminal["runGame"]()

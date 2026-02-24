@@ -1625,3 +1625,35 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testResetRuntimeStateRestoresDefaults`
 - Compile check passed.
 - Full suite remains green (`244` tests passing).
+
+## Milestone 84: Added Single-Cycle Runtime Runner for Host-Controlled Flow
+
+### What changed
+- Added new step-oriented runtime API:
+	- `runOneCycle()`
+- `runOneCycle()` now executes exactly one top-level game cycle:
+	- runs `runComeOutRound()`
+	- if no point is entered, returns immediately with cycle metadata
+	- if point is entered, runs `runPointPhaseRound()` and returns point-phase metadata
+- Refactored `runGame()` loop to call `runOneCycle()` for each cycle while preserving existing terminal behavior and status output.
+
+### Why
+- iOS/app hosts need predictable step-by-step execution control instead of direct dependence on nested infinite loops.
+- A single-cycle runner creates a stable control seam for host-driven UI update loops and future session orchestration.
+- Keeping `runGame()` as the terminal wrapper maintains existing play flow.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Terminal gameplay behavior unchanged.
+- Host integrations can now call `runOneCycle()` directly for deterministic progression.
+
+### Test coverage
+- Added deterministic cycle/control regressions in `tests/testEngineBehavior.py`:
+	- `testRunOneCycleReturnsComeOutOnlyPath`
+	- `testRunOneCycleReturnsPointPhasePath`
+- Updated runGame loop regressions to align with cycle runner integration:
+	- `testRunGameBootstrapsAndLoopsThroughComeOutStatus`
+	- `testRunGameTransitionsIntoPointPhaseRound`
+- Compile check passed.
+- Full suite remains green (`246` tests passing).

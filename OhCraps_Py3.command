@@ -252,6 +252,9 @@ def hostSchemaDescriptor():
 				"deltaSnapshot": [
 					"engineApiVersion", "success", "error", "commandResult", "stateDelta"
 				],
+				"actionBundle": [
+					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot", "statusPanel", "stateDelta"
+				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
 					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
@@ -421,6 +424,24 @@ def runCommandWithStateDelta(commandText, pointPhase=False, autoCapture=False, r
 		"success": bool(commandResult["success"]),
 		"error": commandResult["error"],
 		"commandResult": commandResult,
+		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=pointPhase)
+	})
+
+def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
+	beforeState = getRuntimeState()
+	commandResult = submitCommand(
+		commandText=commandText,
+		pointPhase=pointPhase,
+		autoCapture=autoCapture,
+		raiseOnError=raiseOnError
+	)
+	afterState = getRuntimeState()
+	return withApiVersion({
+		"success": bool(commandResult["success"]),
+		"error": commandResult["error"],
+		"commandResult": commandResult,
+		"uiSnapshot": createHostUiSnapshot(pointPhase=pointPhase),
+		"statusPanel": createHostStatusPanel(pointPhase=pointPhase),
 		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=pointPhase)
 	})
 

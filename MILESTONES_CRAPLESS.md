@@ -2521,3 +2521,38 @@ New milestone updates should be appended here rather than creating new milestone
 	- point/phase transition detection via delta summary
 	- schema descriptor includes new delta contract keys
 - Full suite remains green after this milestone.
+
+## Milestone 109: Unified Host Action Response
+
+### What problem this solves
+- App code had to choose between multiple command helpers depending on what response data was needed.
+- That increased host-side branching and inconsistency risk.
+
+### What changed
+- Added `runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError=False)`.
+- This returns one standard response containing:
+	- command result
+	- UI snapshot
+	- status panel
+	- state delta
+	- top-level success/error
+- Added `actionBundle` keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- One app action can now use one standard engine response shape.
+- Less host-side decision logic.
+- Easier to keep UI sync behavior consistent.
+
+### Behavior
+- No craps rules changed.
+- No payout math changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- normal action response
+	- invalid command response
+	- point-phase response content
+	- Crapless restriction reflected in returned command list
+	- schema descriptor includes `actionBundle`
+- Full suite remains green after this milestone.

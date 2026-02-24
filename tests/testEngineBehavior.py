@@ -1682,6 +1682,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
 		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
 		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
+		self.assertIn("actionBundle", descriptor["payloadKeys"])
 		self.assertIn("stateDelta", descriptor["payloadKeys"])
 		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
@@ -1857,6 +1858,41 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(delta["phaseChanged"], True)
 		self.assertEqual(delta["fromPoint"], 0)
 		self.assertEqual(delta["toPoint"], 8)
+
+	def testRunHostActionReturnsUnifiedResponse(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["runHostAction"]("x", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["command"], "x")
+		self.assertIn("uiSnapshot", payload)
+		self.assertIn("statusPanel", payload)
+		self.assertIn("stateDelta", payload)
+		self.assertEqual(payload["uiSnapshot"]["pointPhase"], False)
+
+	def testRunHostActionHandlesInvalidCommand(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runHostAction"]("notACommand", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["handled"], False)
+		self.assertEqual(payload["stateDelta"]["changed"], False)
+
+	def testRunHostActionPointPhaseUsesPointPhaseData(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["runHostAction"]("x", pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
+		self.assertEqual(payload["uiSnapshot"]["pointPhase"], True)
+		self.assertEqual(payload["statusPanel"]["phaseDisplay"], "Point Phase")
+		self.assertIn("o", commandsByCode)
+
+	def testRunHostActionCraplessReflectsDisabledDontCome(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		payload = terminal["runHostAction"]("dcd", pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
+		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
+		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

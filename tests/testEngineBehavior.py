@@ -1685,6 +1685,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
 		self.assertIn("actionBundle", descriptor["payloadKeys"])
 		self.assertIn("healthReport", descriptor["payloadKeys"])
+		self.assertIn("preflightReport", descriptor["payloadKeys"])
 		self.assertIn("stateDelta", descriptor["payloadKeys"])
 		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
@@ -1975,6 +1976,38 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		})
 		total = terminal["runtimeWagerTotal"](terminal["getRuntimeState"]())
 		self.assertEqual(total, 25)
+
+	def testCreateHostPreflightReportPassesInHealthyState(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		report = terminal["createHostPreflightReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["failedChecks"], [])
+		self.assertTrue(len(report["passedChecks"]) >= 5)
+		self.assertEqual(report["engineApiVersion"], terminal["engineApiVersion"])
+
+	def testCreateHostPreflightReportCapturesForcedFailure(self):
+		terminal = loadTerminalNamespace()
+		terminal["createHostHealthReport"] = lambda raiseOnIssue=False: {
+			"ok": False,
+			"issueCount": 1,
+			"issues": ["forced health failure"],
+			"summary": {}
+		}
+		report = terminal["createHostPreflightReport"]()
+		self.assertEqual(report["ok"], False)
+		self.assertIn("healthReport", report["failedChecks"])
+
+	def testCreateHostPreflightReportRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		terminal["createHostHealthReport"] = lambda raiseOnIssue=False: {
+			"ok": False,
+			"issueCount": 1,
+			"issues": ["forced health failure"],
+			"summary": {}
+		}
+		with self.assertRaises(ValueError):
+			terminal["createHostPreflightReport"](raiseOnFailure=True)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

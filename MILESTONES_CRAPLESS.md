@@ -2626,3 +2626,43 @@ New milestone updates should be appended here rather than creating new milestone
 	- wager total helper in a simple known state
 	- schema descriptor includes `healthReport`
 - Full suite remains green after this milestone.
+
+## Milestone 112: Host Preflight Integration Report
+
+### What problem this solves
+- Host apps had many separate helpers but no one-call integration preflight.
+- QA and startup checks had to call several APIs manually.
+
+### What changed
+- Added `createHostPreflightReport(raiseOnFailure=False)`.
+- Preflight runs key host checks together:
+	- startup bundle
+	- UI snapshot
+	- status panel
+	- host action path
+	- health report
+- Returns one report with:
+	- `ok`
+	- `passedChecks`
+	- `failedChecks`
+	- `checks` details
+- Added strict mode:
+	- `raiseOnFailure=True` raises when any check fails.
+- Added `preflightReport` payload keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can run one quick preflight at launch or during QA.
+- Faster detection of integration issues after updates.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- healthy preflight pass
+	- forced failure capture
+	- strict raise-on-failure mode
+	- schema descriptor includes `preflightReport`
+- Full suite remains green after this milestone.

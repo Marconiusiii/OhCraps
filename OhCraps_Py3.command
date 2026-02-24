@@ -259,6 +259,9 @@ def hostSchemaDescriptor():
 				"healthReport": [
 					"engineApiVersion", "ok", "issueCount", "issues", "summary"
 				],
+				"preflightReport": [
+					"engineApiVersion", "ok", "passedChecks", "failedChecks", "checks"
+				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
 					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
@@ -544,6 +547,50 @@ def createHostHealthReport(raiseOnIssue=False):
 	if raiseOnIssue and len(issues) > 0:
 		raise ValueError("; ".join(issues))
 	return report
+
+def createHostPreflightReport(raiseOnFailure=False):
+	checks = []
+	startupBundle = createHostStartupBundle()
+	checks.append({
+		"name": "startupBundle",
+		"ok": bool(startupBundle.get("success", False)),
+		"details": {"initialized": bool(startupBundle.get("initialized", False))}
+	})
+	uiSnapshot = createHostUiSnapshot(pointPhase=False)
+	checks.append({
+		"name": "uiSnapshot",
+		"ok": ("runtimeState" in uiSnapshot and "allowedCommands" in uiSnapshot),
+		"details": {"pointPhase": bool(uiSnapshot.get("pointPhase", False))}
+	})
+	statusPanel = createHostStatusPanel(pointPhase=False)
+	checks.append({
+		"name": "statusPanel",
+		"ok": ("bankrollDisplay" in statusPanel and "throwDisplay" in statusPanel),
+		"details": {"phaseDisplay": str(statusPanel.get("phaseDisplay", ""))}
+	})
+	actionBundle = runHostAction(commandText="h", pointPhase=False)
+	checks.append({
+		"name": "hostAction",
+		"ok": bool(actionBundle.get("success", False) and actionBundle.get("commandResult") is not None),
+		"details": {"handled": bool(actionBundle.get("commandResult", {}).get("handled", False))}
+	})
+	healthReport = createHostHealthReport()
+	checks.append({
+		"name": "healthReport",
+		"ok": bool(healthReport.get("ok", False)),
+		"details": {"issueCount": int(healthReport.get("issueCount", 0))}
+	})
+	passedChecks = [check["name"] for check in checks if check["ok"]]
+	failedChecks = [check["name"] for check in checks if not check["ok"]]
+	preflight = withApiVersion({
+		"ok": len(failedChecks) == 0,
+		"passedChecks": passedChecks,
+		"failedChecks": failedChecks,
+		"checks": checks
+	})
+	if raiseOnFailure and len(failedChecks) > 0:
+		raise ValueError(f"Preflight failed: {', '.join(failedChecks)}")
+	return preflight
 
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer

@@ -1610,6 +1610,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["hostErrorCodes"]["cycleExecutionFailed"], "cycleExecutionFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["startupValidationFailed"], "startupValidationFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["invalidActionInput"], "invalidActionInput")
+		self.assertEqual(terminal["hostErrorCodes"]["invalidReplayInput"], "invalidReplayInput")
 
 	def testHostEventNamesExposeExpectedContractValues(self):
 		terminal = loadTerminalNamespace()
@@ -1686,6 +1687,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("actionBundle", descriptor["payloadKeys"])
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
+		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
+		self.assertIn("actionLogRun", descriptor["payloadKeys"])
+		self.assertIn("replayReport", descriptor["payloadKeys"])
 		self.assertIn("stateDelta", descriptor["payloadKeys"])
 		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
@@ -1922,6 +1926,46 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
 		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
 		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testRunHostActionAndLogReturnsEntry(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runHostActionAndLog"]("x", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["logEntry"]["request"]["commandText"], "x")
+		self.assertEqual(payload["logEntry"]["request"]["pointPhase"], False)
+		self.assertEqual(payload["logEntry"]["result"]["success"], True)
+
+	def testReplayHostActionLogRunsAllActions(self):
+		terminal = loadTerminalNamespace()
+		actionLog = [
+			{"request": {"commandText": "x", "pointPhase": False}},
+			{"request": {"commandText": "w", "pointPhase": False}}
+		]
+		report = terminal["replayHostActionLog"](actionLog, resetFirst=True)
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["actionsRequested"], 2)
+		self.assertEqual(report["actionsRun"], 2)
+		self.assertEqual(report["failedAt"], None)
+		self.assertEqual(report["finalRuntimeState"], terminal["getRuntimeState"]())
+
+	def testReplayHostActionLogStopsOnInvalidAction(self):
+		terminal = loadTerminalNamespace()
+		actionLog = [
+			{"request": {"commandText": "x", "pointPhase": False}},
+			{"request": {"commandText": "", "pointPhase": False}},
+			{"request": {"commandText": "w", "pointPhase": False}}
+		]
+		report = terminal["replayHostActionLog"](actionLog, resetFirst=True)
+		self.assertEqual(report["ok"], False)
+		self.assertEqual(report["failedAt"], 1)
+		self.assertEqual(report["actionsRun"], 2)
+		self.assertEqual(report["results"][1]["result"]["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+
+	def testReplayHostActionLogRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		actionLog = [{"request": {"commandText": "", "pointPhase": False}}]
+		with self.assertRaises(ValueError):
+			terminal["replayHostActionLog"](actionLog, resetFirst=True, raiseOnFailure=True)
 
 	def testCreateHostHealthReportHealthyState(self):
 		terminal = loadTerminalNamespace()

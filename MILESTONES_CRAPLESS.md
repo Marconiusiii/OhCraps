@@ -2666,3 +2666,44 @@ New milestone updates should be appended here rather than creating new milestone
 	- strict raise-on-failure mode
 	- schema descriptor includes `preflightReport`
 - Full suite remains green after this milestone.
+
+## Milestone 113: Host Action Log + Replay Helpers
+
+### What problem this solves
+- Host debugging was harder because there was no built-in action record/replay flow.
+- Reproducing app-side bugs required manual re-entry.
+
+### What changed
+- Added `buildHostActionLogEntry(commandText, pointPhase, actionResult)`.
+- Added `runHostActionAndLog(...)`.
+- Added `replayHostActionLog(actionLog, resetFirst=True, raiseOnFailure=False)`.
+- Replay report includes:
+	- `ok`
+	- `actionsRequested`
+	- `actionsRun`
+	- `failedAt`
+	- `results`
+	- `finalRuntimeState`
+- Added new error code: `invalidReplayInput`.
+- Added replay-related payload keys to `hostSchemaDescriptor()`:
+	- `actionLogEntry`
+	- `actionLogRun`
+	- `replayReport`
+
+### Why this helps
+- iOS/web sessions can be replayed to reproduce issues quickly.
+- QA and debugging workflows become more deterministic.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- action log entry shape from live command
+	- successful replay of multiple actions
+	- replay failure in the middle on invalid action
+	- strict raise-on-failure mode for replay
+	- schema includes replay contracts and error code map includes `invalidReplayInput`
+- Full suite remains green after this milestone.

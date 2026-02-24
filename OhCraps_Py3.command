@@ -66,7 +66,8 @@ hostErrorCodes = {
 	"commandExecutionFailed": "commandExecutionFailed",
 	"cycleExecutionFailed": "cycleExecutionFailed",
 	"startupValidationFailed": "startupValidationFailed",
-	"invalidActionInput": "invalidActionInput"
+	"invalidActionInput": "invalidActionInput",
+	"invalidReplayInput": "invalidReplayInput"
 }
 
 def hostErrorPayload(errorCode, errorMessage, details=None):
@@ -261,6 +262,15 @@ def hostSchemaDescriptor():
 				],
 				"preflightReport": [
 					"engineApiVersion", "ok", "passedChecks", "failedChecks", "checks"
+				],
+				"actionLogEntry": [
+					"engineApiVersion", "request", "result"
+				],
+				"actionLogRun": [
+					"engineApiVersion", "success", "error", "actionResult", "logEntry"
+				],
+				"replayReport": [
+					"engineApiVersion", "ok", "actionsRequested", "actionsRun", "failedAt", "results", "finalRuntimeState"
 				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
@@ -487,6 +497,91 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
 		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=normalizedPointPhase)
 	})
+
+def buildHostActionLogEntry(commandText, pointPhase, actionResult):
+	commandResult = actionResult.get("commandResult") if isinstance(actionResult, dict) else None
+	return withApiVersion({
+		"request": {
+			"commandText": str(commandText) if commandText is not None else None,
+			"pointPhase": bool(pointPhase)
+		},
+		"result": {
+			"success": bool(actionResult.get("success", False)) if isinstance(actionResult, dict) else False,
+			"error": actionResult.get("error") if isinstance(actionResult, dict) else hostErrorPayload(hostErrorCodes["invalidReplayInput"], "Invalid action result."),
+			"handled": (bool(commandResult.get("handled", False)) if isinstance(commandResult, dict) else False),
+			"shouldRoll": (bool(commandResult.get("shouldRoll", False)) if isinstance(commandResult, dict) else False),
+			"stateDelta": (dict(actionResult.get("stateDelta", {})) if isinstance(actionResult, dict) else {})
+		}
+	})
+
+def runHostActionAndLog(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
+	actionResult = runHostAction(
+		commandText=commandText,
+		pointPhase=pointPhase,
+		autoCapture=autoCapture,
+		raiseOnError=raiseOnError
+	)
+	logEntry = buildHostActionLogEntry(commandText=commandText, pointPhase=pointPhase, actionResult=actionResult)
+	return withApiVersion({
+		"success": bool(actionResult["success"]),
+		"error": actionResult["error"],
+		"actionResult": actionResult,
+		"logEntry": logEntry
+	})
+
+def replayHostActionLog(actionLog, resetFirst=True, raiseOnFailure=False):
+	if not isinstance(actionLog, list):
+		errorPayload = hostErrorPayload(
+			errorCode=hostErrorCodes["invalidReplayInput"],
+			errorMessage="actionLog must be a list."
+		)
+		report = withApiVersion({
+			"ok": False,
+			"actionsRequested": 0,
+			"actionsRun": 0,
+			"failedAt": 0,
+			"results": [withApiVersion({"request": None, "result": {"success": False, "error": errorPayload, "handled": False, "shouldRoll": False, "stateDelta": {}}})],
+			"finalRuntimeState": getRuntimeState()
+		})
+		if raiseOnFailure:
+			raise ValueError(errorPayload["message"])
+		return report
+	if resetFirst:
+		resetRuntimeState()
+	results = []
+	failedAt = None
+	for index, record in enumerate(actionLog):
+		if not isinstance(record, dict) or not isinstance(record.get("request"), dict):
+			errorPayload = hostErrorPayload(
+				errorCode=hostErrorCodes["invalidReplayInput"],
+				errorMessage="Each replay record must include a request object.",
+				details={"index": int(index)}
+			)
+			results.append(withApiVersion({
+				"request": record.get("request") if isinstance(record, dict) else None,
+				"result": {"success": False, "error": errorPayload, "handled": False, "shouldRoll": False, "stateDelta": {}}
+			}))
+			failedAt = index
+			break
+		request = record["request"]
+		commandText = request.get("commandText")
+		pointPhase = request.get("pointPhase", False)
+		runResult = runHostActionAndLog(commandText=commandText, pointPhase=pointPhase, autoCapture=False, raiseOnError=False)
+		results.append(runResult["logEntry"])
+		if not bool(runResult["success"]):
+			failedAt = index
+			break
+	report = withApiVersion({
+		"ok": failedAt is None,
+		"actionsRequested": len(actionLog),
+		"actionsRun": len(results),
+		"failedAt": failedAt,
+		"results": results,
+		"finalRuntimeState": getRuntimeState()
+	})
+	if raiseOnFailure and failedAt is not None:
+		raise ValueError(f"Replay failed at index {failedAt}.")
+	return report
 
 def runtimeWagerTotal(runtimeState):
 	lineTotal = sum(int(value) for value in runtimeState["lineBets"].values())

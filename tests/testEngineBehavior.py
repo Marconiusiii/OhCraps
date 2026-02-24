@@ -1389,7 +1389,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		payload = terminal["submitCommand"]("x", pointPhase=False)
 		self.assertEqual(len(events), 1)
-		self.assertEqual(events[0][0], "commandProcessed")
+		self.assertEqual(events[0][0], terminal["hostEventNames"]["commandProcessed"])
 		self.assertEqual(events[0][1]["command"], "x")
 		self.assertEqual(events[0][1]["shouldRoll"], True)
 		self.assertEqual(events[0][1]["handled"], True)
@@ -1425,7 +1425,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		response = terminal["readInput"]("Bankroll? > ")
 		self.assertEqual(response, "y")
-		self.assertEqual(events[0][0], "inputRequested")
+		self.assertEqual(events[0][0], terminal["hostEventNames"]["inputRequested"])
 		self.assertEqual(events[0][1]["prompt"], "Bankroll? > ")
 		terminal["resetEventHandler"]()
 		terminal["resetIoHandlers"]()
@@ -1535,8 +1535,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		stepPayload = terminal["step"](commandText="x", pointPhase=False)
 		self.assertEqual(len(events), 2)
-		self.assertEqual(events[0][0], "commandProcessed")
-		self.assertEqual(events[1][0], "stepCompleted")
+		self.assertEqual(events[0][0], terminal["hostEventNames"]["commandProcessed"])
+		self.assertEqual(events[1][0], terminal["hostEventNames"]["stepCompleted"])
 		self.assertEqual(events[1][1], stepPayload)
 		terminal["resetEventHandler"]()
 
@@ -1558,6 +1558,23 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["hostErrorCodes"]["invalidStepArguments"], "invalidStepArguments")
 		self.assertEqual(terminal["hostErrorCodes"]["commandExecutionFailed"], "commandExecutionFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["cycleExecutionFailed"], "cycleExecutionFailed")
+
+	def testHostEventNamesExposeExpectedContractValues(self):
+		terminal = loadTerminalNamespace()
+		self.assertEqual(terminal["hostEventNames"]["inputRequested"], "inputRequested")
+		self.assertEqual(terminal["hostEventNames"]["commandProcessed"], "commandProcessed")
+		self.assertEqual(terminal["hostEventNames"]["stepCompleted"], "stepCompleted")
+		self.assertEqual(terminal["hostEventNames"]["cycleCompleted"], "cycleCompleted")
+
+	def testBuildCycleCompletedEventPayloadIncludesCanonicalKeys(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["buildCycleCompletedEventPayload"](
+			cycleResult={"enteredPointPhase": False},
+			runtimeState={"bank": 10}
+		)
+		self.assertEqual(payload["cycleResult"]["enteredPointPhase"], False)
+		self.assertEqual(payload["runtimeState"]["bank"], 10)
+		self.assertEqual(payload["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testBuildHostCommandPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()
@@ -1603,11 +1620,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(descriptor["engineApiVersion"], terminal["engineApiVersion"])
 		self.assertEqual(descriptor["schemaVersion"], "1")
 		self.assertIn("errorCodes", descriptor)
+		self.assertIn("eventNames", descriptor)
 		self.assertIn("features", descriptor)
 		self.assertIn("payloadKeys", descriptor)
 		self.assertIn("command", descriptor["payloadKeys"])
 		self.assertIn("step", descriptor["payloadKeys"])
 		self.assertIn("sessionBundle", descriptor["payloadKeys"])
+		self.assertIn("events", descriptor["payloadKeys"])
+		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
+
+	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["buildGameInitializedEventPayload"](
+			startBank=500,
+			mode=terminal["GameMode"].craps,
+			runtimeState={"bank": 500}
+		)
+		self.assertEqual(payload["startBank"], 500)
+		self.assertEqual(payload["runtimeState"]["bank"], 500)
+		self.assertEqual(payload["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testCheckHostCompatibilityPassesForCurrentVersionAndFeatures(self):
 		terminal = loadTerminalNamespace()
@@ -2051,7 +2082,14 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		result = terminal["runOneCycle"]()
 		self.assertEqual(result["enteredPointPhase"], False)
-		self.assertEqual([event[0] for event in events], ["cycleStarted", "comeOutResolved", "cycleCompleted"])
+		self.assertEqual(
+			[event[0] for event in events],
+			[
+				terminal["hostEventNames"]["cycleStarted"],
+				terminal["hostEventNames"]["comeOutResolved"],
+				terminal["hostEventNames"]["cycleCompleted"]
+			]
+		)
 		self.assertEqual(events[1][1]["enteredPointPhase"], False)
 		self.assertIn("runtimeState", events[2][1])
 		self.assertEqual(events[0][1]["engineApiVersion"], terminal["engineApiVersion"])
@@ -2067,7 +2105,15 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		result = terminal["runOneCycle"]()
 		self.assertEqual(result["enteredPointPhase"], True)
-		self.assertEqual([event[0] for event in events], ["cycleStarted", "comeOutResolved", "pointPhaseResolved", "cycleCompleted"])
+		self.assertEqual(
+			[event[0] for event in events],
+			[
+				terminal["hostEventNames"]["cycleStarted"],
+				terminal["hostEventNames"]["comeOutResolved"],
+				terminal["hostEventNames"]["pointPhaseResolved"],
+				terminal["hostEventNames"]["cycleCompleted"]
+			]
+		)
 		self.assertEqual(events[2][1]["roundEnded"], True)
 		self.assertIn("runtimeState", events[3][1])
 		terminal["resetEventHandler"]()
@@ -2409,7 +2455,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		events = []
 		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
 		terminal["importSessionBundle"](bundle)
-		self.assertEqual(events[-1][0], "sessionImported")
+		self.assertEqual(events[-1][0], terminal["hostEventNames"]["sessionImported"])
 		self.assertEqual(events[-1][1]["engineApiVersion"], terminal["engineApiVersion"])
 		self.assertEqual(events[-1][1]["bundleType"], "ohcrapsSession")
 		terminal["resetEventHandler"]()

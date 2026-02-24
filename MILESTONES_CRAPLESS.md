@@ -2268,3 +2268,49 @@ New milestone updates should be appended here rather than creating new milestone
 	- compatibility failure for unsupported API version
 	- compatibility failure for unsupported feature requests
 - Full suite remains green after this milestone.
+
+## Milestone 102: Host Event Contract Normalization
+
+### What changed
+- Added centralized host event name constants:
+	- `hostEventNames`
+		- `inputRequested`
+		- `sessionImported`
+		- `commandProcessed`
+		- `stepCompleted`
+		- `cycleStarted`
+		- `comeOutResolved`
+		- `pointPhaseResolved`
+		- `cycleCompleted`
+		- `gameInitialized`
+- Added centralized host event payload builders:
+	- `buildInputRequestedEventPayload(...)`
+	- `buildSessionImportedEventPayload(...)`
+	- `buildCycleStartedEventPayload(...)`
+	- `buildComeOutResolvedEventPayload(...)`
+	- `buildPointPhaseResolvedEventPayload(...)`
+	- `buildCycleCompletedEventPayload(...)`
+	- `buildGameInitializedEventPayload(...)`
+- Routed all `emitEvent(...)` call sites through `hostEventNames` and payload builders.
+- Extended `hostSchemaDescriptor()` with event contract introspection:
+	- `eventNames`
+	- `payloadKeys["events"]`
+
+### Why
+- Event names/payloads were still duplicated as raw strings and inline dicts.
+- Centralizing event contracts reduces schema drift and host parsing regressions.
+- Publishing event contracts in schema descriptor improves iOS/web runtime integration safety.
+
+### Behavior
+- No craps rules/payout changes.
+- No bankroll/chips accounting changes.
+- Terminal gameplay flow remains unchanged.
+- Host event contract is now centralized and introspectable.
+
+### Test coverage
+- Added deterministic tests for:
+	- `hostEventNames` contract values
+	- event payload builder contract keys
+	- schema descriptor event sections
+- Updated event-emission tests to assert against `hostEventNames` constants.
+- Full suite remains green after this milestone.

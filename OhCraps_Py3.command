@@ -101,6 +101,54 @@ def buildHostStepPayload(stepType, commandResult, cycleResult, runtimeState, cap
 		"capturedPrompts": list(capturedPrompts)
 	})
 
+hostEventNames = {
+	"inputRequested": "inputRequested",
+	"sessionImported": "sessionImported",
+	"commandProcessed": "commandProcessed",
+	"stepCompleted": "stepCompleted",
+	"cycleStarted": "cycleStarted",
+	"comeOutResolved": "comeOutResolved",
+	"pointPhaseResolved": "pointPhaseResolved",
+	"cycleCompleted": "cycleCompleted",
+	"gameInitialized": "gameInitialized"
+}
+
+def buildInputRequestedEventPayload(prompt):
+	return withApiVersion({"prompt": str(prompt)})
+
+def buildSessionImportedEventPayload(runtimeState, bundleType):
+	return withApiVersion({"runtimeState": dict(runtimeState), "bundleType": str(bundleType)})
+
+def buildCycleStartedEventPayload(point, throwsCount, mode):
+	return withApiVersion({"point": int(point), "throws": int(throwsCount), "gameMode": mode})
+
+def buildComeOutResolvedEventPayload(enteredPointPhase, outcome, runtimeState):
+	return withApiVersion({
+		"enteredPointPhase": bool(enteredPointPhase),
+		"outcome": outcome,
+		"runtimeState": dict(runtimeState)
+	})
+
+def buildPointPhaseResolvedEventPayload(roundEnded, outcome, runtimeState):
+	return withApiVersion({
+		"roundEnded": bool(roundEnded),
+		"outcome": outcome,
+		"runtimeState": dict(runtimeState)
+	})
+
+def buildCycleCompletedEventPayload(cycleResult, runtimeState):
+	return withApiVersion({
+		"cycleResult": dict(cycleResult),
+		"runtimeState": dict(runtimeState)
+	})
+
+def buildGameInitializedEventPayload(startBank, mode, runtimeState):
+	return withApiVersion({
+		"startBank": int(startBank),
+		"gameMode": mode,
+		"runtimeState": dict(runtimeState)
+	})
+
 def hostFeatureFlags():
 	return {
 		"autoCapture": True,
@@ -114,6 +162,7 @@ def hostSchemaDescriptor():
 	return withApiVersion({
 		"schemaVersion": "1",
 		"errorCodes": dict(hostErrorCodes),
+		"eventNames": dict(hostEventNames),
 		"features": hostFeatureFlags(),
 		"payloadKeys": {
 			"command": [
@@ -126,9 +175,20 @@ def hostSchemaDescriptor():
 			],
 			"sessionBundle": [
 				"engineApiVersion", "bundleType", "runtimeState", "gameMode", "captureState", "hostMetadata"
-			]
-		}
-	})
+			],
+			"events": {
+				"inputRequested": ["engineApiVersion", "prompt"],
+				"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
+				"commandProcessed": ["engineApiVersion", "success", "error", "command", "pointPhase", "shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"],
+				"stepCompleted": ["engineApiVersion", "stepType", "success", "error", "commandResult", "cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"],
+				"cycleStarted": ["engineApiVersion", "point", "throws", "gameMode"],
+				"comeOutResolved": ["engineApiVersion", "enteredPointPhase", "outcome", "runtimeState"],
+				"pointPhaseResolved": ["engineApiVersion", "roundEnded", "outcome", "runtimeState"],
+				"cycleCompleted": ["engineApiVersion", "cycleResult", "runtimeState"],
+				"gameInitialized": ["engineApiVersion", "startBank", "gameMode", "runtimeState"]
+				}
+			}
+		})
 
 def checkHostCompatibility(requiredApiVersion=None, requiredFeatures=None):
 	reasons = []
@@ -213,7 +273,7 @@ def readInput(promptText):
 	promptValue = str(promptText)
 	if promptCaptureOn:
 		promptCaptureBuffer.append(promptValue)
-	emitEvent("inputRequested", {"prompt": promptValue})
+	emitEvent(hostEventNames["inputRequested"], buildInputRequestedEventPayload(promptValue))
 	if inputHandler is None:
 		return str(input(promptValue))
 	return str(inputHandler(promptValue))
@@ -2052,7 +2112,7 @@ def importSessionBundle(bundle):
 	promptCaptureOn = bool(captureState.get("promptCaptureOn", False))
 	promptCaptureBuffer = list(captureState.get("promptCaptureBuffer", []))
 	importedBundle = exportSessionBundle()
-	emitEvent("sessionImported", withApiVersion({"runtimeState": getRuntimeState(), "bundleType": importedBundle["bundleType"]}))
+	emitEvent(hostEventNames["sessionImported"], buildSessionImportedEventPayload(getRuntimeState(), importedBundle["bundleType"]))
 	return importedBundle
 
 placeOff = False
@@ -2826,7 +2886,7 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		success=success,
 		error=error
 	)
-	emitEvent("commandProcessed", resultPayload)
+	emitEvent(hostEventNames["commandProcessed"], resultPayload)
 	return resultPayload
 
 def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=False):
@@ -2842,7 +2902,7 @@ def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=Fal
 			capturedOutput=commandPayload["capturedOutput"],
 			capturedPrompts=commandPayload["capturedPrompts"]
 		)
-		emitEvent("stepCompleted", stepPayload)
+		emitEvent(hostEventNames["stepCompleted"], stepPayload)
 		return stepPayload
 	if pointPhase:
 		errorPayload = hostErrorPayload(
@@ -2860,7 +2920,7 @@ def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=Fal
 			capturedOutput=getCapturedOutput(),
 			capturedPrompts=getCapturedPrompts()
 		)
-		emitEvent("stepCompleted", stepPayload)
+		emitEvent(hostEventNames["stepCompleted"], stepPayload)
 		if raiseOnError:
 			raise ValueError("pointPhase can only be used with commandText.")
 		return stepPayload
@@ -2898,7 +2958,7 @@ def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=Fal
 		capturedOutput=capturedOutput,
 		capturedPrompts=capturedPrompts
 	)
-	emitEvent("stepCompleted", stepPayload)
+	emitEvent(hostEventNames["stepCompleted"], stepPayload)
 	return stepPayload
 
 def resolveComeOutRoll():
@@ -3025,10 +3085,10 @@ def runPointPhaseRound():
 
 def runOneCycle():
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("cycleStarted", withApiVersion({"point": int(runtime.comeOut), "throws": int(runtime.throws), "gameMode": runtime.gameMode}))
+	emitEvent(hostEventNames["cycleStarted"], buildCycleStartedEventPayload(runtime.comeOut, runtime.throws, runtime.gameMode))
 	comeOutResult = runComeOutRound()
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("comeOutResolved", withApiVersion({"enteredPointPhase": bool(comeOutResult.enteredPointPhase), "outcome": comeOutResult.outcome, "runtimeState": getRuntimeState()}))
+	emitEvent(hostEventNames["comeOutResolved"], buildComeOutResolvedEventPayload(comeOutResult.enteredPointPhase, comeOutResult.outcome, getRuntimeState()))
 	cycleResult = withApiVersion({
 		"enteredPointPhase": bool(comeOutResult.enteredPointPhase),
 		"comeOutOutcome": comeOutResult.outcome,
@@ -3038,16 +3098,16 @@ def runOneCycle():
 		"throws": int(runtime.throws)
 	})
 	if not comeOutResult.enteredPointPhase:
-		emitEvent("cycleCompleted", withApiVersion({"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()}))
+		emitEvent(hostEventNames["cycleCompleted"], buildCycleCompletedEventPayload(cycleResult, getRuntimeState()))
 		return cycleResult
 	pointPhaseResult = runPointPhaseRound()
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("pointPhaseResolved", withApiVersion({"roundEnded": bool(pointPhaseResult.roundEnded), "outcome": pointPhaseResult.outcome, "runtimeState": getRuntimeState()}))
+	emitEvent(hostEventNames["pointPhaseResolved"], buildPointPhaseResolvedEventPayload(pointPhaseResult.roundEnded, pointPhaseResult.outcome, getRuntimeState()))
 	cycleResult["pointPhaseOutcome"] = pointPhaseResult.outcome
 	cycleResult["pointRoundEnded"] = bool(pointPhaseResult.roundEnded)
 	cycleResult["point"] = int(runtime.comeOut)
 	cycleResult["throws"] = int(runtime.throws)
-	emitEvent("cycleCompleted", withApiVersion({"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()}))
+	emitEvent(hostEventNames["cycleCompleted"], buildCycleCompletedEventPayload(cycleResult, getRuntimeState()))
 	return cycleResult
 
 #Additional Global Variables
@@ -3095,7 +3155,7 @@ def initializeGame(startBank, selectedMode):
 	bank = bankroll
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	syncRuntimeFromGlobals()
-	emitEvent("gameInitialized", withApiVersion({"startBank": bankroll, "gameMode": gameMode, "runtimeState": getRuntimeState()}))
+	emitEvent(hostEventNames["gameInitialized"], buildGameInitializedEventPayload(bankroll, gameMode, getRuntimeState()))
 	return withApiVersion(getRuntimeState())
 
 gameState = createGameState(

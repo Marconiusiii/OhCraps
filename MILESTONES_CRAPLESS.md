@@ -3070,3 +3070,47 @@ New milestone updates should be appended here rather than creating new milestone
 - Added schema coverage for `actionSummary`.
 - Added handled/unhandled/validation-error action summary assertions.
 - Full suite remains green after this milestone.
+
+## Milestone 123: One-Call Host Bootstrap Report
+
+### What problem this solves
+- App startup integration still needed multiple helper calls to verify readiness.
+- There was no one-call report for startup + compatibility + sanity action.
+
+### What changed
+- Added `bootstrapReport` contract keys in `hostSchemaDescriptor()`.
+- Added `createHostBootstrapReport(...)`.
+- Bootstrap report includes:
+	- startup bundle
+	- host API compatibility report
+	- schema descriptor snapshot
+	- optional sanity action result
+- Added strict mode:
+	- `raiseOnFailure=True` raises if any bootstrap check fails.
+
+### Why this helps
+- iOS/web adapter startup can perform one deterministic readiness check.
+- Less orchestration logic needed in host client code.
+
+### How to use
+- Default startup check:
+	- `createHostBootstrapReport()`
+- Startup with init values:
+	- `createHostBootstrapReport(startBank=500, selectedMode="1")`
+- Strict startup gate:
+	- `createHostBootstrapReport(requiredApiVersion="1.0.0", raiseOnFailure=True)`
+
+### How to run in your test cycle
+- Focused bootstrap tests:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k Bootstrap`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for bootstrap success, compatibility-failure reporting, and strict raise behavior.
+- Full suite remains green after this milestone.

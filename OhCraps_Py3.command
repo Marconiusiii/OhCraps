@@ -302,6 +302,10 @@ def hostSchemaDescriptor():
 				"workflowReport": [
 					"engineApiVersion", "ok", "passedSteps", "failedSteps", "steps", "finalRuntimeState"
 				],
+				"bootstrapReport": [
+					"engineApiVersion", "ok", "passedChecks", "failedChecks", "checks",
+					"startupBundle", "compatibilityReport", "schemaDescriptor", "sanityAction"
+				],
 				"compatibilityReport": [
 					"engineApiVersion", "ok", "expectedApiVersion", "schemaApiVersion",
 					"requiredPayloadKeys", "requiredErrorCodes", "missingPayloadKeys", "missingErrorCodes", "reasons"
@@ -896,6 +900,64 @@ def createHostPreflightReport(raiseOnFailure=False):
 	if raiseOnFailure and len(failedChecks) > 0:
 		raise ValueError(f"Preflight failed: {', '.join(failedChecks)}")
 	return preflight
+
+def createHostBootstrapReport(startBank=None, selectedMode=None, requiredApiVersion=None, requiredFeatures=None, runSanityAction=True, sanityCommand="h", sanityPointPhase=False, raiseOnFailure=False):
+	startupBundle = createHostStartupBundle(
+		requiredApiVersion=requiredApiVersion,
+		requiredFeatures=requiredFeatures,
+		startBank=startBank,
+		selectedMode=selectedMode
+	)
+	compatibilityReport = validateHostApiCompatibility(
+		expectedApiVersion=requiredApiVersion,
+		raiseOnFailure=False
+	)
+	schemaDescriptor = hostSchemaDescriptor()
+	sanityAction = None
+	if runSanityAction:
+		sanityAction = runHostAction(
+			commandText=sanityCommand,
+			pointPhase=bool(sanityPointPhase),
+			autoCapture=False,
+			raiseOnError=False
+		)
+	checks = []
+	checks.append({
+		"name": "startupBundle",
+		"ok": bool(startupBundle.get("success", False)),
+		"details": {"initialized": bool(startupBundle.get("initialized", False))}
+	})
+	checks.append({
+		"name": "compatibilityReport",
+		"ok": bool(compatibilityReport.get("ok", False)),
+		"details": {"missingPayloadKeys": list(compatibilityReport.get("missingPayloadKeys", [])), "missingErrorCodes": list(compatibilityReport.get("missingErrorCodes", []))}
+	})
+	checks.append({
+		"name": "schemaDescriptor",
+		"ok": bool("payloadKeys" in schemaDescriptor and "errorCodes" in schemaDescriptor),
+		"details": {"schemaVersion": str(schemaDescriptor.get("schemaVersion", ""))}
+	})
+	if runSanityAction:
+		checks.append({
+			"name": "sanityAction",
+			"ok": bool(sanityAction is not None and sanityAction.get("actionSummary") is not None),
+			"details": {"actionState": (sanityAction.get("actionSummary", {}).get("actionState") if isinstance(sanityAction, dict) else None)}
+		})
+	passedChecks = [check["name"] for check in checks if check["ok"]]
+	failedChecks = [check["name"] for check in checks if not check["ok"]]
+	report = withApiVersion({
+		"ok": len(failedChecks) == 0,
+		"passedChecks": passedChecks,
+		"failedChecks": failedChecks,
+		"checks": checks,
+		"startupBundle": startupBundle,
+		"compatibilityReport": compatibilityReport,
+		"schemaDescriptor": schemaDescriptor,
+		"sanityAction": sanityAction
+	})
+	if raiseOnFailure and len(failedChecks) > 0:
+		raise ValueError(f"Bootstrap failed: {', '.join(failedChecks)}")
+	return report
 
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer

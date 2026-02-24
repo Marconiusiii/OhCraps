@@ -1690,6 +1690,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
 		self.assertIn("workflowReport", descriptor["payloadKeys"])
+		self.assertIn("bootstrapReport", descriptor["payloadKeys"])
 		self.assertIn("compatibilityReport", descriptor["payloadKeys"])
 		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
@@ -2182,6 +2183,30 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		}
 		with self.assertRaises(ValueError):
 			terminal["createHostPreflightReport"](raiseOnFailure=True)
+
+	def testCreateHostBootstrapReportPassesWithDefaults(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		report = terminal["createHostBootstrapReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertIn("startupBundle", report["passedChecks"])
+		self.assertIn("compatibilityReport", report["passedChecks"])
+		self.assertIn("schemaDescriptor", report["passedChecks"])
+		self.assertIn("sanityAction", report["passedChecks"])
+		self.assertIsNotNone(report["sanityAction"])
+		self.assertEqual(report["sanityAction"]["actionSummary"]["actionState"], "handled")
+
+	def testCreateHostBootstrapReportCapturesCompatibilityFailure(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["createHostBootstrapReport"](requiredApiVersion="9.9.9")
+		self.assertEqual(report["ok"], False)
+		self.assertIn("compatibilityReport", report["failedChecks"])
+		self.assertEqual(report["compatibilityReport"]["ok"], False)
+
+	def testCreateHostBootstrapReportRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["createHostBootstrapReport"](requiredApiVersion="9.9.9", raiseOnFailure=True)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

@@ -1681,6 +1681,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("allowedCommands", descriptor["payloadKeys"])
 		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
 		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
+		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
+		self.assertIn("stateDelta", descriptor["payloadKeys"])
 		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
@@ -1823,6 +1825,38 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["commandResult"]["handled"], True)
 		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
 		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testRunCommandWithStateDeltaDetectsChangedState(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["working"] = False
+		terminal["place"] = {4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0}
+		payload = terminal["runCommandWithStateDelta"]("w", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["handled"], True)
+		self.assertEqual(payload["stateDelta"]["changed"], True)
+		self.assertEqual(payload["stateDelta"]["phaseChanged"], False)
+
+	def testRunCommandWithStateDeltaDetectsUnchangedState(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runCommandWithStateDelta"]("notACommand", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["handled"], False)
+		self.assertEqual(payload["stateDelta"]["changed"], False)
+		self.assertEqual(payload["stateDelta"]["bankDelta"], 0)
+		self.assertEqual(payload["stateDelta"]["throwsDelta"], 0)
+
+	def testBuildStateDeltaSummaryDetectsPointAndPhaseTransition(self):
+		terminal = loadTerminalNamespace()
+		delta = terminal["buildStateDeltaSummary"](
+			beforeState={"bank": 100, "chipsOnTable": 0, "throws": 3, "comeOut": 0, "pointIsOn": False},
+			afterState={"bank": 100, "chipsOnTable": 0, "throws": 4, "comeOut": 8, "pointIsOn": True}
+		)
+		self.assertEqual(delta["changed"], True)
+		self.assertEqual(delta["pointChanged"], True)
+		self.assertEqual(delta["phaseChanged"], True)
+		self.assertEqual(delta["fromPoint"], 0)
+		self.assertEqual(delta["toPoint"], 8)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

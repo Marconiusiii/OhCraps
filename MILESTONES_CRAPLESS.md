@@ -2486,3 +2486,38 @@ New milestone updates should be appended here rather than creating new milestone
 	- Crapless mode display text
 	- schema descriptor includes `statusPanel`
 - Full suite remains green after this milestone.
+
+## Milestone 108: Lightweight State-Delta Helper for App Updates
+
+### What problem this solves
+- Full snapshots are useful, but sometimes the app only needs to know what changed.
+- Without a delta helper, the app has to compare large state objects itself.
+
+### What changed
+- Added `buildStateDeltaSummary(beforeState, afterState, pointPhase=None)`.
+- Added `runCommandWithStateDelta(commandText, pointPhase=False, autoCapture=False, raiseOnError=False)`.
+- The delta includes simple change signals:
+	- overall changed flag
+	- bank/chips/throws deltas
+	- point changed flag
+	- phase changed flag
+	- before/after point and phase values
+- Added `deltaSnapshot` and `stateDelta` keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can update UI using lightweight change signals.
+- Less host-side comparison logic.
+- Cleaner app update flow when only part of the screen changed.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- command path that changes state (`w` toggle with active bet)
+	- command path that does not change state (invalid command)
+	- point/phase transition detection via delta summary
+	- schema descriptor includes new delta contract keys
+- Full suite remains green after this milestone.

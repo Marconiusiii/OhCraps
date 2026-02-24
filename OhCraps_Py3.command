@@ -249,6 +249,13 @@ def hostSchemaDescriptor():
 				"commandSnapshot": [
 					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot"
 				],
+				"deltaSnapshot": [
+					"engineApiVersion", "success", "error", "commandResult", "stateDelta"
+				],
+				"stateDelta": [
+					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
+					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
+				],
 				"statusPanel": [
 					"engineApiVersion", "gameMode", "modeDisplay", "pointPhase", "phaseDisplay",
 					"point", "pointDisplay", "bank", "chipsOnTable", "throws", "bankrollDisplay", "throwDisplay"
@@ -370,6 +377,22 @@ def createHostStatusPanel(pointPhase=None):
 		"throwDisplay": throwDisplay
 	})
 
+def buildStateDeltaSummary(beforeState, afterState, pointPhase=None):
+	beforePointPhase = bool(beforeState.get("pointIsOn", False)) if pointPhase is None else bool(pointPhase)
+	afterPointPhase = bool(afterState.get("pointIsOn", False))
+	return {
+		"changed": bool(beforeState != afterState),
+		"bankDelta": int(afterState.get("bank", 0)) - int(beforeState.get("bank", 0)),
+		"chipsDelta": int(afterState.get("chipsOnTable", 0)) - int(beforeState.get("chipsOnTable", 0)),
+		"throwsDelta": int(afterState.get("throws", 0)) - int(beforeState.get("throws", 0)),
+		"pointChanged": int(afterState.get("comeOut", 0)) != int(beforeState.get("comeOut", 0)),
+		"phaseChanged": bool(beforePointPhase != afterPointPhase),
+		"fromPoint": int(beforeState.get("comeOut", 0)),
+		"toPoint": int(afterState.get("comeOut", 0)),
+		"fromPointPhase": bool(beforePointPhase),
+		"toPointPhase": bool(afterPointPhase)
+	}
+
 def runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
 	commandResult = submitCommand(
 		commandText=commandText,
@@ -383,6 +406,22 @@ def runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, r
 		"error": commandResult["error"],
 		"commandResult": commandResult,
 		"uiSnapshot": uiSnapshot
+	})
+
+def runCommandWithStateDelta(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
+	beforeState = getRuntimeState()
+	commandResult = submitCommand(
+		commandText=commandText,
+		pointPhase=pointPhase,
+		autoCapture=autoCapture,
+		raiseOnError=raiseOnError
+	)
+	afterState = getRuntimeState()
+	return withApiVersion({
+		"success": bool(commandResult["success"]),
+		"error": commandResult["error"],
+		"commandResult": commandResult,
+		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=pointPhase)
 	})
 
 def beginOutputCapture():

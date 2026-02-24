@@ -2191,3 +2191,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- command failure returns `commandExecutionFailed` schema.
 	- cycle failure returns `cycleExecutionFailed` schema.
 - Full suite remains green after this milestone.
+
+## Milestone 100: Centralized Host Payload Builders and Error Code Constants
+
+### What changed
+- Added host error code constants in one map:
+	- `hostErrorCodes["invalidStepArguments"]`
+	- `hostErrorCodes["commandExecutionFailed"]`
+	- `hostErrorCodes["cycleExecutionFailed"]`
+- Added shared host payload builders:
+	- `buildHostCommandPayload(...)`
+	- `buildHostStepPayload(...)`
+- Updated `submitCommand(...)` to build payloads through `buildHostCommandPayload(...)`.
+- Updated `step(...)` to build payloads through `buildHostStepPayload(...)` for:
+	- command step path
+	- invalid-argument path
+	- cycle path
+- Replaced inline error-code strings with `hostErrorCodes[...]` references in command/step error paths.
+
+### Why
+- Contract definitions were still duplicated inline across host entrypoints.
+- Central payload builders reduce schema drift risk and make host response changes safer.
+- Error-code constants eliminate typo/regression risk in host-side code that branches on codes.
+
+### Behavior
+- No craps rules/payout changes.
+- No bankroll/chips accounting changes.
+- Terminal game flow remains unchanged.
+- Host payload shape remains compatible; this milestone centralizes construction and stabilizes constants.
+
+### Test coverage
+- Added deterministic regression tests in `tests/testEngineBehavior.py` for:
+	- `hostErrorCodes` contract values.
+	- `buildHostCommandPayload(...)` canonical keys.
+	- `buildHostStepPayload(...)` canonical keys.
+- Updated existing error-path assertions to reference `hostErrorCodes` constants.
+- Full suite remains green after this milestone.

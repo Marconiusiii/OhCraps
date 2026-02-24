@@ -61,6 +61,12 @@ def withApiVersion(payload):
 	payloadDict["engineApiVersion"] = engineApiVersion
 	return payloadDict
 
+hostErrorCodes = {
+	"invalidStepArguments": "invalidStepArguments",
+	"commandExecutionFailed": "commandExecutionFailed",
+	"cycleExecutionFailed": "cycleExecutionFailed"
+}
+
 def hostErrorPayload(errorCode, errorMessage, details=None):
 	payload = {
 		"code": str(errorCode),
@@ -69,6 +75,31 @@ def hostErrorPayload(errorCode, errorMessage, details=None):
 	if details is not None:
 		payload["details"] = dict(details)
 	return payload
+
+def buildHostCommandPayload(command, pointPhase, shouldRoll, handled, runtimeState, capturedOutput, capturedPrompts, success=True, error=None):
+	return withApiVersion({
+		"success": bool(success),
+		"error": error,
+		"command": str(command),
+		"pointPhase": bool(pointPhase),
+		"shouldRoll": bool(shouldRoll),
+		"handled": bool(handled),
+		"runtimeState": dict(runtimeState),
+		"capturedOutput": list(capturedOutput),
+		"capturedPrompts": list(capturedPrompts)
+	})
+
+def buildHostStepPayload(stepType, commandResult, cycleResult, runtimeState, capturedOutput, capturedPrompts, success=True, error=None):
+	return withApiVersion({
+		"stepType": str(stepType),
+		"success": bool(success),
+		"error": error,
+		"commandResult": commandResult,
+		"cycleResult": cycleResult,
+		"runtimeState": dict(runtimeState),
+		"capturedOutput": list(capturedOutput),
+		"capturedPrompts": list(capturedPrompts)
+	})
 
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer
@@ -2725,7 +2756,7 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False, raiseOnError
 	except Exception as exc:
 		success = False
 		error = hostErrorPayload(
-			errorCode="commandExecutionFailed",
+			errorCode=hostErrorCodes["commandExecutionFailed"],
 			errorMessage=str(exc),
 			details={
 				"exceptionType": type(exc).__name__,
@@ -2735,51 +2766,51 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		)
 		if raiseOnError:
 			raise
-	resultPayload = withApiVersion({
-		"success": bool(success),
-		"error": error,
-		"command": commandValue,
-		"pointPhase": bool(pointPhase),
-		"shouldRoll": bool(commandResult.shouldRoll) if commandResult is not None else False,
-		"handled": bool(commandResult.handled) if commandResult is not None else False,
-		"runtimeState": getRuntimeState(),
-		"capturedOutput": capturedOutput,
-		"capturedPrompts": capturedPrompts
-	})
+	resultPayload = buildHostCommandPayload(
+		command=commandValue,
+		pointPhase=pointPhase,
+		shouldRoll=(bool(commandResult.shouldRoll) if commandResult is not None else False),
+		handled=(bool(commandResult.handled) if commandResult is not None else False),
+		runtimeState=getRuntimeState(),
+		capturedOutput=capturedOutput,
+		capturedPrompts=capturedPrompts,
+		success=success,
+		error=error
+	)
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
 
 def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=False):
 	if commandText is not None:
 		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase, autoCapture=autoCapture, raiseOnError=raiseOnError)
-		stepPayload = withApiVersion({
-			"stepType": "command",
-			"success": bool(commandPayload["success"]),
-			"error": commandPayload["error"],
-			"commandResult": commandPayload,
-			"cycleResult": None,
-			"runtimeState": commandPayload["runtimeState"],
-			"capturedOutput": list(commandPayload["capturedOutput"]),
-			"capturedPrompts": list(commandPayload["capturedPrompts"])
-		})
+		stepPayload = buildHostStepPayload(
+			stepType="command",
+			success=commandPayload["success"],
+			error=commandPayload["error"],
+			commandResult=commandPayload,
+			cycleResult=None,
+			runtimeState=commandPayload["runtimeState"],
+			capturedOutput=commandPayload["capturedOutput"],
+			capturedPrompts=commandPayload["capturedPrompts"]
+		)
 		emitEvent("stepCompleted", stepPayload)
 		return stepPayload
 	if pointPhase:
 		errorPayload = hostErrorPayload(
-			errorCode="invalidStepArguments",
+			errorCode=hostErrorCodes["invalidStepArguments"],
 			errorMessage="pointPhase can only be used with commandText.",
 			details={"pointPhase": True, "commandText": None}
 		)
-		stepPayload = withApiVersion({
-			"stepType": "cycle",
-			"success": False,
-			"error": errorPayload,
-			"commandResult": None,
-			"cycleResult": None,
-			"runtimeState": getRuntimeState(),
-			"capturedOutput": getCapturedOutput(),
-			"capturedPrompts": getCapturedPrompts()
-		})
+		stepPayload = buildHostStepPayload(
+			stepType="cycle",
+			success=False,
+			error=errorPayload,
+			commandResult=None,
+			cycleResult=None,
+			runtimeState=getRuntimeState(),
+			capturedOutput=getCapturedOutput(),
+			capturedPrompts=getCapturedPrompts()
+		)
 		emitEvent("stepCompleted", stepPayload)
 		if raiseOnError:
 			raise ValueError("pointPhase can only be used with commandText.")
@@ -2802,22 +2833,22 @@ def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=Fal
 	except Exception as exc:
 		success = False
 		error = hostErrorPayload(
-			errorCode="cycleExecutionFailed",
+			errorCode=hostErrorCodes["cycleExecutionFailed"],
 			errorMessage=str(exc),
 			details={"exceptionType": type(exc).__name__}
 		)
 		if raiseOnError:
 			raise
-	stepPayload = withApiVersion({
-		"stepType": "cycle",
-		"success": bool(success),
-		"error": error,
-		"commandResult": None,
-		"cycleResult": dict(cyclePayload) if cyclePayload is not None else None,
-		"runtimeState": getRuntimeState(),
-		"capturedOutput": capturedOutput,
-		"capturedPrompts": capturedPrompts
-	})
+	stepPayload = buildHostStepPayload(
+		stepType="cycle",
+		success=success,
+		error=error,
+		commandResult=None,
+		cycleResult=(dict(cyclePayload) if cyclePayload is not None else None),
+		runtimeState=getRuntimeState(),
+		capturedOutput=capturedOutput,
+		capturedPrompts=capturedPrompts
+	)
 	emitEvent("stepCompleted", stepPayload)
 	return stepPayload
 

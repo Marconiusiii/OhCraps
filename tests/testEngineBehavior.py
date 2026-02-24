@@ -1679,6 +1679,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("command", descriptor["payloadKeys"])
 		self.assertIn("step", descriptor["payloadKeys"])
 		self.assertIn("sessionBundle", descriptor["payloadKeys"])
+		self.assertIn("sessionCompatibilityReport", descriptor["payloadKeys"])
 		self.assertIn("startupBundle", descriptor["payloadKeys"])
 		self.assertIn("allowedCommands", descriptor["payloadKeys"])
 		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
@@ -2988,6 +2989,50 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(bundle["runtimeState"]["bank"], 123)
 		self.assertEqual(bundle["captureState"]["outputCaptureOn"], True)
 		self.assertEqual(bundle["captureState"]["promptCaptureBuffer"], ["p1"])
+		self.assertEqual(bundle["hostMetadata"]["bundleFormat"], "sessionBundleV1")
+		self.assertEqual(bundle["hostMetadata"]["bundleFormatVersion"], terminal["sessionBundleFormatVersion"])
+
+	def testValidateSessionBundleCompatibilityPassesForExportedBundle(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		report = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["missingKeys"], [])
+		self.assertEqual(report["reasons"], [])
+		self.assertEqual(report["bundleEngineApiVersion"], terminal["engineApiVersion"])
+
+	def testValidateSessionBundleCompatibilityFailsForVersionMismatch(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		bundle["engineApiVersion"] = "0.0.1"
+		report = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(report["ok"], False)
+		self.assertIn("Unsupported session bundle version.", report["reasons"][0])
+
+	def testValidateSessionBundleCompatibilityFailsForMissingKeys(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		del bundle["hostMetadata"]
+		del bundle["runtimeState"]
+		report = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(report["ok"], False)
+		self.assertIn("hostMetadata", report["missingKeys"])
+		self.assertIn("runtimeState", report["missingKeys"])
+
+	def testValidateSessionBundleCompatibilityFailsForBundleFormatMismatch(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		bundle["hostMetadata"]["bundleFormat"] = "sessionBundleV9"
+		report = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(report["ok"], False)
+		self.assertIn("Unsupported session bundle format.", report["reasons"][-1])
+
+	def testValidateSessionBundleCompatibilityRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		bundle["bundleType"] = "wrongType"
+		with self.assertRaises(ValueError):
+			terminal["validateSessionBundleCompatibility"](bundle, raiseOnFailure=True)
 
 	def testImportSessionBundleRoundTripRestoresState(self):
 		terminal = loadTerminalNamespace()
@@ -3014,6 +3059,13 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		bundle = terminal["exportSessionBundle"]()
 		bundle["engineApiVersion"] = "0.0.1"
+		with self.assertRaises(ValueError):
+			terminal["importSessionBundle"](bundle)
+
+	def testImportSessionBundleRejectsMissingHostMetadata(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		del bundle["hostMetadata"]
 		with self.assertRaises(ValueError):
 			terminal["importSessionBundle"](bundle)
 

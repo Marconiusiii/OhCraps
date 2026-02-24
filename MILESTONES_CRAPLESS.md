@@ -2986,3 +2986,42 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added focused compatibility validator tests and schema coverage.
 - Full suite remains green after this milestone.
+
+## Milestone 121: Session Bundle Compatibility Guardrails
+
+### What problem this solves
+- Save/import needed a stricter compatibility gate so app integrations do not load unsupported or incomplete bundles.
+
+### What changed
+- Added `sessionBundleFormatVersion = "1"`.
+- Added `sessionCompatibilityReport` contract keys in `hostSchemaDescriptor()`.
+- Added `validateSessionBundleCompatibility(...)` with strict mode support.
+- Updated `exportSessionBundle()` metadata to include:
+	- `bundleFormat`
+	- `bundleFormatVersion`
+- Updated `importSessionBundle()` to validate compatibility before applying runtime state.
+
+### Why this helps
+- Import now fails fast with deterministic reasons when bundle version/type/format/required keys are wrong.
+- This reduces hidden save/load corruption risk for iOS/web host integration.
+
+### How to use
+- Compatibility check before import:
+	- `validateSessionBundleCompatibility(bundle)`
+- Strict gate (raises on failure):
+	- `validateSessionBundleCompatibility(bundle, raiseOnFailure=True)`
+
+### How to run in your test cycle
+- Focused session compatibility tests:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k SessionBundleCompatibility`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for pass, version mismatch, missing keys, format mismatch, and strict raise behavior.
+- Full suite remains green after this milestone.

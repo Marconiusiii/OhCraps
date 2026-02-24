@@ -8,6 +8,7 @@ from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsFor
 #Version Number
 version = "7.0.0"
 engineApiVersion = "1.0.0"
+sessionBundleFormatVersion = "1"
 
 outputHandler = None
 inputHandler = None
@@ -251,9 +252,14 @@ def hostSchemaDescriptor():
 				"engineApiVersion", "stepType", "success", "error", "commandResult",
 				"cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"
 			],
-			"sessionBundle": [
-				"engineApiVersion", "bundleType", "runtimeState", "gameMode", "captureState", "hostMetadata"
-			],
+				"sessionBundle": [
+					"engineApiVersion", "bundleType", "runtimeState", "gameMode", "captureState", "hostMetadata"
+				],
+				"sessionCompatibilityReport": [
+					"engineApiVersion", "ok", "expectedEngineApiVersion", "bundleEngineApiVersion",
+					"expectedBundleType", "bundleType", "expectedBundleFormat", "bundleFormat",
+					"requiredKeys", "missingKeys", "reasons"
+				],
 			"startupBundle": [
 				"engineApiVersion", "success", "error", "initialized", "runtimeState",
 				"schemaDescriptor", "compatibility", "features"
@@ -2727,25 +2733,71 @@ def exportSessionBundle():
 		},
 		"hostMetadata": {
 			"appName": "Oh Craps",
-			"bundleFormat": "sessionBundleV1"
+			"bundleFormat": "sessionBundleV1",
+			"bundleFormatVersion": sessionBundleFormatVersion
 		}
 	})
 
-def importSessionBundle(bundle):
-	global outputCaptureOn, outputCaptureBuffer, promptCaptureOn, promptCaptureBuffer
+def validateSessionBundleCompatibility(bundle, expectedEngineApiVersion=None, expectedBundleType="ohcrapsSession", expectedBundleFormat="sessionBundleV1", raiseOnFailure=False):
+	requiredKeys = ["engineApiVersion", "bundleType", "runtimeState", "captureState", "hostMetadata"]
+	missingKeys = []
+	reasons = []
 	if not isinstance(bundle, dict):
-		raise ValueError("Session bundle must be a dictionary.")
-	if bundle.get("engineApiVersion") != engineApiVersion:
-		raise ValueError("Unsupported session bundle version.")
-	requiredKeys = ["bundleType", "runtimeState", "captureState"]
+		report = withApiVersion({
+			"ok": False,
+			"expectedEngineApiVersion": str(expectedEngineApiVersion) if expectedEngineApiVersion is not None else str(engineApiVersion),
+			"bundleEngineApiVersion": None,
+			"expectedBundleType": str(expectedBundleType),
+			"bundleType": None,
+			"expectedBundleFormat": str(expectedBundleFormat),
+			"bundleFormat": None,
+			"requiredKeys": requiredKeys,
+			"missingKeys": requiredKeys,
+			"reasons": ["Session bundle must be a dictionary."]
+		})
+		if raiseOnFailure:
+			raise ValueError(report["reasons"][0])
+		return report
 	for key in requiredKeys:
 		if key not in bundle:
-			raise ValueError(f"Missing required bundle key: {key}")
-	if bundle["bundleType"] != "ohcrapsSession":
-		raise ValueError("Unsupported session bundle type.")
+			missingKeys.append(str(key))
+	if len(missingKeys) > 0:
+		reasons.append(f"Missing required bundle key(s): {', '.join(missingKeys)}")
+	expectedVersion = str(expectedEngineApiVersion) if expectedEngineApiVersion is not None else str(engineApiVersion)
+	if str(bundle.get("engineApiVersion")) != expectedVersion:
+		reasons.append(f"Unsupported session bundle version. Expected {expectedVersion}, got {bundle.get('engineApiVersion')}.")
+	if str(bundle.get("bundleType")) != str(expectedBundleType):
+		reasons.append(f"Unsupported session bundle type. Expected {expectedBundleType}, got {bundle.get('bundleType')}.")
+	hostMetadata = bundle.get("hostMetadata")
+	bundleFormat = None
+	if not isinstance(hostMetadata, dict):
+		reasons.append("Invalid hostMetadata in session bundle.")
+	else:
+		bundleFormat = hostMetadata.get("bundleFormat")
+		if str(bundleFormat) != str(expectedBundleFormat):
+			reasons.append(f"Unsupported session bundle format. Expected {expectedBundleFormat}, got {bundleFormat}.")
+	if "captureState" in bundle and not isinstance(bundle["captureState"], dict):
+		reasons.append("Invalid captureState in session bundle.")
+	report = withApiVersion({
+		"ok": len(reasons) == 0,
+		"expectedEngineApiVersion": expectedVersion,
+		"bundleEngineApiVersion": str(bundle.get("engineApiVersion")) if "engineApiVersion" in bundle else None,
+		"expectedBundleType": str(expectedBundleType),
+		"bundleType": str(bundle.get("bundleType")) if "bundleType" in bundle else None,
+		"expectedBundleFormat": str(expectedBundleFormat),
+		"bundleFormat": (str(bundleFormat) if bundleFormat is not None else None),
+		"requiredKeys": requiredKeys,
+		"missingKeys": missingKeys,
+		"reasons": reasons
+	})
+	if raiseOnFailure and not bool(report["ok"]):
+		raise ValueError("; ".join(reasons))
+	return report
+
+def importSessionBundle(bundle):
+	global outputCaptureOn, outputCaptureBuffer, promptCaptureOn, promptCaptureBuffer
+	validateSessionBundleCompatibility(bundle, raiseOnFailure=True)
 	captureState = bundle["captureState"]
-	if not isinstance(captureState, dict):
-		raise ValueError("Invalid captureState in session bundle.")
 	setRuntimeState(bundle["runtimeState"])
 	outputCaptureOn = bool(captureState.get("outputCaptureOn", False))
 	outputCaptureBuffer = list(captureState.get("outputCaptureBuffer", []))

@@ -2586,6 +2586,19 @@ def handleBettingCommand(command, pointPhase=False):
 	writeOutput("That's not an option, silly!")
 	return returnCommandResult(shouldRoll=False, handled=False)
 
+def submitCommand(commandText, pointPhase=False):
+	commandValue = str(commandText).strip().lower()
+	commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
+	resultPayload = {
+		"command": commandValue,
+		"pointPhase": bool(pointPhase),
+		"shouldRoll": bool(commandResult.shouldRoll),
+		"handled": bool(commandResult.handled),
+		"runtimeState": getRuntimeState()
+	}
+	emitEvent("commandProcessed", resultPayload)
+	return resultPayload
+
 def resolveComeOutRoll():
 	global comeOut, throws, working, pointIsOn
 	syncRuntimeFromGlobals()

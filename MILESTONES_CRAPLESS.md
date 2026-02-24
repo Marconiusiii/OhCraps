@@ -1864,3 +1864,37 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRunGameTransitionsIntoPointPhaseRound`
 - Compile check passed.
 - Full suite remains green (`259` tests passing).
+
+## Milestone 91: Host-Facing Command Submission API
+
+### What changed
+- Added host-facing command wrapper:
+	- `submitCommand(commandText, pointPhase=False)`
+- `submitCommand(...)` now:
+	- normalizes input command text
+	- executes command via `handleBettingCommand(...)`
+	- returns normalized result payload containing:
+		- `command`
+		- `pointPhase`
+		- `shouldRoll`
+		- `handled`
+		- `runtimeState`
+	- emits `commandProcessed` event with the same payload
+
+### Why
+- Hosts (iOS/web) need a stable command-entry API rather than directly calling terminal-oriented command handlers.
+- Returning runtime state with each command result reduces host-side polling and simplifies UI refresh logic.
+- Event emission gives hosts an immediate push signal for command lifecycle handling.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Existing command handling behavior preserved.
+
+### Test coverage
+- Added deterministic command API regressions in `tests/testEngineBehavior.py`:
+	- `testSubmitCommandReturnsNormalizedPayload`
+	- `testSubmitCommandReturnsUnhandledPayload`
+	- `testSubmitCommandEmitsCommandProcessedEvent`
+- Compile check passed.
+- Full suite remains green (`262` tests passing).

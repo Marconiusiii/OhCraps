@@ -1359,6 +1359,37 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(calls, [True])
 
+	def testSubmitCommandReturnsNormalizedPayload(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["submitCommand"]("x", pointPhase=True)
+		self.assertEqual(payload["command"], "x")
+		self.assertEqual(payload["pointPhase"], True)
+		self.assertEqual(payload["shouldRoll"], True)
+		self.assertEqual(payload["handled"], True)
+		self.assertIn("runtimeState", payload)
+
+	def testSubmitCommandReturnsUnhandledPayload(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["submitCommand"]("notACommand", pointPhase=False)
+		self.assertEqual(payload["command"], "notacommand")
+		self.assertEqual(payload["pointPhase"], False)
+		self.assertEqual(payload["shouldRoll"], False)
+		self.assertEqual(payload["handled"], False)
+		self.assertIn("runtimeState", payload)
+
+	def testSubmitCommandEmitsCommandProcessedEvent(self):
+		terminal = loadTerminalNamespace()
+		events = []
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		payload = terminal["submitCommand"]("x", pointPhase=False)
+		self.assertEqual(len(events), 1)
+		self.assertEqual(events[0][0], "commandProcessed")
+		self.assertEqual(events[0][1]["command"], "x")
+		self.assertEqual(events[0][1]["shouldRoll"], True)
+		self.assertEqual(events[0][1]["handled"], True)
+		self.assertEqual(events[0][1], payload)
+		terminal["resetEventHandler"]()
+
 	def testResolveComeOutRollNaturalResetsThrowCount(self):
 		terminal = loadTerminalNamespace()
 		terminal["atsOn"] = False

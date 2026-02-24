@@ -2033,3 +2033,39 @@ New milestone updates should be appended here rather than creating new milestone
 - Updated command/step payload shape regressions to assert `capturedPrompts` presence.
 - Compile check passed.
 - Full suite remains green (`271` tests passing).
+
+## Milestone 96: Scoped Capture Helper and autoCapture Host API Option
+
+### What changed
+- Added scoped capture helper:
+	- `runWithCapture(func)`
+	- begins output + prompt capture, executes function, returns:
+		- `result`
+		- `capturedOutput`
+		- `capturedPrompts`
+	- restores prior capture states/buffers in a `finally` block (exception-safe)
+- Extended host APIs with optional auto capture mode:
+	- `submitCommand(commandText, pointPhase=False, autoCapture=False)`
+	- `step(commandText=None, pointPhase=False, autoCapture=False)`
+- `autoCapture=True` now wraps execution through `runWithCapture(...)` and includes scoped transcripts in payloads.
+- Default behavior remains unchanged when `autoCapture=False`.
+
+### Why
+- Hosts previously had to manually coordinate capture lifecycle around every call.
+- `runWithCapture(...)` centralizes that orchestration and guarantees cleanup on failure.
+- Optional `autoCapture` makes iOS/web host calls simpler and less error-prone.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Existing API behavior preserved when `autoCapture` is not used.
+
+### Test coverage
+- Added deterministic scoped-capture/autoCapture regressions in `tests/testEngineBehavior.py`:
+	- `testRunWithCaptureCapturesAndRestoresState`
+	- `testRunWithCaptureRestoresStateAfterException`
+	- `testSubmitCommandAutoCaptureIncludesOutputAndPrompts`
+	- `testStepAutoCaptureCycleIncludesCapturedOutput`
+- Existing command/step payload regressions remain green.
+- Compile check passed.
+- Full suite remains green (`275` tests passing).

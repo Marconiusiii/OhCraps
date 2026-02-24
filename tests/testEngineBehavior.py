@@ -1447,6 +1447,36 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["endPromptCapture"]()
 		terminal["resetIoHandlers"]()
 
+	def testRunWithCaptureCapturesAndRestoresState(self):
+		terminal = loadTerminalNamespace()
+		terminal["setIoHandlers"](outputFunc=lambda message: None, inputFunc=lambda promptText: "done")
+		captureResult = terminal["runWithCapture"](lambda: (terminal["writeOutput"]("hello"), terminal["readInput"]("Prompt > ")))
+		self.assertIn("hello", captureResult["capturedOutput"])
+		self.assertIn("Prompt > ", captureResult["capturedPrompts"])
+		self.assertEqual(terminal["outputCaptureOn"], False)
+		self.assertEqual(terminal["promptCaptureOn"], False)
+		self.assertEqual(terminal["getCapturedOutput"](), [])
+		self.assertEqual(terminal["getCapturedPrompts"](), [])
+		terminal["resetIoHandlers"]()
+
+	def testRunWithCaptureRestoresStateAfterException(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(RuntimeError):
+			terminal["runWithCapture"](lambda: (_ for _ in ()).throw(RuntimeError("boom")))
+		self.assertEqual(terminal["outputCaptureOn"], False)
+		self.assertEqual(terminal["promptCaptureOn"], False)
+
+	def testSubmitCommandAutoCaptureIncludesOutputAndPrompts(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		inputs = iter(["y", "10"])
+		terminal["setIoHandlers"](inputFunc=lambda promptText: next(inputs))
+		payload = terminal["submitCommand"]("f", pointPhase=False, autoCapture=True)
+		self.assertIn("How much on the Field?", " ".join(payload["capturedOutput"]))
+		self.assertIn("Field Bet? > ", payload["capturedPrompts"])
+		self.assertIn("$>", " ".join(payload["capturedPrompts"]))
+		terminal["resetIoHandlers"]()
+
 	def testStepCommandReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
 		stepPayload = terminal["step"](commandText="x", pointPhase=True)
@@ -1476,6 +1506,19 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("runtimeState", stepPayload)
 		self.assertIn("capturedOutput", stepPayload)
 		self.assertIn("capturedPrompts", stepPayload)
+
+	def testStepAutoCaptureCycleIncludesCapturedOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["runOneCycle"] = lambda: (terminal["writeOutput"]("cycle message"), {
+			"enteredPointPhase": False,
+			"comeOutOutcome": terminal["RollOutcome"].natural,
+			"pointPhaseOutcome": None,
+			"pointRoundEnded": False,
+			"point": 0,
+			"throws": 1
+		})[1]
+		stepPayload = terminal["step"](autoCapture=True)
+		self.assertIn("cycle message", " ".join(stepPayload["capturedOutput"]))
 
 	def testStepEmitsStepCompletedEvent(self):
 		terminal = loadTerminalNamespace()

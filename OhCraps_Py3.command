@@ -81,6 +81,27 @@ def endPromptCapture():
 def getCapturedPrompts():
 	return list(promptCaptureBuffer)
 
+def runWithCapture(func):
+	global outputCaptureOn, outputCaptureBuffer, promptCaptureOn, promptCaptureBuffer
+	priorOutputCaptureOn = bool(outputCaptureOn)
+	priorPromptCaptureOn = bool(promptCaptureOn)
+	priorOutputBuffer = list(outputCaptureBuffer)
+	priorPromptBuffer = list(promptCaptureBuffer)
+	beginOutputCapture()
+	beginPromptCapture()
+	try:
+		resultValue = func()
+		return {
+			"result": resultValue,
+			"capturedOutput": getCapturedOutput(),
+			"capturedPrompts": getCapturedPrompts()
+		}
+	finally:
+		outputCaptureOn = priorOutputCaptureOn
+		promptCaptureOn = priorPromptCaptureOn
+		outputCaptureBuffer = priorOutputBuffer if priorOutputCaptureOn else []
+		promptCaptureBuffer = priorPromptBuffer if priorPromptCaptureOn else []
+
 def writeOutput(message):
 	global outputCaptureBuffer
 	if outputCaptureOn:
@@ -2626,24 +2647,32 @@ def handleBettingCommand(command, pointPhase=False):
 	writeOutput("That's not an option, silly!")
 	return returnCommandResult(shouldRoll=False, handled=False)
 
-def submitCommand(commandText, pointPhase=False):
+def submitCommand(commandText, pointPhase=False, autoCapture=False):
 	commandValue = str(commandText).strip().lower()
-	commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
+	if autoCapture:
+		captureResult = runWithCapture(lambda: handleBettingCommand(commandValue, pointPhase=pointPhase))
+		commandResult = captureResult["result"]
+		capturedOutput = list(captureResult["capturedOutput"])
+		capturedPrompts = list(captureResult["capturedPrompts"])
+	else:
+		commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
+		capturedOutput = getCapturedOutput()
+		capturedPrompts = getCapturedPrompts()
 	resultPayload = {
 		"command": commandValue,
 		"pointPhase": bool(pointPhase),
 		"shouldRoll": bool(commandResult.shouldRoll),
 		"handled": bool(commandResult.handled),
 		"runtimeState": getRuntimeState(),
-		"capturedOutput": getCapturedOutput(),
-		"capturedPrompts": getCapturedPrompts()
+		"capturedOutput": capturedOutput,
+		"capturedPrompts": capturedPrompts
 	}
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
 
-def step(commandText=None, pointPhase=False):
+def step(commandText=None, pointPhase=False, autoCapture=False):
 	if commandText is not None:
-		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase)
+		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase, autoCapture=autoCapture)
 		stepPayload = {
 			"stepType": "command",
 			"commandResult": commandPayload,
@@ -2656,14 +2685,22 @@ def step(commandText=None, pointPhase=False):
 		return stepPayload
 	if pointPhase:
 		raise ValueError("pointPhase can only be used with commandText.")
-	cyclePayload = runOneCycle()
+	if autoCapture:
+		captureResult = runWithCapture(lambda: runOneCycle())
+		cyclePayload = captureResult["result"]
+		capturedOutput = list(captureResult["capturedOutput"])
+		capturedPrompts = list(captureResult["capturedPrompts"])
+	else:
+		cyclePayload = runOneCycle()
+		capturedOutput = getCapturedOutput()
+		capturedPrompts = getCapturedPrompts()
 	stepPayload = {
 		"stepType": "cycle",
 		"commandResult": None,
 		"cycleResult": dict(cyclePayload),
 		"runtimeState": getRuntimeState(),
-		"capturedOutput": getCapturedOutput(),
-		"capturedPrompts": getCapturedPrompts()
+		"capturedOutput": capturedOutput,
+		"capturedPrompts": capturedPrompts
 	}
 	emitEvent("stepCompleted", stepPayload)
 	return stepPayload

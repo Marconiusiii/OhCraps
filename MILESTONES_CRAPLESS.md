@@ -2942,3 +2942,47 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Script itself runs existing validated test gates.
 - Full suite remains green after this milestone.
+
+## Milestone 120: Host API Compatibility Guardrails
+
+### What problem this solves
+- Host integrations (iOS/web) needed a strict compatibility gate before consuming engine contracts.
+- There was no one-call validator that checked version, required payload contracts, and required error-code keys together.
+
+### What changed
+- Added `hostCorePayloadKeys` and `hostCoreErrorCodeKeys` as default contract requirements.
+- Added `validateHostApiCompatibility(expectedApiVersion=None, requiredPayloadKeys=None, requiredErrorCodes=None, raiseOnFailure=False)`.
+- Added `compatibilityReport` to `hostSchemaDescriptor()` payload keys.
+- Added tests for:
+	- default pass path
+	- version mismatch path
+	- missing payload key path
+	- missing error-code key path
+	- strict raise path
+
+### Why this helps
+- iOS/web startup flows can fail fast when contract mismatch is detected.
+- Compatibility checks are deterministic and easy to automate in your solo QA cycle.
+
+### How to use
+- Default guardrail check:
+	- `validateHostApiCompatibility()`
+- Explicit version gate:
+	- `validateHostApiCompatibility(expectedApiVersion="1.0.0")`
+- Strict integration gate:
+	- `validateHostApiCompatibility(raiseOnFailure=True)`
+
+### How to run in your test cycle
+- Quick compatibility-only run:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k ValidateHostApiCompatibility`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added focused compatibility validator tests and schema coverage.
+- Full suite remains green after this milestone.

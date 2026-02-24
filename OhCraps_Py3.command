@@ -70,6 +70,23 @@ hostErrorCodes = {
 	"invalidReplayInput": "invalidReplayInput"
 }
 
+hostCorePayloadKeys = [
+	"command",
+	"step",
+	"startupBundle",
+	"workflowReport",
+	"soloDebugBundle"
+]
+
+hostCoreErrorCodeKeys = [
+	"invalidStepArguments",
+	"commandExecutionFailed",
+	"cycleExecutionFailed",
+	"startupValidationFailed",
+	"invalidActionInput",
+	"invalidReplayInput"
+]
+
 def hostErrorPayload(errorCode, errorMessage, details=None):
 	payload = {
 		"code": str(errorCode),
@@ -275,6 +292,10 @@ def hostSchemaDescriptor():
 				"workflowReport": [
 					"engineApiVersion", "ok", "passedSteps", "failedSteps", "steps", "finalRuntimeState"
 				],
+				"compatibilityReport": [
+					"engineApiVersion", "ok", "expectedApiVersion", "schemaApiVersion",
+					"requiredPayloadKeys", "requiredErrorCodes", "missingPayloadKeys", "missingErrorCodes", "reasons"
+				],
 				"soloDebugBundle": [
 					"engineApiVersion", "ok", "summaryLine", "actionExecuted", "actionResult",
 					"workflowStatus", "healthReport", "statusPanel", "uiSnapshot"
@@ -320,6 +341,36 @@ def checkHostCompatibility(requiredApiVersion=None, requiredFeatures=None):
 		"missingFeatures": missingFeatures,
 		"reasons": reasons
 	})
+
+def validateHostApiCompatibility(expectedApiVersion=None, requiredPayloadKeys=None, requiredErrorCodes=None, raiseOnFailure=False):
+	schemaDescriptor = hostSchemaDescriptor()
+	schemaPayloadKeys = schemaDescriptor.get("payloadKeys", {})
+	schemaErrorCodes = schemaDescriptor.get("errorCodes", {})
+	requestedApiVersion = str(expectedApiVersion) if expectedApiVersion is not None else str(engineApiVersion)
+	requestedPayloadKeys = [str(key) for key in (requiredPayloadKeys if requiredPayloadKeys is not None else hostCorePayloadKeys)]
+	requestedErrorCodes = [str(key) for key in (requiredErrorCodes if requiredErrorCodes is not None else hostCoreErrorCodeKeys)]
+	missingPayloadKeys = [key for key in requestedPayloadKeys if key not in schemaPayloadKeys]
+	missingErrorCodes = [key for key in requestedErrorCodes if key not in schemaErrorCodes]
+	reasons = []
+	if requestedApiVersion != str(schemaDescriptor.get("engineApiVersion")):
+		reasons.append(f"Schema engineApiVersion mismatch. Expected {requestedApiVersion}, got {schemaDescriptor.get('engineApiVersion')}.")
+	if len(missingPayloadKeys) > 0:
+		reasons.append(f"Missing payload keys: {', '.join(missingPayloadKeys)}")
+	if len(missingErrorCodes) > 0:
+		reasons.append(f"Missing error codes: {', '.join(missingErrorCodes)}")
+	report = withApiVersion({
+		"ok": len(reasons) == 0,
+		"expectedApiVersion": requestedApiVersion,
+		"schemaApiVersion": str(schemaDescriptor.get("engineApiVersion")),
+		"requiredPayloadKeys": requestedPayloadKeys,
+		"requiredErrorCodes": requestedErrorCodes,
+		"missingPayloadKeys": missingPayloadKeys,
+		"missingErrorCodes": missingErrorCodes,
+		"reasons": reasons
+	})
+	if raiseOnFailure and not bool(report["ok"]):
+		raise ValueError("; ".join(reasons))
+	return report
 
 def createHostStartupBundle(requiredApiVersion=None, requiredFeatures=None, startBank=None, selectedMode=None):
 	shouldInitialize = (startBank is not None or selectedMode is not None)

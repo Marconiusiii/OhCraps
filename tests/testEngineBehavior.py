@@ -1688,6 +1688,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
 		self.assertIn("workflowReport", descriptor["payloadKeys"])
+		self.assertIn("compatibilityReport", descriptor["payloadKeys"])
 		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
 		self.assertIn("actionLogRun", descriptor["payloadKeys"])
@@ -2195,6 +2196,41 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["compatible"], False)
 		self.assertEqual(result["missingFeatures"], ["nonexistentFeature"])
 		self.assertIn("Missing required features: nonexistentFeature", result["reasons"])
+
+	def testValidateHostApiCompatibilityPassesWithDefaults(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["validateHostApiCompatibility"]()
+		self.assertEqual(result["ok"], True)
+		self.assertEqual(result["expectedApiVersion"], terminal["engineApiVersion"])
+		self.assertEqual(result["schemaApiVersion"], terminal["engineApiVersion"])
+		self.assertEqual(result["missingPayloadKeys"], [])
+		self.assertEqual(result["missingErrorCodes"], [])
+		self.assertEqual(result["reasons"], [])
+
+	def testValidateHostApiCompatibilityFailsForVersionMismatch(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["validateHostApiCompatibility"](expectedApiVersion="9.9.9")
+		self.assertEqual(result["ok"], False)
+		self.assertIn("Schema engineApiVersion mismatch.", result["reasons"][0])
+
+	def testValidateHostApiCompatibilityFailsForMissingPayloadKey(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["validateHostApiCompatibility"](requiredPayloadKeys=["notARealPayload"])
+		self.assertEqual(result["ok"], False)
+		self.assertEqual(result["missingPayloadKeys"], ["notARealPayload"])
+		self.assertIn("Missing payload keys: notARealPayload", result["reasons"])
+
+	def testValidateHostApiCompatibilityFailsForMissingErrorCode(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["validateHostApiCompatibility"](requiredErrorCodes=["notARealErrorCode"])
+		self.assertEqual(result["ok"], False)
+		self.assertEqual(result["missingErrorCodes"], ["notARealErrorCode"])
+		self.assertIn("Missing error codes: notARealErrorCode", result["reasons"])
+
+	def testValidateHostApiCompatibilityRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["validateHostApiCompatibility"](requiredPayloadKeys=["notARealPayload"], raiseOnFailure=True)
 
 	def testSubmitCommandReturnsStructuredErrorPayloadOnFailure(self):
 		terminal = loadTerminalNamespace()

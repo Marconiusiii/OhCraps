@@ -1416,6 +1416,62 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["layOff"], False)
 		self.assertEqual(terminal["hardOff"], False)
 
+	def testResolvePointRollPointHitUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["fireBet"] = 0
+		terminal["throws"] = 3
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 8
+		terminal["p2"] = 0
+		terminal["placeOff"] = False
+		terminal["layOff"] = False
+		terminal["hardOff"] = False
+		terminal["roll"] = lambda: 8
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].pointHit
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["lineCheck"] = lambda pointNumber, rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			result = terminal["resolvePointRoll"]()
+		self.assertEqual(result.pointRoundEnded, True)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("Point Hit! Front line winner!", " ".join(writes))
+
+	def testRollUsesWriteOutputForHardWayCall(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["pointIsOn"] = False
+		terminal["rollDice"] = lambda: type("diceResult", (), {"die1": 3, "die2": 3, "total": 6})()
+		terminal["stickman"] = lambda rollValue: "hard call"
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			rollTotal = terminal["roll"]()
+		self.assertEqual(rollTotal, 6)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("6 the Hard Way!", " ".join(writes))
+		self.assertIn("hard call", " ".join(writes))
+
+	def testQuitGameUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 120
+		terminal["chipsOnTable"] = 0
+		terminal["initBank"] = 100
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			with self.assertRaises(SystemExit):
+				terminal["quitGame"]()
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("Nice work coloring up! Come back soon!", " ".join(writes))
+
 	def testRunPointPhaseBettingMenuLoopsUntilRollCommand(self):
 		terminal = loadTerminalNamespace()
 		calls = []

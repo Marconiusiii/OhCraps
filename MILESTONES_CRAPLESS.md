@@ -1455,3 +1455,34 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing `Field Bet?` adapter routing regression retained and passing.
 - Compile check passed.
 - Full suite remains green (`227` tests passing).
+
+## Milestone 79: Roll, Quit, and Round Status Output Adapter Normalization
+
+### What changed
+- Migrated roll narration output in `roll()` from direct `print(...)` to `writeOutput(...)`:
+	- Hard-way callout lines
+	- Come-out 7 and (Craps mode) 11 winner lines
+	- General dealer-call / dice-face narration lines
+- Migrated end-session output in `quitGame()` from `print(...)` to `writeOutput(...)` for all result branches.
+- Migrated point-hit announcement in `resolvePointRoll()` to `writeOutput(...)`.
+- Migrated game-start and top-level round status lines to `writeOutput(...)`:
+	- Startup banner
+	- Bank/bets-on-table status line
+	- Throws line
+
+### Why
+- These high-visibility gameplay/session outputs were still bypassing adapter output.
+- Routing them through `writeOutput(...)` improves consistency with the iOS-portability boundary while preserving current text and game flow.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Existing wording and control flow preserved; only output path changed.
+
+### Test coverage
+- Added deterministic adapter-focused regressions in `tests/testEngineBehavior.py`:
+	- `testResolvePointRollPointHitUsesWriteOutput`
+	- `testRollUsesWriteOutputForHardWayCall`
+	- `testQuitGameUsesWriteOutput`
+- Compile check passed.
+- Full suite remains green (`230` tests passing).

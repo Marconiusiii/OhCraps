@@ -54,12 +54,12 @@ def roll():
 
 	if die1 == die2 and total in [4, 6, 8, 10]:
 		rollHard = True
-		print(f"\n{total} the Hard Way!\n")
-		print("\n" + stickman(total))
+		writeOutput(f"\n{total} the Hard Way!\n")
+		writeOutput("\n" + stickman(total))
 	elif total == 7 and pointIsOn == False:
-		print(f"\n{total} winner! Pay the line, take the don't!\n")
+		writeOutput(f"\n{total} winner! Pay the line, take the don't!\n")
 	elif total == 11 and pointIsOn == False and gameMode == GameMode.craps:
-		print(f"\n{total} winner! Pay the line, take the don't!\n")
+		writeOutput(f"\n{total} winner! Pay the line, take the don't!\n")
 	else:
 		call = random.randrange(1, 21)
 
@@ -67,9 +67,9 @@ def roll():
 		# or if the total is in [2, 3, 11, 12], it uses stickman.
 		# Otherwise it calls out the dice faces.
 		if call <= 10 or total in [2, 3, 11, 12]:
-			print(f"\n{total}, {stickman(total)}!\n")
+			writeOutput(f"\n{total}, {stickman(total)}!\n")
 		else:
-			print(f"\n{total}, a {die1} {die2} {total}!\n")
+			writeOutput(f"\n{total}, a {die1} {die2} {total}!\n")
 
 	return total
 
@@ -1475,11 +1475,11 @@ def cashIn():
 def quitGame():
 	global bank, chipsOnTable, initBank
 	if bank+chipsOnTable > initBank:
-		print("\nNice work coloring up! Come back soon!\n")
+		writeOutput("\nNice work coloring up! Come back soon!\n")
 	elif bank+chipsOnTable == initBank:
-		print("\nWell, at least you didn't lose anything! Try again soon!\n")
+		writeOutput("\nWell, at least you didn't lose anything! Try again soon!\n")
 	else:
-		print("\nOops, tough loss today. Better luck next time!\n")
+		writeOutput("\nOops, tough loss today. Better luck next time!\n")
 	raise SystemExit
 
 def betPrompt():
@@ -2354,7 +2354,7 @@ def resolvePointRoll():
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		return pointRollResult(pointRoundEnded=True, outcome=outcome)
 	if outcome == RollOutcome.pointHit:
-		print("Point Hit! Front line winner!")
+		writeOutput("Point Hit! Front line winner!")
 		pointIsOn = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 		return pointRollResult(pointRoundEnded=True, outcome=outcome)
@@ -2441,18 +2441,18 @@ gameState = createGameState(
 
 
 # Game Start
-print(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
+writeOutput(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
 selectGameMode()
 syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 cashIn()
 while True:
 	if chipsOnTable <= 0:
-		print(f"You have ${bank:,} in the bank.")
+		writeOutput(f"You have ${bank:,} in the bank.")
 	else:
-		print(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+		writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
 	if bank <= 0 and chipsOnTable <= 0:
 		outOfMoney()
-	print(f"Throws: {throws}\n")
+	writeOutput(f"Throws: {throws}\n")
 
 # Initial bets
 

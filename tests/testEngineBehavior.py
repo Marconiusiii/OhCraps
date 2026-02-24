@@ -1885,6 +1885,45 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			terminal["setRuntimeState"]({"unknownKey": 1})
 
+	def testSyncRuntimeFromGlobalsCapturesCoreLoopValues(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 345
+		terminal["chipsOnTable"] = 55
+		terminal["throws"] = 8
+		terminal["comeOut"] = 10
+		terminal["pointIsOn"] = True
+		terminal["p2"] = 6
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		runtime = terminal["syncRuntimeFromGlobals"]()
+		self.assertEqual(runtime.bank, 345)
+		self.assertEqual(runtime.chipsOnTable, 55)
+		self.assertEqual(runtime.throws, 8)
+		self.assertEqual(runtime.comeOut, 10)
+		self.assertEqual(runtime.pointIsOn, True)
+		self.assertEqual(runtime.p2, 6)
+		self.assertEqual(runtime.gameMode, terminal["GameMode"].craplessCraps)
+
+	def testSyncGlobalsFromRuntimeAppliesCoreLoopValues(self):
+		terminal = loadTerminalNamespace()
+		runtime = terminal["GameRuntime"](
+			bank=777,
+			chipsOnTable=23,
+			throws=11,
+			comeOut=9,
+			pointIsOn=True,
+			p2=5,
+			gameMode=terminal["GameMode"].craplessCraps
+		)
+		terminal["syncGlobalsFromRuntime"](runtime)
+		self.assertEqual(terminal["bank"], 777)
+		self.assertEqual(terminal["chipsOnTable"], 23)
+		self.assertEqual(terminal["throws"], 11)
+		self.assertEqual(terminal["comeOut"], 9)
+		self.assertEqual(terminal["pointIsOn"], True)
+		self.assertEqual(terminal["p2"], 5)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(terminal["gameRuntime"].bank, 777)
+
 	def testResetRuntimeStateRestoresDefaults(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 500

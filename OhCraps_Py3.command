@@ -85,6 +85,16 @@ class bettingCommandResult:
 		self.shouldRoll = bool(shouldRoll)
 		self.handled = bool(handled)
 
+class GameRuntime:
+	def __init__(self, bank=0, chipsOnTable=0, throws=0, comeOut=0, pointIsOn=False, p2=0, gameMode=GameMode.craps):
+		self.bank = int(bank)
+		self.chipsOnTable = int(chipsOnTable)
+		self.throws = int(throws)
+		self.comeOut = int(comeOut)
+		self.pointIsOn = bool(pointIsOn)
+		self.p2 = int(p2)
+		self.gameMode = gameMode
+
 #Roll and Dice Setup
 die1 = die2 = 0
 
@@ -1621,6 +1631,39 @@ def normalizedGameMode(modeValue):
 		return GameMode.craplessCraps
 	raise ValueError("Invalid game mode value.")
 
+def syncRuntimeFromGlobals(runtime=None):
+	global gameRuntime
+	targetRuntime = runtime if runtime is not None else gameRuntime
+	if targetRuntime is None:
+		targetRuntime = GameRuntime()
+		if runtime is None:
+			gameRuntime = targetRuntime
+	targetRuntime.bank = int(bank)
+	targetRuntime.chipsOnTable = int(chipsOnTable)
+	targetRuntime.throws = int(throws)
+	targetRuntime.comeOut = int(comeOut)
+	targetRuntime.pointIsOn = bool(pointIsOn)
+	targetRuntime.p2 = int(p2)
+	targetRuntime.gameMode = gameMode
+	return targetRuntime
+
+def syncGlobalsFromRuntime(runtime=None):
+	global bank, chipsOnTable, throws, comeOut, pointIsOn, p2, gameMode, gameRuntime
+	sourceRuntime = runtime if runtime is not None else gameRuntime
+	if sourceRuntime is None:
+		return syncRuntimeFromGlobals()
+	bank = int(sourceRuntime.bank)
+	chipsOnTable = int(sourceRuntime.chipsOnTable)
+	throws = int(sourceRuntime.throws)
+	comeOut = int(sourceRuntime.comeOut)
+	pointIsOn = bool(sourceRuntime.pointIsOn)
+	p2 = int(sourceRuntime.p2)
+	gameMode = normalizedGameMode(sourceRuntime.gameMode)
+	if runtime is not None:
+		gameRuntime = sourceRuntime
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	return syncRuntimeFromGlobals()
+
 def getRuntimeState():
 	return {
 		"bank": int(bank),
@@ -1708,6 +1751,7 @@ def setRuntimeState(runtimeState):
 	if "fireBet" in runtimeState:
 		fireBet = int(runtimeState["fireBet"])
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	syncRuntimeFromGlobals()
 	return getRuntimeState()
 
 def resetRuntimeState():
@@ -2568,14 +2612,15 @@ def runComeOutRound():
 	return comeOutRoundResult(enteredPointPhase=comeOutRoll.enteredPointPhase, outcome=comeOutRoll.outcome)
 
 def showPointPhaseStatus():
-	if chipsOnTable > 0:
-		writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+	runtime = syncRuntimeFromGlobals()
+	if runtime.chipsOnTable > 0:
+		writeOutput(f"You have ${runtime.bank:,} in the bank with ${runtime.chipsOnTable:,} out on the table.")
 	else:
-		writeOutput(f"You have ${bank:,} in the bank.")
-	if bank <= 0 and chipsOnTable <= 0:
+		writeOutput(f"You have ${runtime.bank:,} in the bank.")
+	if runtime.bank <= 0 and runtime.chipsOnTable <= 0:
 		outOfMoney()
-	writeOutput(f"\n{comeOut} is the Point!\n")
-	writeOutput(f"Throws: {throws}")
+	writeOutput(f"\n{runtime.comeOut} is the Point!\n")
+	writeOutput(f"Throws: {runtime.throws}")
 
 def runPointPhaseRound():
 	while True:
@@ -2590,26 +2635,29 @@ def runPointPhaseRound():
 		continue
 
 def runOneCycle():
-	emitEvent("cycleStarted", {"point": int(comeOut), "throws": int(throws), "gameMode": gameMode})
+	runtime = syncRuntimeFromGlobals()
+	emitEvent("cycleStarted", {"point": int(runtime.comeOut), "throws": int(runtime.throws), "gameMode": runtime.gameMode})
 	comeOutResult = runComeOutRound()
+	runtime = syncRuntimeFromGlobals()
 	emitEvent("comeOutResolved", {"enteredPointPhase": bool(comeOutResult.enteredPointPhase), "outcome": comeOutResult.outcome, "runtimeState": getRuntimeState()})
 	cycleResult = {
 		"enteredPointPhase": bool(comeOutResult.enteredPointPhase),
 		"comeOutOutcome": comeOutResult.outcome,
 		"pointPhaseOutcome": None,
 		"pointRoundEnded": False,
-		"point": int(comeOut),
-		"throws": int(throws)
+		"point": int(runtime.comeOut),
+		"throws": int(runtime.throws)
 	}
 	if not comeOutResult.enteredPointPhase:
 		emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
 		return cycleResult
 	pointPhaseResult = runPointPhaseRound()
+	runtime = syncRuntimeFromGlobals()
 	emitEvent("pointPhaseResolved", {"roundEnded": bool(pointPhaseResult.roundEnded), "outcome": pointPhaseResult.outcome, "runtimeState": getRuntimeState()})
 	cycleResult["pointPhaseOutcome"] = pointPhaseResult.outcome
 	cycleResult["pointRoundEnded"] = bool(pointPhaseResult.roundEnded)
-	cycleResult["point"] = int(comeOut)
-	cycleResult["throws"] = int(throws)
+	cycleResult["point"] = int(runtime.comeOut)
+	cycleResult["throws"] = int(runtime.throws)
 	emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
 	return cycleResult
 
@@ -2620,6 +2668,7 @@ working = plWork = hdWork = lyWork = coWork = False
 throws = 0
 comeOut = 0
 gameMode = GameMode.craps
+gameRuntime = GameRuntime(bank=bank, chipsOnTable=chipsOnTable, throws=throws, comeOut=comeOut, pointIsOn=pointIsOn, p2=p2, gameMode=gameMode)
 
 
 def selectGameMode():
@@ -2653,14 +2702,16 @@ def runGame():
 	selectGameMode()
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	cashIn()
+	syncRuntimeFromGlobals()
 	while True:
-		if chipsOnTable <= 0:
-			writeOutput(f"You have ${bank:,} in the bank.")
+		runtime = syncRuntimeFromGlobals()
+		if runtime.chipsOnTable <= 0:
+			writeOutput(f"You have ${runtime.bank:,} in the bank.")
 		else:
-			writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
-		if bank <= 0 and chipsOnTable <= 0:
+			writeOutput(f"You have ${runtime.bank:,} in the bank with ${runtime.chipsOnTable:,} out on the table.")
+		if runtime.bank <= 0 and runtime.chipsOnTable <= 0:
 			outOfMoney()
-		writeOutput(f"Throws: {throws}\n")
+		writeOutput(f"Throws: {runtime.throws}\n")
 
 	# Initial bets
 

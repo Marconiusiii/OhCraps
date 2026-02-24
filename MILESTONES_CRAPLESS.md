@@ -1693,3 +1693,44 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testResetEventHandlerClearsHandler`
 - Compile check passed.
 - Full suite remains green (`249` tests passing).
+
+## Milestone 86: Introduced GameRuntime Core Container and Sync Bridge
+
+### What changed
+- Added `GameRuntime` container for core loop/runtime values:
+	- `bank`
+	- `chipsOnTable`
+	- `throws`
+	- `comeOut`
+	- `pointIsOn`
+	- `p2`
+	- `gameMode`
+- Added runtime/global bridge helpers:
+	- `syncRuntimeFromGlobals(runtime=None)`
+	- `syncGlobalsFromRuntime(runtime=None)`
+- Added initialized shared runtime instance:
+	- `gameRuntime = GameRuntime(...)`
+- Integrated runtime-object reads into the selected vertical slice:
+	- `showPointPhaseStatus()` now reads status values from synced runtime object
+	- `runOneCycle()` now sources cycle/event point/throws metadata from synced runtime object
+	- `runGame()` status banner loop now reads from synced runtime object
+- Updated runtime state apply path:
+	- `setRuntimeState(...)` now calls `syncRuntimeFromGlobals()` after applying/syncing globals
+
+### Why
+- This establishes the first concrete move away from direct scattered globals toward an encapsulated runtime model.
+- The sync bridge keeps behavior stable while enabling incremental migration function-by-function.
+- iOS host integration can now rely on a clearer runtime container without requiring full rewrite in one step.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Terminal gameplay flow unchanged.
+
+### Test coverage
+- Added deterministic runtime-bridge regressions in `tests/testEngineBehavior.py`:
+	- `testSyncRuntimeFromGlobalsCapturesCoreLoopValues`
+	- `testSyncGlobalsFromRuntimeAppliesCoreLoopValues`
+- Existing cycle/status tests continue to pass with runtime-object integration.
+- Compile check passed.
+- Full suite remains green (`251` tests passing).

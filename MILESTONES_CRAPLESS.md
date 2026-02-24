@@ -2909,3 +2909,36 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Existing fast-cycle tests now include richer failure diagnostics.
 - Full suite remains green after this milestone.
+
+## Milestone 119: One-Command Solo QA Cycle
+
+### What problem this solves
+- You needed one command that runs your full confidence path in the correct order every time.
+
+### What changed
+- Added executable script: `tests/runSoloQaCycle.sh`.
+- Script sequence:
+	1. fast host-contract cycle
+	2. compile checks
+	3. full test suite
+- Script exits on first failure and prints clear stage markers.
+
+### Why this helps
+- Removes manual command juggling.
+- Makes your pre-commit sanity routine consistent and faster.
+
+### How to run
+- `./tests/runSoloQaCycle.sh`
+
+### How to use in your solo process
+- During active edits: run fast cycle directly if needed for quick checks.
+- Before commit: run `./tests/runSoloQaCycle.sh` and only proceed if all three stages pass.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Script itself runs existing validated test gates.
+- Full suite remains green after this milestone.

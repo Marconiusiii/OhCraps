@@ -246,6 +246,9 @@ def hostSchemaDescriptor():
 				"engineApiVersion", "gameMode", "pointPhase", "runtimeState",
 				"allowedCommands", "capturedOutput", "capturedPrompts"
 			],
+			"commandSnapshot": [
+				"engineApiVersion", "success", "error", "commandResult", "uiSnapshot"
+			],
 			"events": {
 				"inputRequested": ["engineApiVersion", "prompt"],
 				"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
@@ -331,6 +334,21 @@ def createHostUiSnapshot(pointPhase=False):
 		"allowedCommands": hostAllowedCommands(pointPhase=pointPhase),
 		"capturedOutput": getCapturedOutput(),
 		"capturedPrompts": getCapturedPrompts()
+	})
+
+def runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
+	commandResult = submitCommand(
+		commandText=commandText,
+		pointPhase=pointPhase,
+		autoCapture=autoCapture,
+		raiseOnError=raiseOnError
+	)
+	uiSnapshot = createHostUiSnapshot(pointPhase=pointPhase)
+	return withApiVersion({
+		"success": bool(commandResult["success"]),
+		"error": commandResult["error"],
+		"commandResult": commandResult,
+		"uiSnapshot": uiSnapshot
 	})
 
 def beginOutputCapture():

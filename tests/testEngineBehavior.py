@@ -1680,6 +1680,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("startupBundle", descriptor["payloadKeys"])
 		self.assertIn("allowedCommands", descriptor["payloadKeys"])
 		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
+		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
 
@@ -1746,6 +1747,42 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
 		payload = terminal["createHostUiSnapshot"](pointPhase=True)
 		commandsByCode = {item["code"]: item for item in payload["allowedCommands"]["commands"]}
+		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
+		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testRunCommandWithUiSnapshotReturnsCommandAndSnapshot(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["runCommandWithUiSnapshot"]("x", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["command"], "x")
+		self.assertEqual(payload["commandResult"]["shouldRoll"], True)
+		self.assertEqual(payload["uiSnapshot"]["pointPhase"], False)
+		self.assertIn("allowedCommands", payload["uiSnapshot"])
+
+	def testRunCommandWithUiSnapshotHandlesInvalidCommand(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runCommandWithUiSnapshot"]("notACommand", pointPhase=False)
+		self.assertEqual(payload["success"], True)
+		self.assertEqual(payload["commandResult"]["handled"], False)
+		self.assertEqual(payload["commandResult"]["shouldRoll"], False)
+		self.assertEqual(payload["uiSnapshot"]["pointPhase"], False)
+
+	def testRunCommandWithUiSnapshotPointPhaseUsesPointPhaseCommands(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["runCommandWithUiSnapshot"]("x", pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
+		self.assertEqual(payload["uiSnapshot"]["pointPhase"], True)
+		self.assertIn("o", commandsByCode)
+		self.assertIn("dp", commandsByCode)
+
+	def testRunCommandWithUiSnapshotCraplessReflectsDisabledDontCome(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		payload = terminal["runCommandWithUiSnapshot"]("dcd", pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
+		self.assertEqual(payload["commandResult"]["handled"], True)
 		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
 		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
 

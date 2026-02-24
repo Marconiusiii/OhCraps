@@ -2420,3 +2420,35 @@ New milestone updates should be appended here rather than creating new milestone
 	- Crapless snapshot disables Don’t Come controls in point phase
 	- schema descriptor includes `uiSnapshot`
 - Full suite remains green after this milestone.
+
+## Milestone 106: Run Command + Return Fresh UI Snapshot in One Call
+
+### What problem this solves
+- App code had to run a command, then make a second call for a fresh UI snapshot.
+- That created extra wiring and refresh timing risk.
+
+### What changed
+- Added `runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, raiseOnError=False)`.
+- This returns one package with:
+	- `commandResult`
+	- `uiSnapshot`
+	- top-level `success` and `error`
+- Added `commandSnapshot` payload keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- A button tap in iOS/web can now call one function and get everything needed to refresh.
+- Less host-side glue code and less chance of stale UI.
+
+### Behavior
+- No craps rules changed.
+- No payout math changed.
+- Terminal gameplay flow is unchanged.
+
+### Test coverage
+- Added tests for:
+	- normal command + snapshot response
+	- invalid command + snapshot response
+	- point-phase command + point-phase command list in snapshot
+	- Crapless flow keeping Don’t Come controls disabled in snapshot
+	- schema descriptor includes `commandSnapshot`
+- Full suite remains green after this milestone.

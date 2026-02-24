@@ -1597,6 +1597,42 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["cycleResult"]["enteredPointPhase"], False)
 		self.assertEqual(payload["engineApiVersion"], terminal["engineApiVersion"])
 
+	def testHostSchemaDescriptorIncludesExpectedSections(self):
+		terminal = loadTerminalNamespace()
+		descriptor = terminal["hostSchemaDescriptor"]()
+		self.assertEqual(descriptor["engineApiVersion"], terminal["engineApiVersion"])
+		self.assertEqual(descriptor["schemaVersion"], "1")
+		self.assertIn("errorCodes", descriptor)
+		self.assertIn("features", descriptor)
+		self.assertIn("payloadKeys", descriptor)
+		self.assertIn("command", descriptor["payloadKeys"])
+		self.assertIn("step", descriptor["payloadKeys"])
+		self.assertIn("sessionBundle", descriptor["payloadKeys"])
+
+	def testCheckHostCompatibilityPassesForCurrentVersionAndFeatures(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["checkHostCompatibility"](
+			requiredApiVersion=terminal["engineApiVersion"],
+			requiredFeatures=["autoCapture", "sessionBundle", "structuredErrors"]
+		)
+		self.assertEqual(result["compatible"], True)
+		self.assertEqual(result["missingFeatures"], [])
+		self.assertEqual(result["reasons"], [])
+		self.assertEqual(result["engineApiVersion"], terminal["engineApiVersion"])
+
+	def testCheckHostCompatibilityFailsForUnsupportedVersion(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["checkHostCompatibility"](requiredApiVersion="9.9.9")
+		self.assertEqual(result["compatible"], False)
+		self.assertIn("Unsupported engineApiVersion requirement: 9.9.9", result["reasons"])
+
+	def testCheckHostCompatibilityFailsForMissingFeature(self):
+		terminal = loadTerminalNamespace()
+		result = terminal["checkHostCompatibility"](requiredFeatures=["nonexistentFeature"])
+		self.assertEqual(result["compatible"], False)
+		self.assertEqual(result["missingFeatures"], ["nonexistentFeature"])
+		self.assertIn("Missing required features: nonexistentFeature", result["reasons"])
+
 	def testSubmitCommandReturnsStructuredErrorPayloadOnFailure(self):
 		terminal = loadTerminalNamespace()
 		terminal["handleBettingCommand"] = lambda commandText, pointPhase=False: (_ for _ in ()).throw(RuntimeError("forced command fail"))

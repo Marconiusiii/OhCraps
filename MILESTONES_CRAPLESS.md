@@ -2227,3 +2227,44 @@ New milestone updates should be appended here rather than creating new milestone
 	- `buildHostStepPayload(...)` canonical keys.
 - Updated existing error-path assertions to reference `hostErrorCodes` constants.
 - Full suite remains green after this milestone.
+
+## Milestone 101: Host Schema Descriptor and Compatibility Check API
+
+### What changed
+- Added host feature descriptor helper:
+	- `hostFeatureFlags()`
+- Added host schema descriptor API:
+	- `hostSchemaDescriptor()`
+	- exposes:
+		- `schemaVersion`
+		- `errorCodes`
+		- `features`
+		- `payloadKeys` for `command`, `step`, and `sessionBundle`
+- Added compatibility-check API:
+	- `checkHostCompatibility(requiredApiVersion=None, requiredFeatures=None)`
+	- returns:
+		- `compatible`
+		- `requiredApiVersion`
+		- `requiredFeatures`
+		- `missingFeatures`
+		- `reasons`
+		- `engineApiVersion`
+
+### Why
+- iOS/web hosts need a runtime-safe way to inspect what this engine contract supports.
+- Descriptor-based integration avoids hardcoding payload assumptions in host apps.
+- Explicit compatibility checks make startup gating deterministic and easier to debug.
+
+### Behavior
+- No craps rules/payout changes.
+- No bankroll/chips accounting changes.
+- Terminal gameplay flow unchanged.
+- Host-side introspection capability is additive.
+
+### Test coverage
+- Added deterministic tests in `tests/testEngineBehavior.py` for:
+	- descriptor shape (`hostSchemaDescriptor` includes core sections)
+	- compatibility success for current version + supported features
+	- compatibility failure for unsupported API version
+	- compatibility failure for unsupported feature requests
+- Full suite remains green after this milestone.

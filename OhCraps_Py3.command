@@ -101,6 +101,55 @@ def buildHostStepPayload(stepType, commandResult, cycleResult, runtimeState, cap
 		"capturedPrompts": list(capturedPrompts)
 	})
 
+def hostFeatureFlags():
+	return {
+		"autoCapture": True,
+		"promptCapture": True,
+		"sessionBundle": True,
+		"structuredErrors": True,
+		"runtimeStateApi": True
+	}
+
+def hostSchemaDescriptor():
+	return withApiVersion({
+		"schemaVersion": "1",
+		"errorCodes": dict(hostErrorCodes),
+		"features": hostFeatureFlags(),
+		"payloadKeys": {
+			"command": [
+				"engineApiVersion", "success", "error", "command", "pointPhase",
+				"shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"
+			],
+			"step": [
+				"engineApiVersion", "stepType", "success", "error", "commandResult",
+				"cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"
+			],
+			"sessionBundle": [
+				"engineApiVersion", "bundleType", "runtimeState", "gameMode", "captureState", "hostMetadata"
+			]
+		}
+	})
+
+def checkHostCompatibility(requiredApiVersion=None, requiredFeatures=None):
+	reasons = []
+	requestedFeatures = list(requiredFeatures) if requiredFeatures is not None else []
+	missingFeatures = []
+	if requiredApiVersion is not None and str(requiredApiVersion) != engineApiVersion:
+		reasons.append(f"Unsupported engineApiVersion requirement: {requiredApiVersion}")
+	availableFeatures = hostFeatureFlags()
+	for featureName in requestedFeatures:
+		if not bool(availableFeatures.get(str(featureName), False)):
+			missingFeatures.append(str(featureName))
+	if missingFeatures:
+		reasons.append(f"Missing required features: {', '.join(missingFeatures)}")
+	return withApiVersion({
+		"compatible": len(reasons) == 0,
+		"requiredApiVersion": (str(requiredApiVersion) if requiredApiVersion is not None else None),
+		"requiredFeatures": requestedFeatures,
+		"missingFeatures": missingFeatures,
+		"reasons": reasons
+	})
+
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer
 	outputCaptureOn = True

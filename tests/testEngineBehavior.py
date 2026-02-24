@@ -18,6 +18,17 @@ def loadTerminalNamespace():
 	exec(prefixSource, terminalNamespace)
 	return terminalNamespace
 
+def formatFrozenSetDiff(expectedValues, actualValues, label):
+	expectedSet = set(expectedValues)
+	actualSet = set(actualValues)
+	missingValues = sorted(expectedSet - actualSet)
+	unexpectedValues = sorted(actualSet - expectedSet)
+	return (
+		f"{label} drift detected | "
+		f"missing={missingValues} | "
+		f"unexpected={unexpectedValues}"
+	)
+
 
 class EvaluateRollTests(unittest.TestCase):
 	def testTerminalScriptCompiles(self):
@@ -4494,6 +4505,62 @@ class HostContractFastCycleTests(unittest.TestCase):
 			terminal["hostErrorCodes"]["invalidActionInput"],
 			self.buildFailureContext("invalid-action", bundle)
 		)
+
+
+class HostContractSnapshotTests(unittest.TestCase):
+	def assertFrozenSetEqual(self, expectedValues, actualValues, label):
+		self.assertEqual(set(expectedValues), set(actualValues), formatFrozenSetDiff(expectedValues, actualValues, label))
+
+	def testHostPayloadKeySnapshot(self):
+		terminal = loadTerminalNamespace()
+		descriptor = terminal["hostSchemaDescriptor"]()
+		expectedPayloadKeys = [
+			"command",
+			"step",
+			"sessionBundle",
+			"sessionCompatibilityReport",
+			"startupBundle",
+			"allowedCommands",
+			"uiSnapshot",
+			"commandSnapshot",
+			"deltaSnapshot",
+			"actionBundle",
+			"actionSummary",
+			"healthReport",
+			"preflightReport",
+			"actionLogEntry",
+			"actionLogRun",
+			"replayReport",
+			"workflowReport",
+			"bootstrapReport",
+			"compatibilityReport",
+			"eventValidationReport",
+			"tracePacket",
+			"soloDebugBundle",
+			"stateDelta",
+			"statusPanel",
+			"events"
+		]
+		self.assertFrozenSetEqual(expectedPayloadKeys, descriptor["payloadKeys"].keys(), "payloadKeys")
+
+	def testHostEventContractSnapshot(self):
+		terminal = loadTerminalNamespace()
+		descriptor = terminal["hostSchemaDescriptor"]()
+		eventsMap = descriptor["payloadKeys"]["events"]
+		expectedEventMap = {
+			"inputRequested": ["engineApiVersion", "prompt"],
+			"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
+			"commandProcessed": ["engineApiVersion", "success", "error", "command", "pointPhase", "shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"],
+			"stepCompleted": ["engineApiVersion", "stepType", "success", "error", "commandResult", "cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"],
+			"cycleStarted": ["engineApiVersion", "point", "throws", "gameMode"],
+			"comeOutResolved": ["engineApiVersion", "enteredPointPhase", "outcome", "runtimeState"],
+			"pointPhaseResolved": ["engineApiVersion", "roundEnded", "outcome", "runtimeState"],
+			"cycleCompleted": ["engineApiVersion", "cycleResult", "runtimeState"],
+			"gameInitialized": ["engineApiVersion", "startBank", "gameMode", "runtimeState"]
+		}
+		self.assertFrozenSetEqual(expectedEventMap.keys(), eventsMap.keys(), "eventNames")
+		for eventName, expectedKeys in expectedEventMap.items():
+			self.assertEqual(expectedKeys, eventsMap[eventName], f"event contract drift for {eventName}")
 
 
 if __name__ == "__main__":

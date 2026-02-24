@@ -3198,3 +3198,42 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added tests for trace success, validation-failure trace, and strict raise path.
 - Full suite remains green after this milestone.
+
+## Milestone 126: Frozen Host Contract Snapshot Tests
+
+### What problem this solves
+- Contract drift risk remained: schema/event contracts could change without a clear baseline failure message.
+
+### What changed
+- Added test-only frozen snapshot coverage for:
+	- top-level host `payloadKeys`
+	- host `events` contract key map
+- Added readable diff helper:
+	- `formatFrozenSetDiff(...)`
+- Added snapshot assertion helper:
+	- `assertFrozenSetEqual(...)`
+
+### Why this helps
+- Unexpected contract drift now fails loudly in tests.
+- Failure output shows exactly what keys were missing or unexpected.
+
+### How to use in your test cycle
+- Focused snapshot checks:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k Snapshot`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Debug workflow for snapshot failures
+- Step 1: Read missing/unexpected key list from failure text.
+- Step 2: Decide if drift is intentional.
+- Step 3: If intentional, update snapshot expectations in tests.
+- Step 4: If unintentional, fix contract regression in engine code.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added frozen contract snapshot tests with readable drift diffs.
+- Full suite remains green after this milestone.

@@ -1681,6 +1681,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("allowedCommands", descriptor["payloadKeys"])
 		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
 		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
+		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
 
@@ -1749,6 +1750,43 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		commandsByCode = {item["code"]: item for item in payload["allowedCommands"]["commands"]}
 		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
 		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testCreateHostStatusPanelComeOutText(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 500
+		terminal["chipsOnTable"] = 0
+		terminal["throws"] = 3
+		terminal["pointIsOn"] = False
+		terminal["comeOut"] = 0
+		payload = terminal["createHostStatusPanel"]()
+		self.assertEqual(payload["phaseDisplay"], "Come Out")
+		self.assertEqual(payload["pointDisplay"], "Come Out Roll")
+		self.assertIn("$500", payload["bankrollDisplay"])
+		self.assertEqual(payload["throwDisplay"], "Throws: 3")
+
+	def testCreateHostStatusPanelPointPhaseText(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 250
+		terminal["chipsOnTable"] = 60
+		terminal["throws"] = 7
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 8
+		payload = terminal["createHostStatusPanel"]()
+		self.assertEqual(payload["phaseDisplay"], "Point Phase")
+		self.assertEqual(payload["pointDisplay"], "Point is 8")
+		self.assertIn("$250", payload["bankrollDisplay"])
+		self.assertIn("$60", payload["bankrollDisplay"])
+
+	def testCreateHostStatusPanelCraplessShowsModeName(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 11
+		payload = terminal["createHostStatusPanel"]()
+		self.assertEqual(payload["modeDisplay"], "Crapless Craps")
+		self.assertEqual(payload["pointDisplay"], "Point is 11")
 
 	def testRunCommandWithUiSnapshotReturnsCommandAndSnapshot(self):
 		terminal = loadTerminalNamespace()

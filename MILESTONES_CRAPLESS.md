@@ -2452,3 +2452,37 @@ New milestone updates should be appended here rather than creating new milestone
 	- Crapless flow keeping Don’t Come controls disabled in snapshot
 	- schema descriptor includes `commandSnapshot`
 - Full suite remains green after this milestone.
+
+## Milestone 107: Host Status Panel Helper for App Header UI
+
+### What problem this solves
+- App screens needed to build their own top status text from raw fields.
+- That can create inconsistent wording between screens.
+
+### What changed
+- Added `createHostStatusPanel(pointPhase=None)` in `OhCraps_Py3.command`.
+- It returns a ready-to-use status package with:
+	- mode display name
+	- phase display text
+	- point display text
+	- bank/chips/throws numbers
+	- bankroll display text
+	- throw display text
+- Added `statusPanel` payload keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can render a consistent top status area using one response.
+- Less duplicated UI formatting logic in app code.
+
+### Behavior
+- No craps rules changed.
+- No payout math changed.
+- Terminal gameplay remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- come-out status text
+	- point-phase status text
+	- Crapless mode display text
+	- schema descriptor includes `statusPanel`
+- Full suite remains green after this milestone.

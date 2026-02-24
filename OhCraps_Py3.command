@@ -246,10 +246,14 @@ def hostSchemaDescriptor():
 				"engineApiVersion", "gameMode", "pointPhase", "runtimeState",
 				"allowedCommands", "capturedOutput", "capturedPrompts"
 			],
-			"commandSnapshot": [
-				"engineApiVersion", "success", "error", "commandResult", "uiSnapshot"
-			],
-			"events": {
+				"commandSnapshot": [
+					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot"
+				],
+				"statusPanel": [
+					"engineApiVersion", "gameMode", "modeDisplay", "pointPhase", "phaseDisplay",
+					"point", "pointDisplay", "bank", "chipsOnTable", "throws", "bankrollDisplay", "throwDisplay"
+				],
+				"events": {
 				"inputRequested": ["engineApiVersion", "prompt"],
 				"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
 				"commandProcessed": ["engineApiVersion", "success", "error", "command", "pointPhase", "shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"],
@@ -334,6 +338,36 @@ def createHostUiSnapshot(pointPhase=False):
 		"allowedCommands": hostAllowedCommands(pointPhase=pointPhase),
 		"capturedOutput": getCapturedOutput(),
 		"capturedPrompts": getCapturedPrompts()
+	})
+
+def createHostStatusPanel(pointPhase=None):
+	runtimeState = getRuntimeState()
+	modeProfile = getRulesProfile(runtimeState["gameMode"])
+	isPointPhase = bool(pointPhase) if pointPhase is not None else bool(runtimeState["pointIsOn"])
+	pointNumber = int(runtimeState["comeOut"])
+	if isPointPhase:
+		phaseDisplay = "Point Phase"
+		pointDisplay = f"Point is {pointNumber}"
+	else:
+		phaseDisplay = "Come Out"
+		pointDisplay = "Come Out Roll"
+	if int(runtimeState["chipsOnTable"]) > 0:
+		bankrollDisplay = f"You have ${int(runtimeState['bank']):,} in the bank and ${int(runtimeState['chipsOnTable']):,} on the table."
+	else:
+		bankrollDisplay = f"You have ${int(runtimeState['bank']):,} in the bank."
+	throwDisplay = f"Throws: {int(runtimeState['throws'])}"
+	return withApiVersion({
+		"gameMode": runtimeState["gameMode"],
+		"modeDisplay": modeProfile.displayName,
+		"pointPhase": bool(isPointPhase),
+		"phaseDisplay": phaseDisplay,
+		"point": pointNumber,
+		"pointDisplay": pointDisplay,
+		"bank": int(runtimeState["bank"]),
+		"chipsOnTable": int(runtimeState["chipsOnTable"]),
+		"throws": int(runtimeState["throws"]),
+		"bankrollDisplay": bankrollDisplay,
+		"throwDisplay": throwDisplay
 	})
 
 def runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):

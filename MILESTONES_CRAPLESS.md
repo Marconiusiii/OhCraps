@@ -1824,3 +1824,43 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing runtime-state rejection/reset tests continue to pass.
 - Compile check passed.
 - Full suite remains green (`256` tests passing).
+
+## Milestone 90: Programmatic Startup API for Host-Driven Initialization
+
+### What changed
+- Added host-facing mode setter:
+	- `setGameMode(modeValue)`
+	- normalizes mode input and syncs game/runtime state
+- Added host-facing startup initializer:
+	- `initializeGame(startBank, selectedMode)`
+	- validates starting bank (> 0)
+	- resets runtime to baseline
+	- applies selected game mode
+	- sets bankroll/initBank
+	- syncs game/runtime state
+	- emits `gameInitialized` event with runtime payload
+- Updated terminal startup flow in `runGame()`:
+	- preserved existing prompt sequence (`selectGameMode()` + `cashIn()`)
+	- now calls `initializeGame(startBank=initBank, selectedMode=gameMode)` after prompts
+
+### Why
+- iOS/web hosts need a programmatic entrypoint that sets mode + bankroll without terminal prompts.
+- This creates a clean startup contract while keeping terminal gameplay unchanged.
+- Startup event emission supports host UI/session orchestration.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Terminal user flow remains the same.
+- Host integrations can now initialize directly via API.
+
+### Test coverage
+- Added deterministic startup API regressions in `tests/testEngineBehavior.py`:
+	- `testSetGameModeAcceptsTextAndSyncsRuntime`
+	- `testInitializeGameSetsBankAndMode`
+	- `testInitializeGameRejectsZeroBank`
+- Updated runGame integration regressions for initialization seam:
+	- `testRunGameBootstrapsAndLoopsThroughComeOutStatus`
+	- `testRunGameTransitionsIntoPointPhaseRound`
+- Compile check passed.
+- Full suite remains green (`259` tests passing).

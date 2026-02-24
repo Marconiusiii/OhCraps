@@ -895,6 +895,28 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("Invalid choice. Enter 1 or 2.", writtenText)
 		self.assertIn("Crapless Craps selected.", writtenText)
 
+	def testSetGameModeAcceptsTextAndSyncsRuntime(self):
+		terminal = loadTerminalNamespace()
+		terminal["setGameMode"]("2")
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(terminal["gameRuntime"].gameMode, terminal["GameMode"].craplessCraps)
+
+	def testInitializeGameSetsBankAndMode(self):
+		terminal = loadTerminalNamespace()
+		state = terminal["initializeGame"](startBank=500, selectedMode="crapless craps")
+		self.assertEqual(terminal["bank"], 500)
+		self.assertEqual(terminal["initBank"], 500)
+		self.assertEqual(terminal["chipsOnTable"], 0)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(terminal["gameRuntime"].bank, 500)
+		self.assertEqual(state["bank"], 500)
+		self.assertEqual(state["gameMode"], terminal["GameMode"].craplessCraps)
+
+	def testInitializeGameRejectsZeroBank(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["initializeGame"](startBank=0, selectedMode=terminal["GameMode"].craps)
+
 	def testRunHardWaysMenuUsesReadInput(self):
 		terminal = loadTerminalNamespace()
 		prompts = []
@@ -1728,17 +1750,20 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		selectCalls = []
 		cashInCalls = []
 		syncCalls = []
+		initCalls = []
 		writes = []
 		terminal["selectGameMode"] = lambda: selectCalls.append(True)
-		terminal["cashIn"] = lambda: cashInCalls.append(True)
+		terminal["cashIn"] = lambda: (cashInCalls.append(True), terminal.__setitem__("initBank", 100), terminal.__setitem__("bank", 100)) and None
 		terminal["syncGameState"] = lambda **kwargs: syncCalls.append(kwargs)
+		terminal["initializeGame"] = lambda startBank, selectedMode: initCalls.append((startBank, selectedMode))
 		terminal["runOneCycle"] = lambda: (_ for _ in ()).throw(SystemExit())
 		terminal["writeOutput"] = lambda message: writes.append(str(message))
 		with self.assertRaises(SystemExit):
 			terminal["runGame"]()
 		self.assertEqual(len(selectCalls), 1)
 		self.assertEqual(len(cashInCalls), 1)
-		self.assertEqual(len(syncCalls), 1)
+		self.assertEqual(len(syncCalls), 0)
+		self.assertEqual(initCalls, [(100, terminal["gameMode"])])
 		writtenText = " ".join(writes)
 		self.assertIn("Oh Craps! v.", writtenText)
 		self.assertIn("You have $100 in the bank.", writtenText)
@@ -1751,8 +1776,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["throws"] = 0
 		terminal["gameMode"] = terminal["GameMode"].craps
 		terminal["selectGameMode"] = lambda: None
-		terminal["cashIn"] = lambda: None
-		terminal["syncGameState"] = lambda **kwargs: None
+		terminal["cashIn"] = lambda: (terminal.__setitem__("initBank", 100), terminal.__setitem__("bank", 100)) and None
+		terminal["initializeGame"] = lambda startBank, selectedMode: None
 		pointPhaseCalls = []
 		def fakeRunPointPhaseRound():
 			pointPhaseCalls.append(True)

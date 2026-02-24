@@ -2761,6 +2761,28 @@ def selectGameMode():
 		writeOutput(f"{selectedProfile.displayName} selected.")
 		break
 
+def setGameMode(modeValue):
+	global gameMode
+	gameMode = normalizedGameMode(modeValue)
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	syncRuntimeFromGlobals()
+	return gameMode
+
+def initializeGame(startBank, selectedMode):
+	global bank, initBank
+	bankroll = int(startBank)
+	if bankroll <= 0:
+		raise ValueError("Starting bank must be greater than zero.")
+	mode = normalizedGameMode(selectedMode)
+	resetRuntimeState()
+	setGameMode(mode)
+	initBank = bankroll
+	bank = bankroll
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	syncRuntimeFromGlobals()
+	emitEvent("gameInitialized", {"startBank": bankroll, "gameMode": gameMode, "runtimeState": getRuntimeState()})
+	return getRuntimeState()
+
 gameState = createGameState(
 	bank=bank,
 	chipsOnTable=chipsOnTable,
@@ -2774,9 +2796,8 @@ gameState = createGameState(
 def runGame():
 	writeOutput(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
 	selectGameMode()
-	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	cashIn()
-	syncRuntimeFromGlobals()
+	initializeGame(startBank=initBank, selectedMode=gameMode)
 	while True:
 		runtime = syncRuntimeFromGlobals()
 		if runtime.chipsOnTable <= 0:

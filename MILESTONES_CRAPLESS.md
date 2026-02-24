@@ -2146,3 +2146,48 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testImportSessionBundleEmitsSessionImportedEvent`
 - Compile check passed.
 - Full suite remains green (`279` tests passing).
+
+## Milestone 99: Host Error Contract Normalization and Payload Stability
+
+### What changed
+- Added a shared host error builder:
+	- `hostErrorPayload(errorCode, errorMessage, details=None)`
+- Normalized `submitCommand(...)` contract:
+	- Added always-present keys:
+		- `success` (`True`/`False`)
+		- `error` (`None` or structured error object)
+	- Added protected execution block around command handling.
+	- On failure, returns deterministic error payload instead of returning partial/undefined fields.
+	- Added optional strict mode:
+		- `raiseOnError=True` re-raises exceptions after payload construction path is available.
+- Normalized `step(...)` contract:
+	- Added always-present keys:
+		- `success`
+		- `error`
+	- Command steps now mirror command payload success/error.
+	- Cycle steps now catch execution errors and return structured `cycleExecutionFailed` payload.
+	- Invalid argument path (`pointPhase=True` without command) now returns structured `invalidStepArguments` payload and emits `stepCompleted`.
+	- Added optional strict mode:
+		- `raiseOnError=True` preserves raising behavior for strict callers.
+
+### Why
+- Host apps (iOS/web) need predictable, non-ambiguous response envelopes for every call.
+- Mixing raised exceptions with partial payloads increases integration complexity and UI error drift.
+- A deterministic `success + error` pattern lets host clients implement one response parser and one error display path.
+
+### Behavior
+- No craps rules/payout changes.
+- No bankroll/chips accounting changes.
+- Terminal flow remains unchanged.
+- Host API behavior is additive and more explicit:
+	- Success paths still return existing payload data.
+	- Failure paths now return structured errors by default.
+
+### Test coverage
+- Updated/added deterministic contract tests in `tests/testEngineBehavior.py`:
+	- command and cycle step payloads now assert `success=True` and `error=None` on normal flow.
+	- invalid step argument now returns structured error payload.
+	- strict mode still raises (`raiseOnError=True`).
+	- command failure returns `commandExecutionFailed` schema.
+	- cycle failure returns `cycleExecutionFailed` schema.
+- Full suite remains green after this milestone.

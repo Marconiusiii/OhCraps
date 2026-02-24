@@ -1484,6 +1484,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		stepPayload = terminal["step"](commandText="x", pointPhase=True)
 		self.assertEqual(stepPayload["stepType"], "command")
+		self.assertEqual(stepPayload["success"], True)
+		self.assertEqual(stepPayload["error"], None)
 		self.assertEqual(stepPayload["commandResult"]["command"], "x")
 		self.assertEqual(stepPayload["commandResult"]["pointPhase"], True)
 		self.assertEqual(stepPayload["commandResult"]["shouldRoll"], True)
@@ -1505,6 +1507,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		}
 		stepPayload = terminal["step"]()
 		self.assertEqual(stepPayload["stepType"], "cycle")
+		self.assertEqual(stepPayload["success"], True)
+		self.assertEqual(stepPayload["error"], None)
 		self.assertEqual(stepPayload["commandResult"], None)
 		self.assertEqual(stepPayload["cycleResult"]["enteredPointPhase"], False)
 		self.assertIn("runtimeState", stepPayload)
@@ -1538,8 +1542,34 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 
 	def testStepRejectsPointPhaseWithoutCommand(self):
 		terminal = loadTerminalNamespace()
+		stepPayload = terminal["step"](pointPhase=True)
+		self.assertEqual(stepPayload["success"], False)
+		self.assertEqual(stepPayload["error"]["code"], "invalidStepArguments")
+		self.assertEqual(stepPayload["error"]["message"], "pointPhase can only be used with commandText.")
+		self.assertEqual(stepPayload["cycleResult"], None)
+
+	def testStepPointPhaseWithoutCommandRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
 		with self.assertRaises(ValueError):
-			terminal["step"](pointPhase=True)
+			terminal["step"](pointPhase=True, raiseOnError=True)
+
+	def testSubmitCommandReturnsStructuredErrorPayloadOnFailure(self):
+		terminal = loadTerminalNamespace()
+		terminal["handleBettingCommand"] = lambda commandText, pointPhase=False: (_ for _ in ()).throw(RuntimeError("forced command fail"))
+		payload = terminal["submitCommand"]("x", pointPhase=False)
+		self.assertEqual(payload["success"], False)
+		self.assertEqual(payload["error"]["code"], "commandExecutionFailed")
+		self.assertEqual(payload["error"]["details"]["exceptionType"], "RuntimeError")
+		self.assertEqual(payload["shouldRoll"], False)
+		self.assertEqual(payload["handled"], False)
+
+	def testStepReturnsStructuredCycleErrorPayloadOnFailure(self):
+		terminal = loadTerminalNamespace()
+		terminal["runOneCycle"] = lambda: (_ for _ in ()).throw(RuntimeError("forced cycle fail"))
+		stepPayload = terminal["step"]()
+		self.assertEqual(stepPayload["success"], False)
+		self.assertEqual(stepPayload["error"]["code"], "cycleExecutionFailed")
+		self.assertEqual(stepPayload["cycleResult"], None)
 
 	def testResolveComeOutRollNaturalResetsThrowCount(self):
 		terminal = loadTerminalNamespace()

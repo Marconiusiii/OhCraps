@@ -61,6 +61,15 @@ def withApiVersion(payload):
 	payloadDict["engineApiVersion"] = engineApiVersion
 	return payloadDict
 
+def hostErrorPayload(errorCode, errorMessage, details=None):
+	payload = {
+		"code": str(errorCode),
+		"message": str(errorMessage)
+	}
+	if details is not None:
+		payload["details"] = dict(details)
+	return payload
+
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer
 	outputCaptureOn = True
@@ -2696,22 +2705,43 @@ def handleBettingCommand(command, pointPhase=False):
 	writeOutput("That's not an option, silly!")
 	return returnCommandResult(shouldRoll=False, handled=False)
 
-def submitCommand(commandText, pointPhase=False, autoCapture=False):
+def submitCommand(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
 	commandValue = str(commandText).strip().lower()
-	if autoCapture:
-		captureResult = runWithCapture(lambda: handleBettingCommand(commandValue, pointPhase=pointPhase))
-		commandResult = captureResult["result"]
-		capturedOutput = list(captureResult["capturedOutput"])
-		capturedPrompts = list(captureResult["capturedPrompts"])
-	else:
-		commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
-		capturedOutput = getCapturedOutput()
-		capturedPrompts = getCapturedPrompts()
+	capturedOutput = []
+	capturedPrompts = []
+	commandResult = None
+	success = True
+	error = None
+	try:
+		if autoCapture:
+			captureResult = runWithCapture(lambda: handleBettingCommand(commandValue, pointPhase=pointPhase))
+			commandResult = captureResult["result"]
+			capturedOutput = list(captureResult["capturedOutput"])
+			capturedPrompts = list(captureResult["capturedPrompts"])
+		else:
+			commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
+			capturedOutput = getCapturedOutput()
+			capturedPrompts = getCapturedPrompts()
+	except Exception as exc:
+		success = False
+		error = hostErrorPayload(
+			errorCode="commandExecutionFailed",
+			errorMessage=str(exc),
+			details={
+				"exceptionType": type(exc).__name__,
+				"command": commandValue,
+				"pointPhase": bool(pointPhase)
+			}
+		)
+		if raiseOnError:
+			raise
 	resultPayload = withApiVersion({
+		"success": bool(success),
+		"error": error,
 		"command": commandValue,
 		"pointPhase": bool(pointPhase),
-		"shouldRoll": bool(commandResult.shouldRoll),
-		"handled": bool(commandResult.handled),
+		"shouldRoll": bool(commandResult.shouldRoll) if commandResult is not None else False,
+		"handled": bool(commandResult.handled) if commandResult is not None else False,
 		"runtimeState": getRuntimeState(),
 		"capturedOutput": capturedOutput,
 		"capturedPrompts": capturedPrompts
@@ -2719,11 +2749,13 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False):
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
 
-def step(commandText=None, pointPhase=False, autoCapture=False):
+def step(commandText=None, pointPhase=False, autoCapture=False, raiseOnError=False):
 	if commandText is not None:
-		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase, autoCapture=autoCapture)
+		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase, autoCapture=autoCapture, raiseOnError=raiseOnError)
 		stepPayload = withApiVersion({
 			"stepType": "command",
+			"success": bool(commandPayload["success"]),
+			"error": commandPayload["error"],
 			"commandResult": commandPayload,
 			"cycleResult": None,
 			"runtimeState": commandPayload["runtimeState"],
@@ -2733,20 +2765,55 @@ def step(commandText=None, pointPhase=False, autoCapture=False):
 		emitEvent("stepCompleted", stepPayload)
 		return stepPayload
 	if pointPhase:
-		raise ValueError("pointPhase can only be used with commandText.")
-	if autoCapture:
-		captureResult = runWithCapture(lambda: runOneCycle())
-		cyclePayload = captureResult["result"]
-		capturedOutput = list(captureResult["capturedOutput"])
-		capturedPrompts = list(captureResult["capturedPrompts"])
-	else:
-		cyclePayload = runOneCycle()
-		capturedOutput = getCapturedOutput()
-		capturedPrompts = getCapturedPrompts()
+		errorPayload = hostErrorPayload(
+			errorCode="invalidStepArguments",
+			errorMessage="pointPhase can only be used with commandText.",
+			details={"pointPhase": True, "commandText": None}
+		)
+		stepPayload = withApiVersion({
+			"stepType": "cycle",
+			"success": False,
+			"error": errorPayload,
+			"commandResult": None,
+			"cycleResult": None,
+			"runtimeState": getRuntimeState(),
+			"capturedOutput": getCapturedOutput(),
+			"capturedPrompts": getCapturedPrompts()
+		})
+		emitEvent("stepCompleted", stepPayload)
+		if raiseOnError:
+			raise ValueError("pointPhase can only be used with commandText.")
+		return stepPayload
+	capturedOutput = []
+	capturedPrompts = []
+	success = True
+	error = None
+	cyclePayload = None
+	try:
+		if autoCapture:
+			captureResult = runWithCapture(lambda: runOneCycle())
+			cyclePayload = captureResult["result"]
+			capturedOutput = list(captureResult["capturedOutput"])
+			capturedPrompts = list(captureResult["capturedPrompts"])
+		else:
+			cyclePayload = runOneCycle()
+			capturedOutput = getCapturedOutput()
+			capturedPrompts = getCapturedPrompts()
+	except Exception as exc:
+		success = False
+		error = hostErrorPayload(
+			errorCode="cycleExecutionFailed",
+			errorMessage=str(exc),
+			details={"exceptionType": type(exc).__name__}
+		)
+		if raiseOnError:
+			raise
 	stepPayload = withApiVersion({
 		"stepType": "cycle",
+		"success": bool(success),
+		"error": error,
 		"commandResult": None,
-		"cycleResult": dict(cyclePayload),
+		"cycleResult": dict(cyclePayload) if cyclePayload is not None else None,
 		"runtimeState": getRuntimeState(),
 		"capturedOutput": capturedOutput,
 		"capturedPrompts": capturedPrompts

@@ -1368,6 +1368,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["handled"], True)
 		self.assertIn("runtimeState", payload)
 		self.assertIn("capturedOutput", payload)
+		self.assertIn("capturedPrompts", payload)
 
 	def testSubmitCommandReturnsUnhandledPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1378,6 +1379,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["handled"], False)
 		self.assertIn("runtimeState", payload)
 		self.assertIn("capturedOutput", payload)
+		self.assertIn("capturedPrompts", payload)
 
 	def testSubmitCommandEmitsCommandProcessedEvent(self):
 		terminal = loadTerminalNamespace()
@@ -1403,6 +1405,28 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["endOutputCapture"]()
 		terminal["resetIoHandlers"]()
 
+	def testPromptCaptureBuffersReadInputPromptWhenEnabled(self):
+		terminal = loadTerminalNamespace()
+		terminal["setIoHandlers"](inputFunc=lambda promptText: "ok")
+		terminal["beginPromptCapture"]()
+		response = terminal["readInput"]("Prompt > ")
+		self.assertEqual(response, "ok")
+		self.assertEqual(terminal["getCapturedPrompts"](), ["Prompt > "])
+		terminal["endPromptCapture"]()
+		terminal["resetIoHandlers"]()
+
+	def testReadInputEmitsInputRequestedEvent(self):
+		terminal = loadTerminalNamespace()
+		events = []
+		terminal["setIoHandlers"](inputFunc=lambda promptText: "y")
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		response = terminal["readInput"]("Bankroll? > ")
+		self.assertEqual(response, "y")
+		self.assertEqual(events[0][0], "inputRequested")
+		self.assertEqual(events[0][1]["prompt"], "Bankroll? > ")
+		terminal["resetEventHandler"]()
+		terminal["resetIoHandlers"]()
+
 	def testSubmitCommandIncludesCapturedOutputWhenCaptureEnabled(self):
 		terminal = loadTerminalNamespace()
 		terminal["beginOutputCapture"]()
@@ -1410,6 +1434,18 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertTrue(len(payload["capturedOutput"]) >= 1)
 		self.assertIn("Rolling the dice!", " ".join(payload["capturedOutput"]))
 		terminal["endOutputCapture"]()
+
+	def testSubmitCommandIncludesCapturedPromptsWhenCaptureEnabled(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		inputs = iter(["y", "10"])
+		terminal["setIoHandlers"](inputFunc=lambda promptText: next(inputs))
+		terminal["beginPromptCapture"]()
+		payload = terminal["submitCommand"]("f", pointPhase=False)
+		self.assertTrue(len(payload["capturedPrompts"]) >= 1)
+		self.assertIn("Field Bet? > ", payload["capturedPrompts"])
+		terminal["endPromptCapture"]()
+		terminal["resetIoHandlers"]()
 
 	def testStepCommandReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1421,6 +1457,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(stepPayload["cycleResult"], None)
 		self.assertIn("runtimeState", stepPayload)
 		self.assertIn("capturedOutput", stepPayload)
+		self.assertIn("capturedPrompts", stepPayload)
 
 	def testStepCycleReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1438,6 +1475,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(stepPayload["cycleResult"]["enteredPointPhase"], False)
 		self.assertIn("runtimeState", stepPayload)
 		self.assertIn("capturedOutput", stepPayload)
+		self.assertIn("capturedPrompts", stepPayload)
 
 	def testStepEmitsStepCompletedEvent(self):
 		terminal = loadTerminalNamespace()

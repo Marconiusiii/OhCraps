@@ -14,6 +14,8 @@ randomProvider = random
 eventHandler = None
 outputCaptureOn = False
 outputCaptureBuffer = []
+promptCaptureOn = False
+promptCaptureBuffer = []
 
 def setIoHandlers(outputFunc=None, inputFunc=None):
 	global outputHandler, inputHandler
@@ -65,6 +67,20 @@ def endOutputCapture():
 def getCapturedOutput():
 	return list(outputCaptureBuffer)
 
+def beginPromptCapture():
+	global promptCaptureOn, promptCaptureBuffer
+	promptCaptureOn = True
+	promptCaptureBuffer = []
+	return list(promptCaptureBuffer)
+
+def endPromptCapture():
+	global promptCaptureOn
+	promptCaptureOn = False
+	return getCapturedPrompts()
+
+def getCapturedPrompts():
+	return list(promptCaptureBuffer)
+
 def writeOutput(message):
 	global outputCaptureBuffer
 	if outputCaptureOn:
@@ -75,9 +91,14 @@ def writeOutput(message):
 		outputHandler(message)
 
 def readInput(promptText):
+	global promptCaptureBuffer
+	promptValue = str(promptText)
+	if promptCaptureOn:
+		promptCaptureBuffer.append(promptValue)
+	emitEvent("inputRequested", {"prompt": promptValue})
 	if inputHandler is None:
-		return str(input(promptText))
-	return str(inputHandler(promptText))
+		return str(input(promptValue))
+	return str(inputHandler(promptValue))
 
 class comeOutRollResult:
 	def __init__(self, enteredPointPhase, outcome):
@@ -2614,7 +2635,8 @@ def submitCommand(commandText, pointPhase=False):
 		"shouldRoll": bool(commandResult.shouldRoll),
 		"handled": bool(commandResult.handled),
 		"runtimeState": getRuntimeState(),
-		"capturedOutput": getCapturedOutput()
+		"capturedOutput": getCapturedOutput(),
+		"capturedPrompts": getCapturedPrompts()
 	}
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
@@ -2627,7 +2649,8 @@ def step(commandText=None, pointPhase=False):
 			"commandResult": commandPayload,
 			"cycleResult": None,
 			"runtimeState": commandPayload["runtimeState"],
-			"capturedOutput": list(commandPayload["capturedOutput"])
+			"capturedOutput": list(commandPayload["capturedOutput"]),
+			"capturedPrompts": list(commandPayload["capturedPrompts"])
 		}
 		emitEvent("stepCompleted", stepPayload)
 		return stepPayload
@@ -2639,7 +2662,8 @@ def step(commandText=None, pointPhase=False):
 		"commandResult": None,
 		"cycleResult": dict(cyclePayload),
 		"runtimeState": getRuntimeState(),
-		"capturedOutput": getCapturedOutput()
+		"capturedOutput": getCapturedOutput(),
+		"capturedPrompts": getCapturedPrompts()
 	}
 	emitEvent("stepCompleted", stepPayload)
 	return stepPayload

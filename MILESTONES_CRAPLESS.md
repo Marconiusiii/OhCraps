@@ -1997,3 +1997,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- submit/step payload shape assertions now include `capturedOutput`
 - Compile check passed.
 - Full suite remains green (`268` tests passing).
+
+## Milestone 95: Prompt Capture and inputRequested Event Integration
+
+### What changed
+- Added prompt capture runtime controls:
+	- `beginPromptCapture()`
+	- `endPromptCapture()`
+	- `getCapturedPrompts()`
+- Added prompt capture state:
+	- `promptCaptureOn`
+	- `promptCaptureBuffer`
+- Updated `readInput(promptText)` to:
+	- emit `inputRequested` event for every prompt
+	- append prompt text to capture buffer when prompt capture is enabled
+- Extended host payloads to include prompt transcripts:
+	- `submitCommand(...)` now includes `capturedPrompts`
+	- `step(...)` now includes `capturedPrompts` in both command and cycle payloads
+
+### Why
+- iOS/web hosts need visibility into input prompts to render native UI prompt flows without scraping terminal text.
+- Prompt capture complements output capture so each step can carry complete interaction context (prompts + outputs).
+- `inputRequested` provides real-time prompt intent signaling to host controllers.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Terminal input/output behavior unchanged.
+
+### Test coverage
+- Added deterministic prompt-capture/input-event regressions in `tests/testEngineBehavior.py`:
+	- `testPromptCaptureBuffersReadInputPromptWhenEnabled`
+	- `testReadInputEmitsInputRequestedEvent`
+	- `testSubmitCommandIncludesCapturedPromptsWhenCaptureEnabled`
+- Updated command/step payload shape regressions to assert `capturedPrompts` presence.
+- Compile check passed.
+- Full suite remains green (`271` tests passing).

@@ -2747,3 +2747,51 @@ New milestone updates should be appended here rather than creating new milestone
 	- strict raise-on-failure mode
 	- schema includes workflow-report keys
 - Full suite remains green after this milestone.
+
+## Milestone 115: Solo Debug Bundle For One-Person QA
+
+### What problem this solves
+- You are both developer and QA, so you need one fast check that shows if the engine state is healthy before and after a command.
+- Before this milestone, you had to call multiple helpers separately and compare outputs manually.
+
+### What changed
+- Added `createSoloDebugBundle(commandText=None, pointPhase=False, runAction=False, autoCapture=True)`.
+- Added `soloDebugBundle` contract keys in the host schema descriptor.
+- Added tests for:
+	- no-action debug snapshot path
+	- run-action success path
+	- invalid-action failure path
+
+### Why this helps
+- One call now gives you:
+	- whether the command path was valid
+	- whether the command ran
+	- a health check report
+	- a status panel snapshot
+	- a UI snapshot
+- This reduces manual QA friction and makes regressions easier to isolate.
+
+### How to use it in a debug cycle
+- Step 1: Create a baseline snapshot without running an action:
+	- `createSoloDebugBundle(runAction=False)`
+- Step 2: Run one target command and capture outcome:
+	- `createSoloDebugBundle(commandText="p", pointPhase=False, runAction=True)`
+- Step 3: Compare:
+	- `summaryLine`
+	- `actionResult`
+	- `healthReport.issues`
+	- `statusPanel`
+- Step 4: Repeat with the same inputs when verifying a fix.
+
+### Why this is deterministic
+- Same input state plus same command now returns the same report shape and status fields.
+- That consistency makes bug reproduction and fix verification predictable.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added dedicated tests for all primary bundle paths.
+- Full suite remains green after this milestone.

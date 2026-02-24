@@ -275,6 +275,10 @@ def hostSchemaDescriptor():
 				"workflowReport": [
 					"engineApiVersion", "ok", "passedSteps", "failedSteps", "steps", "finalRuntimeState"
 				],
+				"soloDebugBundle": [
+					"engineApiVersion", "ok", "summaryLine", "actionExecuted", "actionResult",
+					"workflowStatus", "healthReport", "statusPanel", "uiSnapshot"
+				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
 					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
@@ -629,6 +633,67 @@ def runHostWorkflow(startBank=None, selectedMode=None, actionLog=None, resetBefo
 	if raiseOnFailure and len(failedSteps) > 0:
 		raise ValueError(f"Workflow failed: {', '.join(failedSteps)}")
 	return report
+
+def createSoloDebugBundle(commandText=None, pointPhase=False, runAction=False, autoCapture=True):
+	validationError = validateHostActionInput(commandText="h", pointPhase=pointPhase)
+	if validationError is not None:
+		return withApiVersion({
+			"ok": False,
+			"summaryLine": validationError["message"],
+			"actionExecuted": False,
+			"actionResult": None,
+			"workflowStatus": {
+				"ok": False,
+				"passedChecks": [],
+				"failedChecks": ["pointPhaseValidation"]
+			},
+			"healthReport": createHostHealthReport(raiseOnIssue=False),
+			"statusPanel": createHostStatusPanel(pointPhase=False),
+			"uiSnapshot": createHostUiSnapshot(pointPhase=False)
+		})
+	if runAction:
+		actionResult = runHostAction(
+			commandText=commandText,
+			pointPhase=pointPhase,
+			autoCapture=autoCapture,
+			raiseOnError=False
+		)
+	else:
+		actionResult = None
+	healthReport = createHostHealthReport(raiseOnIssue=False)
+	uiSnapshot = createHostUiSnapshot(pointPhase=pointPhase)
+	statusPanel = createHostStatusPanel(pointPhase=pointPhase)
+	workflowChecks = [
+		("startupBundle", bool(createHostStartupBundle().get("success", False))),
+		("snapshotKeys", ("runtimeState" in uiSnapshot and "allowedCommands" in uiSnapshot)),
+		("statusPanelKeys", ("bankrollDisplay" in statusPanel and "throwDisplay" in statusPanel)),
+		("healthReport", bool(healthReport.get("ok", False)))
+	]
+	passedChecks = [name for name, ok in workflowChecks if ok]
+	failedChecks = [name for name, ok in workflowChecks if not ok]
+	workflowStatus = {
+		"ok": len(failedChecks) == 0,
+		"passedChecks": passedChecks,
+		"failedChecks": failedChecks
+	}
+	if actionResult is None:
+		summaryLine = "No action executed. Use runAction=True to test a command."
+	elif not bool(actionResult.get("success", False)):
+		summaryLine = f"Action failed: {actionResult['error']['message']}"
+	elif not bool(actionResult.get("commandResult", {}).get("handled", False)):
+		summaryLine = f"Action '{actionResult['commandResult']['command']}' was not recognized."
+	else:
+		summaryLine = f"Action '{actionResult['commandResult']['command']}' handled successfully."
+	return withApiVersion({
+		"ok": bool(workflowStatus["ok"] and healthReport["ok"] and (actionResult is None or actionResult.get("success", False))),
+		"summaryLine": summaryLine,
+		"actionExecuted": bool(runAction),
+		"actionResult": actionResult,
+		"workflowStatus": workflowStatus,
+		"healthReport": healthReport,
+		"statusPanel": statusPanel,
+		"uiSnapshot": uiSnapshot
+	})
 
 def runtimeWagerTotal(runtimeState):
 	lineTotal = sum(int(value) for value in runtimeState["lineBets"].values())

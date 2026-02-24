@@ -1688,6 +1688,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
 		self.assertIn("workflowReport", descriptor["payloadKeys"])
+		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
 		self.assertIn("actionLogRun", descriptor["payloadKeys"])
 		self.assertIn("replayReport", descriptor["payloadKeys"])
@@ -2007,6 +2008,34 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 				resetBefore=True,
 				raiseOnFailure=True
 			)
+
+	def testCreateSoloDebugBundleNoActionPath(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		bundle = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
+		self.assertEqual(bundle["ok"], True)
+		self.assertEqual(bundle["actionExecuted"], False)
+		self.assertEqual(bundle["actionResult"], None)
+		self.assertIn("No action executed", bundle["summaryLine"])
+		self.assertIn("workflowStatus", bundle)
+		self.assertIn("healthReport", bundle)
+
+	def testCreateSoloDebugBundleRunActionPath(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		bundle = terminal["createSoloDebugBundle"](runAction=True, commandText="x", pointPhase=False)
+		self.assertEqual(bundle["actionExecuted"], True)
+		self.assertEqual(bundle["actionResult"]["success"], True)
+		self.assertIn("handled successfully", bundle["summaryLine"])
+
+	def testCreateSoloDebugBundleRunActionValidationFailure(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		bundle = terminal["createSoloDebugBundle"](runAction=True, commandText="", pointPhase=False)
+		self.assertEqual(bundle["ok"], False)
+		self.assertEqual(bundle["actionExecuted"], True)
+		self.assertEqual(bundle["actionResult"]["success"], False)
+		self.assertIn("Action failed:", bundle["summaryLine"])
 
 	def testCreateHostHealthReportHealthyState(self):
 		terminal = loadTerminalNamespace()

@@ -2350,3 +2350,38 @@ New milestone updates should be appended here rather than creating new milestone
 	- invalid startup values error handling
 	- compatibility failure details included in startup package
 - Full suite remains green after this milestone.
+
+## Milestone 104: Host Command List API (What buttons are valid right now)
+
+### What problem this solves
+- An app UI needs to know which commands are valid in the current moment.
+- Before this, the app had to hardcode that logic and could drift from engine behavior.
+
+### What changed
+- Added `hostAllowedCommands(pointPhase=False)` in `OhCraps_Py3.command`.
+- This returns a simple package with:
+	- current mode
+	- whether we are in point phase
+	- command list with:
+		- `code`
+		- `label`
+		- `enabled`
+		- optional `reason` if disabled
+- Added `allowedCommands` contract keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can build menus/buttons directly from the engine response.
+- Mode-specific rules are now provided by the engine, not guessed by the app.
+
+### Behavior
+- No craps rules changed.
+- No payout math changed.
+- Terminal gameplay flow is unchanged.
+
+### Test coverage
+- Added tests for:
+	- Craps come-out command list includes enabled `dcd`
+	- Crapless come-out command list disables `dcd` with reason
+	- point-phase command list includes odds/come actions
+	- schema descriptor includes `allowedCommands`
+- Full suite remains green after this milestone.

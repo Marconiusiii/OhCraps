@@ -1678,8 +1678,38 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("step", descriptor["payloadKeys"])
 		self.assertIn("sessionBundle", descriptor["payloadKeys"])
 		self.assertIn("startupBundle", descriptor["payloadKeys"])
+		self.assertIn("allowedCommands", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
+
+	def testHostAllowedCommandsComeOutCrapsIncludesDontComeTakeDown(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["hostAllowedCommands"](pointPhase=False)
+		commandsByCode = {item["code"]: item for item in payload["commands"]}
+		self.assertEqual(payload["pointPhase"], False)
+		self.assertIn("l", commandsByCode)
+		self.assertIn("dcd", commandsByCode)
+		self.assertEqual(commandsByCode["dcd"]["enabled"], True)
+
+	def testHostAllowedCommandsComeOutCraplessDisablesDontComeTakeDown(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		payload = terminal["hostAllowedCommands"](pointPhase=False)
+		commandsByCode = {item["code"]: item for item in payload["commands"]}
+		self.assertIn("dcd", commandsByCode)
+		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
+		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testHostAllowedCommandsPointPhaseIncludesOddsAndCome(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["hostAllowedCommands"](pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["commands"]}
+		self.assertEqual(payload["pointPhase"], True)
+		self.assertIn("o", commandsByCode)
+		self.assertIn("c", commandsByCode)
+		self.assertIn("dp", commandsByCode)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

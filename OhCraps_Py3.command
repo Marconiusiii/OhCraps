@@ -150,6 +150,64 @@ def buildGameInitializedEventPayload(startBank, mode, runtimeState):
 		"runtimeState": dict(runtimeState)
 	})
 
+def commandItem(code, label, enabled=True, reason=None):
+	item = {
+		"code": str(code),
+		"label": str(label),
+		"enabled": bool(enabled)
+	}
+	if reason is not None:
+		item["reason"] = str(reason)
+	return item
+
+def hostAllowedCommands(pointPhase=False):
+	commands = []
+	if pointPhase:
+		commands.extend([
+			commandItem("o", "Line and Lay Odds"),
+			commandItem("p", "Place Bets"),
+			commandItem("ly", "Lay Bets"),
+			commandItem("c", "Come Bets"),
+			commandItem("f", "Field Bet"),
+			commandItem("hd", "Hard Ways"),
+			commandItem("pr", "Prop Bets"),
+			commandItem("bb", "Add Bankroll"),
+			commandItem("h", "Help"),
+			commandItem("x", "Roll Dice"),
+			commandItem("r", "Roll Dice")
+		])
+		if gameMode == GameMode.craps:
+			commands.append(commandItem("dp", "Take Down Don't Pass"))
+			commands.append(commandItem("dcd", "Take Down Don't Come"))
+		else:
+			commands.append(commandItem("dp", "Take Down Don't Pass", enabled=False, reason="Not available in Crapless Craps"))
+			commands.append(commandItem("dcd", "Take Down Don't Come", enabled=False, reason="Not available in Crapless Craps"))
+	else:
+		commands.extend([
+			commandItem("l", "Line Bets"),
+			commandItem("p", "Place Bets"),
+			commandItem("ly", "Lay Bets"),
+			commandItem("f", "Field Bet"),
+			commandItem("hd", "Hard Ways"),
+			commandItem("pr", "Prop Bets"),
+			commandItem("w", "Toggle Working Bets"),
+			commandItem("ats", "All Tall Small"),
+			commandItem("fire", "Fire Bet"),
+			commandItem("bb", "Add Bankroll"),
+			commandItem("h", "Help"),
+			commandItem("x", "Roll Dice"),
+			commandItem("r", "Roll Dice")
+		])
+		if gameMode == GameMode.craps:
+			commands.append(commandItem("dcd", "Take Down Don't Come"))
+		else:
+			commands.append(commandItem("dcd", "Take Down Don't Come", enabled=False, reason="Not available in Crapless Craps"))
+	return withApiVersion({
+		"gameMode": gameMode,
+		"pointPhase": bool(pointPhase),
+		"commands": commands
+	})
+
 def hostFeatureFlags():
 	return {
 		"autoCapture": True,
@@ -180,6 +238,9 @@ def hostSchemaDescriptor():
 			"startupBundle": [
 				"engineApiVersion", "success", "error", "initialized", "runtimeState",
 				"schemaDescriptor", "compatibility", "features"
+			],
+			"allowedCommands": [
+				"engineApiVersion", "gameMode", "pointPhase", "commands"
 			],
 			"events": {
 				"inputRequested": ["engineApiVersion", "prompt"],

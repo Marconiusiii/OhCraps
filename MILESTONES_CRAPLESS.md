@@ -2107,3 +2107,42 @@ New milestone updates should be appended here rather than creating new milestone
 	- cycle boundary events
 - Compile check passed.
 - Full suite remains green (`275` tests passing).
+
+## Milestone 98: Session Bundle Export/Import API for Host Save and Restore
+
+### What changed
+- Added session export API:
+	- `exportSessionBundle()`
+	- returns canonical bundle payload with:
+		- `engineApiVersion`
+		- `bundleType` (`ohcrapsSession`)
+		- `runtimeState`
+		- `gameMode`
+		- `captureState` (prompt/output capture flags + buffers)
+		- `hostMetadata`
+- Added session import API:
+	- `importSessionBundle(bundle)`
+	- validates bundle type/version/shape
+	- restores runtime via `setRuntimeState(...)`
+	- restores capture flags/buffers
+	- emits `sessionImported` event
+	- returns normalized exported bundle after import
+
+### Why
+- Host apps need one stable persistence/replay contract instead of stitching runtime/capture/event state manually.
+- Canonical bundle export/import simplifies save/load, handoff, and debugging workflows for iOS/web hosts.
+- Version/type checks protect against incompatible session payloads.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Runtime play flow unchanged; this is additive host-session functionality.
+
+### Test coverage
+- Added deterministic session-bundle regressions in `tests/testEngineBehavior.py`:
+	- `testExportSessionBundleIncludesVersionAndCaptureState`
+	- `testImportSessionBundleRoundTripRestoresState`
+	- `testImportSessionBundleRejectsInvalidVersion`
+	- `testImportSessionBundleEmitsSessionImportedEvent`
+- Compile check passed.
+- Full suite remains green (`279` tests passing).

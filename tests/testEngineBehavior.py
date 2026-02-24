@@ -2251,6 +2251,59 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(resetState["lineBets"], defaultState["lineBets"])
 		self.assertEqual(resetState["betSnapshot"]["fieldBet"], defaultState["betSnapshot"]["fieldBet"])
 
+	def testExportSessionBundleIncludesVersionAndCaptureState(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({"bank": 123, "gameMode": terminal["GameMode"].craplessCraps})
+		terminal["outputCaptureOn"] = True
+		terminal["outputCaptureBuffer"] = ["out1"]
+		terminal["promptCaptureOn"] = True
+		terminal["promptCaptureBuffer"] = ["p1"]
+		bundle = terminal["exportSessionBundle"]()
+		self.assertEqual(bundle["engineApiVersion"], terminal["engineApiVersion"])
+		self.assertEqual(bundle["bundleType"], "ohcrapsSession")
+		self.assertEqual(bundle["runtimeState"]["bank"], 123)
+		self.assertEqual(bundle["captureState"]["outputCaptureOn"], True)
+		self.assertEqual(bundle["captureState"]["promptCaptureBuffer"], ["p1"])
+
+	def testImportSessionBundleRoundTripRestoresState(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({"bank": 222, "throws": 4, "gameMode": terminal["GameMode"].craplessCraps})
+		terminal["outputCaptureOn"] = True
+		terminal["outputCaptureBuffer"] = ["a", "b"]
+		terminal["promptCaptureOn"] = False
+		terminal["promptCaptureBuffer"] = ["q1"]
+		bundle = terminal["exportSessionBundle"]()
+		terminal["setRuntimeState"]({"bank": 1, "throws": 0, "gameMode": terminal["GameMode"].craps})
+		terminal["outputCaptureOn"] = False
+		terminal["outputCaptureBuffer"] = []
+		terminal["promptCaptureOn"] = True
+		terminal["promptCaptureBuffer"] = []
+		importedBundle = terminal["importSessionBundle"](bundle)
+		self.assertEqual(terminal["bank"], 222)
+		self.assertEqual(terminal["throws"], 4)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(terminal["outputCaptureOn"], True)
+		self.assertEqual(terminal["outputCaptureBuffer"], ["a", "b"])
+		self.assertEqual(importedBundle["runtimeState"]["bank"], 222)
+
+	def testImportSessionBundleRejectsInvalidVersion(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		bundle["engineApiVersion"] = "0.0.1"
+		with self.assertRaises(ValueError):
+			terminal["importSessionBundle"](bundle)
+
+	def testImportSessionBundleEmitsSessionImportedEvent(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		events = []
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		terminal["importSessionBundle"](bundle)
+		self.assertEqual(events[-1][0], "sessionImported")
+		self.assertEqual(events[-1][1]["engineApiVersion"], terminal["engineApiVersion"])
+		self.assertEqual(events[-1][1]["bundleType"], "ohcrapsSession")
+		terminal["resetEventHandler"]()
+
 	def testSyncRuntimeFromGlobalsCapturesCoreLoopValues(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 345

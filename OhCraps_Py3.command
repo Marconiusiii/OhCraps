@@ -1925,6 +1925,47 @@ def setRuntimeState(runtimeState):
 def resetRuntimeState():
 	return setRuntimeState(buildDefaultRuntimeState())
 
+def exportSessionBundle():
+	return withApiVersion({
+		"bundleType": "ohcrapsSession",
+		"runtimeState": getRuntimeState(),
+		"gameMode": gameMode,
+		"captureState": {
+			"outputCaptureOn": bool(outputCaptureOn),
+			"outputCaptureBuffer": list(outputCaptureBuffer),
+			"promptCaptureOn": bool(promptCaptureOn),
+			"promptCaptureBuffer": list(promptCaptureBuffer)
+		},
+		"hostMetadata": {
+			"appName": "Oh Craps",
+			"bundleFormat": "sessionBundleV1"
+		}
+	})
+
+def importSessionBundle(bundle):
+	global outputCaptureOn, outputCaptureBuffer, promptCaptureOn, promptCaptureBuffer
+	if not isinstance(bundle, dict):
+		raise ValueError("Session bundle must be a dictionary.")
+	if bundle.get("engineApiVersion") != engineApiVersion:
+		raise ValueError("Unsupported session bundle version.")
+	requiredKeys = ["bundleType", "runtimeState", "captureState"]
+	for key in requiredKeys:
+		if key not in bundle:
+			raise ValueError(f"Missing required bundle key: {key}")
+	if bundle["bundleType"] != "ohcrapsSession":
+		raise ValueError("Unsupported session bundle type.")
+	captureState = bundle["captureState"]
+	if not isinstance(captureState, dict):
+		raise ValueError("Invalid captureState in session bundle.")
+	setRuntimeState(bundle["runtimeState"])
+	outputCaptureOn = bool(captureState.get("outputCaptureOn", False))
+	outputCaptureBuffer = list(captureState.get("outputCaptureBuffer", []))
+	promptCaptureOn = bool(captureState.get("promptCaptureOn", False))
+	promptCaptureBuffer = list(captureState.get("promptCaptureBuffer", []))
+	importedBundle = exportSessionBundle()
+	emitEvent("sessionImported", withApiVersion({"runtimeState": getRuntimeState(), "bundleType": importedBundle["bundleType"]}))
+	return importedBundle
+
 placeOff = False
 
 def validPlaceNumbers():

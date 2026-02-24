@@ -3274,3 +3274,40 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Test-only refactor; no behavioral logic changes.
 - Full suite remains green after this milestone.
+
+## Milestone 128: Critical Host-Contract Fast Suite
+
+### What problem this solves
+- You needed one focused fast test target that checks the most important host-integration contracts together.
+
+### What changed
+- Added `HostContractCriticalFastSuite` in test suite.
+- This fast suite covers:
+	- bootstrap pass
+	- action summary handled + validation error path
+	- session compatibility pass + fail
+	- event validation pass + fail
+	- schema snapshot baseline
+
+### Why this helps
+- One quick test run now covers the most critical host-contract risks.
+- Better speed for solo iteration between full-suite runs.
+
+### Fast command
+- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractCriticalFastSuite`
+
+### How to use in your test cycle
+- While iterating host-integration code: run the fast command above.
+- Before milestone completion/commit: run full gate.
+
+### Full gate
+- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added focused critical fast suite for host-contract checks.
+- Full suite remains green after this milestone.

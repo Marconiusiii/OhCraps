@@ -4565,5 +4565,44 @@ class HostContractSnapshotTests(unittest.TestCase):
 			self.assertEqual(expectedKeys, eventsMap[eventName], f"event contract drift for {eventName}")
 
 
+class HostContractCriticalFastSuite(unittest.TestCase):
+	def testCriticalBootstrapPass(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["createHostBootstrapReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["failedChecks"], [])
+
+	def testCriticalActionSummaryHandledAndValidationError(self):
+		terminal = loadTerminalNamespace()
+		handledPayload = terminal["runHostAction"]("x", pointPhase=False)
+		invalidPayload = terminal["runHostAction"]("", pointPhase=False)
+		assertActionSummaryShape(self, handledPayload["actionSummary"])
+		assertActionSummaryShape(self, invalidPayload["actionSummary"])
+		self.assertEqual(handledPayload["actionSummary"]["actionState"], "handled")
+		self.assertEqual(invalidPayload["actionSummary"]["actionState"], "validationError")
+
+	def testCriticalSessionCompatibilityPassAndFail(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["exportSessionBundle"]()
+		passReport = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(passReport["ok"], True)
+		bundle["engineApiVersion"] = "0.0.1"
+		failReport = terminal["validateSessionBundleCompatibility"](bundle)
+		self.assertEqual(failReport["ok"], False)
+
+	def testCriticalEventValidationPassAndFail(self):
+		terminal = loadTerminalNamespace()
+		validPayload = terminal["buildInputRequestedEventPayload"]("Bankroll? > ")
+		passReport = terminal["validateHostEventPayload"]("inputRequested", validPayload)
+		failReport = terminal["validateHostEventPayload"]("inputRequested", {"engineApiVersion": terminal["engineApiVersion"]})
+		self.assertEqual(passReport["ok"], True)
+		self.assertEqual(failReport["ok"], False)
+
+	def testCriticalSchemaSnapshot(self):
+		terminal = loadTerminalNamespace()
+		descriptor = terminal["hostSchemaDescriptor"]()
+		assertHostSchemaContracts(self, descriptor)
+
+
 if __name__ == "__main__":
 	unittest.main()

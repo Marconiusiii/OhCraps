@@ -3025,3 +3025,48 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added tests for pass, version mismatch, missing keys, format mismatch, and strict raise behavior.
 - Full suite remains green after this milestone.
+
+## Milestone 122: Host-Safe Action Summary Contract
+
+### What problem this solves
+- App adapters needed a compact, UI-agnostic action result summary without parsing terminal text or deep nested payloads.
+
+### What changed
+- Added `actionSummary` contract keys in `hostSchemaDescriptor()`.
+- Added helper: `buildHostActionSummary(commandText, pointPhase, actionResult)`.
+- Updated `runHostAction(...)` to always include `actionSummary` in returned payloads.
+- `actionSummary` now reports:
+	- action state (`handled`, `unhandled`, `validationError`)
+	- summary line
+	- command and point phase
+	- success/handled/shouldRoll
+	- error code/message (if any)
+	- state change and phase change flags
+
+### Why this helps
+- iOS/web adapter code can rely on one stable summary object for action outcomes.
+- Reduces host-side parsing complexity and improves deterministic integration behavior.
+
+### How to use
+- Run any action through host API:
+	- `runHostAction("x", pointPhase=False)`
+- Read:
+	- `payload["actionSummary"]["actionState"]`
+	- `payload["actionSummary"]["summaryLine"]`
+	- `payload["actionSummary"]["errorCode"]`
+
+### How to run in your test cycle
+- Focused action path tests:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k RunHostAction`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added schema coverage for `actionSummary`.
+- Added handled/unhandled/validation-error action summary assertions.
+- Full suite remains green after this milestone.

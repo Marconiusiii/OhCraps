@@ -1686,6 +1686,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
 		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
 		self.assertIn("actionBundle", descriptor["payloadKeys"])
+		self.assertIn("actionSummary", descriptor["payloadKeys"])
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
 		self.assertIn("workflowReport", descriptor["payloadKeys"])
@@ -1879,7 +1880,10 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("uiSnapshot", payload)
 		self.assertIn("statusPanel", payload)
 		self.assertIn("stateDelta", payload)
+		self.assertIn("actionSummary", payload)
 		self.assertEqual(payload["uiSnapshot"]["pointPhase"], False)
+		self.assertEqual(payload["actionSummary"]["actionState"], "handled")
+		self.assertEqual(payload["actionSummary"]["handled"], True)
 
 	def testRunHostActionHandlesInvalidCommand(self):
 		terminal = loadTerminalNamespace()
@@ -1887,6 +1891,9 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["success"], True)
 		self.assertEqual(payload["commandResult"]["handled"], False)
 		self.assertEqual(payload["stateDelta"]["changed"], False)
+		self.assertEqual(payload["actionSummary"]["actionState"], "unhandled")
+		self.assertEqual(payload["actionSummary"]["handled"], False)
+		self.assertEqual(payload["actionSummary"]["success"], True)
 
 	def testValidateHostActionInputAcceptsValidInput(self):
 		terminal = loadTerminalNamespace()
@@ -1900,6 +1907,19 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
 		self.assertEqual(payload["commandResult"], None)
 		self.assertEqual(payload["stateDelta"]["changed"], False)
+		self.assertEqual(payload["actionSummary"]["actionState"], "validationError")
+		self.assertEqual(payload["actionSummary"]["success"], False)
+		self.assertEqual(payload["actionSummary"]["errorCode"], terminal["hostErrorCodes"]["invalidActionInput"])
+		self.assertIn("Action failed:", payload["actionSummary"]["summaryLine"])
+
+	def testBuildHostActionSummaryHandledAndUnhandledPaths(self):
+		terminal = loadTerminalNamespace()
+		handledPayload = terminal["runHostAction"]("h", pointPhase=False)
+		unhandledPayload = terminal["runHostAction"]("notACommand", pointPhase=False)
+		self.assertEqual(handledPayload["actionSummary"]["actionState"], "handled")
+		self.assertEqual(handledPayload["actionSummary"]["handled"], True)
+		self.assertEqual(unhandledPayload["actionSummary"]["actionState"], "unhandled")
+		self.assertEqual(unhandledPayload["actionSummary"]["handled"], False)
 
 	def testRunHostActionRejectsNonBooleanPointPhase(self):
 		terminal = loadTerminalNamespace()

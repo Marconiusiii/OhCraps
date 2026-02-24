@@ -278,7 +278,11 @@ def hostSchemaDescriptor():
 					"engineApiVersion", "success", "error", "commandResult", "stateDelta"
 				],
 				"actionBundle": [
-					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot", "statusPanel", "stateDelta"
+					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot", "statusPanel", "stateDelta", "actionSummary"
+				],
+				"actionSummary": [
+					"engineApiVersion", "actionState", "summaryLine", "command", "pointPhase",
+					"success", "handled", "shouldRoll", "errorCode", "errorMessage", "stateChanged", "phaseChanged"
 				],
 				"healthReport": [
 					"engineApiVersion", "ok", "issueCount", "issues", "summary"
@@ -477,6 +481,39 @@ def buildStateDeltaSummary(beforeState, afterState, pointPhase=None):
 		"toPointPhase": bool(afterPointPhase)
 	}
 
+def buildHostActionSummary(commandText, pointPhase, actionResult):
+	commandValue = str(commandText).strip() if commandText is not None else None
+	successValue = bool(actionResult.get("success", False)) if isinstance(actionResult, dict) else False
+	errorValue = actionResult.get("error") if isinstance(actionResult, dict) else None
+	commandResult = actionResult.get("commandResult") if isinstance(actionResult, dict) else None
+	stateDelta = actionResult.get("stateDelta") if isinstance(actionResult, dict) else None
+	handledValue = bool(commandResult.get("handled", False)) if isinstance(commandResult, dict) else False
+	shouldRollValue = bool(commandResult.get("shouldRoll", False)) if isinstance(commandResult, dict) else False
+	stateChangedValue = bool(stateDelta.get("changed", False)) if isinstance(stateDelta, dict) else False
+	phaseChangedValue = bool(stateDelta.get("phaseChanged", False)) if isinstance(stateDelta, dict) else False
+	if not successValue:
+		actionStateValue = "validationError"
+		summaryLineValue = f"Action failed: {errorValue.get('message') if isinstance(errorValue, dict) else 'Unknown error.'}"
+	elif handledValue:
+		actionStateValue = "handled"
+		summaryLineValue = f"Action '{commandResult.get('command', commandValue)}' handled successfully."
+	else:
+		actionStateValue = "unhandled"
+		summaryLineValue = f"Action '{commandResult.get('command', commandValue)}' was not recognized."
+	return withApiVersion({
+		"actionState": actionStateValue,
+		"summaryLine": summaryLineValue,
+		"command": (commandResult.get("command", commandValue) if isinstance(commandResult, dict) else commandValue),
+		"pointPhase": bool(pointPhase),
+		"success": successValue,
+		"handled": handledValue,
+		"shouldRoll": shouldRollValue,
+		"errorCode": (errorValue.get("code") if isinstance(errorValue, dict) else None),
+		"errorMessage": (errorValue.get("message") if isinstance(errorValue, dict) else None),
+		"stateChanged": stateChangedValue,
+		"phaseChanged": phaseChangedValue
+	})
+
 def validateHostActionInput(commandText, pointPhase):
 	if not isinstance(pointPhase, bool):
 		return hostErrorPayload(
@@ -537,7 +574,7 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		if raiseOnError:
 			raise ValueError(validationError["message"])
 		currentState = getRuntimeState()
-		return withApiVersion({
+		actionResult = withApiVersion({
 			"success": False,
 			"error": validationError,
 			"commandResult": None,
@@ -545,6 +582,8 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 			"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
 			"stateDelta": buildStateDeltaSummary(beforeState=currentState, afterState=currentState, pointPhase=normalizedPointPhase)
 		})
+		actionResult["actionSummary"] = buildHostActionSummary(commandText=commandText, pointPhase=normalizedPointPhase, actionResult=actionResult)
+		return actionResult
 	beforeState = getRuntimeState()
 	commandResult = submitCommand(
 		commandText=commandText,
@@ -553,7 +592,7 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		raiseOnError=raiseOnError
 	)
 	afterState = getRuntimeState()
-	return withApiVersion({
+	actionResult = withApiVersion({
 		"success": bool(commandResult["success"]),
 		"error": commandResult["error"],
 		"commandResult": commandResult,
@@ -561,6 +600,8 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
 		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=normalizedPointPhase)
 	})
+	actionResult["actionSummary"] = buildHostActionSummary(commandText=commandText, pointPhase=normalizedPointPhase, actionResult=actionResult)
+	return actionResult
 
 def buildHostActionLogEntry(commandText, pointPhase, actionResult):
 	commandResult = actionResult.get("commandResult") if isinstance(actionResult, dict) else None

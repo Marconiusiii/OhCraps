@@ -2037,6 +2037,44 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(bundle["actionResult"]["success"], False)
 		self.assertIn("Action failed:", bundle["summaryLine"])
 
+	def testSoloDebugMiniCycleCrapsMode(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
+		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
+		self.assertEqual(baseline["ok"], True)
+		self.assertEqual(baseline["healthReport"]["ok"], True)
+		self.assertEqual(commandResult["ok"], True)
+		self.assertEqual(commandResult["actionExecuted"], True)
+		self.assertEqual(commandResult["actionResult"]["success"], True)
+		self.assertIn("handled successfully", commandResult["summaryLine"])
+
+	def testSoloDebugMiniCycleCraplessMode(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
+		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
+		self.assertEqual(baseline["ok"], True)
+		self.assertEqual(baseline["healthReport"]["ok"], True)
+		self.assertEqual(commandResult["ok"], True)
+		self.assertEqual(commandResult["actionExecuted"], True)
+		self.assertEqual(commandResult["actionResult"]["success"], True)
+		self.assertIn("handled successfully", commandResult["summaryLine"])
+
+	def testSoloDebugMiniCycleInvalidActionHasStableFailureShape(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		bundle = terminal["createSoloDebugBundle"](runAction=True, commandText="", pointPhase=False)
+		self.assertEqual(bundle["ok"], False)
+		self.assertEqual(bundle["actionExecuted"], True)
+		self.assertEqual(bundle["actionResult"]["success"], False)
+		self.assertIn("error", bundle["actionResult"])
+		self.assertEqual(bundle["actionResult"]["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+		self.assertIn("Action failed:", bundle["summaryLine"])
+
 	def testCreateHostHealthReportHealthyState(self):
 		terminal = loadTerminalNamespace()
 		terminal["setRuntimeState"]({

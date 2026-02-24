@@ -2795,3 +2795,41 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added dedicated tests for all primary bundle paths.
 - Full suite remains green after this milestone.
+
+## Milestone 116: Repeatable Solo QA Mini-Cycle
+
+### What problem this solves
+- You needed one repeatable verification pattern for your day-to-day solo testing workflow.
+- Before this, the bundle existed, but the exact mini-cycle expectations were not enforced as one focused test set.
+
+### What changed
+- Added tests that lock a simple mini-cycle in both game modes:
+	- baseline capture with no action
+	- one valid host action
+	- one invalid host action
+- The tests verify that success/failure shape stays stable for quick regression checks.
+
+### Why this helps
+- You can now trust that your quick debug loop is guarded by tests.
+- If future edits break this loop, test failures point directly to the broken phase.
+
+### How to run this during your debug cycle
+- Step 1: Run full tests:
+	- `python3 -m unittest discover -s tests -p 'test*.py'`
+- Step 2: Focus on mini-cycle result lines in the test output:
+	- `testSoloDebugMiniCycleCrapsMode`
+	- `testSoloDebugMiniCycleCraplessMode`
+	- `testSoloDebugMiniCycleInvalidActionHasStableFailureShape`
+- Step 3: If any of these fail, fix that path first before deeper game-flow testing.
+
+### Deterministic note
+- These tests enforce that the same inputs produce the same report structure and success/failure fields.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added dedicated mini-cycle tests in the engine behavior suite.
+- Full suite remains green after this milestone.

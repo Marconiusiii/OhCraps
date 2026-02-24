@@ -1734,3 +1734,31 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing cycle/status tests continue to pass with runtime-object integration.
 - Compile check passed.
 - Full suite remains green (`251` tests passing).
+
+## Milestone 87: Roll Resolution Runtime Bridge Synchronization
+
+### What changed
+- Updated roll-resolution core functions to synchronize runtime bridge at entry/exit points:
+	- `resolveComeOutRoll()`
+	- `resolvePointRoll()`
+- Entry behavior now synchronizes `gameRuntime` from current globals before resolution logic.
+- Return paths now synchronize `gameRuntime` from globals after each outcome branch, preserving runtime/global alignment.
+
+### Why
+- These functions are central state transition points for every cycle.
+- Ensuring runtime/global sync at roll boundaries improves consistency for host integrations using `GameRuntime` without changing existing game behavior.
+- This is an incremental migration step that keeps compatibility with existing global-driven flows.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Legacy behavior and control flow preserved.
+- `gameRuntime` now consistently reflects post-resolution roll outcomes.
+
+### Test coverage
+- Added deterministic runtime-sync roll-resolution regressions in `tests/testEngineBehavior.py`:
+	- `testResolveComeOutRollSyncsGameRuntimeOnReturn`
+	- `testResolvePointRollSyncsGameRuntimeOnReturn`
+- Existing come-out/point resolution regressions remain passing.
+- Compile check passed.
+- Full suite remains green (`253` tests passing).

@@ -2522,6 +2522,7 @@ def handleBettingCommand(command, pointPhase=False):
 
 def resolveComeOutRoll():
 	global comeOut, throws, working, pointIsOn
+	syncRuntimeFromGlobals()
 	comeOut = roll()
 	outcome = evaluateRoll(gameState, comeOut)
 	throws += 1
@@ -2540,19 +2541,23 @@ def resolveComeOutRoll():
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		syncRuntimeFromGlobals()
 		return comeOutRollResult(enteredPointPhase=False, outcome=outcome)
 	if outcome == RollOutcome.craps:
 		lineCheck(comeOut, p2)
 		working = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		syncRuntimeFromGlobals()
 		return comeOutRollResult(enteredPointPhase=False, outcome=outcome)
 	pointIsOn = True
 	working = False
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	syncRuntimeFromGlobals()
 	return comeOutRollResult(enteredPointPhase=True, outcome=outcome)
 
 def resolvePointRoll():
 	global p2, throws, placeOff, layOff, hardOff, pointIsOn
+	syncRuntimeFromGlobals()
 	p2 = roll()
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
 	outcome = evaluateRoll(gameState, p2)
@@ -2581,13 +2586,16 @@ def resolvePointRoll():
 		throws = 0
 		pointIsOn = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		syncRuntimeFromGlobals()
 		return pointRollResult(pointRoundEnded=True, outcome=outcome)
 	if outcome == RollOutcome.pointHit:
 		writeOutput("Point Hit! Front line winner!")
 		pointIsOn = False
 		syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+		syncRuntimeFromGlobals()
 		return pointRollResult(pointRoundEnded=True, outcome=outcome)
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2)
+	syncRuntimeFromGlobals()
 	return pointRollResult(pointRoundEnded=False, outcome=outcome)
 
 def runPointPhaseBettingMenu():

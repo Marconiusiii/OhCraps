@@ -1363,6 +1363,39 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["working"], False)
 		self.assertEqual(terminal["comeOut"], 6)
 
+	def testResolveComeOutRollSyncsGameRuntimeOnReturn(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["working"] = True
+		terminal["throws"] = 8
+		terminal["pointIsOn"] = False
+		terminal["comeOut"] = 0
+		terminal["p2"] = 0
+		terminal["gameRuntime"] = terminal["GameRuntime"](
+			bank=terminal["bank"],
+			chipsOnTable=terminal["chipsOnTable"],
+			throws=1,
+			comeOut=0,
+			pointIsOn=False,
+			p2=0,
+			gameMode=terminal["gameMode"]
+		)
+		terminal["roll"] = lambda: 6
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].pointEstablished
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		terminal["propPay"] = lambda rollValue: None
+		terminal["lineCheck"] = lambda comeRoll, p2Roll: None
+		result = terminal["resolveComeOutRoll"]()
+		self.assertEqual(result.enteredPointPhase, True)
+		self.assertEqual(terminal["throws"], 9)
+		self.assertEqual(terminal["gameRuntime"].throws, 9)
+		self.assertEqual(terminal["comeOut"], 6)
+		self.assertEqual(terminal["gameRuntime"].comeOut, 6)
+
 	def testResolvePointRollSevenOutEndsPoint(self):
 		terminal = loadTerminalNamespace()
 		terminal["atsOn"] = False
@@ -1415,6 +1448,44 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["placeOff"], False)
 		self.assertEqual(terminal["layOff"], False)
 		self.assertEqual(terminal["hardOff"], False)
+
+	def testResolvePointRollSyncsGameRuntimeOnReturn(self):
+		terminal = loadTerminalNamespace()
+		terminal["atsOn"] = False
+		terminal["fireBet"] = 0
+		terminal["throws"] = 10
+		terminal["pointIsOn"] = True
+		terminal["comeOut"] = 8
+		terminal["p2"] = 0
+		terminal["placeOff"] = True
+		terminal["layOff"] = True
+		terminal["hardOff"] = True
+		terminal["gameRuntime"] = terminal["GameRuntime"](
+			bank=terminal["bank"],
+			chipsOnTable=terminal["chipsOnTable"],
+			throws=1,
+			comeOut=4,
+			pointIsOn=False,
+			p2=0,
+			gameMode=terminal["gameMode"]
+		)
+		terminal["roll"] = lambda: 5
+		terminal["evaluateRoll"] = lambda gameState, rollValue: terminal["RollOutcome"].neutral
+		terminal["comeCheck"] = lambda rollValue: None
+		terminal["placeCheck"] = lambda rollValue: None
+		terminal["layCheck"] = lambda rollValue: None
+		terminal["fieldCheck"] = lambda rollValue: None
+		terminal["hardCheck"] = lambda rollValue: None
+		lineCalls = []
+		terminal["lineCheck"] = lambda pointNumber, rollValue: lineCalls.append((pointNumber, rollValue))
+		terminal["propPay"] = lambda rollValue: None
+		result = terminal["resolvePointRoll"]()
+		self.assertEqual(result.pointRoundEnded, False)
+		self.assertEqual(terminal["throws"], 11)
+		self.assertEqual(terminal["gameRuntime"].throws, 11)
+		self.assertEqual(terminal["comeOut"], 8)
+		self.assertEqual(terminal["gameRuntime"].comeOut, 8)
+		self.assertEqual(lineCalls, [(8, 5)])
 
 	def testResolvePointRollPointHitUsesWriteOutput(self):
 		terminal = loadTerminalNamespace()

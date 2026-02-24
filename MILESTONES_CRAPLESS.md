@@ -3311,3 +3311,38 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added focused critical fast suite for host-contract checks.
 - Full suite remains green after this milestone.
+
+## Milestone 129: Solo QA Script Stage 0 Critical Check
+
+### What problem this solves
+- The one-command QA script did not guarantee the new critical host-contract fast suite ran first.
+
+### What changed
+- Updated `tests/runSoloQaCycle.sh` to add a new first stage:
+	- `[0/4]` critical host-contract fast suite
+- Existing stages kept intact:
+	- `[1/4]` fast host-contract cycle
+	- `[2/4]` compile checks
+	- `[3/4]` full suite
+
+### Why this helps
+- Your highest-signal host-contract guard now always runs at the start of the standard solo QA flow.
+- Faster failure detection before longer test stages.
+
+### One-command run
+- `./tests/runSoloQaCycle.sh`
+
+### Stage order now
+- `[0/4]` `HostContractCriticalFastSuite`
+- `[1/4]` `HostContractFastCycle`
+- `[2/4]` compile checks
+- `[3/4]` full suite
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Script now includes critical contract fast suite as default stage 0.
+- Full run remains green after this milestone.

@@ -2,13 +2,16 @@
 
 set -e
 
-echo "[1/3] Running fast host-contract cycle..."
+echo "[0/4] Running critical host-contract fast suite..."
+python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractCriticalFastSuite
+
+echo "[1/4] Running fast host-contract cycle..."
 python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractFastCycle
 
-echo "[2/3] Running compile checks..."
+echo "[2/4] Running compile checks..."
 python3 -m py_compile tests/testEngineBehavior.py OhCraps_Py3.command
 
-echo "[3/3] Running full suite..."
+echo "[3/4] Running full suite..."
 python3 -m unittest discover -s tests -p 'test*.py'
 
 echo "Solo QA cycle complete: all checks passed."

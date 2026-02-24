@@ -1516,3 +1516,35 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testComePayUsesWriteOutputForSettlementMessages`
 - Compile check passed.
 - Full suite remains green (`234` tests passing).
+
+## Milestone 81: Extracted Callable Game Entrypoint for Platform Handoff
+
+### What changed
+- Extracted startup and primary game loop into a callable `runGame()` function.
+- Left a minimal terminal launcher behind `# Game Start`:
+	- `if __name__ == "__main__":`
+	- `	runGame()`
+- Preserved startup behavior and loop sequencing:
+	- Banner output
+	- Game mode selection
+	- Initial game state sync
+	- Cash-in
+	- Come-out loop status + round execution
+	- Point-phase handoff
+
+### Why
+- A callable entrypoint is a key portability seam for iOS/app integration.
+- This removes hardwired startup execution from top-level script body while keeping terminal play unchanged.
+- It enables controlled invocation from future app host layers and automated harnesses.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Terminal execution remains unchanged when running the script directly.
+
+### Test coverage
+- Added deterministic entrypoint regressions in `tests/testEngineBehavior.py`:
+	- `testRunGameBootstrapsAndLoopsThroughComeOutStatus`
+	- `testRunGameTransitionsIntoPointPhaseRound`
+- Compile check passed.
+- Full suite remains green (`236` tests passing).

@@ -1564,6 +1564,51 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(len(menuCalls), 1)
 		self.assertEqual(len(resolveCalls), 1)
 
+	def testRunGameBootstrapsAndLoopsThroughComeOutStatus(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["throws"] = 0
+		terminal["gameMode"] = terminal["GameMode"].craps
+		selectCalls = []
+		cashInCalls = []
+		syncCalls = []
+		writes = []
+		terminal["selectGameMode"] = lambda: selectCalls.append(True)
+		terminal["cashIn"] = lambda: cashInCalls.append(True)
+		terminal["syncGameState"] = lambda **kwargs: syncCalls.append(kwargs)
+		terminal["runComeOutRound"] = lambda: (_ for _ in ()).throw(SystemExit())
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with self.assertRaises(SystemExit):
+			terminal["runGame"]()
+		self.assertEqual(len(selectCalls), 1)
+		self.assertEqual(len(cashInCalls), 1)
+		self.assertEqual(len(syncCalls), 1)
+		writtenText = " ".join(writes)
+		self.assertIn("Oh Craps! v.", writtenText)
+		self.assertIn("You have $100 in the bank.", writtenText)
+		self.assertIn("Throws: 0", writtenText)
+
+	def testRunGameTransitionsIntoPointPhaseRound(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["throws"] = 0
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["selectGameMode"] = lambda: None
+		terminal["cashIn"] = lambda: None
+		terminal["syncGameState"] = lambda **kwargs: None
+		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=True, outcome=terminal["RollOutcome"].pointEstablished)
+		pointPhaseCalls = []
+		def fakeRunPointPhaseRound():
+			pointPhaseCalls.append(True)
+			raise SystemExit()
+		terminal["runPointPhaseRound"] = fakeRunPointPhaseRound
+		terminal["writeOutput"] = lambda message: None
+		with self.assertRaises(SystemExit):
+			terminal["runGame"]()
+		self.assertEqual(pointPhaseCalls, [True])
+
 	def testShowPointPhaseStatusWithChipsShowsTableAmount(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 250

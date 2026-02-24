@@ -2439,26 +2439,29 @@ gameState = createGameState(
 	gameMode=gameMode
 )
 
+def runGame():
+	writeOutput(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
+	selectGameMode()
+	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
+	cashIn()
+	while True:
+		if chipsOnTable <= 0:
+			writeOutput(f"You have ${bank:,} in the bank.")
+		else:
+			writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
+		if bank <= 0 and chipsOnTable <= 0:
+			outOfMoney()
+		writeOutput(f"Throws: {throws}\n")
+
+	# Initial bets
+
+		comeOutResult = runComeOutRound()
+		if not comeOutResult.enteredPointPhase:
+			continue
+		runPointPhaseRound()
+
+		continue
 
 # Game Start
-writeOutput(f"Oh Craps! v.{version}\nBy: Marco Salsiccia")
-selectGameMode()
-syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
-cashIn()
-while True:
-	if chipsOnTable <= 0:
-		writeOutput(f"You have ${bank:,} in the bank.")
-	else:
-		writeOutput(f"You have ${bank:,} in the bank with ${chipsOnTable:,} out on the table.")
-	if bank <= 0 and chipsOnTable <= 0:
-		outOfMoney()
-	writeOutput(f"Throws: {throws}\n")
-
-# Initial bets
-
-	comeOutResult = runComeOutRound()
-	if not comeOutResult.enteredPointPhase:
-		continue
-	runPointPhaseRound()
-
-	continue
+if __name__ == "__main__":
+	runGame()

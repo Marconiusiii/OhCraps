@@ -1695,6 +1695,81 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["messages"], ["m1"])
 		self.assertEqual(result["stateChanged"], True)
 
+	def testEmitActionResultUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			terminal["emitActionResult"]({"messages": ["m1", "m2"]})
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertEqual(writes, ["m1", "m2"])
+
+	def testLineCheckUsesWriteOutputForSettlementMessages(self):
+		terminal = loadTerminalNamespace()
+		terminal["pointIsOn"] = False
+		terminal["lineBets"] = {"Pass": 10, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 10
+		terminal["settleLineBetsForMode"] = lambda **kwargs: type("settlement", (), {
+			"lineBets": kwargs["lineBets"],
+			"bankDelta": 5,
+			"chipsOnTableDelta": -5,
+			"messages": ["line message"]
+		})()
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			terminal["lineCheck"](6, 0)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("line message", writes)
+		self.assertEqual(terminal["bank"], 105)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+
+	def testComeShowUsesWriteOutput(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 20, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 5, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 12, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			terminal["comeShow"]()
+		self.assertEqual(mockPrint.call_count, 0)
+		writtenText = " ".join(writes)
+		self.assertIn("You have $10 on the Come 4 with $20 in Odds.", writtenText)
+		self.assertIn("You have $5 on the Don't Come 5 with $12 in odds.", writtenText)
+
+	def testComePayUsesWriteOutputForSettlementMessages(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["pointIsOn"] = True
+		terminal["working"] = True
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 20
+		terminal["comeBets"] = {2: 0, 3: 0, 4: 10, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, "Come": 0}
+		terminal["dComeBets"] = {2: 0, 3: 0, 4: 0, 5: 5, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["comeOdds"] = {2: 0, 3: 0, 4: 20, 5: 0, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["dComeOdds"] = {2: 0, 3: 0, 4: 0, 5: 12, 6: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+		terminal["settleComeTableBets"] = lambda **kwargs: type("settlement", (), {
+			"comeBets": kwargs["comeBets"],
+			"dComeBets": kwargs["dComeBets"],
+			"comeOdds": kwargs["comeOdds"],
+			"dComeOdds": kwargs["dComeOdds"],
+			"bankDelta": 7,
+			"chipsOnTableDelta": -7,
+			"messages": ["come settlement message"]
+		})()
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		with patch("builtins.print") as mockPrint:
+			terminal["comePay"](4)
+		self.assertEqual(mockPrint.call_count, 0)
+		self.assertIn("come settlement message", writes)
+		self.assertEqual(terminal["bank"], 107)
+		self.assertEqual(terminal["chipsOnTable"], 13)
+
 	def testComeCheckReturnsActionResultForMovedComeBet(self):
 		terminal = loadTerminalNamespace()
 		terminal["gameMode"] = terminal["GameMode"].craps

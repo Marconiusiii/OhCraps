@@ -332,7 +332,7 @@ def lineCheck(roll, p2roll):
 	bank += settlement.bankDelta
 	chipsOnTable += settlement.chipsOnTableDelta
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 	if pointIsOn and (p2roll == roll or p2roll == 7):
 		oddsCheck(p2roll)
@@ -586,11 +586,11 @@ def comeShow():
 	global comeBets, dComeBets, comeOdds, dComeOdds
 	for key in comeBets:
 		if comeBets[key] > 0:
-			print(f"You have ${comeBets[key]:,} on the Come {key} with ${comeOdds[key]:,} in Odds.")
+			writeOutput(f"You have ${comeBets[key]:,} on the Come {key} with ${comeOdds[key]:,} in Odds.")
 	if gameMode != GameMode.craplessCraps:
 		for key in dComeBets:
 			if dComeBets[key] > 0:
-				print(f"You have ${dComeBets[key]:,} on the Don't Come {key} with ${dComeOdds[key]:,} in odds.")
+				writeOutput(f"You have ${dComeBets[key]:,} on the Don't Come {key} with ${dComeOdds[key]:,} in odds.")
 
 def comeOddsChange():
 	global comeBets, dComeBets, comeOdds, dComeOdds, chipsOnTable, bank
@@ -668,7 +668,7 @@ def mergeActionResult(baseResult, newResult):
 
 def emitActionResult(actionResult):
 	for message in actionResult["messages"]:
-		print(message)
+		writeOutput(message)
 
 def processComePostRollAction(roll):
 	global comeBet, comeBets, dComeBet, dComeBets, bank, chipsOnTable, comeOdds, dComeOdds, pointIsOn
@@ -786,7 +786,7 @@ def comePay(roll):
 	snapshot["chipsOnTable"] += settlement.chipsOnTableDelta
 	applyBetSnapshot(snapshot)
 	for message in settlement.messages:
-		print(message)
+		writeOutput(message)
 
 #Field Betting
 

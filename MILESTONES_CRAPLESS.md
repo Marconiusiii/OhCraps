@@ -1486,3 +1486,33 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testQuitGameUsesWriteOutput`
 - Compile check passed.
 - Full suite remains green (`230` tests passing).
+
+## Milestone 80: Shared Settlement and Come Display Output Adapter Normalization
+
+### What changed
+- Migrated settlement message emission to adapter output in:
+	- `lineCheck(...)`
+	- `comePay(...)`
+- Migrated action-result message emission to adapter output in:
+	- `emitActionResult(...)`
+- Migrated Come/Don't Come summary display lines to adapter output in:
+	- `comeShow(...)`
+
+### Why
+- These shared pathways are called frequently across rounds and bet-resolution flows.
+- They still used direct terminal output, which created inconsistent UI boundaries versus the rest of the adapter-based controller.
+- Standardizing these paths improves portability for iOS-facing UI layers while preserving behavior.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Existing settlement/status text preserved; only output routing changed.
+
+### Test coverage
+- Added deterministic adapter-focused regressions in `tests/testEngineBehavior.py`:
+	- `testEmitActionResultUsesWriteOutput`
+	- `testLineCheckUsesWriteOutputForSettlementMessages`
+	- `testComeShowUsesWriteOutput`
+	- `testComePayUsesWriteOutputForSettlementMessages`
+- Compile check passed.
+- Full suite remains green (`234` tests passing).

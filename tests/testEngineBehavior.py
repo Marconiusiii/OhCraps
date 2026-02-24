@@ -1684,6 +1684,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
 		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
 		self.assertIn("actionBundle", descriptor["payloadKeys"])
+		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("stateDelta", descriptor["payloadKeys"])
 		self.assertIn("statusPanel", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
@@ -1920,6 +1921,60 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		commandsByCode = {item["code"]: item for item in payload["uiSnapshot"]["allowedCommands"]["commands"]}
 		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
 		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
+
+	def testCreateHostHealthReportHealthyState(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({
+			"bank": 1000,
+			"chipsOnTable": 0,
+			"throws": 0,
+			"pointIsOn": False,
+			"comeOut": 0,
+			"gameMode": terminal["GameMode"].craps
+		})
+		report = terminal["createHostHealthReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["issueCount"], 0)
+		self.assertEqual(report["issues"], [])
+		self.assertEqual(report["summary"]["bank"], 1000)
+
+	def testCreateHostHealthReportDetectsNegativeBank(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({"bank": -5})
+		report = terminal["createHostHealthReport"]()
+		self.assertEqual(report["ok"], False)
+		self.assertTrue(report["issueCount"] >= 1)
+		self.assertIn("Bank is negative.", report["issues"])
+
+	def testCreateHostHealthReportRaiseOnIssue(self):
+		terminal = loadTerminalNamespace()
+		terminal["setRuntimeState"]({"bank": -1})
+		with self.assertRaises(ValueError):
+			terminal["createHostHealthReport"](raiseOnIssue=True)
+
+	def testRuntimeWagerTotalMatchesSimpleWagerState(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["setRuntimeState"]({
+			"lineBets": {"Pass": 25, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0},
+			"betSnapshot": {
+				"bank": 0,
+				"chipsOnTable": 25,
+				"comeBet": 0,
+				"dComeBet": 0,
+				"comeBets": {key: 0 for key in terminal["comeBets"]},
+				"dComeBets": {key: 0 for key in terminal["dComeBets"]},
+				"comeOdds": {key: 0 for key in terminal["comeOdds"]},
+				"dComeOdds": {key: 0 for key in terminal["dComeOdds"]},
+				"place": {key: 0 for key in terminal["place"]},
+				"layBets": {key: 0 for key in terminal["layBets"]},
+				"hardWays": {key: 0 for key in terminal["hardWays"]},
+				"fieldBet": 0
+			},
+			"chipsOnTable": 25
+		})
+		total = terminal["runtimeWagerTotal"](terminal["getRuntimeState"]())
+		self.assertEqual(total, 25)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

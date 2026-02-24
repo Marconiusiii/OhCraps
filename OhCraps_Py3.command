@@ -256,6 +256,9 @@ def hostSchemaDescriptor():
 				"actionBundle": [
 					"engineApiVersion", "success", "error", "commandResult", "uiSnapshot", "statusPanel", "stateDelta"
 				],
+				"healthReport": [
+					"engineApiVersion", "ok", "issueCount", "issues", "summary"
+				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
 					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
@@ -481,6 +484,66 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
 		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=normalizedPointPhase)
 	})
+
+def runtimeWagerTotal(runtimeState):
+	lineTotal = sum(int(value) for value in runtimeState["lineBets"].values())
+	propTotal = sum(int(value) for value in runtimeState["propBets"].values())
+	atsTotal = int(runtimeState["atsAll"]) + int(runtimeState["atsTall"]) + int(runtimeState["atsSmall"])
+	fireTotal = int(runtimeState["fireBet"])
+	snapshot = runtimeState["betSnapshot"]
+	snapshotTotal = (
+		int(snapshot["comeBet"]) +
+		int(snapshot["dComeBet"]) +
+		sum(int(value) for value in snapshot["comeBets"].values()) +
+		sum(int(value) for value in snapshot["dComeBets"].values()) +
+		sum(int(value) for value in snapshot["comeOdds"].values()) +
+		sum(int(value) for value in snapshot["dComeOdds"].values()) +
+		sum(int(value) for value in snapshot["place"].values()) +
+		sum(int(value) for value in snapshot["layBets"].values()) +
+		sum(int(value) for value in snapshot["hardWays"].values()) +
+		int(snapshot["fieldBet"])
+	)
+	return int(lineTotal + propTotal + atsTotal + fireTotal + snapshotTotal)
+
+def createHostHealthReport(raiseOnIssue=False):
+	runtimeState = getRuntimeState()
+	issues = []
+	if int(runtimeState["bank"]) < 0:
+		issues.append("Bank is negative.")
+	if int(runtimeState["chipsOnTable"]) < 0:
+		issues.append("Chips on table is negative.")
+	if int(runtimeState["throws"]) < 0:
+		issues.append("Throws is negative.")
+	if bool(runtimeState["pointIsOn"]) and int(runtimeState["comeOut"]) == 0:
+		issues.append("Point phase is active but point is 0.")
+	try:
+		normalizedGameMode(runtimeState["gameMode"])
+	except ValueError:
+		issues.append("Game mode is invalid.")
+	snapshot = runtimeState["betSnapshot"]
+	if int(snapshot["bank"]) != int(runtimeState["bank"]):
+		issues.append("Snapshot bank does not match runtime bank.")
+	if int(snapshot["chipsOnTable"]) != int(runtimeState["chipsOnTable"]):
+		issues.append("Snapshot chipsOnTable does not match runtime chipsOnTable.")
+	calculatedWagers = runtimeWagerTotal(runtimeState)
+	if int(runtimeState["chipsOnTable"]) != int(calculatedWagers):
+		issues.append(f"chipsOnTable mismatch. Expected ${calculatedWagers:,} from bets.")
+	report = withApiVersion({
+		"ok": len(issues) == 0,
+		"issueCount": len(issues),
+		"issues": list(issues),
+		"summary": {
+			"bank": int(runtimeState["bank"]),
+			"chipsOnTable": int(runtimeState["chipsOnTable"]),
+			"throws": int(runtimeState["throws"]),
+			"pointIsOn": bool(runtimeState["pointIsOn"]),
+			"point": int(runtimeState["comeOut"]),
+			"gameMode": runtimeState["gameMode"]
+		}
+	})
+	if raiseOnIssue and len(issues) > 0:
+		raise ValueError("; ".join(issues))
+	return report
 
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer

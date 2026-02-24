@@ -2590,3 +2590,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- strict raise mode for validation path
 	- error code presence in host error map
 - Full suite remains green after this milestone.
+
+## Milestone 111: Host Session Health Check Report
+
+### What problem this solves
+- Host apps needed a quick way to verify runtime sanity.
+- Without a health report, issues like invalid values or broken accounting are harder to catch early.
+
+### What changed
+- Added `runtimeWagerTotal(runtimeState)` helper.
+- Added `createHostHealthReport(raiseOnIssue=False)`.
+- Health report includes:
+	- `ok`
+	- `issueCount`
+	- `issues`
+	- `summary` (bank, chips, throws, phase, point, mode)
+- Added strict option:
+	- `raiseOnIssue=True` raises a `ValueError` when issues are present.
+- Added `healthReport` payload keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can run a fast sanity check before/after important actions.
+- Safer integration and easier debugging.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- healthy state report
+	- negative-bank issue detection
+	- strict raise-on-issue mode
+	- wager total helper in a simple known state
+	- schema descriptor includes `healthReport`
+- Full suite remains green after this milestone.

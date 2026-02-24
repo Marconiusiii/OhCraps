@@ -64,7 +64,8 @@ def withApiVersion(payload):
 hostErrorCodes = {
 	"invalidStepArguments": "invalidStepArguments",
 	"commandExecutionFailed": "commandExecutionFailed",
-	"cycleExecutionFailed": "cycleExecutionFailed"
+	"cycleExecutionFailed": "cycleExecutionFailed",
+	"startupValidationFailed": "startupValidationFailed"
 }
 
 def hostErrorPayload(errorCode, errorMessage, details=None):
@@ -176,6 +177,10 @@ def hostSchemaDescriptor():
 			"sessionBundle": [
 				"engineApiVersion", "bundleType", "runtimeState", "gameMode", "captureState", "hostMetadata"
 			],
+			"startupBundle": [
+				"engineApiVersion", "success", "error", "initialized", "runtimeState",
+				"schemaDescriptor", "compatibility", "features"
+			],
 			"events": {
 				"inputRequested": ["engineApiVersion", "prompt"],
 				"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
@@ -208,6 +213,49 @@ def checkHostCompatibility(requiredApiVersion=None, requiredFeatures=None):
 		"requiredFeatures": requestedFeatures,
 		"missingFeatures": missingFeatures,
 		"reasons": reasons
+	})
+
+def createHostStartupBundle(requiredApiVersion=None, requiredFeatures=None, startBank=None, selectedMode=None):
+	shouldInitialize = (startBank is not None or selectedMode is not None)
+	if shouldInitialize and (startBank is None or selectedMode is None):
+		return withApiVersion({
+			"success": False,
+			"error": hostErrorPayload(
+				errorCode=hostErrorCodes["startupValidationFailed"],
+				errorMessage="startBank and selectedMode must both be provided when initializing.",
+				details={"startBankProvided": (startBank is not None), "selectedModeProvided": (selectedMode is not None)}
+			),
+			"initialized": False,
+			"runtimeState": getRuntimeState(),
+			"schemaDescriptor": hostSchemaDescriptor(),
+			"compatibility": checkHostCompatibility(requiredApiVersion=requiredApiVersion, requiredFeatures=requiredFeatures),
+			"features": hostFeatureFlags()
+		})
+	try:
+		if shouldInitialize:
+			initializeGame(startBank=startBank, selectedMode=selectedMode)
+	except Exception as exc:
+		return withApiVersion({
+			"success": False,
+			"error": hostErrorPayload(
+				errorCode=hostErrorCodes["startupValidationFailed"],
+				errorMessage=str(exc),
+				details={"exceptionType": type(exc).__name__}
+			),
+			"initialized": False,
+			"runtimeState": getRuntimeState(),
+			"schemaDescriptor": hostSchemaDescriptor(),
+			"compatibility": checkHostCompatibility(requiredApiVersion=requiredApiVersion, requiredFeatures=requiredFeatures),
+			"features": hostFeatureFlags()
+		})
+	return withApiVersion({
+		"success": True,
+		"error": None,
+		"initialized": bool(shouldInitialize),
+		"runtimeState": getRuntimeState(),
+		"schemaDescriptor": hostSchemaDescriptor(),
+		"compatibility": checkHostCompatibility(requiredApiVersion=requiredApiVersion, requiredFeatures=requiredFeatures),
+		"features": hostFeatureFlags()
 	})
 
 def beginOutputCapture():

@@ -2314,3 +2314,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- schema descriptor event sections
 - Updated event-emission tests to assert against `hostEventNames` constants.
 - Full suite remains green after this milestone.
+
+## Milestone 103: One-Call Startup Package for App Hosts
+
+### What problem this solves
+- Right now, an iOS/web app needs to make several separate calls to understand engine state at startup.
+- That makes startup wiring harder and easier to break.
+
+### What changed
+- Added `createHostStartupBundle(...)` in `OhCraps_Py3.command`.
+- This returns one package with:
+	- current runtime state
+	- schema descriptor
+	- compatibility result
+	- feature flags
+	- success/error fields
+- Added startup validation error code:
+	- `startupValidationFailed`
+- Added `startupBundle` keys to `hostSchemaDescriptor()` so host apps can inspect this contract.
+
+### Why this helps
+- App startup can now be one clean call instead of multiple setup calls.
+- If startup input is bad, the app gets a clear structured error instead of guessing what failed.
+
+### Behavior
+- No craps rules changed.
+- No payout math changed.
+- Terminal gameplay flow is unchanged.
+
+### Test coverage
+- Added tests for:
+	- success startup package without re-initializing
+	- success startup package with initialization
+	- missing startup args error handling
+	- invalid startup values error handling
+	- compatibility failure details included in startup package
+- Full suite remains green after this milestone.

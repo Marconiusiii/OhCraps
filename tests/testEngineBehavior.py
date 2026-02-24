@@ -918,6 +918,56 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			terminal["initializeGame"](startBank=0, selectedMode=terminal["GameMode"].craps)
 
+	def testCreateHostStartupBundleReturnsFullPackageWithoutInit(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 125
+		bundle = terminal["createHostStartupBundle"](
+			requiredApiVersion=terminal["engineApiVersion"],
+			requiredFeatures=["autoCapture", "sessionBundle"]
+		)
+		self.assertEqual(bundle["success"], True)
+		self.assertEqual(bundle["error"], None)
+		self.assertEqual(bundle["initialized"], False)
+		self.assertEqual(bundle["runtimeState"]["bank"], 125)
+		self.assertIn("payloadKeys", bundle["schemaDescriptor"])
+		self.assertEqual(bundle["compatibility"]["compatible"], True)
+		self.assertEqual(bundle["features"]["autoCapture"], True)
+
+	def testCreateHostStartupBundleCanInitializeGame(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["createHostStartupBundle"](
+			requiredApiVersion=terminal["engineApiVersion"],
+			requiredFeatures=["structuredErrors"],
+			startBank=600,
+			selectedMode="2"
+		)
+		self.assertEqual(bundle["success"], True)
+		self.assertEqual(bundle["initialized"], True)
+		self.assertEqual(terminal["bank"], 600)
+		self.assertEqual(terminal["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(bundle["runtimeState"]["bank"], 600)
+
+	def testCreateHostStartupBundleRejectsPartialInitArgs(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["createHostStartupBundle"](startBank=300)
+		self.assertEqual(bundle["success"], False)
+		self.assertEqual(bundle["error"]["code"], terminal["hostErrorCodes"]["startupValidationFailed"])
+		self.assertEqual(bundle["initialized"], False)
+
+	def testCreateHostStartupBundleReturnsValidationErrorForBadInitValues(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["createHostStartupBundle"](startBank=0, selectedMode="1")
+		self.assertEqual(bundle["success"], False)
+		self.assertEqual(bundle["error"]["code"], terminal["hostErrorCodes"]["startupValidationFailed"])
+		self.assertEqual(bundle["error"]["details"]["exceptionType"], "ValueError")
+
+	def testCreateHostStartupBundleIncludesCompatibilityFailureDetails(self):
+		terminal = loadTerminalNamespace()
+		bundle = terminal["createHostStartupBundle"](requiredApiVersion="9.9.9")
+		self.assertEqual(bundle["success"], True)
+		self.assertEqual(bundle["compatibility"]["compatible"], False)
+		self.assertIn("Unsupported engineApiVersion requirement: 9.9.9", bundle["compatibility"]["reasons"])
+
 	def testRunHardWaysMenuUsesReadInput(self):
 		terminal = loadTerminalNamespace()
 		prompts = []
@@ -1558,6 +1608,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["hostErrorCodes"]["invalidStepArguments"], "invalidStepArguments")
 		self.assertEqual(terminal["hostErrorCodes"]["commandExecutionFailed"], "commandExecutionFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["cycleExecutionFailed"], "cycleExecutionFailed")
+		self.assertEqual(terminal["hostErrorCodes"]["startupValidationFailed"], "startupValidationFailed")
 
 	def testHostEventNamesExposeExpectedContractValues(self):
 		terminal = loadTerminalNamespace()
@@ -1626,6 +1677,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("command", descriptor["payloadKeys"])
 		self.assertIn("step", descriptor["payloadKeys"])
 		self.assertIn("sessionBundle", descriptor["payloadKeys"])
+		self.assertIn("startupBundle", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
 

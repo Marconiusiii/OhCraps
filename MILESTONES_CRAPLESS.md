@@ -2069,3 +2069,41 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing command/step payload regressions remain green.
 - Compile check passed.
 - Full suite remains green (`275` tests passing).
+
+## Milestone 97: Engine API Versioning for Host Payload and Event Contracts
+
+### What changed
+- Added explicit engine API version constant:
+	- `engineApiVersion = "1.0.0"`
+- Added shared payload version helper:
+	- `withApiVersion(payload)`
+- Updated event emission to include API version in dict payloads:
+	- `emitEvent(...)` now enriches dict payloads with `engineApiVersion`
+- Added API version to host-facing return payloads:
+	- `initializeGame(...)` return payload
+	- `submitCommand(...)` payload
+	- `step(...)` payload (command and cycle)
+- Added API version to cycle/event payload construction:
+	- `cycleStarted`
+	- `comeOutResolved`
+	- `pointPhaseResolved`
+	- `cycleCompleted`
+	- `gameInitialized`
+
+### Why
+- Host integrations need a stable, explicit contract version for payload/event parsing and forward compatibility.
+- Centralized payload enrichment reduces schema drift and avoids ad hoc per-call version stamping.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Existing host payload keys preserved; `engineApiVersion` is additive.
+
+### Test coverage
+- Added/updated regression assertions in `tests/testEngineBehavior.py` for API version presence in:
+	- `initializeGame(...)` return payload
+	- `submitCommand(...)` payload + `commandProcessed` event payload
+	- `step(...)` command/cycle payloads
+	- cycle boundary events
+- Compile check passed.
+- Full suite remains green (`275` tests passing).

@@ -911,6 +911,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["gameRuntime"].bank, 500)
 		self.assertEqual(state["bank"], 500)
 		self.assertEqual(state["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(state["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testInitializeGameRejectsZeroBank(self):
 		terminal = loadTerminalNamespace()
@@ -1369,6 +1370,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("runtimeState", payload)
 		self.assertIn("capturedOutput", payload)
 		self.assertIn("capturedPrompts", payload)
+		self.assertEqual(payload["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testSubmitCommandReturnsUnhandledPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1392,6 +1394,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(events[0][1]["shouldRoll"], True)
 		self.assertEqual(events[0][1]["handled"], True)
 		self.assertEqual(events[0][1], payload)
+		self.assertEqual(events[0][1]["engineApiVersion"], terminal["engineApiVersion"])
 		terminal["resetEventHandler"]()
 
 	def testOutputCaptureBuffersWriteOutputWhenEnabled(self):
@@ -1488,6 +1491,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("runtimeState", stepPayload)
 		self.assertIn("capturedOutput", stepPayload)
 		self.assertIn("capturedPrompts", stepPayload)
+		self.assertEqual(stepPayload["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testStepCycleReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1506,6 +1510,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("runtimeState", stepPayload)
 		self.assertIn("capturedOutput", stepPayload)
 		self.assertIn("capturedPrompts", stepPayload)
+		self.assertEqual(stepPayload["engineApiVersion"], terminal["engineApiVersion"])
 
 	def testStepAutoCaptureCycleIncludesCapturedOutput(self):
 		terminal = loadTerminalNamespace()
@@ -1939,6 +1944,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual([event[0] for event in events], ["cycleStarted", "comeOutResolved", "cycleCompleted"])
 		self.assertEqual(events[1][1]["enteredPointPhase"], False)
 		self.assertIn("runtimeState", events[2][1])
+		self.assertEqual(events[0][1]["engineApiVersion"], terminal["engineApiVersion"])
 		terminal["resetEventHandler"]()
 
 	def testRunOneCycleEmitsEventsForPointPhasePath(self):

@@ -7,6 +7,7 @@ from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsFor
 
 #Version Number
 version = "7.0.0"
+engineApiVersion = "1.0.0"
 
 outputHandler = None
 inputHandler = None
@@ -51,7 +52,14 @@ def resetEventHandler():
 def emitEvent(eventName, payload=None):
 	if eventHandler is not None:
 		eventPayload = payload if payload is not None else {}
+		if isinstance(eventPayload, dict):
+			eventPayload = withApiVersion(eventPayload)
 		eventHandler(str(eventName), eventPayload)
+
+def withApiVersion(payload):
+	payloadDict = dict(payload) if payload is not None else {}
+	payloadDict["engineApiVersion"] = engineApiVersion
+	return payloadDict
 
 def beginOutputCapture():
 	global outputCaptureOn, outputCaptureBuffer
@@ -2658,7 +2666,7 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False):
 		commandResult = handleBettingCommand(commandValue, pointPhase=pointPhase)
 		capturedOutput = getCapturedOutput()
 		capturedPrompts = getCapturedPrompts()
-	resultPayload = {
+	resultPayload = withApiVersion({
 		"command": commandValue,
 		"pointPhase": bool(pointPhase),
 		"shouldRoll": bool(commandResult.shouldRoll),
@@ -2666,21 +2674,21 @@ def submitCommand(commandText, pointPhase=False, autoCapture=False):
 		"runtimeState": getRuntimeState(),
 		"capturedOutput": capturedOutput,
 		"capturedPrompts": capturedPrompts
-	}
+	})
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
 
 def step(commandText=None, pointPhase=False, autoCapture=False):
 	if commandText is not None:
 		commandPayload = submitCommand(commandText=commandText, pointPhase=pointPhase, autoCapture=autoCapture)
-		stepPayload = {
+		stepPayload = withApiVersion({
 			"stepType": "command",
 			"commandResult": commandPayload,
 			"cycleResult": None,
 			"runtimeState": commandPayload["runtimeState"],
 			"capturedOutput": list(commandPayload["capturedOutput"]),
 			"capturedPrompts": list(commandPayload["capturedPrompts"])
-		}
+		})
 		emitEvent("stepCompleted", stepPayload)
 		return stepPayload
 	if pointPhase:
@@ -2694,14 +2702,14 @@ def step(commandText=None, pointPhase=False, autoCapture=False):
 		cyclePayload = runOneCycle()
 		capturedOutput = getCapturedOutput()
 		capturedPrompts = getCapturedPrompts()
-	stepPayload = {
+	stepPayload = withApiVersion({
 		"stepType": "cycle",
 		"commandResult": None,
 		"cycleResult": dict(cyclePayload),
 		"runtimeState": getRuntimeState(),
 		"capturedOutput": capturedOutput,
 		"capturedPrompts": capturedPrompts
-	}
+	})
 	emitEvent("stepCompleted", stepPayload)
 	return stepPayload
 
@@ -2829,29 +2837,29 @@ def runPointPhaseRound():
 
 def runOneCycle():
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("cycleStarted", {"point": int(runtime.comeOut), "throws": int(runtime.throws), "gameMode": runtime.gameMode})
+	emitEvent("cycleStarted", withApiVersion({"point": int(runtime.comeOut), "throws": int(runtime.throws), "gameMode": runtime.gameMode}))
 	comeOutResult = runComeOutRound()
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("comeOutResolved", {"enteredPointPhase": bool(comeOutResult.enteredPointPhase), "outcome": comeOutResult.outcome, "runtimeState": getRuntimeState()})
-	cycleResult = {
+	emitEvent("comeOutResolved", withApiVersion({"enteredPointPhase": bool(comeOutResult.enteredPointPhase), "outcome": comeOutResult.outcome, "runtimeState": getRuntimeState()}))
+	cycleResult = withApiVersion({
 		"enteredPointPhase": bool(comeOutResult.enteredPointPhase),
 		"comeOutOutcome": comeOutResult.outcome,
 		"pointPhaseOutcome": None,
 		"pointRoundEnded": False,
 		"point": int(runtime.comeOut),
 		"throws": int(runtime.throws)
-	}
+	})
 	if not comeOutResult.enteredPointPhase:
-		emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
+		emitEvent("cycleCompleted", withApiVersion({"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()}))
 		return cycleResult
 	pointPhaseResult = runPointPhaseRound()
 	runtime = syncRuntimeFromGlobals()
-	emitEvent("pointPhaseResolved", {"roundEnded": bool(pointPhaseResult.roundEnded), "outcome": pointPhaseResult.outcome, "runtimeState": getRuntimeState()})
+	emitEvent("pointPhaseResolved", withApiVersion({"roundEnded": bool(pointPhaseResult.roundEnded), "outcome": pointPhaseResult.outcome, "runtimeState": getRuntimeState()}))
 	cycleResult["pointPhaseOutcome"] = pointPhaseResult.outcome
 	cycleResult["pointRoundEnded"] = bool(pointPhaseResult.roundEnded)
 	cycleResult["point"] = int(runtime.comeOut)
 	cycleResult["throws"] = int(runtime.throws)
-	emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
+	emitEvent("cycleCompleted", withApiVersion({"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()}))
 	return cycleResult
 
 #Additional Global Variables
@@ -2899,8 +2907,8 @@ def initializeGame(startBank, selectedMode):
 	bank = bankroll
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	syncRuntimeFromGlobals()
-	emitEvent("gameInitialized", {"startBank": bankroll, "gameMode": gameMode, "runtimeState": getRuntimeState()})
-	return getRuntimeState()
+	emitEvent("gameInitialized", withApiVersion({"startBank": bankroll, "gameMode": gameMode, "runtimeState": getRuntimeState()}))
+	return withApiVersion(getRuntimeState())
 
 gameState = createGameState(
 	bank=bank,

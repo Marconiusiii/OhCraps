@@ -107,7 +107,7 @@ def roll():
 
 dealerCalls = {
 2: ["Craps", "eye balls", "two aces", "rats eyes", "snake eyes", "eleven in a shoe store", "twice in the rice", "two craps two, two bad boys from Illinois", "two crap aces", "aces in both places", "a spot and a dot", "dimples", "double the Field"],
-3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "winner on the dark side", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
+3: ["Craps", "ace-deuce", "three craps, ace caught a deuce, no use", "divorce roll, come up single", "three craps three, the indicator", "crap and a half", "small ace deuce, can't produce", "2 , 1, son of a gun"],
 4: ["Little Joe", "Little Joe from Kokomo", "Ace Tres", "Ace Tres the easy way", "Little Billy from Piccadilly", "Little Joe from Idaho"],
 5: ["After 5 the Field's alive", "Fiver Fiver Race car Driver", "No Field 5", "Little Phoebe", "We got the fiver", "Five 5", "Take a dive"],
 6: ["The national average", "Catch 'em in the corner", "Sixie from Dixie"],

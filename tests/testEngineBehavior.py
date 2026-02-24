@@ -1687,6 +1687,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("actionBundle", descriptor["payloadKeys"])
 		self.assertIn("healthReport", descriptor["payloadKeys"])
 		self.assertIn("preflightReport", descriptor["payloadKeys"])
+		self.assertIn("workflowReport", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
 		self.assertIn("actionLogRun", descriptor["payloadKeys"])
 		self.assertIn("replayReport", descriptor["payloadKeys"])
@@ -1966,6 +1967,46 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		actionLog = [{"request": {"commandText": "", "pointPhase": False}}]
 		with self.assertRaises(ValueError):
 			terminal["replayHostActionLog"](actionLog, resetFirst=True, raiseOnFailure=True)
+
+	def testRunHostWorkflowPassesWithStartupAndNoReplay(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["runHostWorkflow"](
+			startBank=400,
+			selectedMode="1",
+			actionLog=None,
+			resetBefore=True
+		)
+		self.assertEqual(report["ok"], True)
+		self.assertIn("startup", report["passedSteps"])
+		self.assertIn("preflight", report["passedSteps"])
+		self.assertIn("health", report["passedSteps"])
+		self.assertEqual(report["steps"]["startup"]["success"], True)
+		self.assertEqual(report["finalRuntimeState"]["bank"], 400)
+
+	def testRunHostWorkflowFailsWhenReplayFails(self):
+		terminal = loadTerminalNamespace()
+		actionLog = [{"request": {"commandText": "", "pointPhase": False}}]
+		report = terminal["runHostWorkflow"](
+			startBank=300,
+			selectedMode="1",
+			actionLog=actionLog,
+			resetBefore=True
+		)
+		self.assertEqual(report["ok"], False)
+		self.assertIn("replay", report["failedSteps"])
+		self.assertEqual(report["steps"]["replay"]["ok"], False)
+
+	def testRunHostWorkflowRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		actionLog = [{"request": {"commandText": "", "pointPhase": False}}]
+		with self.assertRaises(ValueError):
+			terminal["runHostWorkflow"](
+				startBank=300,
+				selectedMode="1",
+				actionLog=actionLog,
+				resetBefore=True,
+				raiseOnFailure=True
+			)
 
 	def testCreateHostHealthReportHealthyState(self):
 		terminal = loadTerminalNamespace()

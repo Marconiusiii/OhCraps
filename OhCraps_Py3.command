@@ -272,6 +272,9 @@ def hostSchemaDescriptor():
 				"replayReport": [
 					"engineApiVersion", "ok", "actionsRequested", "actionsRun", "failedAt", "results", "finalRuntimeState"
 				],
+				"workflowReport": [
+					"engineApiVersion", "ok", "passedSteps", "failedSteps", "steps", "finalRuntimeState"
+				],
 				"stateDelta": [
 					"changed", "bankDelta", "chipsDelta", "throwsDelta", "pointChanged",
 					"phaseChanged", "fromPoint", "toPoint", "fromPointPhase", "toPointPhase"
@@ -581,6 +584,50 @@ def replayHostActionLog(actionLog, resetFirst=True, raiseOnFailure=False):
 	})
 	if raiseOnFailure and failedAt is not None:
 		raise ValueError(f"Replay failed at index {failedAt}.")
+	return report
+
+def runHostWorkflow(startBank=None, selectedMode=None, actionLog=None, resetBefore=False, raiseOnFailure=False):
+	if resetBefore:
+		resetRuntimeState()
+	startupResult = createHostStartupBundle(startBank=startBank, selectedMode=selectedMode)
+	preflightResult = createHostPreflightReport(raiseOnFailure=False)
+	replayResult = None
+	if actionLog is not None:
+		replayResult = replayHostActionLog(actionLog=actionLog, resetFirst=False, raiseOnFailure=False)
+	healthResult = createHostHealthReport(raiseOnIssue=False)
+	steps = {
+		"startup": startupResult,
+		"preflight": preflightResult,
+		"replay": replayResult,
+		"health": healthResult
+	}
+	passedSteps = []
+	failedSteps = []
+	if bool(startupResult.get("success", False)):
+		passedSteps.append("startup")
+	else:
+		failedSteps.append("startup")
+	if bool(preflightResult.get("ok", False)):
+		passedSteps.append("preflight")
+	else:
+		failedSteps.append("preflight")
+	if replayResult is None or bool(replayResult.get("ok", False)):
+		passedSteps.append("replay")
+	else:
+		failedSteps.append("replay")
+	if bool(healthResult.get("ok", False)):
+		passedSteps.append("health")
+	else:
+		failedSteps.append("health")
+	report = withApiVersion({
+		"ok": len(failedSteps) == 0,
+		"passedSteps": passedSteps,
+		"failedSteps": failedSteps,
+		"steps": steps,
+		"finalRuntimeState": getRuntimeState()
+	})
+	if raiseOnFailure and len(failedSteps) > 0:
+		raise ValueError(f"Workflow failed: {', '.join(failedSteps)}")
 	return report
 
 def runtimeWagerTotal(runtimeState):

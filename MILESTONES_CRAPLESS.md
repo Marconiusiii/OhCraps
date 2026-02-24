@@ -2707,3 +2707,43 @@ New milestone updates should be appended here rather than creating new milestone
 	- strict raise-on-failure mode for replay
 	- schema includes replay contracts and error code map includes `invalidReplayInput`
 - Full suite remains green after this milestone.
+
+## Milestone 114: Unified Host Workflow Runner
+
+### What problem this solves
+- Host apps had many helpers but no single standard workflow runner for integration steps.
+- Startup QA required manual orchestration.
+
+### What changed
+- Added `runHostWorkflow(startBank=None, selectedMode=None, actionLog=None, resetBefore=False, raiseOnFailure=False)`.
+- Workflow runs key steps in order:
+	- startup bundle
+	- preflight report
+	- optional replay
+	- health report
+- Returns one summary report with:
+	- `ok`
+	- `passedSteps`
+	- `failedSteps`
+	- `steps`
+	- `finalRuntimeState`
+- Added strict mode:
+	- `raiseOnFailure=True` raises when any workflow step fails.
+- Added `workflowReport` payload keys to `hostSchemaDescriptor()`.
+
+### Why this helps
+- iOS/web can use one orchestration call for common integration checks.
+- Less host-side sequencing code and fewer setup mistakes.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- successful workflow path
+	- workflow failure when replay fails
+	- strict raise-on-failure mode
+	- schema includes workflow-report keys
+- Full suite remains green after this milestone.

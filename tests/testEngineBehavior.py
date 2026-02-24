@@ -29,6 +29,73 @@ def formatFrozenSetDiff(expectedValues, actualValues, label):
 		f"unexpected={unexpectedValues}"
 	)
 
+EXPECTED_HOST_PAYLOAD_KEYS = [
+	"command",
+	"step",
+	"sessionBundle",
+	"sessionCompatibilityReport",
+	"startupBundle",
+	"allowedCommands",
+	"uiSnapshot",
+	"commandSnapshot",
+	"deltaSnapshot",
+	"actionBundle",
+	"actionSummary",
+	"healthReport",
+	"preflightReport",
+	"actionLogEntry",
+	"actionLogRun",
+	"replayReport",
+	"workflowReport",
+	"bootstrapReport",
+	"compatibilityReport",
+	"eventValidationReport",
+	"tracePacket",
+	"soloDebugBundle",
+	"stateDelta",
+	"statusPanel",
+	"events"
+]
+
+EXPECTED_HOST_EVENT_CONTRACTS = {
+	"inputRequested": ["engineApiVersion", "prompt"],
+	"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
+	"commandProcessed": ["engineApiVersion", "success", "error", "command", "pointPhase", "shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"],
+	"stepCompleted": ["engineApiVersion", "stepType", "success", "error", "commandResult", "cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"],
+	"cycleStarted": ["engineApiVersion", "point", "throws", "gameMode"],
+	"comeOutResolved": ["engineApiVersion", "enteredPointPhase", "outcome", "runtimeState"],
+	"pointPhaseResolved": ["engineApiVersion", "roundEnded", "outcome", "runtimeState"],
+	"cycleCompleted": ["engineApiVersion", "cycleResult", "runtimeState"],
+	"gameInitialized": ["engineApiVersion", "startBank", "gameMode", "runtimeState"]
+}
+
+EXPECTED_ACTION_SUMMARY_KEYS = [
+	"engineApiVersion",
+	"actionState",
+	"summaryLine",
+	"command",
+	"pointPhase",
+	"success",
+	"handled",
+	"shouldRoll",
+	"errorCode",
+	"errorMessage",
+	"stateChanged",
+	"phaseChanged"
+]
+
+def assertHostSchemaContracts(testCase, descriptor):
+	testCase.assertEqual(descriptor["schemaVersion"], "1")
+	testCase.assertIn("errorCodes", descriptor)
+	testCase.assertIn("eventNames", descriptor)
+	testCase.assertIn("features", descriptor)
+	testCase.assertIn("payloadKeys", descriptor)
+	testCase.assertEqual(set(EXPECTED_HOST_PAYLOAD_KEYS), set(descriptor["payloadKeys"].keys()), formatFrozenSetDiff(EXPECTED_HOST_PAYLOAD_KEYS, descriptor["payloadKeys"].keys(), "payloadKeys"))
+	testCase.assertEqual(set(EXPECTED_HOST_EVENT_CONTRACTS.keys()), set(descriptor["payloadKeys"]["events"].keys()), formatFrozenSetDiff(EXPECTED_HOST_EVENT_CONTRACTS.keys(), descriptor["payloadKeys"]["events"].keys(), "eventNames"))
+
+def assertActionSummaryShape(testCase, actionSummary):
+	testCase.assertEqual(set(EXPECTED_ACTION_SUMMARY_KEYS), set(actionSummary.keys()), formatFrozenSetDiff(EXPECTED_ACTION_SUMMARY_KEYS, actionSummary.keys(), "actionSummaryKeys"))
+
 
 class EvaluateRollTests(unittest.TestCase):
 	def testTerminalScriptCompiles(self):
@@ -1716,37 +1783,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		descriptor = terminal["hostSchemaDescriptor"]()
 		self.assertEqual(descriptor["engineApiVersion"], terminal["engineApiVersion"])
-		self.assertEqual(descriptor["schemaVersion"], "1")
-		self.assertIn("errorCodes", descriptor)
-		self.assertIn("eventNames", descriptor)
-		self.assertIn("features", descriptor)
-		self.assertIn("payloadKeys", descriptor)
-		self.assertIn("command", descriptor["payloadKeys"])
-		self.assertIn("step", descriptor["payloadKeys"])
-		self.assertIn("sessionBundle", descriptor["payloadKeys"])
-		self.assertIn("sessionCompatibilityReport", descriptor["payloadKeys"])
-		self.assertIn("startupBundle", descriptor["payloadKeys"])
-		self.assertIn("allowedCommands", descriptor["payloadKeys"])
-		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
-		self.assertIn("commandSnapshot", descriptor["payloadKeys"])
-		self.assertIn("deltaSnapshot", descriptor["payloadKeys"])
-		self.assertIn("actionBundle", descriptor["payloadKeys"])
-		self.assertIn("actionSummary", descriptor["payloadKeys"])
-		self.assertIn("healthReport", descriptor["payloadKeys"])
-		self.assertIn("preflightReport", descriptor["payloadKeys"])
-		self.assertIn("workflowReport", descriptor["payloadKeys"])
-		self.assertIn("bootstrapReport", descriptor["payloadKeys"])
-		self.assertIn("compatibilityReport", descriptor["payloadKeys"])
-		self.assertIn("eventValidationReport", descriptor["payloadKeys"])
-		self.assertIn("tracePacket", descriptor["payloadKeys"])
-		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
-		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
-		self.assertIn("actionLogRun", descriptor["payloadKeys"])
-		self.assertIn("replayReport", descriptor["payloadKeys"])
-		self.assertIn("stateDelta", descriptor["payloadKeys"])
-		self.assertIn("statusPanel", descriptor["payloadKeys"])
-		self.assertIn("events", descriptor["payloadKeys"])
-		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
+		assertHostSchemaContracts(self, descriptor)
 
 	def testHostAllowedCommandsComeOutCrapsIncludesDontComeTakeDown(self):
 		terminal = loadTerminalNamespace()
@@ -1930,6 +1967,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("stateDelta", payload)
 		self.assertIn("actionSummary", payload)
 		self.assertEqual(payload["uiSnapshot"]["pointPhase"], False)
+		assertActionSummaryShape(self, payload["actionSummary"])
 		self.assertEqual(payload["actionSummary"]["actionState"], "handled")
 		self.assertEqual(payload["actionSummary"]["handled"], True)
 
@@ -1939,6 +1977,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["success"], True)
 		self.assertEqual(payload["commandResult"]["handled"], False)
 		self.assertEqual(payload["stateDelta"]["changed"], False)
+		assertActionSummaryShape(self, payload["actionSummary"])
 		self.assertEqual(payload["actionSummary"]["actionState"], "unhandled")
 		self.assertEqual(payload["actionSummary"]["handled"], False)
 		self.assertEqual(payload["actionSummary"]["success"], True)
@@ -1955,6 +1994,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
 		self.assertEqual(payload["commandResult"], None)
 		self.assertEqual(payload["stateDelta"]["changed"], False)
+		assertActionSummaryShape(self, payload["actionSummary"])
 		self.assertEqual(payload["actionSummary"]["actionState"], "validationError")
 		self.assertEqual(payload["actionSummary"]["success"], False)
 		self.assertEqual(payload["actionSummary"]["errorCode"], terminal["hostErrorCodes"]["invalidActionInput"])
@@ -4514,52 +4554,14 @@ class HostContractSnapshotTests(unittest.TestCase):
 	def testHostPayloadKeySnapshot(self):
 		terminal = loadTerminalNamespace()
 		descriptor = terminal["hostSchemaDescriptor"]()
-		expectedPayloadKeys = [
-			"command",
-			"step",
-			"sessionBundle",
-			"sessionCompatibilityReport",
-			"startupBundle",
-			"allowedCommands",
-			"uiSnapshot",
-			"commandSnapshot",
-			"deltaSnapshot",
-			"actionBundle",
-			"actionSummary",
-			"healthReport",
-			"preflightReport",
-			"actionLogEntry",
-			"actionLogRun",
-			"replayReport",
-			"workflowReport",
-			"bootstrapReport",
-			"compatibilityReport",
-			"eventValidationReport",
-			"tracePacket",
-			"soloDebugBundle",
-			"stateDelta",
-			"statusPanel",
-			"events"
-		]
-		self.assertFrozenSetEqual(expectedPayloadKeys, descriptor["payloadKeys"].keys(), "payloadKeys")
+		self.assertFrozenSetEqual(EXPECTED_HOST_PAYLOAD_KEYS, descriptor["payloadKeys"].keys(), "payloadKeys")
 
 	def testHostEventContractSnapshot(self):
 		terminal = loadTerminalNamespace()
 		descriptor = terminal["hostSchemaDescriptor"]()
 		eventsMap = descriptor["payloadKeys"]["events"]
-		expectedEventMap = {
-			"inputRequested": ["engineApiVersion", "prompt"],
-			"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
-			"commandProcessed": ["engineApiVersion", "success", "error", "command", "pointPhase", "shouldRoll", "handled", "runtimeState", "capturedOutput", "capturedPrompts"],
-			"stepCompleted": ["engineApiVersion", "stepType", "success", "error", "commandResult", "cycleResult", "runtimeState", "capturedOutput", "capturedPrompts"],
-			"cycleStarted": ["engineApiVersion", "point", "throws", "gameMode"],
-			"comeOutResolved": ["engineApiVersion", "enteredPointPhase", "outcome", "runtimeState"],
-			"pointPhaseResolved": ["engineApiVersion", "roundEnded", "outcome", "runtimeState"],
-			"cycleCompleted": ["engineApiVersion", "cycleResult", "runtimeState"],
-			"gameInitialized": ["engineApiVersion", "startBank", "gameMode", "runtimeState"]
-		}
-		self.assertFrozenSetEqual(expectedEventMap.keys(), eventsMap.keys(), "eventNames")
-		for eventName, expectedKeys in expectedEventMap.items():
+		self.assertFrozenSetEqual(EXPECTED_HOST_EVENT_CONTRACTS.keys(), eventsMap.keys(), "eventNames")
+		for eventName, expectedKeys in EXPECTED_HOST_EVENT_CONTRACTS.items():
 			self.assertEqual(expectedKeys, eventsMap[eventName], f"event contract drift for {eventName}")
 
 

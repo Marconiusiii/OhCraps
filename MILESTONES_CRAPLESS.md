@@ -3237,3 +3237,40 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added frozen contract snapshot tests with readable drift diffs.
 - Full suite remains green after this milestone.
+
+## Milestone 127: Shared Host Contract Test Helpers
+
+### What problem this solves
+- Host contract tests had repeated schema/event/action-summary assertions, which made maintenance harder.
+
+### What changed
+- Added shared test constants:
+	- `EXPECTED_HOST_PAYLOAD_KEYS`
+	- `EXPECTED_HOST_EVENT_CONTRACTS`
+	- `EXPECTED_ACTION_SUMMARY_KEYS`
+- Added shared test helpers:
+	- `assertHostSchemaContracts(...)`
+	- `assertActionSummaryShape(...)`
+	- existing `formatFrozenSetDiff(...)` reused for readable drift output
+- Refactored repeated tests to use these helpers/constants.
+
+### Why this helps
+- One update point for contract baseline changes.
+- Less duplication and cleaner failure messages.
+- Faster solo maintenance when contract changes are intentional.
+
+### How to use in your test cycle
+- Focused contract/helper checks:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k Snapshot`
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k RunHostAction`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Test-only refactor; no behavioral logic changes.
+- Full suite remains green after this milestone.

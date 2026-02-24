@@ -11,6 +11,7 @@ version = "7.0.0"
 outputHandler = None
 inputHandler = None
 randomProvider = random
+eventHandler = None
 
 def setIoHandlers(outputFunc=None, inputFunc=None):
 	global outputHandler, inputHandler
@@ -34,6 +35,19 @@ def setRandomProvider(provider=None):
 def resetRandomProvider():
 	global randomProvider
 	randomProvider = random
+
+def setEventHandler(handler=None):
+	global eventHandler
+	eventHandler = handler
+
+def resetEventHandler():
+	global eventHandler
+	eventHandler = None
+
+def emitEvent(eventName, payload=None):
+	if eventHandler is not None:
+		eventPayload = payload if payload is not None else {}
+		eventHandler(str(eventName), eventPayload)
 
 def writeOutput(message):
 	if outputHandler is None:
@@ -2576,7 +2590,9 @@ def runPointPhaseRound():
 		continue
 
 def runOneCycle():
+	emitEvent("cycleStarted", {"point": int(comeOut), "throws": int(throws), "gameMode": gameMode})
 	comeOutResult = runComeOutRound()
+	emitEvent("comeOutResolved", {"enteredPointPhase": bool(comeOutResult.enteredPointPhase), "outcome": comeOutResult.outcome, "runtimeState": getRuntimeState()})
 	cycleResult = {
 		"enteredPointPhase": bool(comeOutResult.enteredPointPhase),
 		"comeOutOutcome": comeOutResult.outcome,
@@ -2586,12 +2602,15 @@ def runOneCycle():
 		"throws": int(throws)
 	}
 	if not comeOutResult.enteredPointPhase:
+		emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
 		return cycleResult
 	pointPhaseResult = runPointPhaseRound()
+	emitEvent("pointPhaseResolved", {"roundEnded": bool(pointPhaseResult.roundEnded), "outcome": pointPhaseResult.outcome, "runtimeState": getRuntimeState()})
 	cycleResult["pointPhaseOutcome"] = pointPhaseResult.outcome
 	cycleResult["pointRoundEnded"] = bool(pointPhaseResult.roundEnded)
 	cycleResult["point"] = int(comeOut)
 	cycleResult["throws"] = int(throws)
+	emitEvent("cycleCompleted", {"cycleResult": dict(cycleResult), "runtimeState": getRuntimeState()})
 	return cycleResult
 
 #Additional Global Variables

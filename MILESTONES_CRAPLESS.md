@@ -1657,3 +1657,39 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRunGameTransitionsIntoPointPhaseRound`
 - Compile check passed.
 - Full suite remains green (`246` tests passing).
+
+## Milestone 85: Runtime Event Hook API and Cycle Boundary Events
+
+### What changed
+- Added runtime event hook APIs:
+	- `setEventHandler(handler=None)`
+	- `resetEventHandler()`
+	- `emitEvent(eventName, payload=None)`
+- Integrated event emission into `runOneCycle()` at stable boundaries:
+	- `cycleStarted`
+	- `comeOutResolved`
+	- `pointPhaseResolved` (only when point phase is entered)
+	- `cycleCompleted`
+- Event payloads now include deterministic cycle metadata and runtime snapshots where relevant:
+	- cycle booleans/outcomes
+	- point/throws snapshots
+	- `runtimeState` via `getRuntimeState()` on resolution/completion events
+
+### Why
+- iOS/app hosts need push-style runtime notifications instead of polling full state after every step.
+- Stable boundary events make UI updates, animations, and narration sync deterministic while preserving core game logic.
+- Optional handler keeps terminal execution unchanged when no host subscriber is attached.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting changes.
+- Terminal gameplay unchanged by default.
+- Host integrations can now subscribe to cycle events for structured flow updates.
+
+### Test coverage
+- Added deterministic event regressions in `tests/testEngineBehavior.py`:
+	- `testRunOneCycleEmitsEventsForComeOutOnlyPath`
+	- `testRunOneCycleEmitsEventsForPointPhasePath`
+	- `testResetEventHandlerClearsHandler`
+- Compile check passed.
+- Full suite remains green (`249` tests passing).

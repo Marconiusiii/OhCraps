@@ -1592,6 +1592,42 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(result["point"], 8)
 		self.assertEqual(result["throws"], 5)
 
+	def testRunOneCycleEmitsEventsForComeOutOnlyPath(self):
+		terminal = loadTerminalNamespace()
+		terminal["comeOut"] = 0
+		terminal["throws"] = 2
+		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=False, outcome=terminal["RollOutcome"].natural)
+		terminal["runPointPhaseRound"] = lambda: terminal["pointPhaseRoundResult"](roundEnded=False, outcome=terminal["RollOutcome"].neutral)
+		events = []
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		result = terminal["runOneCycle"]()
+		self.assertEqual(result["enteredPointPhase"], False)
+		self.assertEqual([event[0] for event in events], ["cycleStarted", "comeOutResolved", "cycleCompleted"])
+		self.assertEqual(events[1][1]["enteredPointPhase"], False)
+		self.assertIn("runtimeState", events[2][1])
+		terminal["resetEventHandler"]()
+
+	def testRunOneCycleEmitsEventsForPointPhasePath(self):
+		terminal = loadTerminalNamespace()
+		terminal["comeOut"] = 6
+		terminal["throws"] = 4
+		terminal["runComeOutRound"] = lambda: terminal["comeOutRoundResult"](enteredPointPhase=True, outcome=terminal["RollOutcome"].pointEstablished)
+		terminal["runPointPhaseRound"] = lambda: terminal["pointPhaseRoundResult"](roundEnded=True, outcome=terminal["RollOutcome"].pointHit)
+		events = []
+		terminal["setEventHandler"](lambda eventName, payload: events.append((eventName, payload)))
+		result = terminal["runOneCycle"]()
+		self.assertEqual(result["enteredPointPhase"], True)
+		self.assertEqual([event[0] for event in events], ["cycleStarted", "comeOutResolved", "pointPhaseResolved", "cycleCompleted"])
+		self.assertEqual(events[2][1]["roundEnded"], True)
+		self.assertIn("runtimeState", events[3][1])
+		terminal["resetEventHandler"]()
+
+	def testResetEventHandlerClearsHandler(self):
+		terminal = loadTerminalNamespace()
+		terminal["setEventHandler"](lambda eventName, payload: None)
+		terminal["resetEventHandler"]()
+		self.assertEqual(terminal["eventHandler"], None)
+
 	def testRunGameBootstrapsAndLoopsThroughComeOutStatus(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 100

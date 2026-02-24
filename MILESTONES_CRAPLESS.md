@@ -1762,3 +1762,32 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing come-out/point resolution regressions remain passing.
 - Compile check passed.
 - Full suite remains green (`253` tests passing).
+
+## Milestone 88: Command Path Runtime Synchronization in handleBettingCommand
+
+### What changed
+- Added runtime sync at command entry in `handleBettingCommand(...)`:
+	- `syncRuntimeFromGlobals()` at function start
+- Added a local return helper inside `handleBettingCommand(...)`:
+	- `returnCommandResult(shouldRoll=False, handled=True)`
+	- helper syncs runtime before returning the command result
+- Routed all command return paths in `handleBettingCommand(...)` through `returnCommandResult(...)`.
+
+### Why
+- Command handling is a high-frequency state mutation path.
+- Ensuring runtime sync at command boundaries keeps `gameRuntime` aligned with globals after every betting command outcome.
+- This improves host-integration consistency without changing existing command behavior.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Command responses and flow unchanged.
+- `gameRuntime` now reliably reflects post-command state.
+
+### Test coverage
+- Added/updated command-path runtime-sync regressions in `tests/testEngineBehavior.py`:
+	- `testHandleBettingCommandSyncsRuntimeOnNoStateChangePath`
+	- `testHandleBettingCommandBbCallsOutOfMoneyComeOut` (now also asserts runtime bank sync)
+- Existing command behavior regression remains green (`testHandleBettingCommandPointRollReturnsTrue`).
+- Compile check passed.
+- Full suite remains green (`254` tests passing).

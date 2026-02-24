@@ -1271,6 +1271,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 			result = terminal["handleBettingCommand"]("x", pointPhase=True)
 		self.assertEqual(result.shouldRoll, True)
 
+	def testHandleBettingCommandSyncsRuntimeOnNoStateChangePath(self):
+		terminal = loadTerminalNamespace()
+		terminal["throws"] = 5
+		terminal["comeOut"] = 8
+		terminal["gameRuntime"] = terminal["GameRuntime"](
+			bank=terminal["bank"],
+			chipsOnTable=terminal["chipsOnTable"],
+			throws=1,
+			comeOut=4,
+			pointIsOn=terminal["pointIsOn"],
+			p2=terminal["p2"],
+			gameMode=terminal["gameMode"]
+		)
+		with patch("builtins.print"):
+			result = terminal["handleBettingCommand"]("x", pointPhase=True)
+		self.assertEqual(result.shouldRoll, True)
+		self.assertEqual(terminal["gameRuntime"].throws, 5)
+		self.assertEqual(terminal["gameRuntime"].comeOut, 8)
+
 	def testHandleBettingCommandPointOddsWithoutLineBet(self):
 		terminal = loadTerminalNamespace()
 		terminal["lineBets"] = {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0}
@@ -1302,11 +1321,12 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testHandleBettingCommandBbCallsOutOfMoneyComeOut(self):
 		terminal = loadTerminalNamespace()
 		calls = []
-		terminal["outOfMoney"] = lambda: calls.append(True)
+		terminal["outOfMoney"] = lambda: calls.append(True) or terminal.__setitem__("bank", 150)
 		with patch("builtins.print"):
 			result = terminal["handleBettingCommand"]("bb", pointPhase=False)
 		self.assertEqual(result.shouldRoll, False)
 		self.assertEqual(calls, [True])
+		self.assertEqual(terminal["gameRuntime"].bank, 150)
 
 	def testHandleBettingCommandBbCallsOutOfMoneyPointPhase(self):
 		terminal = loadTerminalNamespace()

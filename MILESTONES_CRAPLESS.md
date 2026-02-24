@@ -3154,3 +3154,47 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added tests for known-event pass, unknown-event failure, missing-key failure, and strict raise.
 - Full suite remains green after this milestone.
+
+## Milestone 125: Host Trace Packet Helper
+
+### What problem this solves
+- There was no single helper to capture one action run with status, summary, and event-contract checks together.
+
+### What changed
+- Added `tracePacket` contract keys in `hostSchemaDescriptor()`.
+- Added `createHostTracePacket(commandText="h", pointPhase=False, autoCapture=True, raiseOnFailure=False)`.
+- Trace packet includes:
+	- request metadata
+	- full action result
+	- action summary
+	- status panel
+	- emitted events
+	- event contract checks
+	- missing core event list
+	- failure reasons
+- Added strict mode (`raiseOnFailure=True`).
+
+### Why this helps
+- One call now gives a compact integration trace for a command path.
+- Faster solo debugging when validating adapter behavior and event contracts together.
+
+### How to use
+- Standard trace:
+	- `createHostTracePacket(commandText="x", pointPhase=False)`
+- Strict trace gate:
+	- `createHostTracePacket(commandText="x", pointPhase=False, raiseOnFailure=True)`
+
+### How to run in your test cycle
+- Focused trace tests:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k TracePacket`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for trace success, validation-failure trace, and strict raise path.
+- Full suite remains green after this milestone.

@@ -313,6 +313,10 @@ def hostSchemaDescriptor():
 				"eventValidationReport": [
 					"engineApiVersion", "ok", "eventName", "requiredKeys", "missingKeys", "unknownEvent", "reasons"
 				],
+				"tracePacket": [
+					"engineApiVersion", "ok", "request", "actionResult", "actionSummary", "statusPanel",
+					"events", "eventChecks", "missingCoreEvents", "reasons"
+				],
 				"soloDebugBundle": [
 					"engineApiVersion", "ok", "summaryLine", "actionExecuted", "actionResult",
 					"workflowStatus", "healthReport", "statusPanel", "uiSnapshot"
@@ -418,6 +422,62 @@ def validateHostEventPayload(eventName, payload, raiseOnFailure=False):
 	if raiseOnFailure and not bool(report["ok"]):
 		raise ValueError("; ".join(reasons))
 	return report
+
+def createHostTracePacket(commandText="h", pointPhase=False, autoCapture=True, raiseOnFailure=False):
+	global eventHandler
+	traceEvents = []
+	priorEventHandler = eventHandler
+	def traceEventHandler(eventName, payload):
+		traceEvents.append({
+			"eventName": str(eventName),
+			"payload": (dict(payload) if isinstance(payload, dict) else payload)
+		})
+	setEventHandler(traceEventHandler)
+	try:
+		actionResult = runHostAction(
+			commandText=commandText,
+			pointPhase=bool(pointPhase),
+			autoCapture=bool(autoCapture),
+			raiseOnError=False
+		)
+	finally:
+		setEventHandler(priorEventHandler)
+	eventChecks = []
+	for traceEvent in traceEvents:
+		checkReport = validateHostEventPayload(
+			eventName=traceEvent["eventName"],
+			payload=(traceEvent["payload"] if isinstance(traceEvent["payload"], dict) else {}),
+			raiseOnFailure=False
+		)
+		eventChecks.append(checkReport)
+	coreEventNames = [hostEventNames["commandProcessed"]]
+	seenEventNames = [item["eventName"] for item in traceEvents]
+	missingCoreEvents = [eventName for eventName in coreEventNames if eventName not in seenEventNames]
+	reasons = []
+	if not bool(actionResult.get("success", False)):
+		reasons.append("Action result is not successful.")
+	if any(not bool(check.get("ok", False)) for check in eventChecks):
+		reasons.append("One or more emitted events failed contract validation.")
+	if len(missingCoreEvents) > 0:
+		reasons.append(f"Missing core events: {', '.join(missingCoreEvents)}")
+	packet = withApiVersion({
+		"ok": len(reasons) == 0,
+		"request": {
+			"commandText": str(commandText) if commandText is not None else None,
+			"pointPhase": bool(pointPhase),
+			"autoCapture": bool(autoCapture)
+		},
+		"actionResult": actionResult,
+		"actionSummary": actionResult.get("actionSummary") if isinstance(actionResult, dict) else None,
+		"statusPanel": actionResult.get("statusPanel") if isinstance(actionResult, dict) else None,
+		"events": traceEvents,
+		"eventChecks": eventChecks,
+		"missingCoreEvents": missingCoreEvents,
+		"reasons": reasons
+	})
+	if raiseOnFailure and not bool(packet["ok"]):
+		raise ValueError("; ".join(reasons))
+	return packet
 
 def createHostStartupBundle(requiredApiVersion=None, requiredFeatures=None, startBank=None, selectedMode=None):
 	shouldInitialize = (startBank is not None or selectedMode is not None)

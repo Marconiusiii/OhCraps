@@ -1727,6 +1727,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("bootstrapReport", descriptor["payloadKeys"])
 		self.assertIn("compatibilityReport", descriptor["payloadKeys"])
 		self.assertIn("eventValidationReport", descriptor["payloadKeys"])
+		self.assertIn("tracePacket", descriptor["payloadKeys"])
 		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
 		self.assertIn("actionLogEntry", descriptor["payloadKeys"])
 		self.assertIn("actionLogRun", descriptor["payloadKeys"])
@@ -2242,6 +2243,28 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		with self.assertRaises(ValueError):
 			terminal["createHostBootstrapReport"](requiredApiVersion="9.9.9", raiseOnFailure=True)
+
+	def testCreateHostTracePacketSuccessPath(self):
+		terminal = loadTerminalNamespace()
+		packet = terminal["createHostTracePacket"](commandText="x", pointPhase=False, autoCapture=True)
+		self.assertEqual(packet["ok"], True)
+		self.assertEqual(packet["actionSummary"]["actionState"], "handled")
+		self.assertEqual(packet["missingCoreEvents"], [])
+		self.assertTrue(any(event["eventName"] == terminal["hostEventNames"]["commandProcessed"] for event in packet["events"]))
+		self.assertTrue(all(check["ok"] for check in packet["eventChecks"]))
+
+	def testCreateHostTracePacketValidationFailurePath(self):
+		terminal = loadTerminalNamespace()
+		packet = terminal["createHostTracePacket"](commandText="", pointPhase=False, autoCapture=True)
+		self.assertEqual(packet["ok"], False)
+		self.assertEqual(packet["actionSummary"]["actionState"], "validationError")
+		self.assertIn(terminal["hostEventNames"]["commandProcessed"], packet["missingCoreEvents"])
+		self.assertIn("Action result is not successful.", packet["reasons"])
+
+	def testCreateHostTracePacketRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["createHostTracePacket"](commandText="", pointPhase=False, autoCapture=True, raiseOnFailure=True)
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

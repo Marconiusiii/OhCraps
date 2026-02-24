@@ -2833,3 +2833,39 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added dedicated mini-cycle tests in the engine behavior suite.
 - Full suite remains green after this milestone.
+
+## Milestone 117: Fast Host-Contract Test Target
+
+### What problem this solves
+- You needed a quick command for your normal solo debug rhythm, without waiting for the full suite every single check.
+
+### What changed
+- Added a dedicated test class: `HostContractFastCycleTests`.
+- This class locks a small, high-signal contract set:
+	- schema includes solo debug bundle keys
+	- fast mini-cycle in Craps mode
+	- fast mini-cycle in Crapless mode
+	- invalid action failure shape
+
+### Why this helps
+- You now have a short test target for rapid checks between bigger edits.
+- Full suite remains the final gate, but fast-cycle checks speed up iteration.
+
+### Fast command for your routine
+- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractFastCycle`
+
+### When to use each command
+- Use fast command while actively iterating on host/debug integration.
+- Use full suite before milestone completion or commit.
+
+### Full gate command
+- `python3 -m unittest discover -s tests -p 'test*.py'`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added a focused host-contract class for rapid verification.
+- Full suite remains green after this milestone.

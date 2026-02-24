@@ -4237,5 +4237,49 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 0)
 
 
+class HostContractFastCycleTests(unittest.TestCase):
+	def testHostSchemaIncludesSoloDebugBundleKeys(self):
+		terminal = loadTerminalNamespace()
+		descriptor = terminal["hostSchemaDescriptor"]()
+		self.assertIn("soloDebugBundle", descriptor["payloadKeys"])
+		self.assertIn("workflowStatus", descriptor["payloadKeys"]["soloDebugBundle"])
+		self.assertIn("healthReport", descriptor["payloadKeys"]["soloDebugBundle"])
+		self.assertIn("statusPanel", descriptor["payloadKeys"]["soloDebugBundle"])
+		self.assertIn("uiSnapshot", descriptor["payloadKeys"]["soloDebugBundle"])
+
+	def testHostContractFastCycleCraps(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
+		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
+		self.assertEqual(baseline["ok"], True)
+		self.assertEqual(baseline["healthReport"]["ok"], True)
+		self.assertEqual(commandResult["ok"], True)
+		self.assertEqual(commandResult["actionExecuted"], True)
+		self.assertEqual(commandResult["actionResult"]["success"], True)
+
+	def testHostContractFastCycleCrapless(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
+		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
+		self.assertEqual(baseline["ok"], True)
+		self.assertEqual(baseline["healthReport"]["ok"], True)
+		self.assertEqual(commandResult["ok"], True)
+		self.assertEqual(commandResult["actionExecuted"], True)
+		self.assertEqual(commandResult["actionResult"]["success"], True)
+
+	def testHostContractFastCycleInvalidActionShape(self):
+		terminal = loadTerminalNamespace()
+		terminal["resetRuntimeState"]()
+		bundle = terminal["createSoloDebugBundle"](runAction=True, commandText="", pointPhase=False)
+		self.assertEqual(bundle["ok"], False)
+		self.assertEqual(bundle["actionExecuted"], True)
+		self.assertEqual(bundle["actionResult"]["success"], False)
+		self.assertEqual(bundle["actionResult"]["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+
+
 if __name__ == "__main__":
 	unittest.main()

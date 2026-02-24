@@ -1934,3 +1934,31 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testStepRejectsPointPhaseWithoutCommand`
 - Compile check passed.
 - Full suite remains green (`266` tests passing).
+
+## Milestone 93: Route Terminal Betting Menus Through Unified step API
+
+### What changed
+- Updated terminal betting menu loops to use unified host/engine path via `step(...)`:
+	- `runPointPhaseBettingMenu()` now calls `step(commandText=..., pointPhase=True)`
+	- `runComeOutBettingMenu()` now calls `step(commandText=..., pointPhase=False)`
+- Menu roll continuation behavior remains unchanged:
+	- menu exits when `stepResult["commandResult"]["shouldRoll"]` is true
+
+### Why
+- This removes duplicate command-execution paths between terminal menu loops and host orchestration.
+- Using `step(...)` everywhere strengthens parity across terminal and app-host execution behavior.
+- It simplifies future platform adapters by consolidating command handling through one API.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Terminal prompts and roll-loop behavior unchanged.
+
+### Test coverage
+- Updated betting-menu loop regressions in `tests/testEngineBehavior.py` to assert `step(...)` path usage:
+	- `testRunPointPhaseBettingMenuLoopsUntilRollCommand`
+	- `testRunPointPhaseBettingMenuUsesPointPhaseTrue`
+	- `testRunComeOutBettingMenuLoopsUntilRollCommand`
+	- `testRunComeOutBettingMenuUsesPointPhaseFalse`
+- Compile check passed.
+- Full suite remains green (`266` tests passing).

@@ -1661,10 +1661,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testRunPointPhaseBettingMenuLoopsUntilRollCommand(self):
 		terminal = loadTerminalNamespace()
 		calls = []
-		def fakeHandleBettingCommand(command, pointPhase=False):
-			calls.append((command, pointPhase))
-			return terminal["bettingCommandResult"](shouldRoll=(command == "x"), handled=True)
-		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+		def fakeStep(commandText=None, pointPhase=False):
+			calls.append((commandText, pointPhase))
+			return {
+				"stepType": "command",
+				"commandResult": {
+					"command": commandText,
+					"pointPhase": pointPhase,
+					"shouldRoll": (commandText == "x"),
+					"handled": True,
+					"runtimeState": {}
+				},
+				"cycleResult": None,
+				"runtimeState": {}
+			}
+		terminal["step"] = fakeStep
 		inputs = iter(["h", "x"])
 		terminal["readInput"] = lambda promptText: next(inputs)
 		terminal["writeOutput"] = lambda message: None
@@ -1675,10 +1686,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testRunPointPhaseBettingMenuUsesPointPhaseTrue(self):
 		terminal = loadTerminalNamespace()
 		pointPhaseFlags = []
-		def fakeHandleBettingCommand(command, pointPhase=False):
+		def fakeStep(commandText=None, pointPhase=False):
 			pointPhaseFlags.append(pointPhase)
-			return terminal["bettingCommandResult"](shouldRoll=True, handled=True)
-		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+			return {
+				"stepType": "command",
+				"commandResult": {
+					"command": commandText,
+					"pointPhase": pointPhase,
+					"shouldRoll": True,
+					"handled": True,
+					"runtimeState": {}
+				},
+				"cycleResult": None,
+				"runtimeState": {}
+			}
+		terminal["step"] = fakeStep
 		terminal["readInput"] = lambda promptText: "x"
 		terminal["writeOutput"] = lambda message: None
 		result = terminal["runPointPhaseBettingMenu"]()
@@ -1688,10 +1710,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testRunComeOutBettingMenuLoopsUntilRollCommand(self):
 		terminal = loadTerminalNamespace()
 		calls = []
-		def fakeHandleBettingCommand(command, pointPhase=False):
-			calls.append((command, pointPhase))
-			return terminal["bettingCommandResult"](shouldRoll=(command == "r"), handled=True)
-		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+		def fakeStep(commandText=None, pointPhase=False):
+			calls.append((commandText, pointPhase))
+			return {
+				"stepType": "command",
+				"commandResult": {
+					"command": commandText,
+					"pointPhase": pointPhase,
+					"shouldRoll": (commandText == "r"),
+					"handled": True,
+					"runtimeState": {}
+				},
+				"cycleResult": None,
+				"runtimeState": {}
+			}
+		terminal["step"] = fakeStep
 		inputs = iter(["h", "r"])
 		terminal["readInput"] = lambda promptText: next(inputs)
 		terminal["writeOutput"] = lambda message: None
@@ -1702,10 +1735,21 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 	def testRunComeOutBettingMenuUsesPointPhaseFalse(self):
 		terminal = loadTerminalNamespace()
 		pointPhaseFlags = []
-		def fakeHandleBettingCommand(command, pointPhase=False):
+		def fakeStep(commandText=None, pointPhase=False):
 			pointPhaseFlags.append(pointPhase)
-			return terminal["bettingCommandResult"](shouldRoll=True, handled=True)
-		terminal["handleBettingCommand"] = fakeHandleBettingCommand
+			return {
+				"stepType": "command",
+				"commandResult": {
+					"command": commandText,
+					"pointPhase": pointPhase,
+					"shouldRoll": True,
+					"handled": True,
+					"runtimeState": {}
+				},
+				"cycleResult": None,
+				"runtimeState": {}
+			}
+		terminal["step"] = fakeStep
 		terminal["readInput"] = lambda promptText: "x"
 		terminal["writeOutput"] = lambda message: None
 		result = terminal["runComeOutBettingMenu"]()

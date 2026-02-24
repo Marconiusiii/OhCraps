@@ -2704,16 +2704,16 @@ def runPointPhaseBettingMenu():
 	while True:
 		writeOutput("Place your bets!\n")
 		round2 = readInput(">  ").strip().lower()
-		commandResult = handleBettingCommand(round2, pointPhase=True)
-		if commandResult.shouldRoll:
+		stepResult = step(commandText=round2, pointPhase=True)
+		if stepResult["commandResult"]["shouldRoll"]:
 			return {"shouldRoll": True}
 
 def runComeOutBettingMenu():
 	while True:
 		writeOutput("Place your Bets!\n")
 		round1 = readInput(">  ").strip().lower()
-		commandResult = handleBettingCommand(round1, pointPhase=False)
-		if commandResult.shouldRoll:
+		stepResult = step(commandText=round1, pointPhase=False)
+		if stepResult["commandResult"]["shouldRoll"]:
 			return {"shouldRoll": True}
 
 def runComeOutRound():

@@ -1976,6 +1976,29 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			terminal["setRuntimeState"]({"unknownKey": 1})
 
+	def testNormalizeRuntimeStatePayloadCastsTypes(self):
+		terminal = loadTerminalNamespace()
+		normalizedState = terminal["normalizeRuntimeStatePayload"]({
+			"bank": "120",
+			"pointIsOn": 1,
+			"gameMode": "2",
+			"allNums": (2, 3, 4)
+		})
+		self.assertEqual(normalizedState["bank"], 120)
+		self.assertEqual(normalizedState["pointIsOn"], True)
+		self.assertEqual(normalizedState["gameMode"], terminal["GameMode"].craplessCraps)
+		self.assertEqual(normalizedState["allNums"], [2, 3, 4])
+
+	def testBuildDefaultRuntimeStateMatchesResetDefaults(self):
+		terminal = loadTerminalNamespace()
+		defaultState = terminal["buildDefaultRuntimeState"]()
+		resetState = terminal["resetRuntimeState"]()
+		self.assertEqual(resetState["bank"], defaultState["bank"])
+		self.assertEqual(resetState["chipsOnTable"], defaultState["chipsOnTable"])
+		self.assertEqual(resetState["gameMode"], defaultState["gameMode"])
+		self.assertEqual(resetState["lineBets"], defaultState["lineBets"])
+		self.assertEqual(resetState["betSnapshot"]["fieldBet"], defaultState["betSnapshot"]["fieldBet"])
+
 	def testSyncRuntimeFromGlobalsCapturesCoreLoopValues(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 345

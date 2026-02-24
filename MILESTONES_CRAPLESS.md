@@ -1791,3 +1791,36 @@ New milestone updates should be appended here rather than creating new milestone
 - Existing command behavior regression remains green (`testHandleBettingCommandPointRollReturnsTrue`).
 - Compile check passed.
 - Full suite remains green (`254` tests passing).
+
+## Milestone 89: Runtime State Schema Helpers and API Normalization Refactor
+
+### What changed
+- Added explicit runtime-state schema helpers:
+	- `runtimeStateKeys()`
+	- `buildDefaultBetSnapshot()`
+	- `buildDefaultRuntimeState()`
+	- `validateRuntimeStatePayload(runtimeState)`
+	- `normalizeRuntimeStatePayload(runtimeState)`
+- Refactored runtime APIs to use schema helpers:
+	- `getRuntimeState()` now returns a normalized payload shape
+	- `setRuntimeState(...)` now validates and normalizes payload before apply
+	- `resetRuntimeState()` now delegates to `buildDefaultRuntimeState()`
+- Preserved partial-update behavior in `setRuntimeState(...)` while centralizing conversion/normalization.
+
+### Why
+- Runtime state logic had become spread across manual key checks and conversions.
+- Centralized schema helpers reduce drift risk and make host contract evolution safer.
+- Canonical default builders improve predictability for resets and test harnesses.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Supported runtime-state keys and overall API behavior remain consistent.
+
+### Test coverage
+- Added deterministic schema/runtime regressions in `tests/testEngineBehavior.py`:
+	- `testNormalizeRuntimeStatePayloadCastsTypes`
+	- `testBuildDefaultRuntimeStateMatchesResetDefaults`
+- Existing runtime-state rejection/reset tests continue to pass.
+- Compile check passed.
+- Full suite remains green (`256` tests passing).

@@ -1664,8 +1664,117 @@ def syncGlobalsFromRuntime(runtime=None):
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	return syncRuntimeFromGlobals()
 
-def getRuntimeState():
+def runtimeStateKeys():
 	return {
+		"bank", "initBank", "chipsOnTable", "throws", "pointIsOn", "comeOut", "p2",
+		"working", "placeOff", "layOff", "hardOff", "rollHard", "gameMode",
+		"lineBets", "propBets", "atsAll", "atsTall", "atsSmall", "atsOn",
+		"allNums", "fire", "fireBet", "betSnapshot"
+	}
+
+def buildDefaultBetSnapshot():
+	return {
+		"bank": 0,
+		"chipsOnTable": 0,
+		"comeBet": 0,
+		"dComeBet": 0,
+		"comeBets": {key: 0 for key in comeBets},
+		"dComeBets": {key: 0 for key in dComeBets},
+		"comeOdds": {key: 0 for key in comeOdds},
+		"dComeOdds": {key: 0 for key in dComeOdds},
+		"place": {key: 0 for key in place},
+		"layBets": {key: 0 for key in layBets},
+		"hardWays": {key: 0 for key in hardWays},
+		"fieldBet": 0
+	}
+
+def buildDefaultRuntimeState():
+	return {
+		"bank": 0,
+		"initBank": 0,
+		"chipsOnTable": 0,
+		"throws": 0,
+		"pointIsOn": False,
+		"comeOut": 0,
+		"p2": 0,
+		"working": False,
+		"placeOff": False,
+		"layOff": False,
+		"hardOff": False,
+		"rollHard": False,
+		"gameMode": GameMode.craps,
+		"lineBets": {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0},
+		"propBets": createDefaultPropBets(),
+		"atsAll": 0,
+		"atsTall": 0,
+		"atsSmall": 0,
+		"atsOn": False,
+		"allNums": [],
+		"fire": [],
+		"fireBet": 0,
+		"betSnapshot": buildDefaultBetSnapshot()
+	}
+
+def validateRuntimeStatePayload(runtimeState):
+	if not isinstance(runtimeState, dict):
+		raise ValueError("Runtime state must be a dictionary.")
+	unknownKeys = [key for key in runtimeState if key not in runtimeStateKeys()]
+	if unknownKeys:
+		raise ValueError(f"Unsupported runtime state keys: {', '.join(str(key) for key in sorted(unknownKeys))}")
+
+def normalizeRuntimeStatePayload(runtimeState):
+	validateRuntimeStatePayload(runtimeState)
+	normalizedState = {}
+	if "betSnapshot" in runtimeState:
+		normalizedState["betSnapshot"] = dict(runtimeState["betSnapshot"])
+	if "bank" in runtimeState:
+		normalizedState["bank"] = int(runtimeState["bank"])
+	if "initBank" in runtimeState:
+		normalizedState["initBank"] = int(runtimeState["initBank"])
+	if "chipsOnTable" in runtimeState:
+		normalizedState["chipsOnTable"] = int(runtimeState["chipsOnTable"])
+	if "throws" in runtimeState:
+		normalizedState["throws"] = int(runtimeState["throws"])
+	if "pointIsOn" in runtimeState:
+		normalizedState["pointIsOn"] = bool(runtimeState["pointIsOn"])
+	if "comeOut" in runtimeState:
+		normalizedState["comeOut"] = int(runtimeState["comeOut"])
+	if "p2" in runtimeState:
+		normalizedState["p2"] = int(runtimeState["p2"])
+	if "working" in runtimeState:
+		normalizedState["working"] = bool(runtimeState["working"])
+	if "placeOff" in runtimeState:
+		normalizedState["placeOff"] = bool(runtimeState["placeOff"])
+	if "layOff" in runtimeState:
+		normalizedState["layOff"] = bool(runtimeState["layOff"])
+	if "hardOff" in runtimeState:
+		normalizedState["hardOff"] = bool(runtimeState["hardOff"])
+	if "rollHard" in runtimeState:
+		normalizedState["rollHard"] = bool(runtimeState["rollHard"])
+	if "gameMode" in runtimeState:
+		normalizedState["gameMode"] = normalizedGameMode(runtimeState["gameMode"])
+	if "lineBets" in runtimeState:
+		normalizedState["lineBets"] = dict(runtimeState["lineBets"])
+	if "propBets" in runtimeState:
+		normalizedState["propBets"] = dict(runtimeState["propBets"])
+	if "atsAll" in runtimeState:
+		normalizedState["atsAll"] = int(runtimeState["atsAll"])
+	if "atsTall" in runtimeState:
+		normalizedState["atsTall"] = int(runtimeState["atsTall"])
+	if "atsSmall" in runtimeState:
+		normalizedState["atsSmall"] = int(runtimeState["atsSmall"])
+	if "atsOn" in runtimeState:
+		normalizedState["atsOn"] = bool(runtimeState["atsOn"])
+	if "allNums" in runtimeState:
+		normalizedState["allNums"] = list(runtimeState["allNums"])
+	if "fire" in runtimeState:
+		normalizedState["fire"] = list(runtimeState["fire"])
+	if "fireBet" in runtimeState:
+		normalizedState["fireBet"] = int(runtimeState["fireBet"])
+	return normalizedState
+
+def getRuntimeState():
+	return normalizeRuntimeStatePayload({
 		"bank": int(bank),
 		"initBank": int(initBank),
 		"chipsOnTable": int(chipsOnTable),
@@ -1689,110 +1798,63 @@ def getRuntimeState():
 		"fire": list(fire),
 		"fireBet": int(fireBet),
 		"betSnapshot": captureBetSnapshot()
-	}
+	})
 
 def setRuntimeState(runtimeState):
 	global bank, initBank, chipsOnTable, throws, pointIsOn, comeOut, p2, working, placeOff, layOff, hardOff, rollHard, gameMode, lineBets, propBets, atsAll, atsTall, atsSmall, atsOn, allNums, fire, fireBet
-	if not isinstance(runtimeState, dict):
-		raise ValueError("Runtime state must be a dictionary.")
-	allowedKeys = {
-		"bank", "initBank", "chipsOnTable", "throws", "pointIsOn", "comeOut", "p2",
-		"working", "placeOff", "layOff", "hardOff", "rollHard", "gameMode",
-		"lineBets", "propBets", "atsAll", "atsTall", "atsSmall", "atsOn",
-		"allNums", "fire", "fireBet", "betSnapshot"
-	}
-	unknownKeys = [key for key in runtimeState if key not in allowedKeys]
-	if unknownKeys:
-		raise ValueError(f"Unsupported runtime state keys: {', '.join(str(key) for key in sorted(unknownKeys))}")
-	if "betSnapshot" in runtimeState:
-		applyBetSnapshot(runtimeState["betSnapshot"])
-	if "bank" in runtimeState:
-		bank = int(runtimeState["bank"])
-	if "initBank" in runtimeState:
-		initBank = int(runtimeState["initBank"])
-	if "chipsOnTable" in runtimeState:
-		chipsOnTable = int(runtimeState["chipsOnTable"])
-	if "throws" in runtimeState:
-		throws = int(runtimeState["throws"])
-	if "pointIsOn" in runtimeState:
-		pointIsOn = bool(runtimeState["pointIsOn"])
-	if "comeOut" in runtimeState:
-		comeOut = int(runtimeState["comeOut"])
-	if "p2" in runtimeState:
-		p2 = int(runtimeState["p2"])
-	if "working" in runtimeState:
-		working = bool(runtimeState["working"])
-	if "placeOff" in runtimeState:
-		placeOff = bool(runtimeState["placeOff"])
-	if "layOff" in runtimeState:
-		layOff = bool(runtimeState["layOff"])
-	if "hardOff" in runtimeState:
-		hardOff = bool(runtimeState["hardOff"])
-	if "rollHard" in runtimeState:
-		rollHard = bool(runtimeState["rollHard"])
-	if "gameMode" in runtimeState:
-		gameMode = normalizedGameMode(runtimeState["gameMode"])
-	if "lineBets" in runtimeState:
-		lineBets = dict(runtimeState["lineBets"])
-	if "propBets" in runtimeState:
-		propBets = dict(runtimeState["propBets"])
-	if "atsAll" in runtimeState:
-		atsAll = int(runtimeState["atsAll"])
-	if "atsTall" in runtimeState:
-		atsTall = int(runtimeState["atsTall"])
-	if "atsSmall" in runtimeState:
-		atsSmall = int(runtimeState["atsSmall"])
-	if "atsOn" in runtimeState:
-		atsOn = bool(runtimeState["atsOn"])
-	if "allNums" in runtimeState:
-		allNums = list(runtimeState["allNums"])
-	if "fire" in runtimeState:
-		fire = list(runtimeState["fire"])
-	if "fireBet" in runtimeState:
-		fireBet = int(runtimeState["fireBet"])
+	normalizedState = normalizeRuntimeStatePayload(runtimeState)
+	if "betSnapshot" in normalizedState:
+		applyBetSnapshot(normalizedState["betSnapshot"])
+	if "bank" in normalizedState:
+		bank = normalizedState["bank"]
+	if "initBank" in normalizedState:
+		initBank = normalizedState["initBank"]
+	if "chipsOnTable" in normalizedState:
+		chipsOnTable = normalizedState["chipsOnTable"]
+	if "throws" in normalizedState:
+		throws = normalizedState["throws"]
+	if "pointIsOn" in normalizedState:
+		pointIsOn = normalizedState["pointIsOn"]
+	if "comeOut" in normalizedState:
+		comeOut = normalizedState["comeOut"]
+	if "p2" in normalizedState:
+		p2 = normalizedState["p2"]
+	if "working" in normalizedState:
+		working = normalizedState["working"]
+	if "placeOff" in normalizedState:
+		placeOff = normalizedState["placeOff"]
+	if "layOff" in normalizedState:
+		layOff = normalizedState["layOff"]
+	if "hardOff" in normalizedState:
+		hardOff = normalizedState["hardOff"]
+	if "rollHard" in normalizedState:
+		rollHard = normalizedState["rollHard"]
+	if "gameMode" in normalizedState:
+		gameMode = normalizedState["gameMode"]
+	if "lineBets" in normalizedState:
+		lineBets = normalizedState["lineBets"]
+	if "propBets" in normalizedState:
+		propBets = normalizedState["propBets"]
+	if "atsAll" in normalizedState:
+		atsAll = normalizedState["atsAll"]
+	if "atsTall" in normalizedState:
+		atsTall = normalizedState["atsTall"]
+	if "atsSmall" in normalizedState:
+		atsSmall = normalizedState["atsSmall"]
+	if "atsOn" in normalizedState:
+		atsOn = normalizedState["atsOn"]
+	if "allNums" in normalizedState:
+		allNums = normalizedState["allNums"]
+	if "fire" in normalizedState:
+		fire = normalizedState["fire"]
+	if "fireBet" in normalizedState:
+		fireBet = normalizedState["fireBet"]
 	syncGameState(gameState=gameState, bank=bank, chipsOnTable=chipsOnTable, throws=throws, pointIsOn=pointIsOn, comeOut=comeOut, p2=p2, gameMode=gameMode)
 	syncRuntimeFromGlobals()
 	return getRuntimeState()
 
 def resetRuntimeState():
-	return setRuntimeState({
-		"bank": 0,
-		"initBank": 0,
-		"chipsOnTable": 0,
-		"throws": 0,
-		"pointIsOn": False,
-		"comeOut": 0,
-		"p2": 0,
-		"working": False,
-		"placeOff": False,
-		"layOff": False,
-		"hardOff": False,
-		"rollHard": False,
-		"gameMode": GameMode.craps,
-		"lineBets": {"Pass": 0, "Pass Odds": 0, "Don't Pass": 0, "Don't Pass Odds": 0},
-		"propBets": createDefaultPropBets(),
-		"atsAll": 0,
-		"atsTall": 0,
-		"atsSmall": 0,
-		"atsOn": False,
-		"allNums": [],
-		"fire": [],
-		"fireBet": 0,
-		"betSnapshot": {
-			"bank": 0,
-			"chipsOnTable": 0,
-			"comeBet": 0,
-			"dComeBet": 0,
-			"comeBets": {key: 0 for key in comeBets},
-			"dComeBets": {key: 0 for key in dComeBets},
-			"comeOdds": {key: 0 for key in comeOdds},
-			"dComeOdds": {key: 0 for key in dComeOdds},
-			"place": {key: 0 for key in place},
-			"layBets": {key: 0 for key in layBets},
-			"hardWays": {key: 0 for key in hardWays},
-			"fieldBet": 0
-		}
-	})
+	return setRuntimeState(buildDefaultRuntimeState())
 
 placeOff = False
 

@@ -2385,3 +2385,38 @@ New milestone updates should be appended here rather than creating new milestone
 	- point-phase command list includes odds/come actions
 	- schema descriptor includes `allowedCommands`
 - Full suite remains green after this milestone.
+
+## Milestone 105: One-Call UI Snapshot API
+
+### What problem this solves
+- After each action, an app still needed multiple calls to rebuild the UI.
+- That made refresh logic harder and increased risk of screen drift.
+
+### What changed
+- Added `createHostUiSnapshot(pointPhase=False)` in `OhCraps_Py3.command`.
+- It returns one package with:
+	- current mode
+	- current phase flag
+	- runtime state
+	- allowed commands
+	- captured output
+	- captured prompts
+- Added `uiSnapshot` to `hostSchemaDescriptor()` payload keys.
+
+### Why this helps
+- iOS/web can refresh screen state from one response.
+- Fewer host calls and less wiring logic.
+- Lower chance of UI showing stale or incomplete state.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- snapshot includes state + commands + capture buffers
+	- point-phase snapshot includes point-phase commands
+	- Crapless snapshot disables Don’t Come controls in point phase
+	- schema descriptor includes `uiSnapshot`
+- Full suite remains green after this milestone.

@@ -1679,6 +1679,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("sessionBundle", descriptor["payloadKeys"])
 		self.assertIn("startupBundle", descriptor["payloadKeys"])
 		self.assertIn("allowedCommands", descriptor["payloadKeys"])
+		self.assertIn("uiSnapshot", descriptor["payloadKeys"])
 		self.assertIn("events", descriptor["payloadKeys"])
 		self.assertIn("cycleCompleted", descriptor["payloadKeys"]["events"])
 
@@ -1710,6 +1711,43 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("o", commandsByCode)
 		self.assertIn("c", commandsByCode)
 		self.assertIn("dp", commandsByCode)
+
+	def testCreateHostUiSnapshotIncludesStateCommandsAndCapture(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		terminal["bank"] = 222
+		terminal["setIoHandlers"](inputFunc=lambda promptText: "")
+		terminal["beginOutputCapture"]()
+		terminal["beginPromptCapture"]()
+		terminal["writeOutput"]("snapshot test output")
+		terminal["readInput"]("Snapshot Prompt > ")
+		payload = terminal["createHostUiSnapshot"](pointPhase=False)
+		self.assertEqual(payload["gameMode"], terminal["GameMode"].craps)
+		self.assertEqual(payload["pointPhase"], False)
+		self.assertEqual(payload["runtimeState"]["bank"], 222)
+		self.assertIn("commands", payload["allowedCommands"])
+		self.assertIn("snapshot test output", payload["capturedOutput"])
+		self.assertIn("Snapshot Prompt > ", payload["capturedPrompts"])
+		terminal["endOutputCapture"]()
+		terminal["endPromptCapture"]()
+		terminal["resetIoHandlers"]()
+
+	def testCreateHostUiSnapshotPointPhaseUsesPointPhaseCommandList(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craps
+		payload = terminal["createHostUiSnapshot"](pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["allowedCommands"]["commands"]}
+		self.assertEqual(payload["pointPhase"], True)
+		self.assertIn("o", commandsByCode)
+		self.assertIn("c", commandsByCode)
+
+	def testCreateHostUiSnapshotCraplessDisablesDontComeItems(self):
+		terminal = loadTerminalNamespace()
+		terminal["gameMode"] = terminal["GameMode"].craplessCraps
+		payload = terminal["createHostUiSnapshot"](pointPhase=True)
+		commandsByCode = {item["code"]: item for item in payload["allowedCommands"]["commands"]}
+		self.assertEqual(commandsByCode["dcd"]["enabled"], False)
+		self.assertIn("Not available in Crapless Craps", commandsByCode["dcd"]["reason"])
 
 	def testBuildGameInitializedEventPayloadIncludesCanonicalKeys(self):
 		terminal = loadTerminalNamespace()

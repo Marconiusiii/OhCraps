@@ -242,6 +242,10 @@ def hostSchemaDescriptor():
 			"allowedCommands": [
 				"engineApiVersion", "gameMode", "pointPhase", "commands"
 			],
+			"uiSnapshot": [
+				"engineApiVersion", "gameMode", "pointPhase", "runtimeState",
+				"allowedCommands", "capturedOutput", "capturedPrompts"
+			],
 			"events": {
 				"inputRequested": ["engineApiVersion", "prompt"],
 				"sessionImported": ["engineApiVersion", "runtimeState", "bundleType"],
@@ -317,6 +321,16 @@ def createHostStartupBundle(requiredApiVersion=None, requiredFeatures=None, star
 		"schemaDescriptor": hostSchemaDescriptor(),
 		"compatibility": checkHostCompatibility(requiredApiVersion=requiredApiVersion, requiredFeatures=requiredFeatures),
 		"features": hostFeatureFlags()
+	})
+
+def createHostUiSnapshot(pointPhase=False):
+	return withApiVersion({
+		"gameMode": gameMode,
+		"pointPhase": bool(pointPhase),
+		"runtimeState": getRuntimeState(),
+		"allowedCommands": hostAllowedCommands(pointPhase=pointPhase),
+		"capturedOutput": getCapturedOutput(),
+		"capturedPrompts": getCapturedPrompts()
 	})
 
 def beginOutputCapture():

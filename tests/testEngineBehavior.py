@@ -4238,6 +4238,28 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 
 
 class HostContractFastCycleTests(unittest.TestCase):
+	def buildFailureContext(self, phaseLabel, bundle):
+		actionResult = bundle.get("actionResult")
+		errorCode = None
+		if isinstance(actionResult, dict):
+			errorInfo = actionResult.get("error")
+			if isinstance(errorInfo, dict):
+				errorCode = errorInfo.get("code")
+		return (
+			f"{phaseLabel} | "
+			f"ok={bundle.get('ok')} | "
+			f"summary={bundle.get('summaryLine')} | "
+			f"actionExecuted={bundle.get('actionExecuted')} | "
+			f"actionSuccess={None if not isinstance(actionResult, dict) else actionResult.get('success')} | "
+			f"errorCode={errorCode} | "
+			f"healthOk={bundle.get('healthReport', {}).get('ok')} | "
+			f"workflowFailed={bundle.get('workflowStatus', {}).get('failedChecks')}"
+		)
+
+	def assertBundleHealthy(self, phaseLabel, bundle):
+		self.assertEqual(bundle["ok"], True, self.buildFailureContext(phaseLabel, bundle))
+		self.assertEqual(bundle["healthReport"]["ok"], True, self.buildFailureContext(phaseLabel, bundle))
+
 	def testHostSchemaIncludesSoloDebugBundleKeys(self):
 		terminal = loadTerminalNamespace()
 		descriptor = terminal["hostSchemaDescriptor"]()
@@ -4253,11 +4275,10 @@ class HostContractFastCycleTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craps
 		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
 		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
-		self.assertEqual(baseline["ok"], True)
-		self.assertEqual(baseline["healthReport"]["ok"], True)
-		self.assertEqual(commandResult["ok"], True)
-		self.assertEqual(commandResult["actionExecuted"], True)
-		self.assertEqual(commandResult["actionResult"]["success"], True)
+		self.assertBundleHealthy("craps-baseline", baseline)
+		self.assertBundleHealthy("craps-command", commandResult)
+		self.assertEqual(commandResult["actionExecuted"], True, self.buildFailureContext("craps-command", commandResult))
+		self.assertEqual(commandResult["actionResult"]["success"], True, self.buildFailureContext("craps-command", commandResult))
 
 	def testHostContractFastCycleCrapless(self):
 		terminal = loadTerminalNamespace()
@@ -4265,20 +4286,23 @@ class HostContractFastCycleTests(unittest.TestCase):
 		terminal["gameMode"] = terminal["GameMode"].craplessCraps
 		baseline = terminal["createSoloDebugBundle"](runAction=False, pointPhase=False)
 		commandResult = terminal["createSoloDebugBundle"](runAction=True, commandText="h", pointPhase=False)
-		self.assertEqual(baseline["ok"], True)
-		self.assertEqual(baseline["healthReport"]["ok"], True)
-		self.assertEqual(commandResult["ok"], True)
-		self.assertEqual(commandResult["actionExecuted"], True)
-		self.assertEqual(commandResult["actionResult"]["success"], True)
+		self.assertBundleHealthy("crapless-baseline", baseline)
+		self.assertBundleHealthy("crapless-command", commandResult)
+		self.assertEqual(commandResult["actionExecuted"], True, self.buildFailureContext("crapless-command", commandResult))
+		self.assertEqual(commandResult["actionResult"]["success"], True, self.buildFailureContext("crapless-command", commandResult))
 
 	def testHostContractFastCycleInvalidActionShape(self):
 		terminal = loadTerminalNamespace()
 		terminal["resetRuntimeState"]()
 		bundle = terminal["createSoloDebugBundle"](runAction=True, commandText="", pointPhase=False)
-		self.assertEqual(bundle["ok"], False)
-		self.assertEqual(bundle["actionExecuted"], True)
-		self.assertEqual(bundle["actionResult"]["success"], False)
-		self.assertEqual(bundle["actionResult"]["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+		self.assertEqual(bundle["ok"], False, self.buildFailureContext("invalid-action", bundle))
+		self.assertEqual(bundle["actionExecuted"], True, self.buildFailureContext("invalid-action", bundle))
+		self.assertEqual(bundle["actionResult"]["success"], False, self.buildFailureContext("invalid-action", bundle))
+		self.assertEqual(
+			bundle["actionResult"]["error"]["code"],
+			terminal["hostErrorCodes"]["invalidActionInput"],
+			self.buildFailureContext("invalid-action", bundle)
+		)
 
 
 if __name__ == "__main__":

@@ -2869,3 +2869,43 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Added a focused host-contract class for rapid verification.
 - Full suite remains green after this milestone.
+
+## Milestone 118: Fast-Cycle Failure Context + Triage Playbook
+
+### What problem this solves
+- Fast tests were quick, but failure output did not immediately show enough context for rapid solo triage.
+
+### What changed
+- Enhanced `HostContractFastCycleTests` assertions with compact failure context.
+- Failure context now includes:
+	- phase label
+	- bundle `ok`
+	- summary line
+	- action executed/success flags
+	- error code (if present)
+	- health status
+	- failed workflow checks
+
+### Why this helps
+- When a fast-cycle test fails, you can see likely root cause fields in one line.
+- This shortens debug time in your one-person workflow.
+
+### Fast triage sequence
+- Step 1: Run fast target:
+	- `python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractFastCycle`
+- Step 2: Read the failing phase label in assertion output.
+- Step 3: Use failure context fields to classify issue:
+	- `healthOk=False` => runtime state/setup issue
+	- `actionExecuted=False` => command dispatch path issue
+	- `actionSuccess=False` with error code => input/validation path issue
+	- `workflowFailed` non-empty => integration check failure
+- Step 4: Fix that layer first, rerun fast target, then run full suite.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Existing fast-cycle tests now include richer failure diagnostics.
+- Full suite remains green after this milestone.

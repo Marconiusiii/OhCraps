@@ -2556,3 +2556,37 @@ New milestone updates should be appended here rather than creating new milestone
 	- Crapless restriction reflected in returned command list
 	- schema descriptor includes `actionBundle`
 - Full suite remains green after this milestone.
+
+## Milestone 110: Host Action Input Validation
+
+### What problem this solves
+- Host apps could pass malformed action inputs and rely on mixed downstream behavior.
+- This made error handling inconsistent and harder to debug.
+
+### What changed
+- Added `validateHostActionInput(commandText, pointPhase)`.
+- Added new error code: `invalidActionInput`.
+- Updated `runHostAction(...)` to validate input before command execution.
+- Validation now rejects:
+	- empty command text
+	- non-boolean `pointPhase`
+- Invalid input returns a consistent structured error response.
+- `raiseOnError=True` still supports strict exception behavior.
+
+### Why this helps
+- Host-side input mistakes now fail early with predictable error shape.
+- Easier iOS/web debugging and safer action handling.
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Added tests for:
+	- valid input accepted by validator
+	- empty command rejected
+	- non-boolean phase rejected
+	- strict raise mode for validation path
+	- error code presence in host error map
+- Full suite remains green after this milestone.

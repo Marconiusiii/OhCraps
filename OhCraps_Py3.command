@@ -65,7 +65,8 @@ hostErrorCodes = {
 	"invalidStepArguments": "invalidStepArguments",
 	"commandExecutionFailed": "commandExecutionFailed",
 	"cycleExecutionFailed": "cycleExecutionFailed",
-	"startupValidationFailed": "startupValidationFailed"
+	"startupValidationFailed": "startupValidationFailed",
+	"invalidActionInput": "invalidActionInput"
 }
 
 def hostErrorPayload(errorCode, errorMessage, details=None):
@@ -396,6 +397,28 @@ def buildStateDeltaSummary(beforeState, afterState, pointPhase=None):
 		"toPointPhase": bool(afterPointPhase)
 	}
 
+def validateHostActionInput(commandText, pointPhase):
+	if not isinstance(pointPhase, bool):
+		return hostErrorPayload(
+			errorCode=hostErrorCodes["invalidActionInput"],
+			errorMessage="pointPhase must be true or false.",
+			details={"pointPhaseType": type(pointPhase).__name__}
+		)
+	if commandText is None:
+		return hostErrorPayload(
+			errorCode=hostErrorCodes["invalidActionInput"],
+			errorMessage="commandText is required.",
+			details={"commandTextProvided": False}
+		)
+	commandValue = str(commandText).strip()
+	if commandValue == "":
+		return hostErrorPayload(
+			errorCode=hostErrorCodes["invalidActionInput"],
+			errorMessage="commandText cannot be empty.",
+			details={"commandTextProvided": True}
+		)
+	return None
+
 def runCommandWithUiSnapshot(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
 	commandResult = submitCommand(
 		commandText=commandText,
@@ -428,10 +451,24 @@ def runCommandWithStateDelta(commandText, pointPhase=False, autoCapture=False, r
 	})
 
 def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError=False):
+	validationError = validateHostActionInput(commandText=commandText, pointPhase=pointPhase)
+	normalizedPointPhase = pointPhase if isinstance(pointPhase, bool) else False
+	if validationError is not None:
+		if raiseOnError:
+			raise ValueError(validationError["message"])
+		currentState = getRuntimeState()
+		return withApiVersion({
+			"success": False,
+			"error": validationError,
+			"commandResult": None,
+			"uiSnapshot": createHostUiSnapshot(pointPhase=normalizedPointPhase),
+			"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
+			"stateDelta": buildStateDeltaSummary(beforeState=currentState, afterState=currentState, pointPhase=normalizedPointPhase)
+		})
 	beforeState = getRuntimeState()
 	commandResult = submitCommand(
 		commandText=commandText,
-		pointPhase=pointPhase,
+		pointPhase=normalizedPointPhase,
 		autoCapture=autoCapture,
 		raiseOnError=raiseOnError
 	)
@@ -440,9 +477,9 @@ def runHostAction(commandText, pointPhase=False, autoCapture=False, raiseOnError
 		"success": bool(commandResult["success"]),
 		"error": commandResult["error"],
 		"commandResult": commandResult,
-		"uiSnapshot": createHostUiSnapshot(pointPhase=pointPhase),
-		"statusPanel": createHostStatusPanel(pointPhase=pointPhase),
-		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=pointPhase)
+		"uiSnapshot": createHostUiSnapshot(pointPhase=normalizedPointPhase),
+		"statusPanel": createHostStatusPanel(pointPhase=normalizedPointPhase),
+		"stateDelta": buildStateDeltaSummary(beforeState=beforeState, afterState=afterState, pointPhase=normalizedPointPhase)
 	})
 
 def beginOutputCapture():

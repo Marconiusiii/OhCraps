@@ -1609,6 +1609,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["hostErrorCodes"]["commandExecutionFailed"], "commandExecutionFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["cycleExecutionFailed"], "cycleExecutionFailed")
 		self.assertEqual(terminal["hostErrorCodes"]["startupValidationFailed"], "startupValidationFailed")
+		self.assertEqual(terminal["hostErrorCodes"]["invalidActionInput"], "invalidActionInput")
 
 	def testHostEventNamesExposeExpectedContractValues(self):
 		terminal = loadTerminalNamespace()
@@ -1876,6 +1877,32 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["success"], True)
 		self.assertEqual(payload["commandResult"]["handled"], False)
 		self.assertEqual(payload["stateDelta"]["changed"], False)
+
+	def testValidateHostActionInputAcceptsValidInput(self):
+		terminal = loadTerminalNamespace()
+		errorPayload = terminal["validateHostActionInput"]("x", False)
+		self.assertEqual(errorPayload, None)
+
+	def testRunHostActionRejectsEmptyCommandText(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runHostAction"]("   ", pointPhase=False)
+		self.assertEqual(payload["success"], False)
+		self.assertEqual(payload["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+		self.assertEqual(payload["commandResult"], None)
+		self.assertEqual(payload["stateDelta"]["changed"], False)
+
+	def testRunHostActionRejectsNonBooleanPointPhase(self):
+		terminal = loadTerminalNamespace()
+		payload = terminal["runHostAction"]("x", pointPhase="yes")
+		self.assertEqual(payload["success"], False)
+		self.assertEqual(payload["error"]["code"], terminal["hostErrorCodes"]["invalidActionInput"])
+		self.assertEqual(payload["commandResult"], None)
+		self.assertEqual(payload["stateDelta"]["changed"], False)
+
+	def testRunHostActionValidationRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		with self.assertRaises(ValueError):
+			terminal["runHostAction"]("", pointPhase=False, raiseOnError=True)
 
 	def testRunHostActionPointPhaseUsesPointPhaseData(self):
 		terminal = loadTerminalNamespace()

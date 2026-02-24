@@ -1367,6 +1367,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["shouldRoll"], True)
 		self.assertEqual(payload["handled"], True)
 		self.assertIn("runtimeState", payload)
+		self.assertIn("capturedOutput", payload)
 
 	def testSubmitCommandReturnsUnhandledPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1376,6 +1377,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(payload["shouldRoll"], False)
 		self.assertEqual(payload["handled"], False)
 		self.assertIn("runtimeState", payload)
+		self.assertIn("capturedOutput", payload)
 
 	def testSubmitCommandEmitsCommandProcessedEvent(self):
 		terminal = loadTerminalNamespace()
@@ -1390,6 +1392,25 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(events[0][1], payload)
 		terminal["resetEventHandler"]()
 
+	def testOutputCaptureBuffersWriteOutputWhenEnabled(self):
+		terminal = loadTerminalNamespace()
+		terminal["setIoHandlers"](outputFunc=lambda message: None)
+		terminal["beginOutputCapture"]()
+		terminal["writeOutput"]("alpha")
+		terminal["writeOutput"]("beta")
+		capturedOutput = terminal["getCapturedOutput"]()
+		self.assertEqual(capturedOutput, ["alpha", "beta"])
+		terminal["endOutputCapture"]()
+		terminal["resetIoHandlers"]()
+
+	def testSubmitCommandIncludesCapturedOutputWhenCaptureEnabled(self):
+		terminal = loadTerminalNamespace()
+		terminal["beginOutputCapture"]()
+		payload = terminal["submitCommand"]("x", pointPhase=False)
+		self.assertTrue(len(payload["capturedOutput"]) >= 1)
+		self.assertIn("Rolling the dice!", " ".join(payload["capturedOutput"]))
+		terminal["endOutputCapture"]()
+
 	def testStepCommandReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
 		stepPayload = terminal["step"](commandText="x", pointPhase=True)
@@ -1399,6 +1420,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(stepPayload["commandResult"]["shouldRoll"], True)
 		self.assertEqual(stepPayload["cycleResult"], None)
 		self.assertIn("runtimeState", stepPayload)
+		self.assertIn("capturedOutput", stepPayload)
 
 	def testStepCycleReturnsNormalizedPayload(self):
 		terminal = loadTerminalNamespace()
@@ -1415,6 +1437,7 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(stepPayload["commandResult"], None)
 		self.assertEqual(stepPayload["cycleResult"]["enteredPointPhase"], False)
 		self.assertIn("runtimeState", stepPayload)
+		self.assertIn("capturedOutput", stepPayload)
 
 	def testStepEmitsStepCompletedEvent(self):
 		terminal = loadTerminalNamespace()

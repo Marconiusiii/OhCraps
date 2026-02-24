@@ -1962,3 +1962,38 @@ New milestone updates should be appended here rather than creating new milestone
 	- `testRunComeOutBettingMenuUsesPointPhaseFalse`
 - Compile check passed.
 - Full suite remains green (`266` tests passing).
+
+## Milestone 94: Optional Output Capture for Host Payloads and Events
+
+### What changed
+- Added optional output capture runtime controls:
+	- `beginOutputCapture()`
+	- `endOutputCapture()`
+	- `getCapturedOutput()`
+- Added capture state variables:
+	- `outputCaptureOn`
+	- `outputCaptureBuffer`
+- Updated `writeOutput(...)` to buffer message strings when capture is enabled while preserving normal output behavior.
+- Updated host-facing payloads to include captured output:
+	- `submitCommand(...)` now includes `capturedOutput`
+	- `step(...)` now includes `capturedOutput` for both command and cycle step payloads
+- Related events now carry payloads with captured output fields:
+	- `commandProcessed`
+	- `stepCompleted`
+
+### Why
+- Host apps often need per-step/per-command transcript chunks without reconstructing output from custom handlers.
+- Optional capture keeps terminal behavior unchanged by default while enabling richer UI rendering and logging in iOS/web hosts.
+
+### Behavior
+- No payout/rule changes.
+- No bankroll/chips accounting rule changes.
+- Terminal output flow remains unchanged when capture is not enabled.
+
+### Test coverage
+- Added/updated deterministic output-capture regressions in `tests/testEngineBehavior.py`:
+	- `testOutputCaptureBuffersWriteOutputWhenEnabled`
+	- `testSubmitCommandIncludesCapturedOutputWhenCaptureEnabled`
+	- submit/step payload shape assertions now include `capturedOutput`
+- Compile check passed.
+- Full suite remains green (`268` tests passing).

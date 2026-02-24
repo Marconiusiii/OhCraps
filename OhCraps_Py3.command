@@ -12,6 +12,8 @@ outputHandler = None
 inputHandler = None
 randomProvider = random
 eventHandler = None
+outputCaptureOn = False
+outputCaptureBuffer = []
 
 def setIoHandlers(outputFunc=None, inputFunc=None):
 	global outputHandler, inputHandler
@@ -49,7 +51,24 @@ def emitEvent(eventName, payload=None):
 		eventPayload = payload if payload is not None else {}
 		eventHandler(str(eventName), eventPayload)
 
+def beginOutputCapture():
+	global outputCaptureOn, outputCaptureBuffer
+	outputCaptureOn = True
+	outputCaptureBuffer = []
+	return list(outputCaptureBuffer)
+
+def endOutputCapture():
+	global outputCaptureOn
+	outputCaptureOn = False
+	return getCapturedOutput()
+
+def getCapturedOutput():
+	return list(outputCaptureBuffer)
+
 def writeOutput(message):
+	global outputCaptureBuffer
+	if outputCaptureOn:
+		outputCaptureBuffer.append(str(message))
 	if outputHandler is None:
 		print(message)
 	else:
@@ -2594,7 +2613,8 @@ def submitCommand(commandText, pointPhase=False):
 		"pointPhase": bool(pointPhase),
 		"shouldRoll": bool(commandResult.shouldRoll),
 		"handled": bool(commandResult.handled),
-		"runtimeState": getRuntimeState()
+		"runtimeState": getRuntimeState(),
+		"capturedOutput": getCapturedOutput()
 	}
 	emitEvent("commandProcessed", resultPayload)
 	return resultPayload
@@ -2606,7 +2626,8 @@ def step(commandText=None, pointPhase=False):
 			"stepType": "command",
 			"commandResult": commandPayload,
 			"cycleResult": None,
-			"runtimeState": commandPayload["runtimeState"]
+			"runtimeState": commandPayload["runtimeState"],
+			"capturedOutput": list(commandPayload["capturedOutput"])
 		}
 		emitEvent("stepCompleted", stepPayload)
 		return stepPayload
@@ -2617,7 +2638,8 @@ def step(commandText=None, pointPhase=False):
 		"stepType": "cycle",
 		"commandResult": None,
 		"cycleResult": dict(cyclePayload),
-		"runtimeState": getRuntimeState()
+		"runtimeState": getRuntimeState(),
+		"capturedOutput": getCapturedOutput()
 	}
 	emitEvent("stepCompleted", stepPayload)
 	return stepPayload

@@ -2,6 +2,22 @@
 
 set -e
 
+quickMode="false"
+if [[ $# -gt 0 ]]; then
+	if [[ "$1" == "--quick" ]]; then
+		quickMode="true"
+	else
+		echo "Usage: ./tests/runSoloQaCycle.sh [--quick]"
+		exit 1
+	fi
+fi
+
+startEpoch=$(date +%s)
+stageZeroStatus="PASS"
+stageOneStatus="PASS"
+stageTwoStatus="PASS"
+stageThreeStatus="PASS"
+
 echo "[0/4] Running critical host-contract fast suite..."
 python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractCriticalFastSuite
 
@@ -11,7 +27,25 @@ python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContract
 echo "[2/4] Running compile checks..."
 python3 -m py_compile tests/testEngineBehavior.py OhCraps_Py3.command
 
-echo "[3/4] Running full suite..."
-python3 -m unittest discover -s tests -p 'test*.py'
+if [[ "${quickMode}" == "true" ]]; then
+	stageThreeStatus="SKIPPED (quick mode)"
+else
+	echo "[3/4] Running full suite..."
+	python3 -m unittest discover -s tests -p 'test*.py'
+fi
 
-echo "Solo QA cycle complete: all checks passed."
+endEpoch=$(date +%s)
+elapsedSeconds=$((endEpoch - startEpoch))
+
+echo ""
+echo "QA Run Summary:"
+echo "  [0/4] Critical host-contract fast suite: ${stageZeroStatus}"
+echo "  [1/4] Fast host-contract cycle: ${stageOneStatus}"
+echo "  [2/4] Compile checks: ${stageTwoStatus}"
+echo "  [3/4] Full suite: ${stageThreeStatus}"
+echo "  Elapsed: ${elapsedSeconds}s"
+if [[ "${quickMode}" == "true" ]]; then
+	echo "Solo QA quick cycle complete: all executed checks passed."
+else
+	echo "Solo QA cycle complete: all checks passed."
+fi

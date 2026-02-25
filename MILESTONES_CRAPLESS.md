@@ -3346,3 +3346,71 @@ New milestone updates should be appended here rather than creating new milestone
 ### Test coverage
 - Script now includes critical contract fast suite as default stage 0.
 - Full run remains green after this milestone.
+
+## Milestone 130: Compact QA Run Summary Output
+
+### What problem this solves
+- The one-command QA run completed successfully, but there was no compact end-of-run summary block for quick scanning.
+
+### What changed
+- Updated `tests/runSoloQaCycle.sh` to print a summary section at the end with:
+	- stage names
+	- pass status
+	- total elapsed seconds
+- Kept fail-fast behavior and stage order unchanged.
+
+### Why this helps
+- Faster post-run review during solo debug cycles.
+- Clear confirmation of all stages without scrolling through full output.
+
+### One-command run
+- `./tests/runSoloQaCycle.sh`
+
+### New summary block
+- `QA Run Summary:`
+	- `[0/4]` critical host-contract fast suite
+	- `[1/4]` fast host-contract cycle
+	- `[2/4]` compile checks
+	- `[3/4]` full suite
+	- elapsed seconds
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Script validated end-to-end with all stages passing and summary output confirmed.
+
+## Milestone 131: Solo QA Script Quick Mode
+
+### What problem this solves
+- Full QA cycles are reliable but slower during active coding loops.
+
+### What changed
+- Added `--quick` mode to `tests/runSoloQaCycle.sh`.
+- Quick mode runs:
+	- `[0/4]` critical host-contract fast suite
+	- `[1/4]` fast host-contract cycle
+	- `[2/4]` compile checks
+- Quick mode skips full suite stage `[3/4]` and marks it as:
+	- `SKIPPED (quick mode)`
+- Default mode behavior remains unchanged.
+
+### Why this helps
+- Faster iteration while coding.
+- Full cycle remains available for completion/commit gate.
+
+### Commands
+- Quick mode:
+	- `./tests/runSoloQaCycle.sh --quick`
+- Full mode:
+	- `./tests/runSoloQaCycle.sh`
+
+### Behavior
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.
+
+### Test coverage
+- Validated quick mode and full mode end-to-end with passing results.

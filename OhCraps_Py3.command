@@ -306,6 +306,10 @@ def hostSchemaDescriptor():
 					"engineApiVersion", "ok", "passedChecks", "failedChecks", "checks",
 					"startupBundle", "compatibilityReport", "schemaDescriptor", "sanityAction"
 				],
+				"releaseGateReport": [
+					"engineApiVersion", "ok", "passedChecks", "failedChecks", "checks",
+					"bootstrapReport", "tracePacket", "sessionCompatibilityReport", "healthReport"
+				],
 				"compatibilityReport": [
 					"engineApiVersion", "ok", "expectedApiVersion", "schemaApiVersion",
 					"requiredPayloadKeys", "requiredErrorCodes", "missingPayloadKeys", "missingErrorCodes", "reasons"
@@ -1050,6 +1054,45 @@ def createHostBootstrapReport(startBank=None, selectedMode=None, requiredApiVers
 	})
 	if raiseOnFailure and len(failedChecks) > 0:
 		raise ValueError(f"Bootstrap failed: {', '.join(failedChecks)}")
+	return report
+
+def createHostReleaseGateReport(requiredApiVersion=None, raiseOnFailure=False):
+	bootstrapReport = createHostBootstrapReport(
+		requiredApiVersion=requiredApiVersion,
+		runSanityAction=True,
+		sanityCommand="h",
+		sanityPointPhase=False,
+		raiseOnFailure=False
+	)
+	tracePacket = createHostTracePacket(
+		commandText="h",
+		pointPhase=False,
+		autoCapture=True,
+		raiseOnFailure=False
+	)
+	sessionBundle = exportSessionBundle()
+	sessionCompatibilityReport = validateSessionBundleCompatibility(sessionBundle, raiseOnFailure=False)
+	healthReport = createHostHealthReport(raiseOnIssue=False)
+	checks = [
+		{"name": "bootstrapReport", "ok": bool(bootstrapReport.get("ok", False)), "details": {"failedChecks": list(bootstrapReport.get("failedChecks", []))}},
+		{"name": "tracePacket", "ok": bool(tracePacket.get("ok", False)), "details": {"reasons": list(tracePacket.get("reasons", []))}},
+		{"name": "sessionCompatibilityReport", "ok": bool(sessionCompatibilityReport.get("ok", False)), "details": {"reasons": list(sessionCompatibilityReport.get("reasons", []))}},
+		{"name": "healthReport", "ok": bool(healthReport.get("ok", False)), "details": {"issueCount": int(healthReport.get("issueCount", 0))}}
+	]
+	passedChecks = [check["name"] for check in checks if check["ok"]]
+	failedChecks = [check["name"] for check in checks if not check["ok"]]
+	report = withApiVersion({
+		"ok": len(failedChecks) == 0,
+		"passedChecks": passedChecks,
+		"failedChecks": failedChecks,
+		"checks": checks,
+		"bootstrapReport": bootstrapReport,
+		"tracePacket": tracePacket,
+		"sessionCompatibilityReport": sessionCompatibilityReport,
+		"healthReport": healthReport
+	})
+	if raiseOnFailure and len(failedChecks) > 0:
+		raise ValueError(f"Release gate failed: {', '.join(failedChecks)}")
 	return report
 
 def beginOutputCapture():

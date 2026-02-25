@@ -3,20 +3,30 @@
 set -e
 
 quickMode="false"
+releaseGateMode="false"
 if [[ $# -gt 0 ]]; then
 	if [[ "$1" == "--quick" ]]; then
 		quickMode="true"
+	elif [[ "$1" == "--release-gate" ]]; then
+		releaseGateMode="true"
 	else
-		echo "Usage: ./tests/runSoloQaCycle.sh [--quick]"
+		echo "Usage: ./tests/runSoloQaCycle.sh [--quick|--release-gate]"
 		exit 1
 	fi
 fi
 
 startEpoch=$(date +%s)
+stageReleaseStatus="SKIPPED"
 stageZeroStatus="PASS"
 stageOneStatus="PASS"
 stageTwoStatus="PASS"
 stageThreeStatus="PASS"
+
+if [[ "${releaseGateMode}" == "true" ]]; then
+	echo "[RG] Running release gate suite..."
+	python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostReleaseGateSuite
+	stageReleaseStatus="PASS"
+fi
 
 echo "[0/4] Running critical host-contract fast suite..."
 python3 -m unittest discover -s tests -p 'testEngineBehavior.py' -k HostContractCriticalFastSuite
@@ -39,6 +49,7 @@ elapsedSeconds=$((endEpoch - startEpoch))
 
 echo ""
 echo "QA Run Summary:"
+echo "  [RG] Release gate suite: ${stageReleaseStatus}"
 echo "  [0/4] Critical host-contract fast suite: ${stageZeroStatus}"
 echo "  [1/4] Fast host-contract cycle: ${stageOneStatus}"
 echo "  [2/4] Compile checks: ${stageTwoStatus}"

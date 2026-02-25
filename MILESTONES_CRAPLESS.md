@@ -3414,3 +3414,31 @@ New milestone updates should be appended here rather than creating new milestone
 
 ### Test coverage
 - Validated quick mode and full mode end-to-end with passing results.
+
+## Final Batch Pass (No New Milestone)
+
+### What was completed in this one-pass finish
+- Added canonical end-to-end readiness helper:
+	- `createHostReleaseGateReport(...)`
+- Added `releaseGateReport` schema contract.
+- Added dedicated release gate test target:
+	- `HostReleaseGateSuite`
+- Extended QA script with:
+	- `--quick` mode
+	- `--release-gate` mode
+	- summary line for release-gate stage
+- Added final pre-port checklist doc:
+	- `docs/pre-port-readiness-checklist.md`
+
+### Canonical commands now
+- Quick loop:
+	- `./tests/runSoloQaCycle.sh --quick`
+- Release gate:
+	- `./tests/runSoloQaCycle.sh --release-gate`
+- Full gate:
+	- `./tests/runSoloQaCycle.sh`
+
+### Final behavior statement
+- No craps rules changed.
+- No payout logic changed.
+- Terminal gameplay flow remains unchanged.

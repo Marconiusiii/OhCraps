@@ -48,6 +48,7 @@ EXPECTED_HOST_PAYLOAD_KEYS = [
 	"replayReport",
 	"workflowReport",
 	"bootstrapReport",
+	"releaseGateReport",
 	"compatibilityReport",
 	"eventValidationReport",
 	"tracePacket",
@@ -2294,6 +2295,26 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		with self.assertRaises(ValueError):
 			terminal["createHostBootstrapReport"](requiredApiVersion="9.9.9", raiseOnFailure=True)
+
+	def testCreateHostReleaseGateReportPassesWithDefaults(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["createHostReleaseGateReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertIn("bootstrapReport", report["passedChecks"])
+		self.assertIn("tracePacket", report["passedChecks"])
+		self.assertIn("sessionCompatibilityReport", report["passedChecks"])
+		self.assertIn("healthReport", report["passedChecks"])
+
+	def testCreateHostReleaseGateReportRaisesWhenConfigured(self):
+		terminal = loadTerminalNamespace()
+		terminal["createHostHealthReport"] = lambda raiseOnIssue=False: {
+			"ok": False,
+			"issueCount": 1,
+			"issues": ["forced health failure"],
+			"summary": {}
+		}
+		with self.assertRaises(ValueError):
+			terminal["createHostReleaseGateReport"](raiseOnFailure=True)
 
 	def testCreateHostTracePacketSuccessPath(self):
 		terminal = loadTerminalNamespace()
@@ -4566,6 +4587,12 @@ class HostContractSnapshotTests(unittest.TestCase):
 
 
 class HostContractCriticalFastSuite(unittest.TestCase):
+	def testCriticalReleaseGatePass(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["createHostReleaseGateReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["failedChecks"], [])
+
 	def testCriticalBootstrapPass(self):
 		terminal = loadTerminalNamespace()
 		report = terminal["createHostBootstrapReport"]()
@@ -4602,6 +4629,25 @@ class HostContractCriticalFastSuite(unittest.TestCase):
 		terminal = loadTerminalNamespace()
 		descriptor = terminal["hostSchemaDescriptor"]()
 		assertHostSchemaContracts(self, descriptor)
+
+
+class HostReleaseGateSuite(unittest.TestCase):
+	def testReleaseGateDefaultPass(self):
+		terminal = loadTerminalNamespace()
+		report = terminal["createHostReleaseGateReport"]()
+		self.assertEqual(report["ok"], True)
+		self.assertEqual(report["failedChecks"], [])
+
+	def testReleaseGateStrictRaiseOnFailure(self):
+		terminal = loadTerminalNamespace()
+		terminal["createHostHealthReport"] = lambda raiseOnIssue=False: {
+			"ok": False,
+			"issueCount": 1,
+			"issues": ["forced health failure"],
+			"summary": {}
+		}
+		with self.assertRaises(ValueError):
+			terminal["createHostReleaseGateReport"](raiseOnFailure=True)
 
 
 if __name__ == "__main__":

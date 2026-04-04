@@ -899,6 +899,87 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertIn("You won $30 on the Hop 10 Easy bet!", settlement.messages)
 		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 30)
 
+	def testSettleHopBetsHop5TwoDollarWinSplitsAcrossOutcomes(self):
+		propBets = {"Hop 5": 2}
+		settlement = settleHopBets(propBets=propBets, roll=5, die1=4, die2=1)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -2)
+		self.assertEqual(settlement.propBets["Hop 5"], 0)
+		self.assertIn("You won $14 on the Hop 5 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 14)
+
+	def testSettleHopBetsHop6EasyGeneralBetSplitsAcrossThreeWays(self):
+		propBets = {"Hop 6": 3}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=4, die2=2)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -3)
+		self.assertEqual(settlement.propBets["Hop 6"], 0)
+		self.assertIn("You won $13 on the Hop 6 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 13)
+
+	def testSettleHopBetsHop6HardGeneralBetSplitsAcrossThreeWays(self):
+		propBets = {"Hop 6": 3}
+		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
+		self.assertEqual(settlement.bankDelta, 31)
+		self.assertEqual(settlement.chipsOnTableDelta, -3)
+		self.assertEqual(settlement.propBets["Hop 6"], 0)
+		self.assertIn("You won $28 on the Hop 6 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 28)
+
+	def testSettleHopBetsHop7ThreeDollarWinSplitsAcrossThreeWays(self):
+		propBets = {"Hop 7": 3}
+		settlement = settleHopBets(propBets=propBets, roll=7, die1=4, die2=3)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -3)
+		self.assertEqual(settlement.propBets["Hop 7"], 0)
+		self.assertIn("You won $13 on the Hop 7 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 13)
+
+	def testSettleHopBetsHop8EasyGeneralBetSplitsAcrossThreeWays(self):
+		propBets = {"Hop 8": 3}
+		settlement = settleHopBets(propBets=propBets, roll=8, die1=5, die2=3)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -3)
+		self.assertEqual(settlement.propBets["Hop 8"], 0)
+		self.assertIn("You won $13 on the Hop 8 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 13)
+
+	def testSettleHopBetsHop8HardGeneralBetSplitsAcrossThreeWays(self):
+		propBets = {"Hop 8": 3}
+		settlement = settleHopBets(propBets=propBets, roll=8, die1=4, die2=4)
+		self.assertEqual(settlement.bankDelta, 31)
+		self.assertEqual(settlement.chipsOnTableDelta, -3)
+		self.assertEqual(settlement.propBets["Hop 8"], 0)
+		self.assertIn("You won $28 on the Hop 8 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 28)
+
+	def testSettleHopBetsHop9TwoDollarWinSplitsAcrossOutcomes(self):
+		propBets = {"Hop 9": 2}
+		settlement = settleHopBets(propBets=propBets, roll=9, die1=5, die2=4)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -2)
+		self.assertEqual(settlement.propBets["Hop 9"], 0)
+		self.assertIn("You won $14 on the Hop 9 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 14)
+
+	def testSettleHopBetsHop10EasyGeneralBetSplitsAcrossOutcomes(self):
+		propBets = {"Hop 10": 2}
+		settlement = settleHopBets(propBets=propBets, roll=10, die1=6, die2=4)
+		self.assertEqual(settlement.bankDelta, 16)
+		self.assertEqual(settlement.chipsOnTableDelta, -2)
+		self.assertEqual(settlement.propBets["Hop 10"], 0)
+		self.assertIn("You won $14 on the Hop 10 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 14)
+
+	def testSettleHopBetsHop10HardGeneralBetSplitsAcrossOutcomes(self):
+		propBets = {"Hop 10": 2}
+		settlement = settleHopBets(propBets=propBets, roll=10, die1=5, die2=5)
+		self.assertEqual(settlement.bankDelta, 31)
+		self.assertEqual(settlement.chipsOnTableDelta, -2)
+		self.assertEqual(settlement.propBets["Hop 10"], 0)
+		self.assertIn("You won $29 on the Hop 10 bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 29)
+
 	def testSettleHopBetsHop6EasyLosesOnHardSix(self):
 		propBets = {"Hop 6 Easy": 20}
 		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)

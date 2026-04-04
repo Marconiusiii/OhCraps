@@ -842,6 +842,24 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertIn("You won $290 on the Hop 4 bet!", settlement.messages)
 		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 290)
 
+	def testSettleHopBetsHop4EasySpecificWin(self):
+		propBets = {"Hop 4 Easy": 20}
+		settlement = settleHopBets(propBets=propBets, roll=4, die1=3, die2=1)
+		self.assertEqual(settlement.bankDelta, 160)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.propBets["Hop 4 Easy"], 0)
+		self.assertIn("You won $140 on the Hop 4 Easy bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 140)
+
+	def testSettleHopBetsHop10EasySpecificWin(self):
+		propBets = {"Hop 10 Easy": 20}
+		settlement = settleHopBets(propBets=propBets, roll=10, die1=6, die2=4)
+		self.assertEqual(settlement.bankDelta, 160)
+		self.assertEqual(settlement.chipsOnTableDelta, -20)
+		self.assertEqual(settlement.propBets["Hop 10 Easy"], 0)
+		self.assertIn("You won $140 on the Hop 10 Easy bet!", settlement.messages)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 140)
+
 	def testSettleHopBetsHop6EasyLosesOnHardSix(self):
 		propBets = {"Hop 6 Easy": 20}
 		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
@@ -4185,6 +4203,53 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("How much on the Hi-Low? Must be a multiple of 2.", printed)
 		self.assertIn("That wasn't a multiple of 2! Try again, genius.", printed)
 		self.assertIn("Done Prop Betting.", printed)
+
+	def testPropBettingHelpListsNewHopEasyCodes(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["help", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertIn("h4e, h6e, h8e, h10e", printed)
+
+	def testPropBettingAcceptsHop4EasyCode(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["h4e", "20", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Hop 4 Easy"], 20)
+		self.assertEqual(terminal["bank"], 80)
+		self.assertEqual(terminal["chipsOnTable"], 20)
+		self.assertIn("How much to Hop the 4 Easies? Must be a multiple of 2.", printed)
+		self.assertIn("Ok, $20 hopping the 4 Easies.", printed)
+
+	def testPropBettingAcceptsHop10EasyCode(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["h10e", "20", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Hop 10 Easy"], 20)
+		self.assertEqual(terminal["bank"], 80)
+		self.assertEqual(terminal["chipsOnTable"], 20)
+		self.assertIn("How much to Hop the 10 Easies? Must be a multiple of 2.", printed)
+		self.assertIn("Ok, $20 hopping the 10 Easies.", printed)
 
 	def testPropPayUsesWriteOutputAdapter(self):
 		terminal = loadTerminalNamespace()

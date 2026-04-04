@@ -2000,7 +2000,7 @@ def fieldCheck(roll):
 propBets = createDefaultPropBets()
 
 def propHelp():
-	writeOutput("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h6e, h8e': Hop 6 or 8 Easies\n\t'hez': Hop the Easies\n\t'hh': Hop the Hard Ways\n\t'hh4-hh10': Hop Hard 4, 6, 8, or 10\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
+	writeOutput("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h4e, h6e, h8e, h10e': Hop 4, 6, 8, or 10 Easies\n\t'hez': Hop the Easies\n\t'hh': Hop the Hard Ways\n\t'hh4-hh10': Hop Hard 4, 6, 8, or 10\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
 
 def propBetting():
 	global propBets, chipsOnTable, bank
@@ -2246,6 +2246,19 @@ def propBetting():
 					continue
 			writeOutput(f"Ok, ${propBets['Hop 4']:,} hopping the 4s.")
 			continue
+		elif bet == 'h4e':
+			writeOutput("How much to Hop the 4 Easies? Must be a multiple of 2.")
+			while True:
+				bank += propBets["Hop 4 Easy"]
+				chipsOnTable -= propBets["Hop 4 Easy"]
+				propBets["Hop 4 Easy"] = betPrompt()
+				if propBets["Hop 4 Easy"]%2 == 0:
+					break
+				else:
+					writeOutput("That's not a multiple of 2! Can't you math?")
+					continue
+			writeOutput(f"Ok, ${propBets['Hop 4 Easy']:,} hopping the 4 Easies.")
+			continue
 		elif bet == 'h10':
 			writeOutput("How much to Hop the 10? Must be an even number.")
 			while True:
@@ -2258,6 +2271,19 @@ def propBetting():
 					writeOutput("That wasn't an even number! You can't even!")
 					continue
 			writeOutput(f"Ok, ${propBets['Hop 10']:,} hopping the 10s.")
+			continue
+		elif bet == 'h10e':
+			writeOutput("How much to Hop the 10 Easies? Must be a multiple of 2.")
+			while True:
+				bank += propBets["Hop 10 Easy"]
+				chipsOnTable -= propBets["Hop 10 Easy"]
+				propBets["Hop 10 Easy"] = betPrompt()
+				if propBets["Hop 10 Easy"]%2 == 0:
+					break
+				else:
+					writeOutput("That's not a multiple of 2! Can't you math?")
+					continue
+			writeOutput(f"Ok, ${propBets['Hop 10 Easy']:,} hopping the 10 Easies.")
 			continue
 		elif bet == 'h5':
 			writeOutput("How much to Hop the 5? Must be an even number.")

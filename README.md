@@ -240,7 +240,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 	• BetCodes: '11', 'e'
 9. Hop Bets - Betting on specific outcomes of the dice; hopping the 4s is betting that the dice roll 3, 1 or 2, 2, etc.
 	• Bet Codes: 'h4', 'h5', 'h6', 'h7', 'h8', 'h9', 'h10'
-	• 'h6e' and 'h8e' will allow you to hop only the easy outcomes for the 6 and 8.
+	• 'h4e', 'h6e', 'h8e', and 'h10e' will allow you to hop only the easy outcomes for the 4, 6, 8, and 10.
 10. Hop the Easies - Placing a bet on all the easy way Hop Bets.
 	• Bet Code: 'hez'
 11. Hop the Hard Ways - Hopping all the numbers that can come out with equal dice amounts, or specifically on one outcome.

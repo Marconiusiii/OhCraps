@@ -1294,13 +1294,9 @@ def settleHopBets(propBets: dict, roll: int, die1: int, die2: int) -> PropSubset
 		elif key == "Hop 4 Easy" and roll == 4:
 			if die1 == 3:
 				multiplier = 15
-				sub = currentBet//2
-				winningBet = currentBet//2
 		elif key == "Hop 10 Easy" and roll == 10:
 			if die1 == 6:
 				multiplier = 15
-				sub = currentBet//2
-				winningBet = currentBet//2
 		elif key == "Hop 5" and roll == 5:
 			multiplier = 15
 			sub = currentBet//2

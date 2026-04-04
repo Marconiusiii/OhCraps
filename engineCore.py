@@ -231,7 +231,6 @@ def getPropKeyMatrix() -> dict:
 
 def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 	updatedPropBets = dict(propBets)
-	messages = []
 
 	worldBet = int(updatedPropBets.get("World", 0))
 	if worldBet > 0:
@@ -240,7 +239,6 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 		updatedPropBets["Any Seven"] = int(updatedPropBets.get("Any Seven", 0)) + anySevenPart
 		updatedPropBets["Horn"] = int(updatedPropBets.get("Horn", 0)) + hornPart
 		updatedPropBets["World"] = 0
-		messages.append("World bet resolved into Any Seven and Horn for settlement.")
 
 	hiLowBet = int(updatedPropBets.get("Hi Low", 0))
 	if hiLowBet > 0:
@@ -249,7 +247,6 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 		updatedPropBets["Snake Eyes"] = int(updatedPropBets.get("Snake Eyes", 0)) + snakeEyesPart
 		updatedPropBets["Boxcars"] = int(updatedPropBets.get("Boxcars", 0)) + boxcarsPart
 		updatedPropBets["Hi Low"] = 0
-		messages.append("Hi Low resolved into Snake Eyes and Boxcars for settlement.")
 
 	hornHighMap = {
 		"Horn High 2": ("Snake Eyes", "Horn High Deuce"),
@@ -267,11 +264,10 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 		updatedPropBets["Horn"] = int(updatedPropBets.get("Horn", 0)) + baseHornPart
 		updatedPropBets[highKey] = int(updatedPropBets.get(highKey, 0)) + highPart
 		updatedPropBets[key] = 0
-		messages.append(f"{label} resolved into Horn and {highKey} for settlement.")
 
 	return PropAliasResolution(
 		propBets=updatedPropBets,
-		messages=messages
+		messages=[]
 	)
 
 

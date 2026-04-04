@@ -2405,8 +2405,6 @@ def propPay(roll):
 	global propBets, bank, chipsOnTable, die1, die2
 	aliasResolution = resolvePropAliases(propBets=propBets)
 	propBets = aliasResolution.propBets
-	for message in aliasResolution.messages:
-		writeOutput(message)
 	subsetSettlement = settlePropSubsetBets(propBets=propBets, roll=roll)
 	propBets = subsetSettlement.propBets
 	bank += subsetSettlement.bankDelta

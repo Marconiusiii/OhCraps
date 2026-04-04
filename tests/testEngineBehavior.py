@@ -816,7 +816,7 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Horn"], 4)
 		self.assertEqual(resolution.propBets["Eleven"], 1)
 		self.assertEqual(resolution.propBets["Acey Deucey"], 1)
-		self.assertIn("Horn High Yo resolved into Horn and Eleven for settlement.", resolution.messages)
+		self.assertEqual(resolution.messages, [])
 
 	def testResolvePropAliasesStacksHornHighTwelveWithExistingHorn(self):
 		propBets = createDefaultPropBets()
@@ -826,7 +826,7 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Horn"], 16)
 		self.assertEqual(resolution.propBets["Boxcars"], 2)
 		self.assertEqual(resolution.propBets["Horn High 12"], 0)
-		self.assertIn("Horn High 12 resolved into Horn and Boxcars for settlement.", resolution.messages)
+		self.assertEqual(resolution.messages, [])
 
 	def testSettleBuffaloBetWinsOnHardNumber(self):
 		propBets = {"Buffalo": 40}
@@ -948,6 +948,7 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Horn"], 20)
 		self.assertEqual(resolution.propBets["Snake Eyes"], 10)
 		self.assertEqual(resolution.propBets["Boxcars"], 10)
+		self.assertEqual(resolution.messages, [])
 
 	def testPropBettingHornHighYoAndAceyDeuceyStayIndependent(self):
 		terminal = loadTerminalNamespace()
@@ -984,7 +985,6 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(terminal["propBets"]["Horn High 11"], 0)
 		self.assertEqual(terminal["bank"], 28)
 		self.assertEqual(terminal["chipsOnTable"], 4)
-		self.assertIn("Horn High Yo resolved into Horn and Eleven for settlement.", printed)
 		self.assertIn("You won $12 on the Horn bet!", printed)
 		self.assertIn("If it pays it stays! Horn bets are still up.", printed)
 		self.assertIn("You won $15 on the Acey Deucey bet!", printed)

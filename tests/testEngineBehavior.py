@@ -807,6 +807,27 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.propBets["Horn"], 0)
 
+	def testResolvePropAliasesConvertsHornHighYoWithoutOverwritingStraightBet(self):
+		propBets = createDefaultPropBets()
+		propBets["Horn High 11"] = 5
+		propBets["Acey Deucey"] = 1
+		resolution = resolvePropAliases(propBets=propBets)
+		self.assertEqual(resolution.propBets["Horn High 11"], 0)
+		self.assertEqual(resolution.propBets["Horn"], 4)
+		self.assertEqual(resolution.propBets["Eleven"], 1)
+		self.assertEqual(resolution.propBets["Acey Deucey"], 1)
+		self.assertIn("Horn High Yo resolved into Horn and Eleven for settlement.", resolution.messages)
+
+	def testResolvePropAliasesStacksHornHighTwelveWithExistingHorn(self):
+		propBets = createDefaultPropBets()
+		propBets["Horn"] = 8
+		propBets["Horn High 12"] = 10
+		resolution = resolvePropAliases(propBets=propBets)
+		self.assertEqual(resolution.propBets["Horn"], 16)
+		self.assertEqual(resolution.propBets["Boxcars"], 2)
+		self.assertEqual(resolution.propBets["Horn High 12"], 0)
+		self.assertIn("Horn High 12 resolved into Horn and Boxcars for settlement.", resolution.messages)
+
 	def testSettleBuffaloBetWinsOnHardNumber(self):
 		propBets = {"Buffalo": 40}
 		settlement = settleBuffaloBet(propBets=propBets, roll=8, die1=4, die2=4)
@@ -908,7 +929,7 @@ class EvaluateRollTests(unittest.TestCase):
 		for key in propKeyMatrix:
 			self.assertIn(propKeyMatrix[key], ["engineSettled", "entryAlias"])
 		entryAliasKeys = [key for key, owner in propKeyMatrix.items() if owner == "entryAlias"]
-		self.assertEqual(set(entryAliasKeys), set(["World", "Hi Low"]))
+		self.assertEqual(set(entryAliasKeys), set(["Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12", "World", "Hi Low"]))
 
 	def testCreateDefaultPropBetsUsesCanonicalKeys(self):
 		propBets = createDefaultPropBets()
@@ -927,6 +948,46 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Horn"], 20)
 		self.assertEqual(resolution.propBets["Snake Eyes"], 10)
 		self.assertEqual(resolution.propBets["Boxcars"], 10)
+
+	def testPropBettingHornHighYoAndAceyDeuceyStayIndependent(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["hhy", "5", "ad", "1", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 5)
+		self.assertEqual(terminal["propBets"]["Acey Deucey"], 1)
+		self.assertEqual(terminal["propBets"]["Eleven"], 0)
+		self.assertEqual(terminal["bank"], 94)
+		self.assertEqual(terminal["chipsOnTable"], 6)
+
+	def testPropPayHornHighYoAndAceyDeuceyBothPayOnThree(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 0
+		terminal["chipsOnTable"] = 6
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		terminal["propBets"]["Horn High 11"] = 5
+		terminal["propBets"]["Acey Deucey"] = 1
+		terminal["die1"] = 2
+		terminal["die2"] = 1
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["propPay"](3)
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Horn"], 4)
+		self.assertEqual(terminal["propBets"]["Eleven"], 0)
+		self.assertEqual(terminal["propBets"]["Acey Deucey"], 0)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 0)
+		self.assertEqual(terminal["bank"], 28)
+		self.assertEqual(terminal["chipsOnTable"], 4)
+		self.assertIn("Horn High Yo resolved into Horn and Eleven for settlement.", printed)
+		self.assertIn("You won $12 on the Horn bet!", printed)
+		self.assertIn("If it pays it stays! Horn bets are still up.", printed)
+		self.assertIn("You won $15 on the Acey Deucey bet!", printed)
 
 	def testCalculateHalfPressIncrementSixFromEighteen(self):
 		self.assertEqual(calculateHalfPressIncrement(number=6, currentWager=18), 6)

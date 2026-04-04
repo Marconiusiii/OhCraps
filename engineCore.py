@@ -186,6 +186,10 @@ PROP_BET_KEYS = [
 	"Any Seven",
 	"C and E",
 	"Horn",
+	"Horn High 2",
+	"Horn High 3",
+	"Horn High 11",
+	"Horn High 12",
 	"World",
 	"Buffalo",
 	"Hi Low",
@@ -220,7 +224,7 @@ def getPropKeyMatrix() -> dict:
 	matrix = {}
 	for key in PROP_BET_KEYS:
 		matrix[key] = "engineSettled"
-	for key in ["World", "Hi Low"]:
+	for key in ["Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12", "World", "Hi Low"]:
 		matrix[key] = "entryAlias"
 	return matrix
 
@@ -246,6 +250,24 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 		updatedPropBets["Boxcars"] = int(updatedPropBets.get("Boxcars", 0)) + boxcarsPart
 		updatedPropBets["Hi Low"] = 0
 		messages.append("Hi Low resolved into Snake Eyes and Boxcars for settlement.")
+
+	hornHighMap = {
+		"Horn High 2": ("Snake Eyes", "Horn High Deuce"),
+		"Horn High 3": ("Acey Deucey", "Horn High Ace-Deuce"),
+		"Horn High 11": ("Eleven", "Horn High Yo"),
+		"Horn High 12": ("Boxcars", "Horn High 12")
+	}
+	for key, hornHighInfo in hornHighMap.items():
+		hornHighBet = int(updatedPropBets.get(key, 0))
+		if hornHighBet <= 0:
+			continue
+		highKey, label = hornHighInfo
+		baseHornPart = hornHighBet//5 * 4
+		highPart = hornHighBet//5
+		updatedPropBets["Horn"] = int(updatedPropBets.get("Horn", 0)) + baseHornPart
+		updatedPropBets[highKey] = int(updatedPropBets.get(highKey, 0)) + highPart
+		updatedPropBets[key] = 0
+		messages.append(f"{label} resolved into Horn and {highKey} for settlement.")
 
 	return PropAliasResolution(
 		propBets=updatedPropBets,

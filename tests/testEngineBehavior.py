@@ -4391,7 +4391,8 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["propBets"]["Hop 4 Easy"], 20)
 		self.assertEqual(terminal["bank"], 80)
 		self.assertEqual(terminal["chipsOnTable"], 20)
-		self.assertIn("How much to Hop the 4 Easies? Must be a multiple of 2.", printed)
+		self.assertIn("How much to Hop the 4 Easies?", printed)
+		self.assertNotIn("multiple of 2", printed)
 		self.assertIn("Ok, $20 hopping the 4 Easies.", printed)
 
 	def testPropBettingAcceptsHop10EasyCode(self):
@@ -4408,8 +4409,43 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["propBets"]["Hop 10 Easy"], 20)
 		self.assertEqual(terminal["bank"], 80)
 		self.assertEqual(terminal["chipsOnTable"], 20)
-		self.assertIn("How much to Hop the 10 Easies? Must be a multiple of 2.", printed)
+		self.assertIn("How much to Hop the 10 Easies?", printed)
+		self.assertNotIn("multiple of 2", printed)
 		self.assertIn("Ok, $20 hopping the 10 Easies.", printed)
+
+	def testPropBettingAcceptsOneDollarHop4Easy(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["h4e", "1", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Hop 4 Easy"], 1)
+		self.assertEqual(terminal["bank"], 99)
+		self.assertEqual(terminal["chipsOnTable"], 1)
+		self.assertIn("How much to Hop the 4 Easies?", printed)
+		self.assertIn("Ok, $1 hopping the 4 Easies.", printed)
+
+	def testPropBettingAcceptsOneDollarHop10Easy(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["h10e", "1", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Hop 10 Easy"], 1)
+		self.assertEqual(terminal["bank"], 99)
+		self.assertEqual(terminal["chipsOnTable"], 1)
+		self.assertIn("How much to Hop the 10 Easies?", printed)
+		self.assertIn("Ok, $1 hopping the 10 Easies.", printed)
 
 	def testPropPayUsesWriteOutputAdapter(self):
 		terminal = loadTerminalNamespace()

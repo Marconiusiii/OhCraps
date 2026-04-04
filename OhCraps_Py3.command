@@ -2243,16 +2243,10 @@ def propBetting():
 			writeOutput(f"Ok, ${propBets['Hop 4']:,} hopping the 4s.")
 			continue
 		elif bet == 'h4e':
-			writeOutput("How much to Hop the 4 Easies? Must be a multiple of 2.")
-			while True:
-				bank += propBets["Hop 4 Easy"]
-				chipsOnTable -= propBets["Hop 4 Easy"]
-				propBets["Hop 4 Easy"] = betPrompt()
-				if propBets["Hop 4 Easy"]%2 == 0:
-					break
-				else:
-					writeOutput("That's not a multiple of 2! Can't you math?")
-					continue
+			writeOutput("How much to Hop the 4 Easies?")
+			bank += propBets["Hop 4 Easy"]
+			chipsOnTable -= propBets["Hop 4 Easy"]
+			propBets["Hop 4 Easy"] = betPrompt()
 			writeOutput(f"Ok, ${propBets['Hop 4 Easy']:,} hopping the 4 Easies.")
 			continue
 		elif bet == 'h10':
@@ -2269,16 +2263,10 @@ def propBetting():
 			writeOutput(f"Ok, ${propBets['Hop 10']:,} hopping the 10s.")
 			continue
 		elif bet == 'h10e':
-			writeOutput("How much to Hop the 10 Easies? Must be a multiple of 2.")
-			while True:
-				bank += propBets["Hop 10 Easy"]
-				chipsOnTable -= propBets["Hop 10 Easy"]
-				propBets["Hop 10 Easy"] = betPrompt()
-				if propBets["Hop 10 Easy"]%2 == 0:
-					break
-				else:
-					writeOutput("That's not a multiple of 2! Can't you math?")
-					continue
+			writeOutput("How much to Hop the 10 Easies?")
+			bank += propBets["Hop 10 Easy"]
+			chipsOnTable -= propBets["Hop 10 Easy"]
+			propBets["Hop 10 Easy"] = betPrompt()
 			writeOutput(f"Ok, ${propBets['Hop 10 Easy']:,} hopping the 10 Easies.")
 			continue
 		elif bet == 'h5':

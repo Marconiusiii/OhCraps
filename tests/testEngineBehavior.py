@@ -3,7 +3,7 @@ from pathlib import Path
 import py_compile
 from unittest.mock import patch
 
-from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import GameState, RollOutcome, evaluateRoll, settleLineBets, settleLineBetsForMode, settleOddsBets, settlePlaceBets, settlePlaceBetsForMode, settleLayBets, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, comeOddsWinForMode, dComeOddsWinForMode, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, getHornFamilyKeys, resolvePropAliases, PROP_BET_KEYS, calculateHalfPressIncrement, createGameState, syncGameState, GameMode, parseGameModeChoice, getRulesProfile
 
 
 def loadTerminalNamespace():
@@ -807,26 +807,24 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(settlement.chipsOnTableDelta, -40)
 		self.assertEqual(settlement.propBets["Horn"], 0)
 
-	def testResolvePropAliasesConvertsHornHighYoWithoutOverwritingStraightBet(self):
+	def testSettlePropSubsetHornHighYoWinsOnTwoAndStaysUp(self):
 		propBets = createDefaultPropBets()
 		propBets["Horn High 11"] = 5
-		propBets["Acey Deucey"] = 1
-		resolution = resolvePropAliases(propBets=propBets)
-		self.assertEqual(resolution.propBets["Horn High 11"], 0)
-		self.assertEqual(resolution.propBets["Horn"], 4)
-		self.assertEqual(resolution.propBets["Eleven"], 1)
-		self.assertEqual(resolution.propBets["Acey Deucey"], 1)
-		self.assertEqual(resolution.messages, [])
+		settlement = settlePropSubsetBets(propBets=propBets, roll=2)
+		self.assertEqual(settlement.bankDelta, 26)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertEqual(settlement.propBets["Horn High 11"], 5)
+		self.assertIn("You won $26 on the Horn High Yo!", settlement.messages)
+		self.assertIn("If it pays it stays! Horn bets are still up.", settlement.messages)
 
-	def testResolvePropAliasesStacksHornHighTwelveWithExistingHorn(self):
+	def testSettlePropSubsetHornHighYoWinsHighSideAndStaysUp(self):
 		propBets = createDefaultPropBets()
-		propBets["Horn"] = 8
-		propBets["Horn High 12"] = 10
-		resolution = resolvePropAliases(propBets=propBets)
-		self.assertEqual(resolution.propBets["Horn"], 16)
-		self.assertEqual(resolution.propBets["Boxcars"], 2)
-		self.assertEqual(resolution.propBets["Horn High 12"], 0)
-		self.assertEqual(resolution.messages, [])
+		propBets["Horn High 11"] = 5
+		settlement = settlePropSubsetBets(propBets=propBets, roll=11)
+		self.assertEqual(settlement.bankDelta, 27)
+		self.assertEqual(settlement.chipsOnTableDelta, 0)
+		self.assertEqual(settlement.propBets["Horn High 11"], 5)
+		self.assertIn("You won $27 on the Horn High Yo!", settlement.messages)
 
 	def testSettleBuffaloBetWinsOnHardNumber(self):
 		propBets = {"Buffalo": 40}
@@ -1028,7 +1026,7 @@ class EvaluateRollTests(unittest.TestCase):
 		for key in propKeyMatrix:
 			self.assertIn(propKeyMatrix[key], ["engineSettled", "entryAlias"])
 		entryAliasKeys = [key for key, owner in propKeyMatrix.items() if owner == "entryAlias"]
-		self.assertEqual(set(entryAliasKeys), set(["Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12", "World", "Hi Low"]))
+		self.assertEqual(set(entryAliasKeys), set(["World", "Hi Low"]))
 
 	def testCreateDefaultPropBetsUsesCanonicalKeys(self):
 		propBets = createDefaultPropBets()
@@ -1048,6 +1046,9 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertEqual(resolution.propBets["Snake Eyes"], 10)
 		self.assertEqual(resolution.propBets["Boxcars"], 10)
 		self.assertEqual(resolution.messages, [])
+
+	def testGetHornFamilyKeysListsAllHornFamilyStorageKeys(self):
+		self.assertEqual(getHornFamilyKeys(), ["Horn", "Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12"])
 
 	def testPropBettingHornHighYoAndAceyDeuceyStayIndependent(self):
 		terminal = loadTerminalNamespace()
@@ -1078,13 +1079,13 @@ class EvaluateRollTests(unittest.TestCase):
 		terminal["writeOutput"] = lambda message: writes.append(str(message))
 		terminal["propPay"](3)
 		printed = " ".join(writes)
-		self.assertEqual(terminal["propBets"]["Horn"], 4)
+		self.assertEqual(terminal["propBets"]["Horn"], 0)
 		self.assertEqual(terminal["propBets"]["Eleven"], 0)
 		self.assertEqual(terminal["propBets"]["Acey Deucey"], 0)
-		self.assertEqual(terminal["propBets"]["Horn High 11"], 0)
-		self.assertEqual(terminal["bank"], 28)
-		self.assertEqual(terminal["chipsOnTable"], 4)
-		self.assertIn("You won $12 on the Horn bet!", printed)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 5)
+		self.assertEqual(terminal["bank"], 27)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+		self.assertIn("You won $11 on the Horn High Yo!", printed)
 		self.assertIn("If it pays it stays! Horn bets are still up.", printed)
 		self.assertIn("You won $15 on the Acey Deucey bet!", printed)
 
@@ -4447,6 +4448,66 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertIn("How much to Hop the 10 Easies?", printed)
 		self.assertIn("Ok, $1 hopping the 10 Easies.", printed)
 
+	def testPropBettingHornHighYoAndAceyDeuceyStayIndependent(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["hhy", "5", "ad", "1", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 5)
+		self.assertEqual(terminal["propBets"]["Acey Deucey"], 1)
+		self.assertEqual(terminal["propBets"]["Horn"], 0)
+		self.assertEqual(terminal["propBets"]["Eleven"], 0)
+		self.assertEqual(terminal["bank"], 94)
+		self.assertEqual(terminal["chipsOnTable"], 6)
+
+	def testPropBettingHornHighReplacesHorn(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		inputs = iter(["h", "4", "hhy", "5", "x"])
+		terminal["writeOutput"] = lambda message: None
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Horn"], 0)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 5)
+		self.assertEqual(terminal["bank"], 95)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+
+	def testPropBettingHornReplacesHornHigh(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		inputs = iter(["hhy", "5", "h", "4", "x"])
+		terminal["writeOutput"] = lambda message: None
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Horn"], 4)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 0)
+		self.assertEqual(terminal["bank"], 96)
+		self.assertEqual(terminal["chipsOnTable"], 4)
+
+	def testWorldReplacesExistingHornHighFamily(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		inputs = iter(["hhy", "5", "w", "10", "x"])
+		terminal["writeOutput"] = lambda message: None
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		self.assertEqual(terminal["propBets"]["Horn"], 8)
+		self.assertEqual(terminal["propBets"]["Any Seven"], 2)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 0)
+		self.assertEqual(terminal["bank"], 90)
+		self.assertEqual(terminal["chipsOnTable"], 10)
+
 	def testPropPayUsesWriteOutputAdapter(self):
 		terminal = loadTerminalNamespace()
 		terminal["bank"] = 0
@@ -4459,6 +4520,28 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		terminal["writeOutput"] = lambda message: writes.append(str(message))
 		terminal["propPay"](9)
 		self.assertTrue(len(writes) > 0)
+
+	def testPropPayHornHighYoAndAceyDeuceyBothPayOnThree(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 0
+		terminal["chipsOnTable"] = 6
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		terminal["propBets"]["Horn High 11"] = 5
+		terminal["propBets"]["Acey Deucey"] = 1
+		terminal["die1"] = 2
+		terminal["die2"] = 1
+		writes = []
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["propPay"](3)
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Horn"], 0)
+		self.assertEqual(terminal["propBets"]["Acey Deucey"], 0)
+		self.assertEqual(terminal["propBets"]["Horn High 11"], 5)
+		self.assertEqual(terminal["bank"], 27)
+		self.assertEqual(terminal["chipsOnTable"], 5)
+		self.assertIn("You won $11 on the Horn High Yo!", printed)
+		self.assertIn("If it pays it stays! Horn bets are still up.", printed)
+		self.assertIn("You won $15 on the Acey Deucey bet!", printed)
 
 	def testPlacePresetAcrossExcludePoint(self):
 		terminal = loadTerminalNamespace()

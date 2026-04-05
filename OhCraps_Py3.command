@@ -3,7 +3,7 @@
 import random
 import math
 import os
-from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
+from engineCore import settleLineBetsForMode, settleOddsBets, settlePlaceBetsForMode, settleLayBetsForMode, settleFieldBet, settleHardWays, settleComeTableBets, settleComeBarBet, settleDComeBarBet, maxPassOdds, maxComeOdds, maxComeOddsForMode, comeOddsUnitForMode, dComeOddsUnitForMode, isOddsBetUnitValid, maxLayOdds, oddsBetLimits, settlePropSubsetBets, settleBuffaloBet, settleHopBets, createDefaultPropBets, getPropKeyMatrix, getHornFamilyKeys, resolvePropAliases, calculateHalfPressIncrement, createGameState, syncGameState, GameState, RollOutcome, evaluateRoll, rollDice, GameMode, parseGameModeChoice, getRulesProfile
 
 #Version Number
 version = "7.0.0"
@@ -1999,6 +1999,16 @@ def fieldCheck(roll):
 
 propBets = createDefaultPropBets()
 
+def hornFamilyAmount():
+	total = 0
+	for key in getHornFamilyKeys():
+		total += propBets.get(key, 0)
+	return total
+
+def clearHornFamilyBets():
+	for key in getHornFamilyKeys():
+		propBets[key] = 0
+
 def propHelp():
 	writeOutput("Proposition Bet Codes:\n\t'a': Aces\n\t'ad': Acey-Deucey\n\t'ce': C and E\n\t'cr': Any Craps\n\t'seven': Any 7'\n\t'b': Boxcars\n\t'h4-h10': Hop bets\n\t'h4e, h6e, h8e, h10e': Hop 4, 6, 8, or 10 Easies\n\t'hez': Hop the Easies\n\t'hh': Hop the Hard Ways\n\t'hh4-hh10': Hop Hard 4, 6, 8, or 10\n\t'h': Horn Bet\n\t'hl': Hi-Low\n\t'wh': Whirl/World Bet\n\t'bf': Buffalo Bet\n\t'bf11': Buffalo Yo\n\t'all': Show all bets\n\t'help': Show this menu\n\t'x': Finish betting")
 
@@ -2056,15 +2066,17 @@ def propBetting():
 			continue
 		elif bet in ['h', 'horn']:
 			writeOutput("How much on the Horn Bet? Must be a multiple of 4.")
-			bank += propBets["Horn"]
-			chipsOnTable -= propBets["Horn"]
+			bank += hornFamilyAmount()
+			chipsOnTable -= hornFamilyAmount()
+			clearHornFamilyBets()
 			propBets["Horn"] = betPrompt()
 			writeOutput(f"Ok, ${propBets['Horn']:,} on the Horn Bet.")
 			continue
 		elif bet == 'hh2':
 			writeOutput("How much on the Horn High Deuce? Must be multiple of 5.")
-			bank += propBets["Horn High 2"]
-			chipsOnTable -= propBets["Horn High 2"]
+			bank += hornFamilyAmount()
+			chipsOnTable -= hornFamilyAmount()
+			clearHornFamilyBets()
 			while True:
 				hornHigh2 = betPrompt()
 				if hornHigh2%5 == 0:
@@ -2079,8 +2091,9 @@ def propBetting():
 			continue
 		elif bet == 'hh3':
 			writeOutput("How much on the Horn High Ace-Deuce? Must be a multiple of 5.")
-			bank += propBets["Horn High 3"]
-			chipsOnTable -= propBets["Horn High 3"]
+			bank += hornFamilyAmount()
+			chipsOnTable -= hornFamilyAmount()
+			clearHornFamilyBets()
 			while True:
 				hornHigh3 = betPrompt()
 				if hornHigh3%5 == 0:
@@ -2095,8 +2108,9 @@ def propBetting():
 			continue
 		elif bet in ['hhy', 'hh11']:
 			writeOutput("How much on the Horn High Yo? Must be a multiple of 5.")
-			bank += propBets["Horn High 11"]
-			chipsOnTable -= propBets["Horn High 11"]
+			bank += hornFamilyAmount()
+			chipsOnTable -= hornFamilyAmount()
+			clearHornFamilyBets()
 			while True:
 				hornHigh11 = betPrompt()
 				if hornHigh11%5 == 0:
@@ -2111,8 +2125,9 @@ def propBetting():
 			continue
 		elif bet in ['hh12', 'hhm', 'hhb']:
 			writeOutput("How much on the Horn High 12? Must be a multiple of 5.")
-			bank += propBets["Horn High 12"]
-			chipsOnTable -= propBets["Horn High 12"]
+			bank += hornFamilyAmount()
+			chipsOnTable -= hornFamilyAmount()
+			clearHornFamilyBets()
 			while True:
 				hornHigh12 = betPrompt()
 				if hornHigh12%5 == 0:
@@ -2141,8 +2156,9 @@ def propBetting():
 			continue
 		elif bet == 'w':
 			writeOutput("How much on the World bet? Must be a multiple of 5.")
-			bank += propBets["Any Seven"] + propBets["Horn"]
-			chipsOnTable -= propBets["Any Seven"] + propBets["Horn"]
+			bank += propBets["Any Seven"] + hornFamilyAmount()
+			chipsOnTable -= propBets["Any Seven"] + hornFamilyAmount()
+			clearHornFamilyBets()
 			while True:
 				chipsOnTable -= propBets["World"]
 				propBets["World"] = betPrompt()

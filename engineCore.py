@@ -220,11 +220,15 @@ def createDefaultPropBets() -> dict:
 	return defaultPropBets
 
 
+def getHornFamilyKeys() -> list[str]:
+	return ["Horn", "Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12"]
+
+
 def getPropKeyMatrix() -> dict:
 	matrix = {}
 	for key in PROP_BET_KEYS:
 		matrix[key] = "engineSettled"
-	for key in ["Horn High 2", "Horn High 3", "Horn High 11", "Horn High 12", "World", "Hi Low"]:
+	for key in ["World", "Hi Low"]:
 		matrix[key] = "entryAlias"
 	return matrix
 
@@ -247,23 +251,6 @@ def resolvePropAliases(propBets: dict) -> PropAliasResolution:
 		updatedPropBets["Snake Eyes"] = int(updatedPropBets.get("Snake Eyes", 0)) + snakeEyesPart
 		updatedPropBets["Boxcars"] = int(updatedPropBets.get("Boxcars", 0)) + boxcarsPart
 		updatedPropBets["Hi Low"] = 0
-
-	hornHighMap = {
-		"Horn High 2": ("Snake Eyes", "Horn High Deuce"),
-		"Horn High 3": ("Acey Deucey", "Horn High Ace-Deuce"),
-		"Horn High 11": ("Eleven", "Horn High Yo"),
-		"Horn High 12": ("Boxcars", "Horn High 12")
-	}
-	for key, hornHighInfo in hornHighMap.items():
-		hornHighBet = int(updatedPropBets.get(key, 0))
-		if hornHighBet <= 0:
-			continue
-		highKey, label = hornHighInfo
-		baseHornPart = hornHighBet//5 * 4
-		highPart = hornHighBet//5
-		updatedPropBets["Horn"] = int(updatedPropBets.get("Horn", 0)) + baseHornPart
-		updatedPropBets[highKey] = int(updatedPropBets.get(highKey, 0)) + highPart
-		updatedPropBets[key] = 0
 
 	return PropAliasResolution(
 		propBets=updatedPropBets,
@@ -1181,6 +1168,33 @@ def settlePropSubsetBets(propBets: dict, roll: int) -> PropSubsetSettlement:
 				updatedPropBets[key] = 0
 		else:
 			messages.append(f"You lost ${bet:,} from the {key}.")
+			chipsOnTableDelta -= bet
+			updatedPropBets[key] = 0
+
+	hornHighConfigs = {
+		"Horn High 2": {"highRoll": 2, "label": "Horn High Deuce"},
+		"Horn High 3": {"highRoll": 3, "label": "Horn High Ace-Deuce"},
+		"Horn High 11": {"highRoll": 11, "label": "Horn High Yo"},
+		"Horn High 12": {"highRoll": 12, "label": "Horn High Midnight"}
+	}
+	for key, config in hornHighConfigs.items():
+		bet = int(updatedPropBets.get(key, 0))
+		if bet <= 0:
+			continue
+		baseUnit = bet//5
+		if roll in [2, 3, 11, 12]:
+			if roll == config["highRoll"]:
+				winningUnit = baseUnit * 2
+			else:
+				winningUnit = baseUnit
+			losingUnits = bet - winningUnit
+			multiplier = 30 if roll in [2, 12] else 15
+			winAmount = (winningUnit * multiplier) - losingUnits
+			messages.append(f"You won ${winAmount:,} on the {config['label']}!")
+			messages.append("If it pays it stays! Horn bets are still up.")
+			bankDelta += winAmount
+		else:
+			messages.append(f"You lost ${bet:,} from the {config['label']}.")
 			chipsOnTableDelta -= bet
 			updatedPropBets[key] = 0
 

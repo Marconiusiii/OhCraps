@@ -264,7 +264,7 @@ These bets are all single-roll bets. If they do not come up on the very next rol
 
 Hop Bets are where you can bet that a specific number will appear on the next roll. Hopping the number places a unit on each of the outcomes possible for that number. For example, hopping the 6 places a bet on the dice rolling as 3 and 3, 4 and 2, or5 and 1 on the next roll. If one of those outcomes hits, you get paid for that but lose the other bets on the other outcomes for the number. Hard Way hop bets pay 30:1, while all the other bets pay 15:1. You will be prompted to make a correct bet amount for the specific number you bet on. There are 3 ways to make a 6, so any Hop 6 bets must be made in multiples of 3, and so on.
 
-The Hop the Easies bet, or 'hez' as the bet code, places a single unit on all 15 easy way outcomes for the dice.
+The Hop the Easies bet, or 'hez' as the bet code, places a single unit on all 10 easy way outcomes for the dice.
 
 The Hop the Hard Ways bets allows you to bet on all the Hard outcomes at once, or on any of the values that have equal dice amounts, so 2, 4, 6, 8, 10, and 12. The 'hh' code allows you to bet on all of these numbers at once with a bet that is a multiple of 6, and while Snake Eyes is the "Hard Way" bet for 2 and Boxcars is for 12, the 4, 6, 8. and 10 can be individually hopped with 'hh4', 'hh6', 'hh8', and 'hh10' respectively.
 

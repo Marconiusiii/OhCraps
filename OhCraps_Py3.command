@@ -2377,15 +2377,15 @@ def propBetting():
 			writeOutput(f"Ok, ${propBets['Hop 8 Easy']:,} hopping the 8 Easies.")
 			continue
 		elif bet == 'hez':
-			writeOutput("How much to Hop the Easies? Must be a multiple of 15.")
+			writeOutput("How much to Hop the Easies? Must be a multiple of 10.")
 			while True:
 				bank += propBets["Hop EZ"]
 				chipsOnTable -= propBets["Hop EZ"]
 				propBets["Hop EZ"] = betPrompt()
-				if propBets["Hop EZ"]%15 == 0:
+				if propBets["Hop EZ"]%10 == 0:
 					break
 				else:
-					writeOutput("That's not a multiple of 15! Can't you math?")
+					writeOutput("That's not a multiple of 10! Can't you math?")
 					continue
 			writeOutput(f"Ok, ${propBets['Hop EZ']:,} hopping the Easies.")
 			continue

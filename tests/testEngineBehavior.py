@@ -1004,21 +1004,21 @@ class EvaluateRollTests(unittest.TestCase):
 		self.assertIn("You lost $10 from the Hop Hard 8.", settlement.messages)
 
 	def testSettleHopBetsHopEZLosesOnHardRoll(self):
-		propBets = {"Hop EZ": 15}
+		propBets = {"Hop EZ": 10}
 		settlement = settleHopBets(propBets=propBets, roll=6, die1=3, die2=3)
 		self.assertEqual(settlement.bankDelta, 0)
-		self.assertEqual(settlement.chipsOnTableDelta, -15)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
 		self.assertEqual(settlement.propBets["Hop EZ"], 0)
-		self.assertIn("You lost $15 from the Hop EZ.", settlement.messages)
+		self.assertIn("You lost $10 from the Hop EZ.", settlement.messages)
 
 	def testSettleHopBetsHopEZWinsOnEasyRoll(self):
-		propBets = {"Hop EZ": 15}
+		propBets = {"Hop EZ": 10}
 		settlement = settleHopBets(propBets=propBets, roll=6, die1=4, die2=2)
 		self.assertEqual(settlement.bankDelta, 16)
-		self.assertEqual(settlement.chipsOnTableDelta, -15)
-		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 1)
+		self.assertEqual(settlement.chipsOnTableDelta, -10)
+		self.assertEqual(settlement.bankDelta + settlement.chipsOnTableDelta, 6)
 		self.assertEqual(settlement.propBets["Hop EZ"], 0)
-		self.assertIn("You won $1 on the Hop EZ bet!", settlement.messages)
+		self.assertIn("You won $6 on the Hop EZ bet!", settlement.messages)
 
 	def testPropKeyMatrixAccountsForEveryConfiguredPropKey(self):
 		propKeyMatrix = getPropKeyMatrix()
@@ -4447,6 +4447,24 @@ class TerminalFlowRegressionTests(unittest.TestCase):
 		self.assertEqual(terminal["chipsOnTable"], 1)
 		self.assertIn("How much on the Hop 10 Easy?", printed)
 		self.assertIn("Ok, $1 on the Hop 10 Easy.", printed)
+
+	def testPropBettingHopEZUsesMultipleOfTen(self):
+		terminal = loadTerminalNamespace()
+		terminal["bank"] = 100
+		terminal["chipsOnTable"] = 0
+		terminal["propBets"] = terminal["createDefaultPropBets"]()
+		writes = []
+		inputs = iter(["hez", "15", "20", "x"])
+		terminal["writeOutput"] = lambda message: writes.append(str(message))
+		terminal["readInput"] = lambda promptText: next(inputs)
+		terminal["propBetting"]()
+		printed = " ".join(writes)
+		self.assertEqual(terminal["propBets"]["Hop EZ"], 20)
+		self.assertEqual(terminal["bank"], 80)
+		self.assertEqual(terminal["chipsOnTable"], 20)
+		self.assertIn("How much to Hop the Easies? Must be a multiple of 10.", printed)
+		self.assertIn("That's not a multiple of 10! Can't you math?", printed)
+		self.assertIn("Ok, $20 hopping the Easies.", printed)
 
 	def testPropBettingHornHighYoAndAceyDeuceyStayIndependent(self):
 		terminal = loadTerminalNamespace()
